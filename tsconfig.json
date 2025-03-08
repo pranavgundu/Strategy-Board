@@ -2,11 +2,12 @@
     "compilerOptions": {
         "target": "ES2022",
         "useDefineForClassFields": true,
-        "module": "ESNext",
+        "module": "ES2022",
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "skipLibCheck": true,
         "allowImportingTsExtensions": true,
-        "noEmit": true ,
+        "noEmit": true,
+        "moduleResolution": "bundler",
 
         "strict": true,
         "noUnusedLocals": true,

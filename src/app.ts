@@ -1,4 +1,7 @@
 import { View } from "@/view.ts";
 import { Model } from "@/model.ts";
 
-new View(new Model());
+const model = new Model();
+await model.loadPersistentData();
+
+const ui = new View(model);

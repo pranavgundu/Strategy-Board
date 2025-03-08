@@ -4,9 +4,10 @@ const get = document.getElementById.bind(document);
 
 // buttons
 const B = {
-    NewMatch: get("home-toolbar-new-btn"),
-    CreateMatch: get("create-match-create-btn"),
-    CancelCreate: get("create-match-cancel-btn"),
+    NewMatch: <HTMLElement>get("home-toolbar-new-btn"),
+    Clear: <HTMLElement>get("home-toolbar-clear-btn"),
+    CreateMatch: <HTMLElement>get("create-match-create-btn"),
+    CancelCreate: <HTMLElement>get("create-match-cancel-btn"),
 }
 
 // inputs
@@ -22,10 +23,10 @@ const I = {
 
 // other elements
 const E = {
-    MatchList: get("home-match-list"),
-    CreateMatchPanel: get("create-match-container"),
-    EmptyMatchListPlaceholder: get("home-match-list-empty-placeholder"),
-    MatchListItemTemplate: get("home-match-list-item-template"),
+    MatchList: <HTMLElement>get("home-match-list"),
+    CreateMatchPanel: <HTMLElement>get("create-match-container"),
+    EmptyMatchListPlaceholder: <HTMLElement>get("home-match-list-empty-placeholder"),
+    MatchListItemTemplate: <HTMLElement>get("home-match-list-item-template"),
 };
 
 export class View {
@@ -34,9 +35,14 @@ export class View {
     constructor (model: Model) {
         this.model = model;
 
-        B.NewMatch?.addEventListener("click", e => this.onClickNewMatch(e));
-        B.CreateMatch?.addEventListener("click", e => this.onClickCreateMatch(e));
-        B.CancelCreate?.addEventListener("click", e => this.onClickCancelCreateMatch(e));
+        for (let match of this.model.matches) {
+            this.createNewMatch(match.id, match.matchName, match.redOne, match.redTwo, match.redThree, match.blueOne, match.blueTwo, match.blueThree);
+        }
+
+        B.NewMatch.addEventListener("click", e => this.onClickNewMatch(e));
+        B.CreateMatch.addEventListener("click", e => this.onClickCreateMatch(e));
+        B.CancelCreate.addEventListener("click", e => this.onClickCancelCreateMatch(e));
+        B.Clear.addEventListener("click", e => this.onClickClear(e));
     }
 
     private show (e: HTMLElement | null) {
@@ -62,14 +68,13 @@ export class View {
         I.BlueThree.value = "";
     }
 
-    public createNewMatch (
-        matchName: string, redOne: String, redTwo: String, redThree: String, blueOne: String, blueTwo: String, blueThree: String
+    public async createNewMatch (
+        id: string, matchName: string, redOne: string, redTwo: string, redThree: string, blueOne: string, blueTwo: string, blueThree: string
     ) {
         this.hide(E.EmptyMatchListPlaceholder);
-        const item = E.MatchListItemTemplate?.cloneNode(true) as HTMLElement;
+        const item = E.MatchListItemTemplate.cloneNode(true) as HTMLElement;
         if (item == null) return;
 
-        const id = this.model.createNewMatch(matchName, redOne, redTwo, redThree, blueOne, blueTwo, blueThree);
         item.id = id;
 
         if (matchName === "") matchName = "Untitled";
@@ -80,16 +85,16 @@ export class View {
         if (blueTwo === "") blueTwo = "---";
         if (blueThree === "") blueThree = "---";
 
-        item.childNodes[1]!.textContent = matchName;
-        item.childNodes[3].childNodes[1].textContent = `${redOne} ${redTwo} ${redThree}`;
-        item.childNodes[3].childNodes[5].textContent = `${blueOne} ${blueTwo} ${blueThree}`;
+        item.children[0].textContent = matchName;
+        item.children[1].children[0].textContent = `${redOne} ${redTwo} ${redThree}`;
+        item.children[1].children[2].textContent = `${blueOne} ${blueTwo} ${blueThree}`;
 
         item.setAttribute("tabindex", "0");
 
-        let kebab = item.childNodes[5].childNodes[1] as HTMLElement;
-        let options = item.childNodes[5].childNodes[3] as HTMLElement;
-        let exportOption = options.childNodes[1] as HTMLElement;
-        let deleteOption = options.childNodes[3] as HTMLElement;
+        let kebab = item.children[2].children[0] as HTMLElement;
+        let options = item.children[2].children[1] as HTMLElement;
+        let exportOption = options.children[0] as HTMLElement;
+        let deleteOption = options.children[1] as HTMLElement;
 
         kebab.addEventListener("click", e => {
             this.hide(kebab);
@@ -109,14 +114,15 @@ export class View {
         });
         
         this.show(item);
-        E.MatchList?.prepend(item);
+        E.MatchList.prepend(item);
     }
 
-    public deleteMatch (id: string) {
+    public async deleteMatch (id: string) {
         const item = get(id);
         if (item === null) return;
-
-        E.MatchList?.removeChild(item);
+        
+        await this.model.deleteMatch(id);
+        E.MatchList.removeChild(item);
     }
 
     private onClickNewMatch (e: Event) {
@@ -127,8 +133,17 @@ export class View {
         this.hideCreateMatchPanel();
     }
 
-    private onClickCreateMatch (e: Event) {
-        this.createNewMatch(I.MatchName.value, I.RedOne.value, I.RedTwo.value, I.RedThree.value, I.BlueOne.value, I.BlueTwo.value, I.BlueThree.value);
+    private async onClickCreateMatch (e: Event) {
+        const id = await this.model.createNewMatch(I.MatchName.value, I.RedOne.value, I.RedTwo.value, I.RedThree.value, I.BlueOne.value, I.BlueTwo.value, I.BlueThree.value);
+        this.createNewMatch(id, I.MatchName.value, I.RedOne.value, I.RedTwo.value, I.RedThree.value, I.BlueOne.value, I.BlueTwo.value, I.BlueThree.value);
         this.hideCreateMatchPanel();
+    }
+
+    private async onClickClear (e: Event) {
+        console.log(E.MatchList.children);
+        while(E.MatchList.children.length > 0) {
+            E.MatchList.removeChild(<Node>E.MatchList.lastChild);
+        }
+        this.model.clear();
     }
 }
