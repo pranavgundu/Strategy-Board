@@ -5,6 +5,8 @@
         "module": "ESNext",
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "skipLibCheck": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true ,
 
         "strict": true,
         "noUnusedLocals": true,

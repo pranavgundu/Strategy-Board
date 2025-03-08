@@ -1,7 +1,59 @@
 <!DOCTYPE html>
 <html>
-    <head></head>
+    <head>
+        <style>
+            @import "tailwindcss";
+        </style>
+    </head>
     <body>
+        <div id="home-container" class="flex flex-col w-screen h-screen">
+            <div id="home-toolbar" class="flex items-center justify-between w-full h-24 bg-slate-600">
+                <div id="home-toolbar-logo" class="ml-12 text-3xl font-extrabold text-white select-none">StrategyBoard</div>
+                <div class="flex mr-12 text-2xl text-sky-200">
+                    <button id="home-toolbar-new-btn" class="flex items-center justify-center mr-4 font-mono w-36 h-12 rounded-full bg-blue-500">New</button>
+                    <button id="home-toolbar-import-btn" class="flex items-center justify-center font-mono w-36 h-12 rounded-full bg-blue-500">Import QR</button>
+                </div>
+            </div>
+            <div id="home-match-list" class="w-full p-6 flex-1 flex flex-col gap-2 items-center overflow-y-auto bg-slate-800">
+                <div id="home-match-list-empty-placeholder" class="absolute top-1/2 text-slate-300 text-xl italic">Click New to add matches</div>
+                <div id="home-match-list-item-template" class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center">
+                    <div class="ml-12 grow-1 basis-0 text-slate-200 font-bold text-2xl select-none">Match Name</div>
+                    <div class="w-1/2 flex justify-center items-center">
+                        <div class="w-1/2 text-red-400 text-2xl text-right select-none">000 000 000</div>
+                        <div class="text-slate-200 text-2xl mx-6 select-none">VS</div>
+                        <div class="w-1/2 text-blue-400 text-2xl select-none">000 000 000</div>
+                    </div>
+                    <div class="mr-12 grow-1 basis-0 flex h-full justify-end">
+                        <button class="flex flex-col w-6 gap-1 items-center justify-center">
+                            <div class="w-2 h-2 rounded-full bg-white"></div>
+                            <div class="w-2 h-2 rounded-full bg-white"></div>
+                            <div class="w-2 h-2 rounded-full bg-white"></div>
+                        </button>
+                        <div class="hidden flex items-center justify-center">
+                            <button class="w-24 p-1 mr-2 text-xl text-slate-300 bg-sky-600 rounded-xl">Export</button>
+                            <button class="w-24 p-1 text-xl text-slate-300 bg-red-700 rounded-xl">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="create-match-container" class="hidden absolute top-0 left-0 w-screen h-screen backdrop-blur-xs">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 h-1/2 bg-slate-600 rounded-xl">
+                <input id="create-match-name" placeholder="Match Name" class="w-full pt-6 pb-6 text-3xl text-center text-slate-300 font-bold rounded-t-xl bg-slate-500 outline-0">
+                <div class="grid grid-cols-3 w-full p-6">
+                    <input id="create-match-red-1" placeholder="Red 1" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0">
+                    <input id="create-match-red-2" placeholder="Red 2" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0">
+                    <input id="create-match-red-3" placeholder="Red 3" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0">
+                    <input id="create-match-blue-1" placeholder="Blue 1" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0">
+                    <input id="create-match-blue-2" placeholder="Blue 2" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0">
+                    <input id="create-match-blue-3" placeholder="Blue 3" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0">
+                </div>
+                <div class="flex w-full">
+                    <button id="create-match-create-btn" class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-xl">Create</button>
+                    <button id="create-match-cancel-btn" class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-xl">Cancel</button>
+                </div>
+            </div>
+        </div>
         <script type="module" src="./src/app.ts"></script>
     </body>
 </html>
