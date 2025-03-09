@@ -196,12 +196,13 @@ export class Whiteboard {
         const data = this.getData();
 
         if (data === null || this.match === null) return;
-        
+
+        DR.clearRect(0, 0, width, height);
         for (let stroke of data.drawing) {
             DR.beginPath();
-            DR.moveTo(stroke[0][0], stroke[0][1]);
+            DR.moveTo(stroke[0][0] - (this.camera.x - width / 2 ), stroke[0][1] - (this.camera.y - height / 2));
             for (let point of stroke) {
-                DR.lineTo(point[0], point[1]);
+                DR.lineTo(point[0] - (this.camera.x - width / 2), point[1] - (this.camera.y - height / 2));
             }
             DR.stroke();
         }
@@ -210,6 +211,7 @@ export class Whiteboard {
     private redrawAll () {
         this.drawBackground();
         this.drawRobots();
+        this.redrawDrawing();
     }
 
     private isRobotAtPoint (robot: any, x: number, y: number) {
@@ -266,7 +268,7 @@ export class Whiteboard {
         if(this.selected == null && this.isPointerDown) {
             if (Math.hypot(x - this.currentStrokePoints[this.currentStrokePoints.length - 1][0], y - this.currentStrokePoints[this.currentStrokePoints.length - 1][1]) < 10) return;
             this.currentStrokePoints.push([x, y]);
-            DR.lineTo(x, y);
+            DR.lineTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
             DR.stroke();
         }
     }
@@ -283,7 +285,7 @@ export class Whiteboard {
             DR.lineWidth = 10;
             DR.lineCap = "round";
             DR.lineJoin = "round";
-            DR.moveTo(x, y);
+            DR.moveTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
             this.currentStrokePoints.push([x, y]);
         }
     }
