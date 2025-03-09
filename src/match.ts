@@ -24,6 +24,36 @@ export class Match {
 
     public readonly id: string;
 
+    public auton: any = {
+        redOneRobot: { x: 2055, y: 505, w: 152.4, h: 152.4, r: 0 },
+        redTwoRobot: { x: 2055, y: 805, w: 152.4, h: 152.4, r: 0 },
+        redThreeRobot: { x: 2055, y: 1105, w: 152.4, h: 152.4, r: 0 },
+        blueOneRobot: { x: 1455, y: 505, w: 152.4, h: 152.4, r: 0 },
+        blueTwoRobot: { x: 1455, y: 805, w: 152.4, h: 152.4, r: 0 },
+        blueThreeRobot: { x: 1455, y: 1105, w: 152.4, h: 152.4, r: 0 },
+        drawing: []
+    }
+
+    public teleop: any = {
+        redOneRobot: { x: 2055, y: 505, w: 152.4, h: 152.4, r: 0 },
+        redTwoRobot: { x: 2055, y: 805, w: 152.4, h: 152.4, r: 0 },
+        redThreeRobot: { x: 2055, y: 1105, w: 152.4, h: 152.4, r: 0 },
+        blueOneRobot: { x: 1455, y: 505, w: 152.4, h: 152.4, r: 0 },
+        blueTwoRobot: { x: 1455, y: 805, w: 152.4, h: 152.4, r: 0 },
+        blueThreeRobot: { x: 1455, y: 1105, w: 152.4, h: 152.4, r: 0 },
+        drawing: []
+    }
+
+    public endgame: any = {
+        redOneRobot: { x: 2055, y: 505, w: 152.4, h: 152.4, r: 0 },
+        redTwoRobot: { x: 2055, y: 805, w: 152.4, h: 152.4, r: 0 },
+        redThreeRobot: { x: 2055, y: 1105, w: 152.4, h: 152.4, r: 0 },
+        blueOneRobot: { x: 1455, y: 505, w: 152.4, h: 152.4, r: 0 },
+        blueTwoRobot: { x: 1455, y: 805, w: 152.4, h: 152.4, r: 0 },
+        blueThreeRobot: { x: 1455, y: 1105, w: 152.4, h: 152.4, r: 0 },
+        drawing: []
+    }
+
     constructor (
         matchName: string,
         redOne: string,

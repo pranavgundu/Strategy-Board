@@ -44,6 +44,12 @@ export class Model {
         DEL(id);
     }
 
+    public getMatch(id: string) {
+        const index = this.matches.findIndex(e => e.id === id);
+        if (index === -1) return null;
+        return this.matches[index];
+    }
+
     public async clear() {
         this.matches = [];
         this.matchIds = [];

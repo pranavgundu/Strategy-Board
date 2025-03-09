@@ -1,4 +1,6 @@
 import { Model } from "@/model.ts";
+import { Whiteboard } from "@/whiteboard.ts";
+import { Match } from "@/match.ts";
 
 const get = document.getElementById.bind(document);
 
@@ -8,6 +10,8 @@ const B = {
     Clear: <HTMLElement>get("home-toolbar-clear-btn"),
     CreateMatch: <HTMLElement>get("create-match-create-btn"),
     CancelCreate: <HTMLElement>get("create-match-cancel-btn"),
+    Back: <HTMLElement>get("whiteboard-toolbar-back"),
+    ToggleView: <HTMLElement>get("whiteboard-toolbar-view-toggle"),
 }
 
 // inputs
@@ -23,6 +27,8 @@ const I = {
 
 // other elements
 const E = {
+    Home: <HTMLElement>get("home-container"),
+    Whiteboard: <HTMLElement>get("whiteboard-container"),
     MatchList: <HTMLElement>get("home-match-list"),
     CreateMatchPanel: <HTMLElement>get("create-match-container"),
     EmptyMatchListPlaceholder: <HTMLElement>get("home-match-list-empty-placeholder"),
@@ -31,9 +37,11 @@ const E = {
 
 export class View {
     private model: Model;
+    private whiteboard: Whiteboard;
 
-    constructor (model: Model) {
+    constructor (model: Model, whiteboard: Whiteboard) {
         this.model = model;
+        this.whiteboard = whiteboard;
 
         for (let match of this.model.matches) {
             this.createNewMatch(match.id, match.matchName, match.redOne, match.redTwo, match.redThree, match.blueOne, match.blueTwo, match.blueThree);
@@ -43,6 +51,8 @@ export class View {
         B.CreateMatch.addEventListener("click", e => this.onClickCreateMatch(e));
         B.CancelCreate.addEventListener("click", e => this.onClickCancelCreateMatch(e));
         B.Clear.addEventListener("click", e => this.onClickClear(e));
+        B.Back.addEventListener("click", e => this.onClickBack(e));
+        B.ToggleView.addEventListener("click", e => this.onClickToggleView(e));
     }
 
     private show (e: HTMLElement | null) {
@@ -66,6 +76,13 @@ export class View {
         I.BlueOne.value = "";
         I.BlueTwo.value = "";
         I.BlueThree.value = "";
+    }
+
+    private loadWhiteboard (match: Match) {
+        this.whiteboard.setMatch(match);
+        this.whiteboard.setActive(true);
+        this.show(E.Whiteboard);
+        this.hide(E.Home);
     }
 
     public async createNewMatch (
@@ -112,6 +129,13 @@ export class View {
         deleteOption.addEventListener("click", e => {
             this.deleteMatch(item.id);
         });
+
+        item.children[0].addEventListener("click", e => {
+            const match = this.model.getMatch(id)
+            if (match !== null) {
+                this.loadWhiteboard(match);
+            }
+        });
         
         this.show(item);
         E.MatchList.prepend(item);
@@ -140,10 +164,19 @@ export class View {
     }
 
     private async onClickClear (e: Event) {
-        console.log(E.MatchList.children);
+        if(!confirm("Are you sure you want to clear all data?")) return;
         while(E.MatchList.children.length > 0) {
             E.MatchList.removeChild(<Node>E.MatchList.lastChild);
         }
         this.model.clear();
+    }
+
+    private onClickBack (e: Event) {
+        this.show(E.Home);
+        this.hide(E.Whiteboard);
+    }
+
+    private onClickToggleView (e: Event) {
+        this.whiteboard.toggleView();
     }
 }
