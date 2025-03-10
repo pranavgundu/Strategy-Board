@@ -414,7 +414,13 @@ export class Whiteboard {
                 document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
             }
         } else {
-            document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
+            if (this.lastSelected != null) {
+                if (document.getElementById("whiteboard-robot-config")?.classList.contains("hidden")) {
+                    document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
+                } else {
+                    document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
+                }
+            }
         }
     }
 
@@ -484,6 +490,7 @@ export class Whiteboard {
             this.drawRobots();
             // document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
             // document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
+            clickMovement = 0;
             return;
         }
         this.lastSelected = this.selected;
