@@ -138,7 +138,6 @@ export class View {
             }
         }
         item.children[0].addEventListener("click", openMatch);
-        item.addEventListener("click", openMatch);
         
         this.show(item);
         E.MatchList.prepend(item);
