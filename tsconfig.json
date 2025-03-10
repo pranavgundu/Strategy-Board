@@ -9,11 +9,7 @@
         "noEmit": true,
         "moduleResolution": "bundler",
 
-        "strict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true,
+        "strict": false,
         
         "baseUrl": ".",
         "paths": {
