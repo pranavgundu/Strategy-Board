@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="theme-color" content="#000000">
         <style>
             @import "tailwindcss";
         </style>
     </head>
-    <body>
-        <div id="home-container" class="flex flex-col w-screen h-screen">
+    <body class="overflow-hidden">
+        <div id="home-container" class="flex flex-col w-dvw h-dvh touch-none">
             <div id="home-toolbar" class="flex items-center justify-between w-full h-24 bg-slate-600">
                 <div id="home-toolbar-logo" class="ml-12 text-3xl font-extrabold text-white select-none">StrategyBoard</div>
                 <div class="flex mr-12 text-2xl text-sky-200">
@@ -38,16 +42,16 @@
                 </div>
             </div>
         </div>
-        <div id="create-match-container" class="hidden absolute top-0 left-0 w-screen h-screen backdrop-blur-xs">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 h-1/2 bg-slate-600 rounded-xl">
-                <input id="create-match-name" placeholder="Match Name" class="w-full pt-6 pb-6 text-3xl text-center text-slate-300 font-bold rounded-t-xl bg-slate-500 outline-0">
-                <div class="grid grid-cols-3 w-full p-6">
-                    <input id="create-match-red-1" placeholder="Red 1" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0">
-                    <input id="create-match-red-2" placeholder="Red 2" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0">
-                    <input id="create-match-red-3" placeholder="Red 3" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0">
-                    <input id="create-match-blue-1" placeholder="Blue 1" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0">
-                    <input id="create-match-blue-2" placeholder="Blue 2" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0">
-                    <input id="create-match-blue-3" placeholder="Blue 3" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0">
+        <div id="create-match-container" class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 bg-slate-600 rounded-xl">
+                <input id="create-match-name" placeholder="Match Name" class="w-full pt-6 pb-6 text-3xl text-center text-slate-300 font-bold rounded-t-xl bg-slate-500 outline-0" autocomplete="off" autocapitalize="off" spellcheck="false">
+                <div class="grid grid-cols-3 w-full">
+                    <input type="number" id="create-match-red-1" placeholder="Red 1" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input type="number" id="create-match-red-2" placeholder="Red 2" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input type="number" id="create-match-red-3" placeholder="Red 3" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input type="number" id="create-match-blue-1" placeholder="Blue 1" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input type="number" id="create-match-blue-2" placeholder="Blue 2" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input type="number" id="create-match-blue-3" placeholder="Blue 3" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
                 </div>
                 <div class="flex w-full">
                     <button id="create-match-create-btn" class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-xl">Create</button>
@@ -55,33 +59,33 @@
                 </div>
             </div>
         </div>
-        <div id="whiteboard-container" class="hidden flex flex-col w-screen h-screen">
-            <div id="whiteboard-toolbar" class="flex items-center justify-between w-full h-24 bg-zinc-700" style="z-index: 999">
+        <div id="whiteboard-container" class="hidden flex flex-col w-dvw h-dvh touch-none">
+            <div id="whiteboard-toolbar" class="flex items-center justify-between w-full h-24 sm:h-12 bg-zinc-700" style="z-index: 999">
                 <div>
-                    <button id="whiteboard-toolbar-back" class="ml-12 text-3xl font-extrabold text-white">back</button>
-                    <button id="whiteboard-toolbar-undo" class="w-24 h-full ml-12 text-center text-3xl font-bold text-amber-700">undo</button>
+                    <button id="whiteboard-toolbar-back" class="ml-12 text-3xl font-extrabold text-white select-none touch-none">back</button>
+                    <button id="whiteboard-toolbar-undo" class="w-24 h-full ml-12 text-center text-3xl font-bold text-amber-700 select-none touch-none">undo</button>
                 </div>
                 <div id="whiteboard-toolbar-mode-select" class="flex justify-center items-center gap-6">
-                    <div id="whiteboard-toolbar-mode-auton" class="text-3xl text-zinc-100 font-extrabold select-none">AUTON</div>
-                    <div id="whiteboard-toolbar-mode-teleop" class="text-3xl text-zinc-300 select-none">TELEOP</div>
-                    <div id="whiteboard-toolbar-mode-endgame" class="text-3xl text-zinc-300 select-none">ENDGAME</div>
+                    <div id="whiteboard-toolbar-mode-auton" class="text-3xl text-zinc-100 font-extrabold select-none select-none touch-none">AUTON</div>
+                    <div id="whiteboard-toolbar-mode-teleop" class="text-3xl text-zinc-300 select-none select-none touch-none">TELEOP</div>
+                    <div id="whiteboard-toolbar-mode-endgame" class="text-3xl text-zinc-300 select-none select-none touch-none">ENDGAME</div>
                 </div>
-                <button id="whiteboard-toolbar-view-toggle" class="w-48 h-full mr-12 text-3xl font-bold text-zinc-300">Toggle View</button>
+                <button id="whiteboard-toolbar-view-toggle" class="w-48 h-full mr-12 text-3xl font-bold text-zinc-300 select-none touch-none">Toggle View</button>
             </div>
             <div id="whiteboard-wrapper" class="w-full h-full m-0 p-0 bg-zinc-900">
-                <canvas id="whiteboard-canvas-background" width=3510 height=1610 class="absolute m-0"></canvas>
-                <canvas id="whiteboard-canvas-items" width=3510 height=1610 class="absolute m-0"></canvas>
-                <canvas id="whiteboard-canvas-drawing" width=3510 height=1610 class="absolute m-0"></canvas>
+                <canvas id="whiteboard-canvas-background" width=3510 height=1610 class="absolute m-0 select-none touch-none"></canvas>
+                <canvas id="whiteboard-canvas-items" width=3510 height=1610 class="absolute m-0 select-none touch-none"></canvas>
+                <canvas id="whiteboard-canvas-drawing" width=3510 height=1610 class="absolute m-0 select-none touch-none"></canvas>
             </div>
-            <div id="whiteboard-robot-config" class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-20 right-0 bg-zinc-800 rounded-b-xl">
+            <div id="whiteboard-robot-config" class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-xl">
                 <div class="text-2xl text-zinc-400 font-bold mb-4 select-none">Robot Config (in.)</div>
                 <div class="flex w-full justify-center items-center">
-                    <input id="whiteboard-robot-config-width" placeholder="width" class="w-1/3 mr-4 text-3xl text-zinc-500 text-right outline-0">
+                    <input id="whiteboard-robot-config-width" placeholder="width" class="w-1/3 mr-4 text-3xl text-zinc-500 text-right outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
                     <div class="text-3xl text-zinc-700 text-center outline-0">x</div>
-                    <input id="whiteboard-robot-config-height" placeholder="length" class="w-1/3 ml-4 text-3xl text-zinc-500 text-left outline-0">
+                    <input id="whiteboard-robot-config-height" placeholder="length" class="w-1/3 ml-4 text-3xl text-zinc-500 text-left outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
                 </div>
             </div>
-            <div id="whiteboard-draw-config" class="hidden absolute flex flex-col justify-center items-center w-48 h-48 top-20 right-0 bg-zinc-800 rounded-b-xl">
+            <div id="whiteboard-draw-config" class="hidden absolute flex flex-col justify-center items-center w-48 h-48 top-12 right-0 bg-zinc-800 rounded-b-xl">
                 <div class="text-2xl text-zinc-400 font-bold mb-6 select-none">Draw Tools</div>
                 <div id="whiteboard-draw-config-marker" class="text-3xl text-zinc-300 text-center select-none">Marker</div>
                 <div id="whiteboard-draw-config-eraser" class="text-3xl text-zinc-500 text-center select-none">Eraser</div>

@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 export interface Packet {
     m: string,
     r1: string,
@@ -108,7 +110,7 @@ export class Match {
         this.blueTwo = blueTwo;
         this.blueThree = blueThree;
 
-        this.id = id ?? self.crypto.randomUUID();
+        this.id = id ?? uuidv4();
 
         if (options) {
             this.auton.drawing = options.a.d;

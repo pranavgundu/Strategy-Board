@@ -166,8 +166,7 @@ export class Whiteboard {
 
     public setMatch(match: Match) {
         this.match = match;
-        this.drawRobots();
-        this.redrawDrawing();
+        this.redrawAll();
     }
 
     public toggleView () {
@@ -250,7 +249,7 @@ export class Whiteboard {
     }
 
     private drawRobot (name: string, robot: any, team: string, slot: string) {
-        if (!name) return;
+        // if (!name) return;
 
         const isSelected = this.selected !== null && this.selected[0] == slot;
 
