@@ -12,5 +12,6 @@ export default defineConfig({
         alias: {
             "@": new URL("./src", import.meta.url).pathname
         }
-    }
+    },
+    base: "https://frcteam834.github.io/StrategyBoard2025/"
 });
