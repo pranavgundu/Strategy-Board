@@ -1,16 +1,51 @@
 export interface Packet {
-    id: string,
     m: string,
     r1: string,
     r2: string,
     r3: string,
     b1: string,
     b2: string,
-    b3: string
+    b3: string,
+    id: string,
+    o: Optional
 }
 
 interface Optional {
-    id: string
+    dim: {
+        r1: { w: number, h: number },
+        r2: { w: number, h: number },
+        r3: { w: number, h: number },
+        b1: { w: number, h: number },
+        b2: { w: number, h: number },
+        b3: { w: number, h: number },
+    },
+    a: {
+        r1: { x: number, y: number, r: number },
+        r2: { x: number, y: number, r: number },
+        r3: { x: number, y: number, r: number },
+        b1: { x: number, y: number, r: number },
+        b2: { x: number, y: number, r: number },
+        b3: { x: number, y: number, r: number },
+        d: Array<[x: number, y: number]>,
+    },
+    t: {
+        r1: { x: number, y: number, r: number },
+        r2: { x: number, y: number, r: number },
+        r3: { x: number, y: number, r: number },
+        b1: { x: number, y: number, r: number },
+        b2: { x: number, y: number, r: number },
+        b3: { x: number, y: number, r: number },
+        d: Array<[x: number, y: number]>,
+    },
+    e: {
+        r1: { x: number, y: number, r: number },
+        r2: { x: number, y: number, r: number },
+        r3: { x: number, y: number, r: number },
+        b1: { x: number, y: number, r: number },
+        b2: { x: number, y: number, r: number },
+        b3: { x: number, y: number, r: number },
+        d: Array<[x: number, y: number]>,
+    }
 }
 
 export class Match {
@@ -62,6 +97,7 @@ export class Match {
         blueOne: string,
         blueTwo: string,
         blueThree: string,
+        id?: string,
         options?: Optional
     ) {
         this.matchName = matchName;
@@ -72,7 +108,144 @@ export class Match {
         this.blueTwo = blueTwo;
         this.blueThree = blueThree;
 
-        this.id = options?.id ?? self.crypto.randomUUID();
+        this.id = id ?? self.crypto.randomUUID();
+
+        if (options) {
+            this.auton.drawing = options.a.d;
+            this.teleop.drawing = options.t.d;
+            this.endgame.drawing = options.e.d;
+
+            this.auton.redOneRobot = {
+                x: options.a.r1.x,
+                y: options.a.r1.y,
+                r: options.a.r1.r,
+                w: options.dim.r1.w,
+                h: options.dim.r1.h
+            };
+            this.auton.redTwoRobot = {
+                x: options.a.r2.x,
+                y: options.a.r2.y,
+                r: options.a.r2.r,
+                w: options.dim.r2.w,
+                h: options.dim.r2.h
+            };
+            this.auton.redThreeRobot = {
+                x: options.a.r3.x,
+                y: options.a.r3.y,
+                r: options.a.r3.r,
+                w: options.dim.r3.w,
+                h: options.dim.r3.h
+            };
+            this.auton.blueOneRobot = {
+                x: options.a.b1.x,
+                y: options.a.b1.y,
+                r: options.a.b1.r,
+                w: options.dim.b1.w,
+                h: options.dim.b1.h
+            };
+            this.auton.blueTwoRobot = {
+                x: options.a.b2.x,
+                y: options.a.b2.y,
+                r: options.a.b2.r,
+                w: options.dim.b2.w,
+                h: options.dim.b2.h
+            };
+            this.auton.blueThreeRobot = {
+                x: options.a.b3.x,
+                y: options.a.b3.y,
+                r: options.a.b3.r,
+                w: options.dim.b3.w,
+                h: options.dim.b3.h
+            };
+
+
+            this.teleop.redOneRobot = {
+                x: options.t.r1.x,
+                y: options.t.r1.y,
+                r: options.t.r1.r,
+                w: options.dim.r1.w,
+                h: options.dim.r1.h
+            };
+            this.teleop.redTwoRobot = {
+                x: options.t.r2.x,
+                y: options.t.r2.y,
+                r: options.t.r2.r,
+                w: options.dim.r2.w,
+                h: options.dim.r2.h
+            };
+            this.teleop.redThreeRobot = {
+                x: options.t.r3.x,
+                y: options.t.r3.y,
+                r: options.t.r3.r,
+                w: options.dim.r3.w,
+                h: options.dim.r3.h
+            };
+            this.teleop.blueOneRobot = {
+                x: options.t.b1.x,
+                y: options.t.b1.y,
+                r: options.t.b1.r,
+                w: options.dim.b1.w,
+                h: options.dim.b1.h
+            };
+            this.teleop.blueTwoRobot = {
+                x: options.t.b2.x,
+                y: options.t.b2.y,
+                r: options.t.b2.r,
+                w: options.dim.b2.w,
+                h: options.dim.b2.h
+            };
+            this.teleop.blueThreeRobot = {
+                x: options.t.b3.x,
+                y: options.t.b3.y,
+                r: options.t.b3.r,
+                w: options.dim.b3.w,
+                h: options.dim.b3.h
+            };
+
+
+            this.endgame.redOneRobot = {
+                x: options.e.r1.x,
+                y: options.e.r1.y,
+                r: options.e.r1.r,
+                w: options.dim.r1.w,
+                h: options.dim.r1.h
+            };
+            this.endgame.redTwoRobot = {
+                x: options.e.r2.x,
+                y: options.e.r2.y,
+                r: options.e.r2.r,
+                w: options.dim.r2.w,
+                h: options.dim.r2.h
+            };
+            this.endgame.redThreeRobot = {
+                x: options.e.r3.x,
+                y: options.e.r3.y,
+                r: options.e.r3.r,
+                w: options.dim.r3.w,
+                h: options.dim.r3.h
+            };
+            this.endgame.blueOneRobot = {
+                x: options.e.b1.x,
+                y: options.e.b1.y,
+                r: options.e.b1.r,
+                w: options.dim.b1.w,
+                h: options.dim.b1.h
+            };
+            this.endgame.blueTwoRobot = {
+                x: options.e.b2.x,
+                y: options.e.b2.y,
+                r: options.e.b2.r,
+                w: options.dim.b2.w,
+                h: options.dim.b2.h
+            };
+            this.endgame.blueThreeRobot = {
+                x: options.e.b3.x,
+                y: options.e.b3.y,
+                r: options.e.b3.r,
+                w: options.dim.b3.w,
+                h: options.dim.b3.h
+            };
+        }
     }
 
     static fromPacket (packet: Packet) {
@@ -84,22 +257,94 @@ export class Match {
             packet.b1,
             packet.b2,
             packet.b3,
+            packet.id,
             {
-                id: packet.id
+                dim: {
+                    r1: packet.o.dim.r1,
+                    r2: packet.o.dim.r2,
+                    r3: packet.o.dim.r3,
+                    b1: packet.o.dim.b1,
+                    b2: packet.o.dim.b2,
+                    b3: packet.o.dim.b3,
+                },
+                a: {
+                    r1: packet.o.a.r1,
+                    r2: packet.o.a.r2,
+                    r3: packet.o.a.r3,
+                    b1: packet.o.a.b1,
+                    b2: packet.o.a.b2,
+                    b3: packet.o.a.b3,
+                    d: packet.o.a.d
+                },
+                t: {
+                    r1: packet.o.t.r1,
+                    r2: packet.o.t.r2,
+                    r3: packet.o.t.r3,
+                    b1: packet.o.t.b1,
+                    b2: packet.o.t.b2,
+                    b3: packet.o.t.b3,
+                    d: packet.o.t.d
+                },
+                e: {
+                    r1: packet.o.e.r1,
+                    r2: packet.o.e.r2,
+                    r3: packet.o.e.r3,
+                    b1: packet.o.e.b1,
+                    b2: packet.o.e.b2,
+                    b3: packet.o.e.b3,
+                    d: packet.o.e.d
+                },
             }
         );
     }
 
     getAsPacket (): Packet {
         return {
-            id: this.id,
             m: this.matchName,
             r1: this.redOne,
             r2: this.redTwo,
             r3: this.redThree,
             b1: this.blueOne,
             b2: this.blueTwo,
-            b3: this.blueThree
+            b3: this.blueThree,
+            id: this.id,
+            o: {
+                dim: {
+                    r1: { w: this.auton.redOneRobot.w, h: this.auton.redOneRobot.h },
+                    r2: { w: this.auton.redTwoRobot.w, h: this.auton.redTwoRobot.h },
+                    r3: { w: this.auton.redThreeRobot.w, h: this.auton.redThreeRobot.h },
+                    b1: { w: this.auton.blueOneRobot.w, h: this.auton.blueOneRobot.h },
+                    b2: { w: this.auton.blueTwoRobot.w, h: this.auton.blueTwoRobot.h },
+                    b3: { w: this.auton.blueThreeRobot.w, h: this.auton.blueThreeRobot.h },
+                },
+                a: {
+                    r1: { x: this.auton.redOneRobot.x, y: this.auton.redOneRobot.y, r: this.auton.redOneRobot.r },
+                    r2: { x: this.auton.redTwoRobot.x, y: this.auton.redTwoRobot.y, r: this.auton.redTwoRobot.r },
+                    r3: { x: this.auton.redThreeRobot.x, y: this.auton.redThreeRobot.y, r: this.auton.redThreeRobot.r },
+                    b1: { x: this.auton.blueOneRobot.x, y: this.auton.blueOneRobot.y, r: this.auton.blueOneRobot.r },
+                    b2: { x: this.auton.blueTwoRobot.x, y: this.auton.blueTwoRobot.y, r: this.auton.blueTwoRobot.r },
+                    b3: { x: this.auton.blueThreeRobot.x, y: this.auton.blueThreeRobot.y, r: this.auton.blueThreeRobot.r },
+                    d: this.auton.drawing
+                },
+                t: {
+                    r1: { x: this.teleop.redOneRobot.x, y: this.teleop.redOneRobot.y, r: this.teleop.redOneRobot.r },
+                    r2: { x: this.teleop.redTwoRobot.x, y: this.teleop.redTwoRobot.y, r: this.teleop.redTwoRobot.r },
+                    r3: { x: this.teleop.redThreeRobot.x, y: this.teleop.redThreeRobot.y, r: this.teleop.redThreeRobot.r },
+                    b1: { x: this.teleop.blueOneRobot.x, y: this.teleop.blueOneRobot.y, r: this.teleop.blueOneRobot.r },
+                    b2: { x: this.teleop.blueTwoRobot.x, y: this.teleop.blueTwoRobot.y, r: this.teleop.blueTwoRobot.r },
+                    b3: { x: this.teleop.blueThreeRobot.x, y: this.teleop.blueThreeRobot.y, r: this.teleop.blueThreeRobot.r },
+                    d: this.teleop.drawing
+                },
+                e: {
+                    r1: { x: this.endgame.redOneRobot.x, y: this.endgame.redOneRobot.y, r: this.endgame.redOneRobot.r },
+                    r2: { x: this.endgame.redTwoRobot.x, y: this.endgame.redTwoRobot.y, r: this.endgame.redTwoRobot.r },
+                    r3: { x: this.endgame.redThreeRobot.x, y: this.endgame.redThreeRobot.y, r: this.endgame.redThreeRobot.r },
+                    b1: { x: this.endgame.blueOneRobot.x, y: this.endgame.blueOneRobot.y, r: this.endgame.blueOneRobot.r },
+                    b2: { x: this.endgame.blueTwoRobot.x, y: this.endgame.blueTwoRobot.y, r: this.endgame.blueTwoRobot.r },
+                    b3: { x: this.endgame.blueThreeRobot.x, y: this.endgame.blueThreeRobot.y, r: this.endgame.blueThreeRobot.r },
+                    d: this.endgame.drawing
+                },
+            }
         };
     }
 }

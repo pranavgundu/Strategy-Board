@@ -11,11 +11,13 @@ export class Model {
 
     public async loadPersistentData () {
         const matchIds: Array<string> = await GET("matchIds", e => {
-            alert("Could not load data from IndexedDB. IndexedDB might be disabled on this browser");
+            alert("Could not load data from IndexedDB. Data will not persist. This could be a permissions issue or code bug.");
         });
         if (matchIds === undefined) return;
 
-        const matches = await GETMANY(matchIds);
+        const matches = await GETMANY(matchIds, e => {
+            alert("Could not load data from IndexedDB. Data will not persist. This could be a permissions issue or code bug.");
+        });
         if (matches !== undefined) {
             for (let match of matches) {
                 this.matches.push(Match.fromPacket(match));
@@ -48,6 +50,13 @@ export class Model {
         const index = this.matches.findIndex(e => e.id === id);
         if (index === -1) return null;
         return this.matches[index];
+    }
+
+    public async updateMatch(id: string) {
+        const index = this.matches.findIndex(e => e.id === id);
+        if (index === -1) return;
+        const match = this.matches[index];
+        await SET(match.id, match.getAsPacket());
     }
 
     public async clear() {

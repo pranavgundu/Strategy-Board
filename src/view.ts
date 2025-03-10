@@ -1,5 +1,5 @@
 import { Model } from "@/model.ts";
-import { Whiteboard } from "@/whiteboard.ts";
+import { Whiteboard, updateCanvasSize } from "@/whiteboard.ts";
 import { Match } from "@/match.ts";
 
 const get = document.getElementById.bind(document);
@@ -83,6 +83,7 @@ export class View {
         this.whiteboard.setActive(true);
         this.show(E.Whiteboard);
         this.hide(E.Home);
+        updateCanvasSize();
     }
 
     public async createNewMatch (
@@ -130,12 +131,14 @@ export class View {
             this.deleteMatch(item.id);
         });
 
-        item.children[0].addEventListener("click", e => {
-            const match = this.model.getMatch(id)
+        const openMatch = (e: Event) => {
+            const match = this.model.getMatch(id);
             if (match !== null) {
                 this.loadWhiteboard(match);
             }
-        });
+        }
+        item.children[0].addEventListener("click", openMatch);
+        item.addEventListener("click", openMatch);
         
         this.show(item);
         E.MatchList.prepend(item);
@@ -147,6 +150,9 @@ export class View {
         
         await this.model.deleteMatch(id);
         E.MatchList.removeChild(item);
+        if (E.MatchList.children.length < 3) {
+            this.show(E.EmptyMatchListPlaceholder);
+        }
     }
 
     private onClickNewMatch (e: Event) {
@@ -165,13 +171,15 @@ export class View {
 
     private async onClickClear (e: Event) {
         if(!confirm("Are you sure you want to clear all data?")) return;
-        while(E.MatchList.children.length > 0) {
-            E.MatchList.removeChild(<Node>E.MatchList.lastChild);
+        while(E.MatchList.children.length > 2) {
+            E.MatchList.removeChild(<Node>E.MatchList.firstChild);
         }
         this.model.clear();
+        this.show(E.EmptyMatchListPlaceholder);
     }
 
     private onClickBack (e: Event) {
+        this.whiteboard.setActive(false);
         this.show(E.Home);
         this.hide(E.Whiteboard);
     }

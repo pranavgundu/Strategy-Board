@@ -20,7 +20,7 @@ let scaling = 1;
 const fieldImage = new Image();
 fieldImage.src = "../field25.png";
 
-function updateCanvasSize () {
+export function updateCanvasSize () {
     const wrapper = <HTMLElement>document.getElementById("whiteboard-wrapper");
 
     const fillWidth = wrapper.clientWidth;
@@ -41,7 +41,8 @@ function updateCanvasSize () {
 
 window.addEventListener("resize", updateCanvasSize);
 window.addEventListener("orientationchange", updateCanvasSize);
-updateCanvasSize();
+
+let clickMovement = 0;
 
 export class Whiteboard {
     private model;
@@ -55,9 +56,14 @@ export class Whiteboard {
     };
 
     private selected: any = null;
+    private selectedType: string = "";
+    private lastSelected: any = null;
+    private rotControl: { x: number, y: number } | null = null;
     private isPointerDown = false;
 
     private currentStrokePoints: Array<[number, number]> = [];
+    private previousRobotTransform: any = {};
+    private currentAction = "none";
 
     private autonActionHistory: Array<any> = [];
     private teleopActionHistory: Array<any> = [];
@@ -80,6 +86,11 @@ export class Whiteboard {
         drawing.addEventListener("pointermove", this.onPointerMove.bind(this));
         drawing.addEventListener("pointerup", this.onPointerUp.bind(this));
         drawing.addEventListener("pointerdown", this.onPointerDown.bind(this));
+        drawing.addEventListener("pointerleave", this.onPointerLeave.bind(this));
+
+        document.getElementById("whiteboard-toolbar-mode-auton")?.addEventListener("click", e => this.toggleMode("auton"));
+        document.getElementById("whiteboard-toolbar-mode-teleop")?.addEventListener("click", e => this.toggleMode("teleop"));
+        document.getElementById("whiteboard-toolbar-mode-endgame")?.addEventListener("click", e => this.toggleMode("endgame"));
 
         const widthConfig = <HTMLInputElement>document.getElementById("whiteboard-robot-config-width");
         widthConfig.addEventListener("input", e => {
@@ -88,7 +99,10 @@ export class Whiteboard {
                 if (Number.isNaN(robotWidth) || robotWidth > 100 || robotWidth < 5) {
                     robotWidth = 30;
                 }
-                this.selected[1].w = robotWidth * width / realWidth;
+                if (this.match === null) return;
+                this.match.auton[`${this.selected[0]}Robot`].w = robotWidth * width / realWidth;
+                this.match.teleop[`${this.selected[0]}Robot`].w = robotWidth * width / realWidth;
+                this.match.endgame[`${this.selected[0]}Robot`].w = robotWidth * width / realWidth;
                 this.drawRobots();
             }
         });
@@ -100,22 +114,52 @@ export class Whiteboard {
                 if (Number.isNaN(robotHeight) || robotHeight > 100 || robotHeight < 5) {
                     robotHeight = 30;
                 }
-                this.selected[1].h = robotHeight * height / realHeight;
+                if (this.match === null) return;
+                this.match.auton[`${this.selected[0]}Robot`].h = robotHeight * height / realHeight;
+                this.match.teleop[`${this.selected[0]}Robot`].h = robotHeight * height / realHeight;
+                this.match.endgame[`${this.selected[0]}Robot`].h = robotHeight * height / realHeight;
                 this.drawRobots();
             }
         });
 
+        document.getElementById("whiteboard-toolbar-undo")?.addEventListener("click", e => {
+            this.undo();
+        });
+        
+        DR.strokeStyle = "white";
+        DR.lineWidth = 10;
+        DR.lineCap = "round";
+        DR.lineJoin = "round";
+
         requestAnimationFrame(this.main.bind(this));
+
+        setInterval(() => {
+            if (this.match !== null) {
+                this.model.updateMatch(this.match.id);
+            }
+        }, 3000);
     }
 
     public setActive(active: boolean) {
         this.active = active;
-        if (active == false) {
+        if (active == true) {
+            if (this.getCurrentUndoHistory().length < 1) {
+                document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-500");
+                document.getElementById("whiteboard-toolbar-undo")?.classList.add("text-amber-700");
+            } else {
+                document.getElementById("whiteboard-toolbar-undo")?.classList.add("text-amber-500");
+                document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-700");
+            }
+        } else if (active == false) {
+            if (this.match !== null) this.model.updateMatch(this.match.id);
+            this.match = null;
+            this.lastSelected = null;
             this.selected = null;
             this.autonActionHistory = [];
             this.teleopActionHistory = [];
             this.endgameActionHistory = [];
             document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
+            document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
         }
     }
 
@@ -137,6 +181,63 @@ export class Whiteboard {
         this.redrawAll();
     }
 
+    private addUndoHistory (action: any) {
+        if (this.mode === "auton") {
+            this.autonActionHistory.push(action);
+        }
+        if (this.mode === "teleop") {
+            this.teleopActionHistory.push(action);
+        }
+        if (this.mode === "endgame") {
+            this.endgameActionHistory.push(action);
+        }
+
+        document.getElementById("whiteboard-toolbar-undo")?.classList.add("text-amber-500");
+        document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-700");
+    }
+
+    private getCurrentUndoHistory () {
+        if (this.mode === "auton") {
+            return this.autonActionHistory;
+        }
+        if (this.mode === "teleop") {
+            return this.teleopActionHistory;
+        }
+        if (this.mode === "endgame") {
+            return this.endgameActionHistory;
+        }
+
+        return [];
+    }
+
+    private undo () {
+        const history = this.getCurrentUndoHistory();
+        if (history.length < 1) return;
+
+        const action = history.pop();
+        if (action.type == "stroke") {
+            const data = this.getData();
+            if (data !== null) {
+                data.drawing.pop();
+                this.redrawDrawing();
+            }
+        } else if (action.type == "transform") {
+            const data = this.getData();
+            if (data !== null) {
+                const robot = data[`${action.slot}Robot`];
+                if (action.prev.x != undefined) robot.x = action.prev.x;
+                if (action.prev.y != undefined) robot.y = action.prev.y;
+                if (action.prev.r != undefined) robot.r = action.prev.r;
+                this.drawRobots();
+            }
+        }
+
+        if (history.length < 1) {
+            document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-500");
+            document.getElementById("whiteboard-toolbar-undo")?.classList.add("text-amber-700");
+        }
+    }
+
     private drawBackground () {
         BG.save();
         BG.clearRect(0, 0, width, height);
@@ -147,8 +248,10 @@ export class Whiteboard {
         BG.restore();
     }
 
-    private drawRobot (name: string, robot: any, team: string) {
+    private drawRobot (name: string, robot: any, team: string, slot: string) {
         if (!name) return;
+
+        const isSelected = this.selected !== null && this.selected[0] == slot;
 
         if (team === "red") {
             IT.fillStyle = "red";
@@ -160,7 +263,33 @@ export class Whiteboard {
         IT.save();
         IT.translate(robot.x - (this.camera.x - width / 2), robot.y - (this.camera.y - height / 2));
         IT.rotate(robot.r);
-        IT.fillRect(-robot.w / 2, -robot.h / 2, robot.w, robot.h);
+        IT.roundRect(-robot.w / 2, -robot.h / 2, robot.w, robot.h, 20);
+        if (isSelected) {
+            IT.shadowBlur = 30;
+            IT.shadowColor = "white";
+        }
+        IT.fill();
+        if (isSelected) {
+            IT.shadowBlur = 0;
+        }
+        IT.beginPath();
+        IT.fillStyle = "#242429";
+        IT.roundRect(-robot.w / 2 + 17, -robot.h / 2 + 17, robot.w - 34, robot.h - 34, 10);
+        IT.fill();
+
+        IT.font = "bold 48px sans-serif";
+        IT.fillStyle = "white";
+        IT.textAlign = "center";
+        IT.textBaseline = "middle";
+        IT.fillText(name, 0, 0);
+
+        if (this.selected !== null && this.selected[0] == slot) {
+            IT.beginPath();
+            IT.fillStyle = "white";
+            IT.arc(robot.w / 2, 0, 20, 0, Math.PI * 2);
+            IT.fill();
+        }
+
         IT.restore();
     }
 
@@ -184,12 +313,12 @@ export class Whiteboard {
         if (data === null || this.match === null) return;
 
         IT.clearRect(0, 0, width, height);
-        this.drawRobot(this.match.redOne, data.redOneRobot, "red");
-        this.drawRobot(this.match.redTwo, data.redTwoRobot, "red");
-        this.drawRobot(this.match.redThree, data.redThreeRobot, "red");
-        this.drawRobot(this.match.blueOne, data.blueOneRobot, "blue");
-        this.drawRobot(this.match.blueTwo, data.blueTwoRobot, "blue");
-        this.drawRobot(this.match.blueThree, data.blueThreeRobot, "blue");
+        this.drawRobot(this.match.redOne, data.redOneRobot, "red", "redOne");
+        this.drawRobot(this.match.redTwo, data.redTwoRobot, "red", "redTwo");
+        this.drawRobot(this.match.redThree, data.redThreeRobot, "red", "redThree");
+        this.drawRobot(this.match.blueOne, data.blueOneRobot, "blue", "blueOne");
+        this.drawRobot(this.match.blueTwo, data.blueTwoRobot, "blue", "blueTwo");
+        this.drawRobot(this.match.blueThree, data.blueThreeRobot, "blue", "blueThree");
     }
 
     private redrawDrawing () {
@@ -212,6 +341,30 @@ export class Whiteboard {
         this.drawBackground();
         this.drawRobots();
         this.redrawDrawing();
+    }
+
+    private toggleMode (mode: string) {
+        if (this.mode === mode) return;
+        this.lastSelected = null;
+        this.selected = null;
+        document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
+        document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
+        document.getElementById(`whiteboard-toolbar-mode-${this.mode}`)?.classList.remove("font-extrabold");
+        document.getElementById(`whiteboard-toolbar-mode-${this.mode}`)?.classList.remove("text-zinc-100");
+        document.getElementById(`whiteboard-toolbar-mode-${this.mode}`)?.classList.add("text-zinc-300");
+        document.getElementById(`whiteboard-toolbar-mode-${mode}`)?.classList.add("font-extrabold");
+        document.getElementById(`whiteboard-toolbar-mode-${mode}`)?.classList.add("text-zinc-100");
+        document.getElementById(`whiteboard-toolbar-mode-${mode}`)?.classList.remove("text-zinc-300");
+        this.mode = mode;
+        this.redrawAll();
+
+        if (this.getCurrentUndoHistory().length < 1) {
+            document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-500");
+            document.getElementById("whiteboard-toolbar-undo")?.classList.add("text-amber-700");
+        } else {
+            document.getElementById("whiteboard-toolbar-undo")?.classList.add("text-amber-500");
+            document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-700");
+        }
     }
 
     private isRobotAtPoint (robot: any, x: number, y: number) {
@@ -248,16 +401,18 @@ export class Whiteboard {
         const rect = drawing.getBoundingClientRect();
         const x = (e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
         const y = (e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
-        const selected = this.getRobotAtPoint(x, y);
-        if (selected !== null) {
-            const widthConfig = <HTMLInputElement>document.getElementById("whiteboard-robot-config-width");
-            const heightConfig = <HTMLInputElement>document.getElementById("whiteboard-robot-config-height");
-            widthConfig.value = String(Math.round(selected[1].w * realWidth / width * 10) / 10);
-            heightConfig.value = String(Math.round(selected[1].h * realHeight / height * 10) / 10);
-            this.selected = selected;
-            document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
-        } else {
-            document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
+        if (clickMovement > 30) return;
+        //const selected = this.getRobotAtPoint(x, y);
+        if (this.selected == null) {
+            if (document.getElementById("whiteboard-robot-config")?.classList.contains("hidden") && this.lastSelected == null) {
+                if (document.getElementById("whiteboard-draw-config")?.classList.contains("hidden")) {
+                    document.getElementById("whiteboard-draw-config")?.classList.remove("hidden");
+                } else {
+                    document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
+                }
+            } else {
+                document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
+            }
         }
     }
 
@@ -265,11 +420,31 @@ export class Whiteboard {
         const rect = drawing.getBoundingClientRect();
         const x = (e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
         const y = (e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
+        clickMovement += Math.abs(x) + Math.abs(y);
         if(this.selected == null && this.isPointerDown) {
             if (Math.hypot(x - this.currentStrokePoints[this.currentStrokePoints.length - 1][0], y - this.currentStrokePoints[this.currentStrokePoints.length - 1][1]) < 10) return;
             this.currentStrokePoints.push([x, y]);
             DR.lineTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
             DR.stroke();
+        } else if (this.selected != null && this.isPointerDown) {
+            if (this.selectedType === "robot") {
+                this.selected[1].x = x + this.selected[2];
+                this.selected[1].y = y + this.selected[3];
+                this.rotControl = {
+                    x: this.selected[1].x + (this.selected[1].w / 2) * Math.cos(this.selected[1].r),
+                    y: this.selected[1].y + (this.selected[1].w / 2) * Math.sin(this.selected[1].r)
+                };
+                this.currentAction = "transform";
+                this.drawRobots();
+            } else if (this.selectedType === "rot") {
+                this.rotControl = {
+                    x: this.selected[1].x + (this.selected[1].w / 2) * Math.cos(this.selected[1].r),
+                    y: this.selected[1].y + (this.selected[1].w / 2) * Math.sin(this.selected[1].r)
+                };
+                this.selected[1].r = Math.atan2(y - this.selected[1].y, x - this.selected[1].x);
+                this.currentAction = "rot";
+                this.drawRobots();
+            }
         }
     }
 
@@ -278,29 +453,81 @@ export class Whiteboard {
         const rect = drawing.getBoundingClientRect();
         const x = (e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
         const y = (e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
-        this.selected = this.getRobotAtPoint(x, y);
+        const selected = this.getRobotAtPoint(x, y);
+        if (this.selected !== null && this.rotControl !== null) {
+            if (Math.hypot(x - this.rotControl.x, y - this.rotControl.y) < 30) {
+                this.selectedType = "rot";
+                this.previousRobotTransform = {
+                    r: this.selected[1].r
+                };
+                return;
+            }
+        }
+        if (selected !== null) {
+            const widthConfig = <HTMLInputElement>document.getElementById("whiteboard-robot-config-width");
+            const heightConfig = <HTMLInputElement>document.getElementById("whiteboard-robot-config-height");
+            widthConfig.value = String(Math.round(selected[1].w * realWidth / width * 10) / 10);
+            heightConfig.value = String(Math.round(selected[1].h * realHeight / height * 10) / 10);
+            this.lastSelected = this.selected;
+            this.selected = selected;
+            this.selectedType = "robot";
+            this.rotControl = {
+                x: this.selected[1].x + (this.selected[1].w / 2) * Math.cos(this.selected[1].r),
+                y: this.selected[1].y + (this.selected[1].w / 2) * Math.sin(this.selected[1].r)
+            };
+            this.previousRobotTransform = {
+                x: this.selected[1].x,
+                y: this.selected[1].y
+            };
+            this.drawRobots();
+            document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
+            document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
+            return;
+        }
+        this.lastSelected = this.selected;
+        this.selected = selected;
         if (this.selected == null) {
+            this.drawRobots();
+            document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
             DR.beginPath();
-            DR.strokeStyle = "white";
-            DR.lineWidth = 10;
-            DR.lineCap = "round";
-            DR.lineJoin = "round";
             DR.moveTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
             this.currentStrokePoints.push([x, y]);
         }
+        clickMovement = 0;
     }
 
     private onPointerUp (e: PointerEvent) {
         this.isPointerDown = false;
-        if (this.currentStrokePoints.length > 1) {
-            if (this.mode === "auton") {
-                this.autonActionHistory.push({
-                    type: "stroke"
+        if (this.selected !== null) {
+            if (this.currentAction !== "none") {
+                this.addUndoHistory({
+                    type: "transform",
+                    prev: this.previousRobotTransform,
+                    slot: this.selected[0]
                 });
-                this.getData()?.drawing.push(this.currentStrokePoints);
-                this.currentStrokePoints = [];
             }
+            this.currentAction = "none";
+            //this.previousRobotTransform = this.selected[1];
+        } else if (this.currentStrokePoints.length > 1) {
+            DR.closePath();
+            this.addUndoHistory({
+                type: "stroke"
+            });
+            this.getData()?.drawing.push(this.currentStrokePoints);
         }
+        this.currentStrokePoints = [];
+    }
+
+    private onPointerLeave (e: Event) {
+        this.isPointerDown = false;
+        if (this.currentStrokePoints.length > 1) {
+            DR.closePath();
+            this.addUndoHistory({
+                type: "stroke"
+            });
+            this.getData()?.drawing.push(this.currentStrokePoints);
+        }
+        this.currentStrokePoints = [];
     }
 
     private main () {
