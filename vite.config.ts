@@ -60,5 +60,5 @@ export default defineConfig({
             "@": new URL("./src", import.meta.url).pathname
         }
     },
-    //base: "https://frcteam834.github.io/StrategyBoard2025/"
+    base: "/StrategyBoard2025"
 });
