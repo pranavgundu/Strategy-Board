@@ -1,5 +1,6 @@
 import { Match } from "@/match.ts";
 import { Model } from "@/model.ts";
+import fieldUrl from "./field25.png";
 
 const background = <HTMLCanvasElement>document.getElementById("whiteboard-canvas-background");
 const items = <HTMLCanvasElement>document.getElementById("whiteboard-canvas-items");
@@ -18,7 +19,7 @@ const realHeight = 317; // inches
 let scaling = 1;
 
 const fieldImage = new Image();
-fieldImage.src = "../field25.png";
+fieldImage.src = fieldUrl;
 
 export function updateCanvasSize () {
     const wrapper = <HTMLElement>document.getElementById("whiteboard-wrapper");
@@ -125,7 +126,7 @@ export class Whiteboard {
         document.getElementById("whiteboard-toolbar-undo")?.addEventListener("click", e => {
             this.undo();
         });
-        
+
         DR.strokeStyle = "white";
         DR.lineWidth = 10;
         DR.lineCap = "round";
