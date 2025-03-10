@@ -413,6 +413,8 @@ export class Whiteboard {
             } else {
                 document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
             }
+        } else {
+            document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
         }
     }
 
@@ -480,8 +482,8 @@ export class Whiteboard {
                 y: this.selected[1].y
             };
             this.drawRobots();
-            document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
-            document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
+            // document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
+            // document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
             return;
         }
         this.lastSelected = this.selected;

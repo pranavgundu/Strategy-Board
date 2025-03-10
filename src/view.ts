@@ -56,6 +56,11 @@ export class View {
     }
 
     private show (e: HTMLElement | null) {
+        if (e === E.Home) {
+            document.documentElement.style.backgroundColor = "#192334";
+        } else if (e === E.Whiteboard) {
+            document.documentElement.style.backgroundColor = "#18181b";
+        }
         e?.classList.remove("hidden");
     }
 

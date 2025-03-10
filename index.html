@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html style="background-color: #192334;">
     <head>
+        <title>StrategyBoard2025</title>
+        <meta name="description" content="2025 FRC Strategy Board">
+        <link rel="icon" href="/favicon/favicon.ico">
+        <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png" sizes="180x180">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
         <meta name="theme-color" content="#000000">
         <style>
             @import "tailwindcss";
@@ -12,21 +17,21 @@
     <body class="overflow-hidden">
         <div id="home-container" class="flex flex-col w-dvw h-dvh touch-none">
             <div id="home-toolbar" class="flex items-center justify-between w-full h-24 bg-slate-600">
-                <div id="home-toolbar-logo" class="ml-12 text-3xl font-extrabold text-white select-none">StrategyBoard</div>
-                <div class="flex mr-12 text-2xl text-sky-200">
-                    <button id="home-toolbar-new-btn" class="flex items-center justify-center mr-4 font-mono w-36 h-12 rounded-full bg-blue-500">New</button>
-                    <button id="home-toolbar-import-btn" class="flex items-center justify-center mr-4 font-mono w-36 h-12 rounded-full bg-blue-500">Import QR</button>
-                    <button id="home-toolbar-clear-btn" class="flex items-center justify-center font-mono w-36 h-12 rounded-full bg-red-500">Clear</button>
+                <div id="home-toolbar-logo" class="ml-12 text-2xl md:text-3xl font-extrabold text-white select-none">StrategyBoard</div>
+                <div class="flex mr-12 text-lg md:text-2xl text-sky-200">
+                    <button id="home-toolbar-new-btn" class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500">New</button>
+                    <button id="home-toolbar-import-btn" class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500">Import QR</button>
+                    <button id="home-toolbar-clear-btn" class="flex items-center justify-center w-24 md:w-36 h-12 rounded-full bg-red-500">Clear</button>
                 </div>
             </div>
             <div id="home-match-list" class="w-full p-6 flex-1 flex flex-col gap-2 items-center overflow-y-auto bg-slate-800">
                 <div id="home-match-list-empty-placeholder" class="absolute top-1/2 text-slate-300 text-xl italic">Click New to add matches</div>
                 <div id="home-match-list-item-template" class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center">
-                    <div class="ml-12 grow-1 basis-0 text-slate-200 font-bold text-2xl select-none">Match Name</div>
+                    <div class="ml-12 grow-1 basis-0 text-slate-200 font-bold text-xl md:text-2xl select-none">Match Name</div>
                     <div class="w-1/2 flex justify-center items-center">
-                        <div class="w-1/2 text-red-400 text-2xl text-right select-none">000 000 000</div>
-                        <div class="text-slate-200 text-2xl mx-6 select-none">VS</div>
-                        <div class="w-1/2 text-blue-400 text-2xl select-none">000 000 000</div>
+                        <div class="w-1/2 text-red-400 text-lg md:text-2xl text-right select-none">000 000 000</div>
+                        <div class="text-slate-200 text-lg md:text-2xl mx-6 select-none">VS</div>
+                        <div class="w-1/2 text-blue-400 text-lg md:text-2xl select-none">000 000 000</div>
                     </div>
                     <div class="mr-9 grow-1 basis-0 flex h-full justify-end">
                         <button class="flex flex-col w-12 gap-1 items-center justify-center">
@@ -35,8 +40,8 @@
                             <div class="w-2 h-2 rounded-full bg-white"></div>
                         </button>
                         <div class="hidden flex items-center justify-center">
-                            <button class="w-24 p-1 mr-2 text-xl text-slate-300 bg-sky-600 rounded-xl">Export</button>
-                            <button class="w-24 p-1 text-xl text-slate-300 bg-red-700 rounded-xl">Delete</button>
+                            <button class="w-24 p-1 mr-2 text-md md:text-xl text-slate-300 bg-sky-600 rounded-xl">Export</button>
+                            <button class="w-24 p-1 text-md md:text-xl text-slate-300 bg-red-700 rounded-xl">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -62,15 +67,15 @@
         <div id="whiteboard-container" class="hidden flex flex-col w-dvw h-dvh touch-none">
             <div id="whiteboard-toolbar" class="flex items-center justify-between w-full h-24 sm:h-12 bg-zinc-700" style="z-index: 999">
                 <div>
-                    <button id="whiteboard-toolbar-back" class="ml-12 text-3xl font-extrabold text-white select-none touch-none">back</button>
-                    <button id="whiteboard-toolbar-undo" class="w-24 h-full ml-12 text-center text-3xl font-bold text-amber-700 select-none touch-none">undo</button>
+                    <button id="whiteboard-toolbar-back" class="ml-6 md:ml-12 text-xl md:text-3xl font-extrabold text-white select-none touch-none">back</button>
+                    <button id="whiteboard-toolbar-undo" class="w-24 h-full ml-6 md:ml-12 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none">undo</button>
                 </div>
                 <div id="whiteboard-toolbar-mode-select" class="flex justify-center items-center gap-6">
-                    <div id="whiteboard-toolbar-mode-auton" class="text-3xl text-zinc-100 font-extrabold select-none select-none touch-none">AUTON</div>
-                    <div id="whiteboard-toolbar-mode-teleop" class="text-3xl text-zinc-300 select-none select-none touch-none">TELEOP</div>
-                    <div id="whiteboard-toolbar-mode-endgame" class="text-3xl text-zinc-300 select-none select-none touch-none">ENDGAME</div>
+                    <div id="whiteboard-toolbar-mode-auton" class="text-xl md:text-3xl text-zinc-100 font-extrabold select-none select-none touch-none">AUTON</div>
+                    <div id="whiteboard-toolbar-mode-teleop" class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none">TELEOP</div>
+                    <div id="whiteboard-toolbar-mode-endgame" class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none">ENDGAME</div>
                 </div>
-                <button id="whiteboard-toolbar-view-toggle" class="w-48 h-full mr-12 text-3xl font-bold text-zinc-300 select-none touch-none">Toggle View</button>
+                <button id="whiteboard-toolbar-view-toggle" class="w-48 h-full mr-6 md:mr-12 text-xl md:text-3xl font-bold text-zinc-300 select-none touch-none">Toggle View</button>
             </div>
             <div id="whiteboard-wrapper" class="w-full h-full m-0 p-0 bg-zinc-900">
                 <canvas id="whiteboard-canvas-background" width=3510 height=1610 class="absolute m-0 select-none touch-none"></canvas>
@@ -80,9 +85,9 @@
             <div id="whiteboard-robot-config" class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-xl">
                 <div class="text-2xl text-zinc-400 font-bold mb-4 select-none">Robot Config (in.)</div>
                 <div class="flex w-full justify-center items-center">
-                    <input id="whiteboard-robot-config-width" placeholder="width" class="w-1/3 mr-4 text-3xl text-zinc-500 text-right outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input id="whiteboard-robot-config-width" placeholder="width" class="w-1/3 mr-4 text-3xl text-zinc-500 text-right outline-0 select-none touch-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
                     <div class="text-3xl text-zinc-700 text-center outline-0">x</div>
-                    <input id="whiteboard-robot-config-height" placeholder="length" class="w-1/3 ml-4 text-3xl text-zinc-500 text-left outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input id="whiteboard-robot-config-height" placeholder="length" class="w-1/3 ml-4 text-3xl text-zinc-500 text-left outline-0 select-none touch-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
                 </div>
             </div>
             <div id="whiteboard-draw-config" class="hidden absolute flex flex-col justify-center items-center w-48 h-48 top-12 right-0 bg-zinc-800 rounded-b-xl">
