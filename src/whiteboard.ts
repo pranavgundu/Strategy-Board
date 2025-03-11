@@ -1,6 +1,7 @@
 import { Match } from "@/match.ts";
 import { Model } from "@/model.ts";
-import fieldUrl from "./field25.png";
+import { Config } from "@/config.ts";
+import fieldUrl from "./field.png";
 
 const background = <HTMLCanvasElement>document.getElementById("whiteboard-canvas-background");
 const items = <HTMLCanvasElement>document.getElementById("whiteboard-canvas-items");
@@ -11,10 +12,10 @@ const IT = <CanvasRenderingContext2D>items.getContext("2d");
 const DR = <CanvasRenderingContext2D>drawing.getContext("2d");
 
 const dpr = window.devicePixelRatio || 1;
-const width = 3510;
-const height = 1610;
-const realWidth = 690.875; // inches
-const realHeight = 317; // inches
+const width = Config.fieldPNGPixelWidth;
+const height = Config.fieldPNGPixelHeight;
+const realWidth = Config.fieldRealWidthInches; // inches
+const realHeight = Config.fieldRealHeightInches; // inches
 
 let scaling = 1;
 
@@ -285,6 +286,44 @@ export class Whiteboard {
         BG.fillRect(0, 0, width, height);
         BG.translate(width / 2 - this.camera.x, height / 2 - this.camera.y);
         BG.drawImage(fieldImage, 0, 0);
+
+        BG.restore();
+
+        if (this.match == null) return;
+
+        BG.font = "bold 64px sans-serif";
+        BG.fillStyle = "white";
+        BG.textAlign = "center";
+        BG.textBaseline = "middle";
+        BG.save();
+        BG.translate(Config.redOneStationX - (this.camera.x - width/2), Config.redOneStationY - (this.camera.y - height / 2));
+        BG.rotate(-Math.PI / 2);
+        BG.fillText(this.match.redOne, 0, 0);
+        BG.restore();
+        BG.save();
+        BG.translate(Config.redTwoStationX - (this.camera.x - width/2), Config.redTwoStationY - (this.camera.y - height / 2));
+        BG.rotate(-Math.PI / 2);
+        BG.fillText(this.match.redTwo, 0, 0);
+        BG.restore();
+        BG.save();
+        BG.translate(Config.redThreeStationX - (this.camera.x - width/2), Config.redThreeStationY - (this.camera.y - height / 2));
+        BG.rotate(-Math.PI / 2);
+        BG.fillText(this.match.redThree, 0, 0);
+        BG.restore();
+        BG.save();
+        BG.translate(Config.blueOneStationX - (this.camera.x - width/2), Config.blueOneStationY - (this.camera.y - height / 2));
+        BG.rotate(Math.PI / 2);
+        BG.fillText(this.match.blueOne, 0, 0);
+        BG.restore();
+        BG.save();
+        BG.translate(Config.blueTwoStationX - (this.camera.x - width/2), Config.blueTwoStationY - (this.camera.y - height / 2));
+        BG.rotate(Math.PI / 2);
+        BG.fillText(this.match.blueTwo, 0, 0);
+        BG.restore();
+        BG.save();
+        BG.translate(Config.blueThreeStationX - (this.camera.x - width/2), Config.blueThreeStationY - (this.camera.y - height / 2));
+        BG.rotate(Math.PI / 2);
+        BG.fillText(this.match.blueThree, 0, 0);
         BG.restore();
     }
 

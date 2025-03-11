@@ -1,12 +1,14 @@
 import { Model } from "@/model.ts";
 import { Whiteboard, updateCanvasSize } from "@/whiteboard.ts";
 import { Match } from "@/match.ts";
+import { QRImport, QRExport } from "@/qr.ts";
 
 const get = document.getElementById.bind(document);
 
 // buttons
 const B = {
     NewMatch: <HTMLElement>get("home-toolbar-new-btn"),
+    ImportMatch: <HTMLElement>get("home-toolbar-import-btn"),
     Clear: <HTMLElement>get("home-toolbar-clear-btn"),
     CreateMatch: <HTMLElement>get("create-match-create-btn"),
     CancelCreate: <HTMLElement>get("create-match-cancel-btn"),
@@ -33,15 +35,23 @@ const E = {
     CreateMatchPanel: <HTMLElement>get("create-match-container"),
     EmptyMatchListPlaceholder: <HTMLElement>get("home-match-list-empty-placeholder"),
     MatchListItemTemplate: <HTMLElement>get("home-match-list-item-template"),
+    Export: <HTMLElement>get("qr-export-container"),
+    Import: <HTMLElement>get("qr-import-container"),
+    ImportInner: <HTMLElement>get("qr-import-inner-container"),
 };
 
 export class View {
     private model: Model;
     private whiteboard: Whiteboard;
+    private qrimport: QRImport;
+    private qrexport: QRExport;
 
-    constructor (model: Model, whiteboard: Whiteboard) {
+
+    constructor (model: Model, whiteboard: Whiteboard, qrimport: QRImport, qrexport: QRExport) {
         this.model = model;
         this.whiteboard = whiteboard;
+        this.qrimport = qrimport;
+        this.qrexport = qrexport;
 
         for (let match of this.model.matches) {
             this.createNewMatch(match.id, match.matchName, match.redOne, match.redTwo, match.redThree, match.blueOne, match.blueTwo, match.blueThree);
@@ -53,6 +63,11 @@ export class View {
         B.Clear.addEventListener("click", e => this.onClickClear(e));
         B.Back.addEventListener("click", e => this.onClickBack(e));
         B.ToggleView.addEventListener("click", e => this.onClickToggleView(e));
+        B.ImportMatch.addEventListener("click", e => this.onClickImportMatch(e));
+
+        E.Export.addEventListener("click", e => this.onCancelExport(e));
+        E.Import.addEventListener("click", e => this.onCancelImport(e));
+        E.ImportInner.addEventListener("click", e => e.stopPropagation());
     }
 
     private show (e: HTMLElement | null) {
@@ -124,7 +139,7 @@ export class View {
             this.show(options);
             item.focus();
         });
-
+        
         item.addEventListener("focusout", e => {
             if (item.contains(<Node>e.relatedTarget)) return;
 
@@ -134,6 +149,11 @@ export class View {
 
         deleteOption.addEventListener("click", e => {
             this.deleteMatch(item.id);
+        });
+
+        exportOption.addEventListener("click", e => {
+            this.qrexport.export(this.model.getMatch(id));
+            this.show(E.Export);
         });
 
         const openMatch = (e: Event) => {
@@ -190,5 +210,20 @@ export class View {
 
     private onClickToggleView (e: Event) {
         this.whiteboard.toggleView();
+    }
+
+    private onClickImportMatch (e: Event) {
+        this.qrimport.start();
+        this.show(E.Import);
+    }
+
+    private onCancelExport (e: Event) {
+        this.qrexport.close();
+        this.hide(E.Export);
+    }
+
+    private onCancelImport (e: Event) {
+        this.qrimport.stop();
+        this.hide(E.Import);
     }
 }
