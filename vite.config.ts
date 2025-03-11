@@ -7,9 +7,10 @@ export default defineConfig({
         tailwindcss(),
         VitePWA({ 
             injectRegister: "auto",
-            registerType: "prompt",
+            registerType: "autoUpdate",
             workbox: {
                 globPatterns: ["**/*.{js,html,png}"],
+                cleanupOutdatedCaches: true,
                 runtimeCaching: [
                     {
                         urlPattern: ({ request }) => request.mode === "navigate",

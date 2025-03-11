@@ -1,5 +1,5 @@
 import QrScanner from "qr-scanner";
-import { QRCode } from "@/lib/qrcode.js";
+import QRCode from "qrcodejs2-fixes";
 import { Match } from "@/match.ts";
 
 const HEADER_SIZE = 4;
