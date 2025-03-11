@@ -1,4 +1,5 @@
 import QrScanner from "qr-scanner";
+import { QRCode } from "@/lib/qrcode.js";
 import { Match } from "@/match.ts";
 
 const HEADER_SIZE = 4;
@@ -11,15 +12,15 @@ export class QRExport {
     private intervalId;
     constructor () {
         this.pool = [
-            new globalThis.QRCode("qr-export-code-worker-0", {
+            new QRCode("qr-export-code-worker-0", {
                 width: SIZE,
                 height: SIZE
             }),
-            new globalThis.QRCode("qr-export-code-worker-1", {
+            new QRCode("qr-export-code-worker-1", {
                 width: SIZE,
                 height: SIZE
             }),
-            new globalThis.QRCode("qr-export-code-worker-2", {
+            new QRCode("qr-export-code-worker-2", {
                 width: SIZE,
                 height: SIZE
             }),
