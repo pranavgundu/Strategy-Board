@@ -439,8 +439,8 @@ export class Whiteboard {
 
     private onClick (e: MouseEvent) {
         const rect = drawing.getBoundingClientRect();
-        const x = (e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
-        const y = (e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
+        const x = Math.round(e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
+        const y = Math.round(e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
         if (clickMovement > 30) return;
         //const selected = this.getRobotAtPoint(x, y);
         if (this.selected == null) {
@@ -466,8 +466,8 @@ export class Whiteboard {
 
     private onPointerMove (e: PointerEvent) {
         const rect = drawing.getBoundingClientRect();
-        const x = (e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
-        const y = (e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
+        const x = Math.round(e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
+        const y = Math.round(e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
         clickMovement += Math.abs(x) + Math.abs(y);
         if(this.selected == null && this.isPointerDown) {
             if (this.currentTool == "marker") {
@@ -522,8 +522,8 @@ export class Whiteboard {
     private onPointerDown (e: PointerEvent) {
         this.isPointerDown = true;
         const rect = drawing.getBoundingClientRect();
-        const x = (e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
-        const y = (e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
+        const x = Math.round(e.clientX / scaling - rect.left / scaling) - (width / 2 - this.camera.x);
+        const y = Math.round(e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
         const selected = this.getRobotAtPoint(x, y);
         if (this.selected !== null && this.rotControl !== null) {
             if (Math.hypot(x - this.rotControl.x, y - this.rotControl.y) < 30) {
