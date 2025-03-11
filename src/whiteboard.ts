@@ -63,8 +63,12 @@ export class Whiteboard {
     private isPointerDown = false;
 
     private currentStrokePoints: Array<[number, number]> = [];
+    private currentErasePoint: { x: number, y: number } | null = null;
+    private lastErasePoint: { x: number, y: number } | null = null;
+    private currentErasedStrokes: any = [];
     private previousRobotTransform: any = {};
     private currentAction = "none";
+    private currentTool = "marker";
 
     private autonActionHistory: Array<any> = [];
     private teleopActionHistory: Array<any> = [];
@@ -123,6 +127,24 @@ export class Whiteboard {
             }
         });
 
+        const markerConfig = <HTMLButtonElement>document.getElementById("whiteboard-draw-config-marker");
+        markerConfig.addEventListener("click", e => {
+            this.currentTool = "marker";
+            document.getElementById("whiteboard-draw-config-marker")?.classList.remove("text-zinc-500");
+            document.getElementById("whiteboard-draw-config-marker")?.classList.add("text-zinc-300");
+            document.getElementById("whiteboard-draw-config-eraser")?.classList.remove("text-zinc-300");
+            document.getElementById("whiteboard-draw-config-eraser")?.classList.add("text-zinc-500");
+        });
+
+        const eraserConfig = <HTMLButtonElement>document.getElementById("whiteboard-draw-config-eraser");
+        eraserConfig.addEventListener("click", e => {
+            this.currentTool = "eraser";
+            document.getElementById("whiteboard-draw-config-eraser")?.classList.remove("text-zinc-500");
+            document.getElementById("whiteboard-draw-config-eraser")?.classList.add("text-zinc-300");
+            document.getElementById("whiteboard-draw-config-marker")?.classList.remove("text-zinc-300");
+            document.getElementById("whiteboard-draw-config-marker")?.classList.add("text-zinc-500");
+        });
+
         document.getElementById("whiteboard-toolbar-undo")?.addEventListener("click", e => {
             this.undo();
         });
@@ -151,6 +173,11 @@ export class Whiteboard {
                 document.getElementById("whiteboard-toolbar-undo")?.classList.add("text-amber-500");
                 document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-700");
             }
+            this.currentTool = "marker";
+            document.getElementById("whiteboard-draw-config-marker")?.classList.remove("text-zinc-500");
+            document.getElementById("whiteboard-draw-config-marker")?.classList.add("text-zinc-300");
+            document.getElementById("whiteboard-draw-config-eraser")?.classList.remove("text-zinc-300");
+            document.getElementById("whiteboard-draw-config-eraser")?.classList.add("text-zinc-500");
         } else if (active == false) {
             if (this.match !== null) this.model.updateMatch(this.match.id);
             this.match = null;
@@ -218,8 +245,12 @@ export class Whiteboard {
         if (action.type == "stroke") {
             const data = this.getData();
             if (data !== null) {
-                data.drawing.pop();
-                this.redrawDrawing();
+                const index = data.drawing.indexOf(action.ref);
+                if (index !== -1) {
+                    data.drawing.splice(index, 1);
+                    data.drawingBBox.splice(index, 1);
+                    this.redrawDrawing();
+                }
             }
         } else if (action.type == "transform") {
             const data = this.getData();
@@ -229,6 +260,15 @@ export class Whiteboard {
                 if (action.prev.y != undefined) robot.y = action.prev.y;
                 if (action.prev.r != undefined) robot.r = action.prev.r;
                 this.drawRobots();
+            }
+        } else if (action.type == "erase") {
+            const data = this.getData();
+            if (data !== null) {
+                for (let stroke of action.erased) {
+                    data.drawing.push(stroke);
+                    data.drawingBBox.push(getBBox(stroke));
+                }
+                this.redrawDrawing();
             }
         }
 
@@ -368,7 +408,7 @@ export class Whiteboard {
     }
 
     private isRobotAtPoint (robot: any, x: number, y: number) {
-        return isPointInRect(x, y, robot.x, robot.y, robot.w, robot.h, robot.r);
+        return isPointInRotRect(x, y, robot.x, robot.y, robot.w, robot.h, robot.r);
     }
 
     private getRobotAtPoint (x: number, y: number): [string, any, number, number] | null {
@@ -430,10 +470,33 @@ export class Whiteboard {
         const y = (e.clientY / scaling - rect.top / scaling) - (height / 2 - this.camera.y);
         clickMovement += Math.abs(x) + Math.abs(y);
         if(this.selected == null && this.isPointerDown) {
-            if (Math.hypot(x - this.currentStrokePoints[this.currentStrokePoints.length - 1][0], y - this.currentStrokePoints[this.currentStrokePoints.length - 1][1]) < 10) return;
-            this.currentStrokePoints.push([x, y]);
-            DR.lineTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
-            DR.stroke();
+            if (this.currentTool == "marker") {
+                if (Math.hypot(x - this.currentStrokePoints[this.currentStrokePoints.length - 1][0], y - this.currentStrokePoints[this.currentStrokePoints.length - 1][1]) < 10) return;
+                this.currentStrokePoints.push([x, y]);
+                DR.lineTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
+                DR.stroke();
+            } else if (this.currentTool == "eraser") {
+                if (Math.hypot(x - this.currentErasePoint.x, y - this.currentErasePoint.y) < 20) return;
+                this.lastErasePoint = this.currentErasePoint;
+                this.currentErasePoint = { x: x, y: y };
+                const data = this.getData();
+                if (data == null) return;
+                const bboxes = data.drawingBBox;
+                for (let i = bboxes.length - 1; i >= 0; i--) {
+                    if (isSegmentInBound(x, y, this.lastErasePoint.x, this.lastErasePoint.y, bboxes[i][0], bboxes[i][1], bboxes[i][2], bboxes[i][3])) {
+                        const stroke = data.drawing[i];
+                        for (let j = 0; j < stroke.length - 2; j++) {
+                            if (isSegmentsIntersecting(x, y, this.lastErasePoint.x, this.lastErasePoint.y, stroke[j][0], stroke[j][1], stroke[j+1][0], stroke[j+1][1])) {
+                                data.drawing.splice(i, 1);
+                                data.drawingBBox.splice(i, 1);
+                                this.redrawDrawing();
+                                this.currentErasedStrokes.push(stroke);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         } else if (this.selected != null && this.isPointerDown) {
             if (this.selectedType === "robot") {
                 this.selected[1].x = x + this.selected[2];
@@ -498,9 +561,14 @@ export class Whiteboard {
         if (this.selected == null) {
             this.drawRobots();
             document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
-            DR.beginPath();
-            DR.moveTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
-            this.currentStrokePoints.push([x, y]);
+            if (this.currentTool == "marker") {
+                DR.beginPath();
+                DR.moveTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
+                this.currentStrokePoints.push([x, y]);
+            } else if (this.currentTool == "eraser") {
+                this.currentErasePoint = { x: x, y: y };
+            }
+            
         }
         clickMovement = 0;
     }
@@ -520,9 +588,17 @@ export class Whiteboard {
         } else if (this.currentStrokePoints.length > 1) {
             DR.closePath();
             this.addUndoHistory({
-                type: "stroke"
+                type: "stroke",
+                ref: this.currentStrokePoints
             });
             this.getData()?.drawing.push(this.currentStrokePoints);
+            this.getData()?.drawingBBox.push(getBBox(this.currentStrokePoints));
+        } else if (this.currentErasedStrokes.length > 0) {
+            this.addUndoHistory({
+                type: "erase",
+                erased: this.currentErasedStrokes
+            });
+            this.currentErasedStrokes = [];
         }
         this.currentStrokePoints = [];
     }
@@ -535,6 +611,23 @@ export class Whiteboard {
                 type: "stroke"
             });
             this.getData()?.drawing.push(this.currentStrokePoints);
+            let minx = this.currentStrokePoints[0][0];
+            let miny = this.currentStrokePoints[0][0];
+            let maxx = minx;
+            let maxy = miny;
+            for (let point of this.currentStrokePoints) {
+                if (point[0] < minx) {
+                    minx = point[0];
+                } else if (point[0] > maxx) {
+                    maxx = point[0];
+                }
+                if (point[1] < miny) {
+                    miny = point[1];
+                } else if (point[1] > maxy) {
+                    maxy = point[1];
+                }
+            }
+            this.getData()?.drawingBBox.push([minx, miny, maxx, maxy]);
         }
         this.currentStrokePoints = [];
     }
@@ -544,7 +637,7 @@ export class Whiteboard {
     }
 }
 
-function isPointInRect(px: number, py: number, rx: number, ry: number, rw: number, rh: number, rr: number) {
+function isPointInRotRect(px: number, py: number, rx: number, ry: number, rw: number, rh: number, rr: number) {
     const cos = Math.cos(-rr);
     const sin = Math.sin(-rr);
     const localX = cos * (px - rx) - sin * (py - ry);
@@ -555,4 +648,65 @@ function isPointInRect(px: number, py: number, rx: number, ry: number, rw: numbe
         localY >= -rh / 2 &&
         localY <= rh / 2
     );
+}
+
+function isPointInBound(px: number, py: number, minx: number, miny: number, maxx: number, maxy: number) {
+    return !(
+        px < minx ||
+        py < miny ||
+        px > maxx ||
+        py > maxy
+    );
+}
+
+function isSegmentInBound(x1, y1, x2, y2, minx, miny, maxx, maxy) {
+    if (isPointInBound(x1, y1, minx, miny, maxx, maxy) ||
+        isPointInBound(x2, y2, minx, miny, maxx, maxy)) {
+        return true;
+    }
+
+    if (isSegmentsIntersecting(x1, y1, x2, y2, minx, miny, maxx, miny) ||
+        isSegmentsIntersecting(x1, y1, x2, y2, minx, maxy, maxx, maxy) ||
+        isSegmentsIntersecting(x1, y1, x2, y2, minx, miny, minx, maxy) ||
+        isSegmentsIntersecting(x1, y1, x2, y2, maxx, miny, maxx, maxy)) {
+        return true;
+    }
+
+    return false;
+}
+
+function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
+    const sx = ax2 - ax1;
+    const sy = ay2 - ay1;
+    const tx = bx2 - bx1;
+    const ty = by2 - by1;
+    const d = -tx * sy + sx * ty;
+
+    if (Math.abs(d) < 1e-10) return false;
+
+    const s = (-sy * (ax1 - bx1) + sx * (ay1 - by1)) / d;
+    const t = (tx * (ay1 - by1) - ty * (ax1 - bx1)) / d;
+    
+    return s >= 0 && s <= 1 && t >= 0 && t <= 1;
+}
+
+
+function getBBox (stroke) {
+    let minx = stroke[0][0];
+    let miny = stroke[0][1];
+    let maxx = minx;
+    let maxy = miny;
+    for (let point of stroke) {
+        if (point[0] < minx) {
+            minx = point[0];
+        } else if (point[0] > maxx) {
+            maxx = point[0];
+        }
+         if (point[1] < miny) {
+            miny = point[1];
+        } else if (point[1] > maxy) {
+            maxy = point[1];
+        }
+    }
+    return [minx, miny, maxx, maxy];
 }

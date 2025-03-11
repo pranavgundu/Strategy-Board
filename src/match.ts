@@ -28,7 +28,8 @@ interface Optional {
         b1: { x: number, y: number, r: number },
         b2: { x: number, y: number, r: number },
         b3: { x: number, y: number, r: number },
-        d: Array<[x: number, y: number]>,
+        d: Array<[number, number]>,
+        dx: Array<[number, number, number, number]>,
     },
     t: {
         r1: { x: number, y: number, r: number },
@@ -37,7 +38,8 @@ interface Optional {
         b1: { x: number, y: number, r: number },
         b2: { x: number, y: number, r: number },
         b3: { x: number, y: number, r: number },
-        d: Array<[x: number, y: number]>,
+        d: Array<[number, number]>,
+        dx: Array<[number, number, number, number]>,
     },
     e: {
         r1: { x: number, y: number, r: number },
@@ -46,7 +48,8 @@ interface Optional {
         b1: { x: number, y: number, r: number },
         b2: { x: number, y: number, r: number },
         b3: { x: number, y: number, r: number },
-        d: Array<[x: number, y: number]>,
+        d: Array<[number, number]>,
+        dx: Array<[number, number, number, number]>,
     }
 }
 
@@ -68,7 +71,8 @@ export class Match {
         blueOneRobot: { x: 1455, y: 505, w: 152.4, h: 152.4, r: 0 },
         blueTwoRobot: { x: 1455, y: 805, w: 152.4, h: 152.4, r: 0 },
         blueThreeRobot: { x: 1455, y: 1105, w: 152.4, h: 152.4, r: 0 },
-        drawing: []
+        drawing: [],
+        drawingBBox: []
     }
 
     public teleop: any = {
@@ -78,7 +82,8 @@ export class Match {
         blueOneRobot: { x: 1455, y: 505, w: 152.4, h: 152.4, r: 0 },
         blueTwoRobot: { x: 1455, y: 805, w: 152.4, h: 152.4, r: 0 },
         blueThreeRobot: { x: 1455, y: 1105, w: 152.4, h: 152.4, r: 0 },
-        drawing: []
+        drawing: [],
+        drawingBBox: []
     }
 
     public endgame: any = {
@@ -88,7 +93,8 @@ export class Match {
         blueOneRobot: { x: 1455, y: 505, w: 152.4, h: 152.4, r: 0 },
         blueTwoRobot: { x: 1455, y: 805, w: 152.4, h: 152.4, r: 0 },
         blueThreeRobot: { x: 1455, y: 1105, w: 152.4, h: 152.4, r: 0 },
-        drawing: []
+        drawing: [],
+        drawingBBox: []
     }
 
     constructor (
@@ -116,6 +122,9 @@ export class Match {
             this.auton.drawing = options.a.d;
             this.teleop.drawing = options.t.d;
             this.endgame.drawing = options.e.d;
+            this.auton.drawingBBox = options.a.dx;
+            this.teleop.drawingBBox = options.t.dx;
+            this.endgame.drawingBBox = options.e.dx;
 
             this.auton.redOneRobot = {
                 x: options.a.r1.x,
@@ -276,7 +285,8 @@ export class Match {
                     b1: packet.o.a.b1,
                     b2: packet.o.a.b2,
                     b3: packet.o.a.b3,
-                    d: packet.o.a.d
+                    d: packet.o.a.d,
+                    dx: packet.o.a.dx
                 },
                 t: {
                     r1: packet.o.t.r1,
@@ -285,7 +295,8 @@ export class Match {
                     b1: packet.o.t.b1,
                     b2: packet.o.t.b2,
                     b3: packet.o.t.b3,
-                    d: packet.o.t.d
+                    d: packet.o.t.d,
+                    dx: packet.o.t.dx
                 },
                 e: {
                     r1: packet.o.e.r1,
@@ -294,7 +305,8 @@ export class Match {
                     b1: packet.o.e.b1,
                     b2: packet.o.e.b2,
                     b3: packet.o.e.b3,
-                    d: packet.o.e.d
+                    d: packet.o.e.d,
+                    dx: packet.o.e.dx
                 },
             }
         );
@@ -326,7 +338,8 @@ export class Match {
                     b1: { x: this.auton.blueOneRobot.x, y: this.auton.blueOneRobot.y, r: this.auton.blueOneRobot.r },
                     b2: { x: this.auton.blueTwoRobot.x, y: this.auton.blueTwoRobot.y, r: this.auton.blueTwoRobot.r },
                     b3: { x: this.auton.blueThreeRobot.x, y: this.auton.blueThreeRobot.y, r: this.auton.blueThreeRobot.r },
-                    d: this.auton.drawing
+                    d: this.auton.drawing,
+                    dx: this.auton.drawingBBox
                 },
                 t: {
                     r1: { x: this.teleop.redOneRobot.x, y: this.teleop.redOneRobot.y, r: this.teleop.redOneRobot.r },
@@ -335,7 +348,8 @@ export class Match {
                     b1: { x: this.teleop.blueOneRobot.x, y: this.teleop.blueOneRobot.y, r: this.teleop.blueOneRobot.r },
                     b2: { x: this.teleop.blueTwoRobot.x, y: this.teleop.blueTwoRobot.y, r: this.teleop.blueTwoRobot.r },
                     b3: { x: this.teleop.blueThreeRobot.x, y: this.teleop.blueThreeRobot.y, r: this.teleop.blueThreeRobot.r },
-                    d: this.teleop.drawing
+                    d: this.teleop.drawing,
+                    dx: this.teleop.drawingBBox
                 },
                 e: {
                     r1: { x: this.endgame.redOneRobot.x, y: this.endgame.redOneRobot.y, r: this.endgame.redOneRobot.r },
@@ -344,7 +358,8 @@ export class Match {
                     b1: { x: this.endgame.blueOneRobot.x, y: this.endgame.blueOneRobot.y, r: this.endgame.blueOneRobot.r },
                     b2: { x: this.endgame.blueTwoRobot.x, y: this.endgame.blueTwoRobot.y, r: this.endgame.blueTwoRobot.r },
                     b3: { x: this.endgame.blueThreeRobot.x, y: this.endgame.blueThreeRobot.y, r: this.endgame.blueThreeRobot.r },
-                    d: this.endgame.drawing
+                    d: this.endgame.drawing,
+                    dx: this.endgame.drawingBBox
                 },
             }
         };
