@@ -110,6 +110,8 @@ export class QRImport {
             option.text = camera.label;
             list.add(option);
         }
+        list.selectedIndex = 0;
+        await this.scanner.setCamera(list.options[0]);
     }
 
     public async start () {
