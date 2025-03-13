@@ -213,7 +213,12 @@ export class View {
     }
 
     private onClickImportMatch (e: Event) {
-        this.qrimport.start();
+        this.qrimport.start(async data => {
+            const match = Match.fromPacket(data);
+            const id = await this.model.addMatch(match);
+            this.createNewMatch(id, match.matchName, match.redOne, match.redTwo, match.redThree, match.blueOne, match.blueTwo, match.blueThree);
+            this.hide(E.Import);
+        });
         this.show(E.Import);
     }
 

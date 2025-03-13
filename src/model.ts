@@ -21,7 +21,7 @@ export class Model {
         if (matches !== undefined) {
             for (let match of matches) {
                 this.matches.push(Match.fromPacket(match));
-                this.matchIds.push(match.id);
+                this.matchIds.push(match[7]);
             }
         }
     }
@@ -30,6 +30,12 @@ export class Model {
         matchName: string, redOne: string, redTwo: string, redThree: string, blueOne: string, blueTwo: string, blueThree: string
     ) {
         const match = new Match(matchName, redOne, redTwo, redThree, blueOne, blueTwo, blueThree);
+        return this.addMatch(match);
+    }
+
+    public async addMatch (
+        match: Match
+    ) {
         this.matches.push(match);
         this.matchIds.push(match.id);
         await SET(match.id, match.getAsPacket());

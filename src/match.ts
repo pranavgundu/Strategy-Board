@@ -1,58 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 
-export interface Packet {
-    m: string,
-    r1: string,
-    r2: string,
-    r3: string,
-    b1: string,
-    b2: string,
-    b3: string,
-    id: string,
-    o: Optional
-}
-
-interface Optional {
-    dim: {
-        r1: { w: number, h: number },
-        r2: { w: number, h: number },
-        r3: { w: number, h: number },
-        b1: { w: number, h: number },
-        b2: { w: number, h: number },
-        b3: { w: number, h: number },
-    },
-    a: {
-        r1: { x: number, y: number, r: number },
-        r2: { x: number, y: number, r: number },
-        r3: { x: number, y: number, r: number },
-        b1: { x: number, y: number, r: number },
-        b2: { x: number, y: number, r: number },
-        b3: { x: number, y: number, r: number },
-        d: Array<[number, number]>,
-        dx: Array<[number, number, number, number]>,
-    },
-    t: {
-        r1: { x: number, y: number, r: number },
-        r2: { x: number, y: number, r: number },
-        r3: { x: number, y: number, r: number },
-        b1: { x: number, y: number, r: number },
-        b2: { x: number, y: number, r: number },
-        b3: { x: number, y: number, r: number },
-        d: Array<[number, number]>,
-        dx: Array<[number, number, number, number]>,
-    },
-    e: {
-        r1: { x: number, y: number, r: number },
-        r2: { x: number, y: number, r: number },
-        r3: { x: number, y: number, r: number },
-        b1: { x: number, y: number, r: number },
-        b2: { x: number, y: number, r: number },
-        b3: { x: number, y: number, r: number },
-        d: Array<[number, number]>,
-        dx: Array<[number, number, number, number]>,
-    }
-}
-
 export class Match {
     public readonly matchName: string;
     public readonly redOne: string;
@@ -106,7 +53,7 @@ export class Match {
         blueTwo: string,
         blueThree: string,
         id?: string,
-        options?: Optional
+        options?: any
     ) {
         this.matchName = matchName;
         this.redOne = redOne;
@@ -259,109 +206,117 @@ export class Match {
         }
     }
 
-    static fromPacket (packet: Packet) {
+    static fromPacket (packet) {
         return new Match(
-            packet.m,
-            packet.r1,
-            packet.r2,
-            packet.r3,
-            packet.b1,
-            packet.b2,
-            packet.b3,
-            packet.id,
+            packet[0],
+            packet[1],
+            packet[2],
+            packet[3],
+            packet[4],
+            packet[5],
+            packet[6],
+            packet[7],
             {
                 dim: {
-                    r1: packet.o.dim.r1,
-                    r2: packet.o.dim.r2,
-                    r3: packet.o.dim.r3,
-                    b1: packet.o.dim.b1,
-                    b2: packet.o.dim.b2,
-                    b3: packet.o.dim.b3,
+                    r1: { w: packet[8][0][0][0], h: packet[8][0][0][1] },
+                    r2: { w: packet[8][0][1][0], h: packet[8][0][1][1] },
+                    r3: { w: packet[8][0][2][0], h: packet[8][0][2][1] },
+                    b1: { w: packet[8][0][3][0], h: packet[8][0][3][1] },
+                    b2: { w: packet[8][0][4][0], h: packet[8][0][4][1] },
+                    b3: { w: packet[8][0][5][0], h: packet[8][0][5][1] },
                 },
                 a: {
-                    r1: packet.o.a.r1,
-                    r2: packet.o.a.r2,
-                    r3: packet.o.a.r3,
-                    b1: packet.o.a.b1,
-                    b2: packet.o.a.b2,
-                    b3: packet.o.a.b3,
-                    d: packet.o.a.d,
-                    dx: packet.o.a.dx
+                    r1: Match.robotFromArrayPacket(packet[8][1][0]),
+                    r2: Match.robotFromArrayPacket(packet[8][1][1]),
+                    r3: Match.robotFromArrayPacket(packet[8][1][2]),
+                    b1: Match.robotFromArrayPacket(packet[8][1][3]),
+                    b2: Match.robotFromArrayPacket(packet[8][1][4]),
+                    b3: Match.robotFromArrayPacket(packet[8][1][5]),
+                    d: packet[8][1][6],
+                    dx: packet[8][1][7]
                 },
                 t: {
-                    r1: packet.o.t.r1,
-                    r2: packet.o.t.r2,
-                    r3: packet.o.t.r3,
-                    b1: packet.o.t.b1,
-                    b2: packet.o.t.b2,
-                    b3: packet.o.t.b3,
-                    d: packet.o.t.d,
-                    dx: packet.o.t.dx
+                    r1: Match.robotFromArrayPacket(packet[8][2][0]),
+                    r2: Match.robotFromArrayPacket(packet[8][2][1]),
+                    r3: Match.robotFromArrayPacket(packet[8][2][2]),
+                    b1: Match.robotFromArrayPacket(packet[8][2][3]),
+                    b2: Match.robotFromArrayPacket(packet[8][2][4]),
+                    b3: Match.robotFromArrayPacket(packet[8][2][5]),
+                    d: packet[8][2][6],
+                    dx: packet[8][2][7]
                 },
                 e: {
-                    r1: packet.o.e.r1,
-                    r2: packet.o.e.r2,
-                    r3: packet.o.e.r3,
-                    b1: packet.o.e.b1,
-                    b2: packet.o.e.b2,
-                    b3: packet.o.e.b3,
-                    d: packet.o.e.d,
-                    dx: packet.o.e.dx
+                    r1: Match.robotFromArrayPacket(packet[8][3][0]),
+                    r2: Match.robotFromArrayPacket(packet[8][3][1]),
+                    r3: Match.robotFromArrayPacket(packet[8][3][2]),
+                    b1: Match.robotFromArrayPacket(packet[8][3][3]),
+                    b2: Match.robotFromArrayPacket(packet[8][3][4]),
+                    b3: Match.robotFromArrayPacket(packet[8][3][5]),
+                    d: packet[8][3][6],
+                    dx: packet[8][3][7]
                 },
             }
         );
     }
 
-    getAsPacket (): Packet {
+    static robotFromArrayPacket (array) {
         return {
-            m: this.matchName,
-            r1: this.redOne,
-            r2: this.redTwo,
-            r3: this.redThree,
-            b1: this.blueOne,
-            b2: this.blueTwo,
-            b3: this.blueThree,
-            id: this.id,
-            o: {
-                dim: {
-                    r1: { w: Number(this.auton.redOneRobot.w.toFixed(1)), h: Number(this.auton.redOneRobot.h.toFixed(1)) },
-                    r2: { w: Number(this.auton.redTwoRobot.w.toFixed(1)), h: Number(this.auton.redTwoRobot.h.toFixed(1)) },
-                    r3: { w: Number(this.auton.redThreeRobot.w.toFixed(1)), h: Number(this.auton.redThreeRobot.h.toFixed(1)) },
-                    b1: { w: Number(this.auton.blueOneRobot.w.toFixed(1)), h: Number(this.auton.blueOneRobot.h.toFixed(1)) },
-                    b2: { w: Number(this.auton.blueTwoRobot.w.toFixed(1)), h: Number(this.auton.blueTwoRobot.h.toFixed(1)) },
-                    b3: { w: Number(this.auton.blueThreeRobot.w.toFixed(1)), h: Number(this.auton.blueThreeRobot.h.toFixed(1)) },
-                },
-                a: {
-                    r1: { x: this.auton.redOneRobot.x, y: this.auton.redOneRobot.y, r: Number(this.auton.redOneRobot.r.toFixed(2)) },
-                    r2: { x: this.auton.redTwoRobot.x, y: this.auton.redTwoRobot.y, r: Number(this.auton.redTwoRobot.r.toFixed(2)) },
-                    r3: { x: this.auton.redThreeRobot.x, y: this.auton.redThreeRobot.y, r: Number(this.auton.redThreeRobot.r.toFixed(2)) },
-                    b1: { x: this.auton.blueOneRobot.x, y: this.auton.blueOneRobot.y, r: Number(this.auton.blueOneRobot.r.toFixed(2)) },
-                    b2: { x: this.auton.blueTwoRobot.x, y: this.auton.blueTwoRobot.y, r: Number(this.auton.blueTwoRobot.r.toFixed(2)) },
-                    b3: { x: this.auton.blueThreeRobot.x, y: this.auton.blueThreeRobot.y, r: Number(this.auton.blueThreeRobot.r.toFixed(2)) },
-                    d: this.auton.drawing,
-                    dx: this.auton.drawingBBox
-                },
-                t: {
-                    r1: { x: this.teleop.redOneRobot.x, y: this.teleop.redOneRobot.y, r: Number(this.teleop.redOneRobot.r.toFixed(2)) },
-                    r2: { x: this.teleop.redTwoRobot.x, y: this.teleop.redTwoRobot.y, r: Number(this.teleop.redTwoRobot.r.toFixed(2)) },
-                    r3: { x: this.teleop.redThreeRobot.x, y: this.teleop.redThreeRobot.y, r: Number(this.teleop.redThreeRobot.r.toFixed(2)) },
-                    b1: { x: this.teleop.blueOneRobot.x, y: this.teleop.blueOneRobot.y, r: Number(this.teleop.blueOneRobot.r.toFixed(2)) },
-                    b2: { x: this.teleop.blueTwoRobot.x, y: this.teleop.blueTwoRobot.y, r: Number(this.teleop.blueTwoRobot.r.toFixed(2)) },
-                    b3: { x: this.teleop.blueThreeRobot.x, y: this.teleop.blueThreeRobot.y, r: Number(this.teleop.blueThreeRobot.r.toFixed(2)) },
-                    d: this.teleop.drawing,
-                    dx: this.teleop.drawingBBox
-                },
-                e: {
-                    r1: { x: this.endgame.redOneRobot.x, y: this.endgame.redOneRobot.y, r: Number(this.endgame.redOneRobot.r.toFixed(2)) },
-                    r2: { x: this.endgame.redTwoRobot.x, y: this.endgame.redTwoRobot.y, r: Number(this.endgame.redTwoRobot.r.toFixed(2)) },
-                    r3: { x: this.endgame.redThreeRobot.x, y: this.endgame.redThreeRobot.y, r: Number(this.endgame.redThreeRobot.r.toFixed(2)) },
-                    b1: { x: this.endgame.blueOneRobot.x, y: this.endgame.blueOneRobot.y, r: Number(this.endgame.blueOneRobot.r.toFixed(2)) },
-                    b2: { x: this.endgame.blueTwoRobot.x, y: this.endgame.blueTwoRobot.y, r: Number(this.endgame.blueTwoRobot.r.toFixed(2)) },
-                    b3: { x: this.endgame.blueThreeRobot.x, y: this.endgame.blueThreeRobot.y, r: Number(this.endgame.blueThreeRobot.r.toFixed(2)) },
-                    d: this.endgame.drawing,
-                    dx: this.endgame.drawingBBox
-                },
-            }
-        };
+            x: array[0],
+            y: array[1],
+            r: array[2]
+        }
+    }
+
+    getAsPacket (): any {
+        return [
+            this.matchName,
+            this.redOne,
+            this.redTwo,
+            this.redThree,
+            this.blueOne,
+            this.blueTwo,
+            this.blueThree,
+            this.id,
+            [
+                [
+                    [ Number(this.auton.redOneRobot.w.toFixed(1)), Number(this.auton.redOneRobot.h.toFixed(1)) ],
+                    [ Number(this.auton.redTwoRobot.w.toFixed(1)), Number(this.auton.redTwoRobot.h.toFixed(1)) ],
+                    [ Number(this.auton.redThreeRobot.w.toFixed(1)), Number(this.auton.redThreeRobot.h.toFixed(1)) ],
+                    [ Number(this.auton.blueOneRobot.w.toFixed(1)), Number(this.auton.blueOneRobot.h.toFixed(1)) ],
+                    [ Number(this.auton.blueTwoRobot.w.toFixed(1)), Number(this.auton.blueTwoRobot.h.toFixed(1)) ],
+                    [ Number(this.auton.blueThreeRobot.w.toFixed(1)), Number(this.auton.blueThreeRobot.h.toFixed(1)) ],
+                ],
+                [
+                    [ this.auton.redOneRobot.x, this.auton.redOneRobot.y, Number(this.auton.redOneRobot.r.toFixed(2)) ],
+                    [ this.auton.redTwoRobot.x, this.auton.redTwoRobot.y, Number(this.auton.redTwoRobot.r.toFixed(2)) ],
+                    [ this.auton.redThreeRobot.x, this.auton.redThreeRobot.y, Number(this.auton.redThreeRobot.r.toFixed(2)) ],
+                    [ this.auton.blueOneRobot.x, this.auton.blueOneRobot.y, Number(this.auton.blueOneRobot.r.toFixed(2)) ],
+                    [ this.auton.blueTwoRobot.x, this.auton.blueTwoRobot.y, Number(this.auton.blueTwoRobot.r.toFixed(2)) ],
+                    [ this.auton.blueThreeRobot.x, this.auton.blueThreeRobot.y, Number(this.auton.blueThreeRobot.r.toFixed(2)) ],
+                    this.auton.drawing,
+                    this.auton.drawingBBox
+                ],
+                [
+                    [ this.teleop.redOneRobot.x, this.teleop.redOneRobot.y, Number(this.teleop.redOneRobot.r.toFixed(2)) ],
+                    [ this.teleop.redTwoRobot.x, this.teleop.redTwoRobot.y, Number(this.teleop.redTwoRobot.r.toFixed(2)) ],
+                    [ this.teleop.redThreeRobot.x, this.teleop.redThreeRobot.y, Number(this.teleop.redThreeRobot.r.toFixed(2)) ],
+                    [ this.teleop.blueOneRobot.x, this.teleop.blueOneRobot.y, Number(this.teleop.blueOneRobot.r.toFixed(2)) ],
+                    [ this.teleop.blueTwoRobot.x, this.teleop.blueTwoRobot.y, Number(this.teleop.blueTwoRobot.r.toFixed(2)) ],
+                    [ this.teleop.blueThreeRobot.x, this.teleop.blueThreeRobot.y, Number(this.teleop.blueThreeRobot.r.toFixed(2)) ],
+                    this.teleop.drawing,
+                    this.teleop.drawingBBox
+                ],
+                [
+                    [ this.endgame.redOneRobot.x, this.endgame.redOneRobot.y, Number(this.endgame.redOneRobot.r.toFixed(2)) ],
+                    [ this.endgame.redTwoRobot.x, this.endgame.redTwoRobot.y, Number(this.endgame.redTwoRobot.r.toFixed(2)) ],
+                    [ this.endgame.redThreeRobot.x, this.endgame.redThreeRobot.y, Number(this.endgame.redThreeRobot.r.toFixed(2)) ],
+                    [ this.endgame.blueOneRobot.x, this.endgame.blueOneRobot.y, Number(this.endgame.blueOneRobot.r.toFixed(2)) ],
+                    [ this.endgame.blueTwoRobot.x, this.endgame.blueTwoRobot.y, Number(this.endgame.blueTwoRobot.r.toFixed(2)) ],
+                    [ this.endgame.blueThreeRobot.x, this.endgame.blueThreeRobot.y, Number(this.endgame.blueThreeRobot.r.toFixed(2)) ],
+                    this.endgame.drawing,
+                    this.endgame.drawingBBox
+                ],
+            ]
+        ];
     }
 }

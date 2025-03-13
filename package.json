@@ -16,7 +16,7 @@
         "@tailwindcss/vite": "^4.0.12",
         "idb-keyval": "^6.2.1",
         "qr-scanner": "^1.4.2",
-        "qrcodejs2-fixes": "^0.0.2",
+        "qrcode": "^1.5.4",
         "tailwindcss": "^4.0.12",
         "uuidv4": "^6.2.13"
     }
