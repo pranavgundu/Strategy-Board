@@ -13,6 +13,7 @@
         <style>
             @import "tailwindcss";
         </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body class="overflow-hidden">
         <div id="home-container" class="flex flex-col w-dvw h-dvh touch-none">
@@ -101,10 +102,9 @@
                     <input id="whiteboard-robot-config-height" placeholder="length" class="w-1/3 ml-4 text-3xl text-zinc-500 text-left outline-0 select-none touch-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
                 </div>
             </div>
-            <div id="whiteboard-draw-config" class="hidden absolute flex flex-col justify-center items-center w-48 h-48 top-12 right-0 bg-zinc-800 rounded-b-xl">
-                <div class="text-2xl text-zinc-400 font-bold mb-6 select-none">Draw Tools</div>
-                <button id="whiteboard-draw-config-marker" class="text-3xl text-zinc-300 text-center select-none">Marker</button>
-                <button id="whiteboard-draw-config-eraser" class="text-3xl text-zinc-500 text-center select-none">Eraser</button>
+            <div id="whiteboard-draw-config" class="absolute flex flex-col justify-center items-center size-12 md:size-16 lg:size-24 bottom-4 right-4 bg-zinc-800 rounded-full">
+                <i id="whiteboard-draw-config-marker" class="fa fa-pencil text-xl md:text-2xl lg:text-3xl text-white"></i>
+                <i id="whiteboard-draw-config-eraser" class="fa fa-eraser text-xl md:text-2xl lg:text-3xl text-white" style="display: none;"></i>
             </div>
         </div>
         <script type="module" src="./src/app.ts"></script>

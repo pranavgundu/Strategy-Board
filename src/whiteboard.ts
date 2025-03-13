@@ -102,7 +102,18 @@ export class Whiteboard {
         document.getElementById("whiteboard-toolbar-mode-auton")?.addEventListener("click", e => this.toggleMode("auton"));
         document.getElementById("whiteboard-toolbar-mode-teleop")?.addEventListener("click", e => this.toggleMode("teleop"));
         document.getElementById("whiteboard-toolbar-mode-endgame")?.addEventListener("click", e => this.toggleMode("endgame"));
-
+        document.getElementById("whiteboard-draw-config")?.addEventListener("click", e => {
+            if (this.currentTool == "marker") {
+                this.currentTool = "eraser";
+                document.getElementById("whiteboard-draw-config-marker").style.setProperty("display", "none");
+                document.getElementById("whiteboard-draw-config-eraser").style.setProperty("display", "inline");
+            } else if (this.currentTool == "eraser") {
+                this.currentTool = "marker";
+                document.getElementById("whiteboard-draw-config-marker").style.setProperty("display", "inline");
+                document.getElementById("whiteboard-draw-config-eraser").style.setProperty("display", "none");
+            }
+        });
+        
         const widthConfig = <HTMLInputElement>document.getElementById("whiteboard-robot-config-width");
         widthConfig.addEventListener("input", e => {
             if (this.selected !== null) {
@@ -131,24 +142,6 @@ export class Whiteboard {
                 this.match.endgame[`${this.selected[0]}Robot`].h = robotHeight * height / realHeight;
                 this.drawRobots();
             }
-        });
-
-        const markerConfig = <HTMLButtonElement>document.getElementById("whiteboard-draw-config-marker");
-        markerConfig.addEventListener("click", e => {
-            this.currentTool = "marker";
-            document.getElementById("whiteboard-draw-config-marker")?.classList.remove("text-zinc-500");
-            document.getElementById("whiteboard-draw-config-marker")?.classList.add("text-zinc-300");
-            document.getElementById("whiteboard-draw-config-eraser")?.classList.remove("text-zinc-300");
-            document.getElementById("whiteboard-draw-config-eraser")?.classList.add("text-zinc-500");
-        });
-
-        const eraserConfig = <HTMLButtonElement>document.getElementById("whiteboard-draw-config-eraser");
-        eraserConfig.addEventListener("click", e => {
-            this.currentTool = "eraser";
-            document.getElementById("whiteboard-draw-config-eraser")?.classList.remove("text-zinc-500");
-            document.getElementById("whiteboard-draw-config-eraser")?.classList.add("text-zinc-300");
-            document.getElementById("whiteboard-draw-config-marker")?.classList.remove("text-zinc-300");
-            document.getElementById("whiteboard-draw-config-marker")?.classList.add("text-zinc-500");
         });
 
         document.getElementById("whiteboard-toolbar-undo")?.addEventListener("click", e => {
@@ -180,10 +173,8 @@ export class Whiteboard {
                 document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-700");
             }
             this.currentTool = "marker";
-            document.getElementById("whiteboard-draw-config-marker")?.classList.remove("text-zinc-500");
-            document.getElementById("whiteboard-draw-config-marker")?.classList.add("text-zinc-300");
-            document.getElementById("whiteboard-draw-config-eraser")?.classList.remove("text-zinc-300");
-            document.getElementById("whiteboard-draw-config-eraser")?.classList.add("text-zinc-500");
+            document.getElementById("whiteboard-draw-config-marker").style.setProperty("display", "inline");
+            document.getElementById("whiteboard-draw-config-eraser").style.setProperty("display", "none");
         } else if (active == false) {
             if (this.match !== null) this.model.updateMatch(this.match.id);
             this.match = null;
@@ -193,7 +184,6 @@ export class Whiteboard {
             this.teleopActionHistory = [];
             this.endgameActionHistory = [];
             document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
-            document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
         }
     }
 
@@ -432,7 +422,6 @@ export class Whiteboard {
         this.lastSelected = null;
         this.selected = null;
         document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
-        document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
         document.getElementById(`whiteboard-toolbar-mode-${this.mode}`)?.classList.remove("font-extrabold");
         document.getElementById(`whiteboard-toolbar-mode-${this.mode}`)?.classList.remove("text-zinc-100");
         document.getElementById(`whiteboard-toolbar-mode-${this.mode}`)?.classList.add("text-zinc-300");
@@ -488,23 +477,16 @@ export class Whiteboard {
         if (clickMovement > 30) return;
         //const selected = this.getRobotAtPoint(x, y);
         if (this.selected == null) {
-            if (document.getElementById("whiteboard-robot-config")?.classList.contains("hidden") && this.lastSelected == null) {
-                if (document.getElementById("whiteboard-draw-config")?.classList.contains("hidden")) {
-                    document.getElementById("whiteboard-draw-config")?.classList.remove("hidden");
-                } else {
-                    document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
-                }
-            } else {
-                document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
-            }
+            document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
         } else {
-            if (this.lastSelected != null) {
+            if (this.lastSelected[0] == this.selected[0]) {
                 if (document.getElementById("whiteboard-robot-config")?.classList.contains("hidden")) {
                     document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
-                    document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
                 } else {
                     document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
                 }
+            } else {
+                document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
             }
         }
     }
