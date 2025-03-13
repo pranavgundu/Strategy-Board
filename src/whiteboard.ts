@@ -88,6 +88,11 @@ export class Whiteboard {
         
         window.addEventListener("resize", this.redrawAll.bind(this));
         window.addEventListener("orientationchange", this.redrawAll.bind(this));
+        window.addEventListener("keydown", e => {
+            if (e.ctrlKey && e.code == "KeyZ") {
+                this.undo();
+            }
+        });
         drawing.addEventListener("click", e => this.onClick(e));
         drawing.addEventListener("pointermove", this.onPointerMove.bind(this));
         drawing.addEventListener("pointerup", this.onPointerUp.bind(this));
