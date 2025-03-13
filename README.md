@@ -14,7 +14,7 @@
 
 For the best experience, especially on mobile devices, install the website as a Progressive Web App (PWA).
 
-> PWA is not needed for any of the features to work. On mobile devices, PWA will remove the browser UI for a larger app window.
+> On mobile, PWA will remove the browser UI for a larger app window.
 
 ## Features
 
@@ -29,8 +29,6 @@ For the best experience, especially on mobile devices, install the website as a 
     - Robot dimensions (to scale)
 - Separate whiteboard for auton, teleop, endgame
 - Toggle betwen three perspectives
-
-> Tap on a robot to edit its dimensions. Tap anywhere else on the field to open the Draw/Erase menu.
 
 ### Offline
 
