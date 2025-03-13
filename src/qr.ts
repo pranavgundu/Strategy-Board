@@ -217,11 +217,12 @@ export class QRImport {
         dataALPHA = dataALPHA.replaceAll(" ", ",");
 
         data = dataBYTES + dataALPHA;
-        
+
         data = JSON.parse(data);
         data.splice(7, 0, null);
 
         this.callback(data);
+        this.callback = null;
     }
 }
 

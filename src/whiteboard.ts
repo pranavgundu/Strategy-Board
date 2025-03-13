@@ -647,26 +647,11 @@ export class Whiteboard {
         if (this.currentStrokePoints.length > 1) {
             DR.closePath();
             this.addUndoHistory({
-                type: "stroke"
+                type: "stroke",
+                ref: this.currentStrokePoints
             });
             this.getData()?.drawing.push(this.currentStrokePoints);
-            let minx = this.currentStrokePoints[0][0];
-            let miny = this.currentStrokePoints[0][0];
-            let maxx = minx;
-            let maxy = miny;
-            for (let point of this.currentStrokePoints) {
-                if (point[0] < minx) {
-                    minx = point[0];
-                } else if (point[0] > maxx) {
-                    maxx = point[0];
-                }
-                if (point[1] < miny) {
-                    miny = point[1];
-                } else if (point[1] > maxy) {
-                    maxy = point[1];
-                }
-            }
-            this.getData()?.drawingBBox.push([minx, miny, maxx, maxy]);
+            this.getData()?.drawingBBox.push(getBBox(this.currentStrokePoints));
         }
         this.currentStrokePoints = [];
     }
