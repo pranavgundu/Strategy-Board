@@ -8,6 +8,8 @@
 
 ### https://frcteam834.github.io/StrategyBoard2025/
 
+> This app is intended for tablets in landscape mode. However, it should work on most platforms
+
 ### Install as a PWA
 
 For the best experience, especially on mobile devices, install the website as a Progressive Web App (PWA).
