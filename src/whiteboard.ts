@@ -496,6 +496,7 @@ export class Whiteboard {
             if (this.lastSelected != null) {
                 if (document.getElementById("whiteboard-robot-config")?.classList.contains("hidden")) {
                     document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
+                    document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
                 } else {
                     document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
                 }
