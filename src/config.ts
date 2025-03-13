@@ -5,8 +5,7 @@ export const Config = {
     fieldRealWidthInches: 690.875, // real field width in inches (long side)
     fieldRealHeightInches: 317, // real field height in inches (short side)
 
-    ///
-
+    // renderred position of driver stations
     redOneStationX:    3575, // pixels
     redOneStationY:    1155,
 
