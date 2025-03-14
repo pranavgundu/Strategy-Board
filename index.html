@@ -18,6 +18,15 @@
                 --breakpoint-lg: 80rem;
             }
         </style>
+        <script type="module">
+            import { CLEAR } from "@/db.ts";
+            document.getElementById("home-toolbar-clear-btn").addEventListener("click", e => {
+                if(!confirm("Are you sure you want to clear all data?")) return;
+
+                CLEAR();
+                location.reload();
+            });
+        </script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body class="overflow-hidden">

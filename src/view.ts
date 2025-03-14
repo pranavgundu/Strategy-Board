@@ -60,7 +60,7 @@ export class View {
         B.NewMatch.addEventListener("click", e => this.onClickNewMatch(e));
         B.CreateMatch.addEventListener("click", e => this.onClickCreateMatch(e));
         B.CancelCreate.addEventListener("click", e => this.onClickCancelCreateMatch(e));
-        B.Clear.addEventListener("click", e => this.onClickClear(e));
+        //B.Clear.addEventListener("click", e => this.onClickClear(e));
         B.Back.addEventListener("click", e => this.onClickBack(e));
         B.ToggleView.addEventListener("click", e => this.onClickToggleView(e));
         B.ImportMatch.addEventListener("click", e => this.onClickImportMatch(e));
