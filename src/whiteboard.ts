@@ -63,13 +63,15 @@ export class Whiteboard {
     private rotControl: { x: number, y: number } | null = null;
     private isPointerDown = false;
 
-    private currentStrokePoints: Array<[number, number]> = [];
+    private currentStrokePoints: Array<any> = []; // first index is the currentColor
     private currentErasePoint: { x: number, y: number } | null = null;
     private lastErasePoint: { x: number, y: number } | null = null;
     private currentErasedStrokes: any = [];
+    private currentErasedStrokeIndexes: any = [];
     private previousRobotTransform: any = {};
     private currentAction = "none";
     private currentTool = "marker";
+    private currentColor = 0;
 
     private autonActionHistory: Array<any> = [];
     private teleopActionHistory: Array<any> = [];
@@ -148,7 +150,138 @@ export class Whiteboard {
             this.undo();
         });
 
-        DR.strokeStyle = "white";
+        document.getElementById("whiteboard-color-close")?.addEventListener("click", e => {
+            document.getElementById("whiteboard-color-white")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-white")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-red")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-red")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-blue")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-blue")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-green")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-green")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-yellow")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-yellow")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-close")?.classList.add("hidden");
+            switch (this.currentColor) {
+                case 0: {
+                    document.getElementById("whiteboard-color-white")?.classList.remove("hidden");
+                    break;
+                }
+                case 1: {
+                    document.getElementById("whiteboard-color-red")?.classList.remove("hidden");
+                    break;
+                }
+                case 2: {
+                    document.getElementById("whiteboard-color-blue")?.classList.remove("hidden");
+                    break;
+                }
+                case 3: {
+                    document.getElementById("whiteboard-color-green")?.classList.remove("hidden");
+                    break;
+                }
+                case 4: {
+                    document.getElementById("whiteboard-color-yellow")?.classList.remove("hidden");
+                    break;
+                }
+                default: break;
+            }
+        });
+
+        document.getElementById("whiteboard-color-white")?.addEventListener("click", e => {
+            if (document.getElementById("whiteboard-color-close")?.classList.contains("hidden")) {
+                document.getElementById("whiteboard-color-white")?.classList.add("border-4");
+                document.getElementById("whiteboard-color-white")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-red")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-green")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-close")?.classList.remove("hidden");
+            } else {
+                document.getElementById("whiteboard-color-red")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-green")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("border-4");
+                this.currentColor = 0;
+                document.getElementById("whiteboard-color-white")?.classList.add("border-4");
+            }
+        });
+
+        document.getElementById("whiteboard-color-red")?.addEventListener("click", e => {
+            if (document.getElementById("whiteboard-color-close")?.classList.contains("hidden")) {
+                document.getElementById("whiteboard-color-red")?.classList.add("border-4");
+                document.getElementById("whiteboard-color-white")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-red")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-green")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-close")?.classList.remove("hidden");
+            } else {
+                document.getElementById("whiteboard-color-white")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-green")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("border-4");
+                this.currentColor = 1;
+                document.getElementById("whiteboard-color-red")?.classList.add("border-4");
+            }
+        });
+
+        document.getElementById("whiteboard-color-blue")?.addEventListener("click", e => {
+            if (document.getElementById("whiteboard-color-close")?.classList.contains("hidden")) {
+                document.getElementById("whiteboard-color-blue")?.classList.add("border-4");
+                document.getElementById("whiteboard-color-white")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-red")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-green")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-close")?.classList.remove("hidden");
+            } else {
+                document.getElementById("whiteboard-color-white")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-red")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-green")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("border-4");
+                this.currentColor = 2;
+                document.getElementById("whiteboard-color-blue")?.classList.add("border-4");
+            }
+        });
+
+        document.getElementById("whiteboard-color-green")?.addEventListener("click", e => {
+            if (document.getElementById("whiteboard-color-close")?.classList.contains("hidden")) {
+                document.getElementById("whiteboard-color-green")?.classList.add("border-4");
+                document.getElementById("whiteboard-color-white")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-red")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-green")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-close")?.classList.remove("hidden");
+            } else {
+                document.getElementById("whiteboard-color-white")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-red")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("border-4");
+                this.currentColor = 3;
+                document.getElementById("whiteboard-color-green")?.classList.add("border-4");
+            }
+        });
+
+        document.getElementById("whiteboard-color-yellow")?.addEventListener("click", e => {
+            if (document.getElementById("whiteboard-color-close")?.classList.contains("hidden")) {
+                document.getElementById("whiteboard-color-yellow")?.classList.add("border-4");
+                document.getElementById("whiteboard-color-white")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-red")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-green")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-yellow")?.classList.remove("hidden");
+                document.getElementById("whiteboard-color-close")?.classList.remove("hidden");
+            } else {
+                document.getElementById("whiteboard-color-white")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-red")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-blue")?.classList.remove("border-4");
+                document.getElementById("whiteboard-color-green")?.classList.remove("border-4");
+                this.currentColor = 4;
+                document.getElementById("whiteboard-color-yellow")?.classList.add("border-4");
+            }
+        });
+
         DR.lineWidth = 10;
         DR.lineCap = "round";
         DR.lineJoin = "round";
@@ -173,8 +306,21 @@ export class Whiteboard {
                 document.getElementById("whiteboard-toolbar-undo")?.classList.remove("text-amber-700");
             }
             this.currentTool = "marker";
+            this.currentColor = 0;
             document.getElementById("whiteboard-draw-config-marker").style.setProperty("display", "inline");
             document.getElementById("whiteboard-draw-config-eraser").style.setProperty("display", "none");
+
+            document.getElementById("whiteboard-color-white")?.classList.remove("hidden");
+            document.getElementById("whiteboard-color-white")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-red")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-red")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-blue")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-blue")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-green")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-green")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-yellow")?.classList.add("hidden");
+            document.getElementById("whiteboard-color-yellow")?.classList.remove("border-4");
+            document.getElementById("whiteboard-color-close")?.classList.add("hidden");
         } else if (active == false) {
             if (this.match !== null) this.model.updateMatch(this.match.id);
             this.match = null;
@@ -260,9 +406,9 @@ export class Whiteboard {
         } else if (action.type == "erase") {
             const data = this.getData();
             if (data !== null) {
-                for (let stroke of action.erased) {
-                    data.drawing.push(stroke);
-                    data.drawingBBox.push(getBBox(stroke));
+                for (let i = action.erased.length - 1; i >= 0; i--) {
+                    data.drawing.splice(action.indexes[i], 0, action.erased[i]);
+                    data.drawingBBox.splice(action.indexes[i], 0, getBBox(action.erased[i]));
                 }
                 this.redrawDrawing();
             }
@@ -403,9 +549,10 @@ export class Whiteboard {
         DR.clearRect(0, 0, width, height);
         for (let stroke of data.drawing) {
             DR.beginPath();
-            DR.moveTo(stroke[0][0] - (this.camera.x - width / 2 ), stroke[0][1] - (this.camera.y - height / 2));
-            for (let point of stroke) {
-                DR.lineTo(point[0] - (this.camera.x - width / 2), point[1] - (this.camera.y - height / 2));
+            DR.strokeStyle = this.getStrokeColor(stroke[0]);
+            DR.moveTo(stroke[1][0] - (this.camera.x - width / 2 ), stroke[1][1] - (this.camera.y - height / 2));
+            for (let i = 1; i < stroke.length; i++) {
+                DR.lineTo(stroke[i][0] - (this.camera.x - width / 2), stroke[i][1] - (this.camera.y - height / 2));
             }
             DR.stroke();
         }
@@ -415,6 +562,27 @@ export class Whiteboard {
         this.drawBackground();
         this.drawRobots();
         this.redrawDrawing();
+    }
+
+    private getStrokeColor (id) {
+        switch (id) {
+            case 0: {
+                return "white";
+            }
+            case 1: {
+                return "#ef4444";
+            }
+            case 2: {
+                return "#3b82f6";
+            }
+            case 3: {
+                return "#22c55e";
+            }
+            case 4: {
+                return "#eab308";
+            }
+            default: return "white";
+        }
     }
 
     private toggleMode (mode: string) {
@@ -479,7 +647,7 @@ export class Whiteboard {
         if (this.selected == null) {
             document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
         } else {
-            if (this.lastSelected[0] == this.selected[0]) {
+            if (this.lastSelected !== null && this.lastSelected[0] == this.selected[0]) {
                 if (document.getElementById("whiteboard-robot-config")?.classList.contains("hidden")) {
                     document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
                 } else {
@@ -490,6 +658,7 @@ export class Whiteboard {
             }
         }
     }
+
 
     private onPointerMove (e: PointerEvent) {
         const rect = drawing.getBoundingClientRect();
@@ -518,6 +687,7 @@ export class Whiteboard {
                                 data.drawingBBox.splice(i, 1);
                                 this.redrawDrawing();
                                 this.currentErasedStrokes.push(stroke);
+                                this.currentErasedStrokeIndexes.push(i);
                                 break;
                             }
                         }
@@ -589,8 +759,10 @@ export class Whiteboard {
             this.drawRobots();
             document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
             if (this.currentTool == "marker") {
+                DR.strokeStyle = this.getStrokeColor(this.currentColor);
                 DR.beginPath();
                 DR.moveTo(x - (this.camera.x - width / 2), y - (this.camera.y - height / 2));
+                this.currentStrokePoints.push(this.currentColor);
                 this.currentStrokePoints.push([x, y]);
             } else if (this.currentTool == "eraser") {
                 this.currentErasePoint = { x: x, y: y };
@@ -612,7 +784,7 @@ export class Whiteboard {
             }
             this.currentAction = "none";
             //this.previousRobotTransform = this.selected[1];
-        } else if (this.currentStrokePoints.length > 1) {
+        } else if (this.currentStrokePoints.length > 2) {
             DR.closePath();
             this.addUndoHistory({
                 type: "stroke",
@@ -623,16 +795,18 @@ export class Whiteboard {
         } else if (this.currentErasedStrokes.length > 0) {
             this.addUndoHistory({
                 type: "erase",
-                erased: this.currentErasedStrokes
+                erased: this.currentErasedStrokes,
+                indexes: this.currentErasedStrokeIndexes
             });
             this.currentErasedStrokes = [];
+            this.currentErasedStrokeIndexes = [];
         }
         this.currentStrokePoints = [];
     }
 
     private onPointerLeave (e: Event) {
         this.isPointerDown = false;
-        if (this.currentStrokePoints.length > 1) {
+        if (this.currentStrokePoints.length > 2) {
             DR.closePath();
             this.addUndoHistory({
                 type: "stroke",
@@ -704,11 +878,12 @@ function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
 
 
 function getBBox (stroke) {
-    let minx = stroke[0][0];
-    let miny = stroke[0][1];
+    let minx = stroke[1][0];
+    let miny = stroke[1][1];
     let maxx = minx;
     let maxy = miny;
-    for (let point of stroke) {
+    for (let i = 1; i < stroke.length; i++) {
+        let point = stroke[i];
         if (point[0] < minx) {
             minx = point[0];
         } else if (point[0] > maxx) {
@@ -721,4 +896,16 @@ function getBBox (stroke) {
         }
     }
     return [minx, miny, maxx, maxy];
+}
+
+function getSortedIndex(arr, num) {
+    let left = 0, right = arr.length;
+    
+    while (left < right) {
+        let mid = Math.floor((left + right) / 2);
+        if (arr[mid] < num) left = mid + 1;
+        else right = mid;
+    }
+    
+    return left;
 }

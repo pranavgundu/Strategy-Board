@@ -26,7 +26,7 @@ For the best experience, especially on mobile devices, install the website as a 
 - Robots
     - Draggable
     - Rotatable
-    - Robot dimensions (to scale)
+    - Edit Robot dimensions (to scale)
 - Separate whiteboard for auton, teleop, endgame
 - Toggle betwen three perspectives
 
@@ -59,7 +59,7 @@ When the import is finished, it will automatically close the window. Tap outside
 By nature, importing may take a few seconds. For the fastest imports:
 
 - Don't draw excessively; every additional point is more data to send
-- Find decent lighting
+- Find decent diffuse lighting without any glare
 - Make sure the importing device has a good camera >15fps
 
 <a href="https://imgbox.com/xirEOutY" target="_blank"><img src="https://images2.imgbox.com/86/34/xirEOutY_o.png" alt="image host"/></a>
@@ -70,8 +70,9 @@ Please report any bugs on [GitHub](https://github.com/FRCTeam834/StrategyBoard20
 
 If the app isn't working, try to:
 
-- Manual clear IndexedDB
+- Manually clear IndexedDB
 - Delete and re-add as PWA
+- Manully unregister the service worker
 
 ## Contributing
 
