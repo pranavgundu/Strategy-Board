@@ -3,19 +3,184 @@ import { Model } from "@/model.ts";
 import { Config } from "@/config.ts";
 import fieldUrl from "./field.png";
 
-const background = <HTMLCanvasElement>(
-  document.getElementById("whiteboard-canvas-background")
-);
-const items = <HTMLCanvasElement>(
-  document.getElementById("whiteboard-canvas-items")
-);
-const drawing = <HTMLCanvasElement>(
-  document.getElementById("whiteboard-canvas-drawing")
-);
+/**
+ * Lazily-resolved canvas elements and contexts.
+ *
+ * When the module is evaluated before the DOM is available (e.g. certain bundling
+ * or early-import scenarios), directly querying for elements and contexts will
+ * throw or return null. To make the whiteboard resilient we:
+ *  - defer document lookups until first use,
+ *  - provide offscreen-canvas fallbacks so drawing calls are no-ops (but safe),
+ *  - and prefer real DOM canvases/contexts when they become available.
+ *
+ * The rest of the file can continue to use `background`, `items`, `drawing`,
+ * `BG`, `IT` and `DR` exactly as before; these are proxies that forward to the
+ * real elements/contexts (or to safe fallbacks) and will switch to real
+ * instances when the DOM is present.
+ */
 
-const BG = <CanvasRenderingContext2D>background.getContext("2d");
-const IT = <CanvasRenderingContext2D>items.getContext("2d");
-const DR = <CanvasRenderingContext2D>drawing.getContext("2d");
+let _backgroundEl: HTMLCanvasElement | null = null;
+let _itemsEl: HTMLCanvasElement | null = null;
+let _drawingEl: HTMLCanvasElement | null = null;
+
+let _BGctx: CanvasRenderingContext2D | null = null;
+let _ITctx: CanvasRenderingContext2D | null = null;
+let _DRctx: CanvasRenderingContext2D | null = null;
+
+/**
+ * Ensure that element references and contexts exist. If real DOM elements are
+ * present the real contexts are preferred; otherwise offscreen canvases are
+ * created as safe fallbacks so the library can run without throwing.
+ */
+function ensureCanvases(): void {
+  // Resolve DOM elements if available
+  if (!_backgroundEl) {
+    _backgroundEl = document.getElementById(
+      "whiteboard-canvas-background",
+    ) as HTMLCanvasElement | null;
+  }
+  if (!_itemsEl) {
+    _itemsEl = document.getElementById(
+      "whiteboard-canvas-items",
+    ) as HTMLCanvasElement | null;
+  }
+  if (!_drawingEl) {
+    _drawingEl = document.getElementById(
+      "whiteboard-canvas-drawing",
+    ) as HTMLCanvasElement | null;
+  }
+
+  // If a real element exists, prefer its 2D context
+  if (_backgroundEl) {
+    const ctx = _backgroundEl.getContext("2d");
+    if (ctx) _BGctx = ctx;
+  }
+  if (_itemsEl) {
+    const ctx = _itemsEl.getContext("2d");
+    if (ctx) _ITctx = ctx;
+  }
+  if (_drawingEl) {
+    const ctx = _drawingEl.getContext("2d");
+    if (ctx) _DRctx = ctx;
+  }
+
+  // Create offscreen fallback contexts if any context is still missing.
+  // These ensure method calls like `BG.fillRect(...)` are safe before the real
+  // DOM canvas exists. If a real canvas appears later, `ensureCanvases()` will
+  // pick up the real context on the next call.
+  if (!_BGctx) {
+    const c = document.createElement("canvas");
+    c.width = Config.fieldPNGPixelWidth;
+    c.height = Config.fieldPNGPixelHeight;
+    _BGctx = c.getContext("2d");
+  }
+  if (!_ITctx) {
+    const c = document.createElement("canvas");
+    c.width = Config.fieldPNGPixelWidth;
+    c.height = Config.fieldPNGPixelHeight;
+    _ITctx = c.getContext("2d");
+  }
+  if (!_DRctx) {
+    const c = document.createElement("canvas");
+    c.width = Config.fieldPNGPixelWidth;
+    c.height = Config.fieldPNGPixelHeight;
+    _DRctx = c.getContext("2d");
+  }
+}
+
+// Minimal offscreen stub canvas used when DOM element isn't available yet
+const _canvasStub = (() => {
+  const c = document.createElement("canvas");
+  c.width = Config.fieldPNGPixelWidth;
+  c.height = Config.fieldPNGPixelHeight;
+  return c;
+})();
+
+/**
+ * Proxies for the three canvases. These forward property access and method
+ * calls to the real DOM element when available; otherwise they operate on the
+ * fallback stub. Methods are bound correctly so existing calls like
+ * `background.getContext("2d")` or `background.width` continue to work.
+ */
+const background = new Proxy({} as HTMLCanvasElement, {
+  get(_t, prop) {
+    ensureCanvases();
+    const el = _backgroundEl || _canvasStub;
+    const value = (el as any)[prop];
+    if (typeof value === "function") return value.bind(el);
+    return value;
+  },
+  set(_t, prop, val) {
+    ensureCanvases();
+    if (_backgroundEl) (_backgroundEl as any)[prop] = val;
+    return true;
+  },
+}) as unknown as HTMLCanvasElement;
+
+const items = new Proxy({} as HTMLCanvasElement, {
+  get(_t, prop) {
+    ensureCanvases();
+    const el = _itemsEl || _canvasStub;
+    const value = (el as any)[prop];
+    if (typeof value === "function") return value.bind(el);
+    return value;
+  },
+  set(_t, prop, val) {
+    ensureCanvases();
+    if (_itemsEl) (_itemsEl as any)[prop] = val;
+    return true;
+  },
+}) as unknown as HTMLCanvasElement;
+
+const drawing = new Proxy({} as HTMLCanvasElement, {
+  get(_t, prop) {
+    ensureCanvases();
+    const el = _drawingEl || _canvasStub;
+    const value = (el as any)[prop];
+    if (typeof value === "function") return value.bind(el);
+    return value;
+  },
+  set(_t, prop, val) {
+    ensureCanvases();
+    if (_drawingEl) (_drawingEl as any)[prop] = val;
+    return true;
+  },
+}) as unknown as HTMLCanvasElement;
+
+/**
+ * Context proxies: these behave like real CanvasRenderingContext2D objects,
+ * but are resolved lazily via ensureCanvases(). Method calls are forwarded
+ * and bound so existing code using `BG`, `IT`, and `DR` can remain unchanged.
+ */
+const BG = new Proxy({} as CanvasRenderingContext2D, {
+  get(_t, prop) {
+    ensureCanvases();
+    const ctx = _BGctx as any;
+    const value = ctx[prop];
+    if (typeof value === "function") return value.bind(ctx);
+    return value;
+  },
+}) as unknown as CanvasRenderingContext2D;
+
+const IT = new Proxy({} as CanvasRenderingContext2D, {
+  get(_t, prop) {
+    ensureCanvases();
+    const ctx = _ITctx as any;
+    const value = ctx[prop];
+    if (typeof value === "function") return value.bind(ctx);
+    return value;
+  },
+}) as unknown as CanvasRenderingContext2D;
+
+const DR = new Proxy({} as CanvasRenderingContext2D, {
+  get(_t, prop) {
+    ensureCanvases();
+    const ctx = _DRctx as any;
+    const value = ctx[prop];
+    if (typeof value === "function") return value.bind(ctx);
+    return value;
+  },
+}) as unknown as CanvasRenderingContext2D;
 
 const dpr = window.devicePixelRatio || 1;
 const width = Config.fieldPNGPixelWidth;

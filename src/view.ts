@@ -2,45 +2,43 @@ import { Model } from "@/model.ts";
 import { Whiteboard, updateCanvasSize } from "@/whiteboard.ts";
 import { Match } from "@/match.ts";
 import { QRImport, QRExport } from "@/qr.ts";
+import { CLEAR } from "@/db.ts";
 
 const get = (id: string): HTMLElement | null => document.getElementById(id);
 
-// buttons
-const B = {
-  NewMatch: get("home-toolbar-new-btn") as HTMLElement,
-  ImportMatch: get("home-toolbar-import-btn") as HTMLElement,
-  Clear: get("home-toolbar-clear-btn") as HTMLElement,
-  CreateMatch: get("create-match-create-btn") as HTMLElement,
-  CancelCreate: get("create-match-cancel-btn") as HTMLElement,
-  Back: get("whiteboard-toolbar-back") as HTMLElement,
-  ToggleView: get("whiteboard-toolbar-view-toggle") as HTMLElement,
-};
+// Lazily resolve DOM elements at initialization time.
+// These placeholders are assigned once the DOM is ready.
+let B: {
+  NewMatch?: HTMLElement | null;
+  ImportMatch?: HTMLElement | null;
+  Clear?: HTMLElement | null;
+  CreateMatch?: HTMLElement | null;
+  CancelCreate?: HTMLElement | null;
+  Back?: HTMLElement | null;
+  ToggleView?: HTMLElement | null;
+} | null = null;
 
-// inputs
-const I = {
-  MatchName: get("create-match-name") as HTMLInputElement,
-  RedOne: get("create-match-red-1") as HTMLInputElement,
-  RedTwo: get("create-match-red-2") as HTMLInputElement,
-  RedThree: get("create-match-red-3") as HTMLInputElement,
-  BlueOne: get("create-match-blue-1") as HTMLInputElement,
-  BlueTwo: get("create-match-blue-2") as HTMLInputElement,
-  BlueThree: get("create-match-blue-3") as HTMLInputElement,
-};
+let I: {
+  MatchName?: HTMLInputElement | null;
+  RedOne?: HTMLInputElement | null;
+  RedTwo?: HTMLInputElement | null;
+  RedThree?: HTMLInputElement | null;
+  BlueOne?: HTMLInputElement | null;
+  BlueTwo?: HTMLInputElement | null;
+  BlueThree?: HTMLInputElement | null;
+} | null = null;
 
-// other elements
-const E = {
-  Home: get("home-container") as HTMLElement,
-  Whiteboard: get("whiteboard-container") as HTMLElement,
-  MatchList: get("home-match-list") as HTMLElement,
-  CreateMatchPanel: get("create-match-container") as HTMLElement,
-  EmptyMatchListPlaceholder: get(
-    "home-match-list-empty-placeholder",
-  ) as HTMLElement,
-  MatchListItemTemplate: get("home-match-list-item-template") as HTMLElement,
-  Export: get("qr-export-container") as HTMLElement,
-  Import: get("qr-import-container") as HTMLElement,
-  ImportInner: get("qr-import-inner-container") as HTMLElement,
-};
+let E: {
+  Home?: HTMLElement | null;
+  Whiteboard?: HTMLElement | null;
+  MatchList?: HTMLElement | null;
+  CreateMatchPanel?: HTMLElement | null;
+  EmptyMatchListPlaceholder?: HTMLElement | null;
+  MatchListItemTemplate?: HTMLElement | null;
+  Export?: HTMLElement | null;
+  Import?: HTMLElement | null;
+  ImportInner?: HTMLElement | null;
+} | null = null;
 
 export class View {
   private model: Model;
@@ -59,31 +57,239 @@ export class View {
     this.qrimport = qrimport;
     this.qrexport = qrexport;
 
-    for (const match of this.model.matches) {
-      this.createNewMatch(
-        match.id,
-        match.matchName,
-        match.redOne,
-        match.redTwo,
-        match.redThree,
-        match.blueOne,
-        match.blueTwo,
-        match.blueThree,
-      );
+    // Initialize DOM-dependent state only after the DOM is ready.
+    const initDOM = () => {
+      // Resolve element references now that the DOM exists.
+      B = {
+        NewMatch: get("home-toolbar-new-btn") as HTMLElement | null,
+        ImportMatch: get("home-toolbar-import-btn") as HTMLElement | null,
+        Clear: get("home-toolbar-clear-btn") as HTMLElement | null,
+        CreateMatch: get("create-match-create-btn") as HTMLElement | null,
+        CancelCreate: get("create-match-cancel-btn") as HTMLElement | null,
+        Back: get("whiteboard-toolbar-back") as HTMLElement | null,
+        ToggleView: get("whiteboard-toolbar-view-toggle") as HTMLElement | null,
+      };
+
+      I = {
+        MatchName: get("create-match-name") as HTMLInputElement | null,
+        RedOne: get("create-match-red-1") as HTMLInputElement | null,
+        RedTwo: get("create-match-red-2") as HTMLInputElement | null,
+        RedThree: get("create-match-red-3") as HTMLInputElement | null,
+        BlueOne: get("create-match-blue-1") as HTMLInputElement | null,
+        BlueTwo: get("create-match-blue-2") as HTMLInputElement | null,
+        BlueThree: get("create-match-blue-3") as HTMLInputElement | null,
+      };
+
+      E = {
+        Home: get("home-container") as HTMLElement | null,
+        Whiteboard: get("whiteboard-container") as HTMLElement | null,
+        MatchList: get("home-match-list") as HTMLElement | null,
+        CreateMatchPanel: get("create-match-container") as HTMLElement | null,
+        EmptyMatchListPlaceholder: get(
+          "home-match-list-empty-placeholder",
+        ) as HTMLElement | null,
+        MatchListItemTemplate: get(
+          "home-match-list-item-template",
+        ) as HTMLElement | null,
+        Export: get("qr-export-container") as HTMLElement | null,
+        Import: get("qr-import-container") as HTMLElement | null,
+        ImportInner: get("qr-import-inner-container") as HTMLElement | null,
+      };
+
+      // Create existing match entries now that the list/template are available.
+      for (const match of this.model.matches) {
+        this.createNewMatch(
+          match.id,
+          match.matchName,
+          match.redOne,
+          match.redTwo,
+          match.redThree,
+          match.blueOne,
+          match.blueTwo,
+          match.blueThree,
+        );
+      }
+
+      // Attach event listeners defensively (if element exists).
+      // Use consolidated registration to add debug logs when handlers are attached.
+      const trackedHandlers = [
+        {
+          el: B?.NewMatch,
+          id: "home-toolbar-new-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickNewMatch(e),
+        },
+        {
+          el: B?.CreateMatch,
+          id: "create-match-create-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickCreateMatch(e),
+        },
+        {
+          el: B?.CancelCreate,
+          id: "create-match-cancel-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickCancelCreateMatch(e),
+        },
+        {
+          el: B?.Back,
+          id: "whiteboard-toolbar-back",
+          evt: "click",
+          fn: (e: Event) => this.onClickBack(e),
+        },
+        {
+          el: B?.ToggleView,
+          id: "whiteboard-toolbar-view-toggle",
+          evt: "click",
+          fn: (e: Event) => this.onClickToggleView(e),
+        },
+        {
+          el: B?.ImportMatch,
+          id: "home-toolbar-import-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickImportMatch(e),
+        },
+      ];
+
+      for (const h of trackedHandlers) {
+        if (h.el) {
+          console.debug(`View: attaching '${h.evt}' handler to #${h.id}`);
+          try {
+            // Emit a lightweight event so the debug overlay or external monitors can see when
+            // handlers are attached. Ignore if dispatching fails in constrained environments.
+            try {
+              window.dispatchEvent(
+                new CustomEvent("app:handlerattached", {
+                  detail: { id: h.id, event: h.evt },
+                }),
+              );
+            } catch (_err) {}
+
+            (h.el as HTMLElement).addEventListener(
+              h.evt,
+              h.fn as EventListener,
+            );
+            console.debug(`View: attached '${h.evt}' handler to #${h.id}`);
+          } catch (err) {
+            console.error(
+              `View: failed to attach handler '${h.evt}' to #${h.id}:`,
+              err,
+            );
+          }
+        } else {
+          console.warn(`Missing element: ${h.id}`);
+        }
+      }
+
+      // Clear button has a special inline handler body; keep behavior but add logs.
+      const clearBtn = B?.Clear;
+      if (clearBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #home-toolbar-clear-btn",
+        );
+        try {
+          try {
+            window.dispatchEvent(
+              new CustomEvent("app:handlerattached", {
+                detail: { id: "home-toolbar-clear-btn", event: "click" },
+              }),
+            );
+          } catch (_err) {}
+          clearBtn.addEventListener("click", (e) => {
+            if (!confirm("Are you sure you want to clear all data?")) return;
+            CLEAR();
+            location.reload();
+          });
+          console.debug(
+            "View: attached 'click' handler to #home-toolbar-clear-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #home-toolbar-clear-btn:",
+            err,
+          );
+        }
+      } else {
+        // There might be an inline handler in index.html; still warn to help debugging.
+        console.warn(
+          "Missing element: home-toolbar-clear-btn (no clear handler attached here)",
+        );
+      }
+
+      const exportEl = E?.Export;
+      if (exportEl) {
+        console.debug(
+          "View: attaching 'click' handler to #qr-export-container",
+        );
+        try {
+          try {
+            window.dispatchEvent(
+              new CustomEvent("app:handlerattached", {
+                detail: { id: "qr-export-container", event: "click" },
+              }),
+            );
+          } catch (_err) {}
+          exportEl.addEventListener("click", (e) => this.onCancelExport(e));
+          console.debug(
+            "View: attached 'click' handler to #qr-export-container",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #qr-export-container:",
+            err,
+          );
+        }
+      } else {
+        console.warn("Missing element: qr-export-container");
+      }
+
+      const importEl = E?.Import;
+      if (importEl) {
+        console.debug(
+          "View: attaching 'click' handler to #qr-import-container",
+        );
+        try {
+          try {
+            window.dispatchEvent(
+              new CustomEvent("app:handlerattached", {
+                detail: { id: "qr-import-container", event: "click" },
+              }),
+            );
+          } catch (_err) {}
+          importEl.addEventListener("click", (e) => this.onCancelImport(e));
+          console.debug(
+            "View: attached 'click' handler to #qr-import-container",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #qr-import-container:",
+            err,
+          );
+        }
+      } else {
+        console.warn("Missing element: qr-import-container");
+      }
+
+      const importInner = E?.ImportInner;
+      if (importInner) {
+        console.debug(
+          "View: attaching 'click' handler to #qr-import-inner-container (stopPropagation)",
+        );
+        importInner.addEventListener("click", (e) => e.stopPropagation());
+        console.debug(
+          "View: attached 'click' handler to #qr-import-inner-container",
+        );
+      } else {
+        console.warn("Missing element: qr-import-inner-container");
+      }
+    };
+
+    // If the DOM hasn't loaded yet, wait for it; otherwise initialize immediately.
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initDOM, { once: true });
+    } else {
+      initDOM();
     }
-
-    B.NewMatch.addEventListener("click", (e) => this.onClickNewMatch(e));
-    B.CreateMatch.addEventListener("click", (e) => this.onClickCreateMatch(e));
-    B.CancelCreate.addEventListener("click", (e) =>
-      this.onClickCancelCreateMatch(e),
-    );
-    B.Back.addEventListener("click", (e) => this.onClickBack(e));
-    B.ToggleView.addEventListener("click", (e) => this.onClickToggleView(e));
-    B.ImportMatch.addEventListener("click", (e) => this.onClickImportMatch(e));
-
-    E.Export.addEventListener("click", (e) => this.onCancelExport(e));
-    E.Import.addEventListener("click", (e) => this.onCancelImport(e));
-    E.ImportInner.addEventListener("click", (e) => e.stopPropagation());
   }
 
   private show(e: HTMLElement | null): void {
@@ -128,8 +334,27 @@ export class View {
     blueTwo: string,
     blueThree: string,
   ): void {
+    // Defensive: ensure necessary DOM elements are available before proceeding.
+    if (!E || !E.MatchList || !E.MatchListItemTemplate) {
+      console.warn(
+        "createNewMatch called before DOM initialization - skipping creation for",
+        id,
+      );
+      return;
+    }
+
     this.hide(E.EmptyMatchListPlaceholder);
-    const item = E.MatchListItemTemplate.cloneNode(true) as HTMLElement;
+
+    const template = E.MatchListItemTemplate;
+    if (!template) {
+      console.warn(
+        "Missing match list item template; cannot create match item:",
+        id,
+      );
+      return;
+    }
+
+    const item = template.cloneNode(true) as HTMLElement;
     if (!item) return;
 
     item.id = id;
