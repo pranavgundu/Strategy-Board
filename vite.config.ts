@@ -35,9 +35,9 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: "StrategyBoard2025",
-        short_name: "Strategy2025",
-        description: "FRC2025 Strategy Board",
+        name: "Strategy Board",
+        short_name: "Strategy Board",
+        description: "Strategy Board",
         theme_color: "#ffffff",
         icons: [
           {
@@ -62,5 +62,5 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  base: "/StrategyBoard2025",
+  base: "/Strategy-Board",
 });

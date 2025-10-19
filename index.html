@@ -1,15 +1,25 @@
-<!DOCTYPE html>
-<html style="background-color: #192334;">
+<!doctype html>
+<html style="background-color: #192334">
     <head>
-        <title>StrategyBoard2025</title>
-        <meta name="description" content="2025 FRC Strategy Board">
-        <link rel="icon" href="/favicon/favicon.ico">
-        <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png" sizes="180x180">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-        <meta name="theme-color" content="#000000">
+        <title>Strategy Board</title>
+        <meta name="description" content="FRC Strategy Board" />
+        <link rel="icon" href="/favicon/favicon.ico" />
+        <link
+            rel="apple-touch-icon"
+            href="favicon/apple-touch-icon.png"
+            sizes="180x180"
+        />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+        <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1,user-scalable=no"
+        />
+        <meta name="theme-color" content="#000000" />
         <style>
             @import "tailwindcss";
 
@@ -20,114 +30,390 @@
         </style>
         <script type="module">
             import { CLEAR } from "@/db.ts";
-            document.getElementById("home-toolbar-clear-btn").addEventListener("click", e => {
-                if(!confirm("Are you sure you want to clear all data?")) return;
+            document
+                .getElementById("home-toolbar-clear-btn")
+                .addEventListener("click", (e) => {
+                    if (!confirm("Are you sure you want to clear all data?"))
+                        return;
 
-                CLEAR();
-                location.reload();
-            });
+                    CLEAR();
+                    location.reload();
+                });
         </script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+            integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
     </head>
     <body class="overflow-hidden">
         <div id="home-container" class="flex flex-col w-dvw h-dvh touch-none">
-            <div id="home-toolbar" class="flex items-center justify-between w-full h-24 bg-slate-600">
-                <div id="home-toolbar-logo" class="ml-12 text-2xl md:text-3xl font-extrabold text-white select-none">StrategyBoard</div>
+            <div
+                id="home-toolbar"
+                class="flex items-center justify-between w-full h-24 bg-slate-600"
+            >
+                <div
+                    id="home-toolbar-logo"
+                    class="ml-12 text-2xl md:text-3xl font-extrabold text-white select-none"
+                >
+                    Strategy Board
+                </div>
                 <div class="flex mr-12 text-lg md:text-2xl text-sky-200">
-                    <button id="home-toolbar-new-btn" class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500">New</button>
-                    <button id="home-toolbar-import-btn" class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500">Import QR</button>
-                    <button id="home-toolbar-clear-btn" class="flex items-center justify-center w-24 md:w-36 h-12 rounded-full bg-red-500">Clear</button>
+                    <button
+                        id="home-toolbar-new-btn"
+                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500"
+                    >
+                        New
+                    </button>
+                    <button
+                        id="home-toolbar-import-btn"
+                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500"
+                    >
+                        Import QR
+                    </button>
+                    <button
+                        id="home-toolbar-clear-btn"
+                        class="flex items-center justify-center w-24 md:w-36 h-12 rounded-full bg-red-500"
+                    >
+                        Clear
+                    </button>
                 </div>
             </div>
-            <div id="home-match-list" class="w-full p-6 flex-1 flex flex-col gap-2 items-center overflow-y-auto bg-slate-800">
-                <div id="home-match-list-empty-placeholder" class="absolute top-1/2 text-slate-300 text-xl italic">Click New to add matches</div>
-                <div id="home-match-list-item-template" class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center">
-                    <div class="ml-12 grow-1 basis-0 text-slate-200 font-bold text-xl md:text-2xl select-none">Match Name</div>
+            <div
+                id="home-match-list"
+                class="w-full p-6 flex-1 flex flex-col gap-2 items-center overflow-y-auto bg-slate-800"
+            >
+                <div
+                    id="home-match-list-empty-placeholder"
+                    class="absolute top-1/2 text-slate-300 text-xl italic"
+                >
+                    Click New to add matches
+                </div>
+                <div
+                    id="home-match-list-item-template"
+                    class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center"
+                >
+                    <div
+                        class="ml-12 grow-1 basis-0 text-slate-200 font-bold text-xl md:text-2xl select-none"
+                    >
+                        Match Name
+                    </div>
                     <div class="w-1/2 flex justify-center items-center">
-                        <div class="w-1/2 text-red-400 text-lg md:text-2xl text-right select-none">000 000 000</div>
-                        <div class="text-slate-200 text-lg md:text-2xl mx-6 select-none">VS</div>
-                        <div class="w-1/2 text-blue-400 text-lg md:text-2xl select-none">000 000 000</div>
+                        <div
+                            class="w-1/2 text-red-400 text-lg md:text-2xl text-right select-none"
+                        >
+                            000 000 000
+                        </div>
+                        <div
+                            class="text-slate-200 text-lg md:text-2xl mx-6 select-none"
+                        >
+                            VS
+                        </div>
+                        <div
+                            class="w-1/2 text-blue-400 text-lg md:text-2xl select-none"
+                        >
+                            000 000 000
+                        </div>
                     </div>
                     <div class="mr-9 grow-1 basis-0 flex h-full justify-end">
-                        <button class="flex flex-col w-12 gap-1 items-center justify-center">
+                        <button
+                            class="flex flex-col w-12 gap-1 items-center justify-center"
+                        >
                             <div class="w-2 h-2 rounded-full bg-white"></div>
                             <div class="w-2 h-2 rounded-full bg-white"></div>
                             <div class="w-2 h-2 rounded-full bg-white"></div>
                         </button>
                         <div class="hidden flex items-center justify-center">
-                            <button class="w-24 p-1 mr-2 text-md md:text-xl text-slate-300 bg-blue-500 rounded-full">Export</button>
-                            <button class="w-24 p-1 text-md md:text-xl text-slate-300 bg-red-500 rounded-full">Delete</button>
+                            <button
+                                class="w-24 p-1 mr-2 text-md md:text-xl text-slate-300 bg-blue-500 rounded-full"
+                            >
+                                Export
+                            </button>
+                            <button
+                                class="w-24 p-1 text-md md:text-xl text-slate-300 bg-red-500 rounded-full"
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="create-match-container" class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 bg-slate-600 rounded-xl">
-                <input id="create-match-name" placeholder="Match Name" maxLength=25 class="w-full pt-6 pb-6 text-3xl text-center text-slate-300 font-bold rounded-t-xl bg-slate-500 outline-0" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div
+            id="create-match-container"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
+        >
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 bg-slate-600 rounded-xl"
+            >
+                <input
+                    id="create-match-name"
+                    placeholder="Match Name"
+                    maxlength="25"
+                    class="w-full pt-6 pb-6 text-3xl text-center text-slate-300 font-bold rounded-t-xl bg-slate-500 outline-0"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                />
                 <div class="grid grid-cols-3 w-full">
-                    <input type="number" id="create-match-red-1" placeholder="Red 1" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
-                    <input type="number" id="create-match-red-2" placeholder="Red 2" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
-                    <input type="number" id="create-match-red-3" placeholder="Red 3" class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
-                    <input type="number" id="create-match-blue-1" placeholder="Blue 1" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
-                    <input type="number" id="create-match-blue-2" placeholder="Blue 2" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
-                    <input type="number" id="create-match-blue-3" placeholder="Blue 3" class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input
+                        type="number"
+                        id="create-match-red-1"
+                        placeholder="Red 1"
+                        class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="create-match-red-2"
+                        placeholder="Red 2"
+                        class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="create-match-red-3"
+                        placeholder="Red 3"
+                        class="text-3xl text-center text-red-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="create-match-blue-1"
+                        placeholder="Blue 1"
+                        class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="create-match-blue-2"
+                        placeholder="Blue 2"
+                        class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="create-match-blue-3"
+                        placeholder="Blue 3"
+                        class="text-3xl text-center text-blue-400 p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
                 </div>
                 <div class="flex w-full">
-                    <button id="create-match-create-btn" class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-xl">Create</button>
-                    <button id="create-match-cancel-btn" class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-xl">Cancel</button>
+                    <button
+                        id="create-match-create-btn"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-xl"
+                    >
+                        Create
+                    </button>
+                    <button
+                        id="create-match-cancel-btn"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-xl"
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
-        <div id="qr-import-container" class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none">
-            <div id="qr-import-inner-container" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-slate-600 rounded-xl">
-                <select id="qr-import-camera-select" class="text-md md:text-xl"></select>
+        <div
+            id="qr-import-container"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
+        >
+            <div
+                id="qr-import-inner-container"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-slate-600 rounded-xl"
+            >
+                <select
+                    id="qr-import-camera-select"
+                    class="text-md md:text-xl"
+                ></select>
                 <video id="qr-import-video"></video>
             </div>
         </div>
-        <div id="qr-export-container" class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none">
-                <div id="qr-export-code-worker-0" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="z-index: 1"></div>
-                <div id="qr-export-code-worker-1" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="z-index: 2"></div>
-                <div id="qr-export-code-worker-2" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="z-index: 3"></div>
+        <div
+            id="qr-export-container"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
+        >
+            <div
+                id="qr-export-code-worker-0"
+                class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                style="z-index: 1"
+            ></div>
+            <div
+                id="qr-export-code-worker-1"
+                class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                style="z-index: 2"
+            ></div>
+            <div
+                id="qr-export-code-worker-2"
+                class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                style="z-index: 3"
+            ></div>
         </div>
-        <div id="whiteboard-container" class="hidden flex flex-col w-dvw h-dvh touch-none">
-            <div id="whiteboard-toolbar" class="flex items-center justify-between w-full h-12 md:h-16 bg-zinc-700" style="z-index: 999">
+        <div
+            id="whiteboard-container"
+            class="hidden flex flex-col w-dvw h-dvh touch-none"
+        >
+            <div
+                id="whiteboard-toolbar"
+                class="flex items-center justify-between w-full h-12 md:h-16 bg-zinc-700"
+                style="z-index: 999"
+            >
                 <div>
-                    <button id="whiteboard-toolbar-back" class="ml-6 md:ml-12 text-xl md:text-3xl font-extrabold text-white select-none touch-none">back</button>
-                    <button id="whiteboard-toolbar-undo" class="w-24 h-full ml-6 md:ml-12 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none">undo</button>
+                    <button
+                        id="whiteboard-toolbar-back"
+                        class="ml-6 md:ml-12 text-xl md:text-3xl font-extrabold text-white select-none touch-none"
+                    >
+                        back
+                    </button>
+                    <button
+                        id="whiteboard-toolbar-undo"
+                        class="w-24 h-full ml-6 md:ml-12 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none"
+                    >
+                        undo
+                    </button>
                 </div>
-                <div id="whiteboard-toolbar-mode-select" class="flex justify-center items-center gap-6">
-                    <div id="whiteboard-toolbar-mode-auton" class="text-xl md:text-3xl text-zinc-100 font-extrabold select-none select-none touch-none">AUTON</div>
-                    <div id="whiteboard-toolbar-mode-teleop" class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none">TELEOP</div>
-                    <div id="whiteboard-toolbar-mode-endgame" class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none">ENDGAME</div>
+                <div
+                    id="whiteboard-toolbar-mode-select"
+                    class="flex justify-center items-center gap-6"
+                >
+                    <div
+                        id="whiteboard-toolbar-mode-auton"
+                        class="text-xl md:text-3xl text-zinc-100 font-extrabold select-none select-none touch-none"
+                    >
+                        AUTON
+                    </div>
+                    <div
+                        id="whiteboard-toolbar-mode-teleop"
+                        class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none"
+                    >
+                        TELEOP
+                    </div>
+                    <div
+                        id="whiteboard-toolbar-mode-endgame"
+                        class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none"
+                    >
+                        ENDGAME
+                    </div>
                 </div>
-                <button id="whiteboard-toolbar-view-toggle" class="w-48 h-full mr-6 md:mr-12 text-xl md:text-3xl font-bold text-zinc-300 select-none touch-none">Toggle View</button>
+                <button
+                    id="whiteboard-toolbar-view-toggle"
+                    class="w-48 h-full mr-6 md:mr-12 text-xl md:text-3xl font-bold text-zinc-300 select-none touch-none"
+                >
+                    Toggle View
+                </button>
             </div>
-            <div id="whiteboard-wrapper" class="w-full h-full m-0 p-0 bg-zinc-900">
-                <canvas id="whiteboard-canvas-background" width=3510 height=1610 class="absolute m-0 select-none touch-none"></canvas>
-                <canvas id="whiteboard-canvas-items" width=3510 height=1610 class="absolute m-0 select-none touch-none"></canvas>
-                <canvas id="whiteboard-canvas-drawing" width=3510 height=1610 class="absolute m-0 select-none touch-none"></canvas>
+            <div
+                id="whiteboard-wrapper"
+                class="w-full h-full m-0 p-0 bg-zinc-900"
+            >
+                <canvas
+                    id="whiteboard-canvas-background"
+                    width="3510"
+                    height="1610"
+                    class="absolute m-0 select-none touch-none"
+                ></canvas>
+                <canvas
+                    id="whiteboard-canvas-items"
+                    width="3510"
+                    height="1610"
+                    class="absolute m-0 select-none touch-none"
+                ></canvas>
+                <canvas
+                    id="whiteboard-canvas-drawing"
+                    width="3510"
+                    height="1610"
+                    class="absolute m-0 select-none touch-none"
+                ></canvas>
             </div>
-            <div id="whiteboard-robot-config" class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-xl">
-                <div class="text-2xl text-zinc-400 font-bold mb-4 select-none">Robot Config (in.)</div>
+            <div
+                id="whiteboard-robot-config"
+                class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-xl"
+            >
+                <div class="text-2xl text-zinc-400 font-bold mb-4 select-none">
+                    Robot Config (in.)
+                </div>
                 <div class="flex w-full justify-center items-center">
-                    <input id="whiteboard-robot-config-width" placeholder="width" class="w-1/3 mr-4 text-3xl text-zinc-500 text-right outline-0 select-none touch-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
-                    <div class="text-3xl text-zinc-700 text-center outline-0">x</div>
-                    <input id="whiteboard-robot-config-height" placeholder="length" class="w-1/3 ml-4 text-3xl text-zinc-500 text-left outline-0 select-none touch-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input
+                        id="whiteboard-robot-config-width"
+                        placeholder="width"
+                        class="w-1/3 mr-4 text-3xl text-zinc-500 text-right outline-0 select-none touch-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <div class="text-3xl text-zinc-700 text-center outline-0">
+                        x
+                    </div>
+                    <input
+                        id="whiteboard-robot-config-height"
+                        placeholder="length"
+                        class="w-1/3 ml-4 text-3xl text-zinc-500 text-left outline-0 select-none touch-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
                 </div>
             </div>
-            <div id="whiteboard-draw-config" class="absolute flex flex-col justify-center items-center size-12 md:size-16 lg:size-24 bottom-4 right-4 bg-zinc-800 rounded-full">
-                <i id="whiteboard-draw-config-marker" class="fa fa-pencil text-xl md:text-2xl lg:text-3xl text-white"></i>
-                <i id="whiteboard-draw-config-eraser" class="fa fa-eraser text-xl md:text-2xl lg:text-3xl text-white" style="display: none;"></i>
+            <div
+                id="whiteboard-draw-config"
+                class="absolute flex flex-col justify-center items-center size-12 md:size-16 lg:size-24 bottom-4 right-4 bg-zinc-800 rounded-full"
+            >
+                <i
+                    id="whiteboard-draw-config-marker"
+                    class="fa fa-pencil text-xl md:text-2xl lg:text-3xl text-white"
+                ></i>
+                <i
+                    id="whiteboard-draw-config-eraser"
+                    class="fa fa-eraser text-xl md:text-2xl lg:text-3xl text-white"
+                    style="display: none"
+                ></i>
             </div>
-            <div id="whiteboard-color-config" class="absolute flex flex-col justify-center items-center bottom-4 left-4 bg-zinc-800 rounded-full">
-                <div id="whiteboard-color-yellow" class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-yellow-500 rounded-full border-amber-600"></div>
-                <div id="whiteboard-color-green" class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-green-500 rounded-full border-amber-500"></div>
-                <div id="whiteboard-color-blue" class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-blue-500 rounded-full border-amber-500"></div>
-                <div id="whiteboard-color-red" class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-red-500 rounded-full border-amber-500"></div>
-                <div id="whiteboard-color-white" class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-white rounded-full border-amber-500"></div>
-                <div id="whiteboard-color-close" class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 flex justify-center items-center text-center rounded-full">
-                    <i class="fa fa-close text-xl md:text-2xl lg:text-3xl text-red-500"></i>
+            <div
+                id="whiteboard-color-config"
+                class="absolute flex flex-col justify-center items-center bottom-4 left-4 bg-zinc-800 rounded-full"
+            >
+                <div
+                    id="whiteboard-color-yellow"
+                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-yellow-500 rounded-full border-amber-600"
+                ></div>
+                <div
+                    id="whiteboard-color-green"
+                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-green-500 rounded-full border-amber-500"
+                ></div>
+                <div
+                    id="whiteboard-color-blue"
+                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-blue-500 rounded-full border-amber-500"
+                ></div>
+                <div
+                    id="whiteboard-color-red"
+                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-red-500 rounded-full border-amber-500"
+                ></div>
+                <div
+                    id="whiteboard-color-white"
+                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-white rounded-full border-amber-500"
+                ></div>
+                <div
+                    id="whiteboard-color-close"
+                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 flex justify-center items-center text-center rounded-full"
+                >
+                    <i
+                        class="fa fa-close text-xl md:text-2xl lg:text-3xl text-red-500"
+                    ></i>
                 </div>
             </div>
         </div>
