@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.12",
+    "gulp": "^5.0.1",
     "idb-keyval": "^6.2.1",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
