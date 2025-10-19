@@ -147,7 +147,7 @@ After deployment, verify:
 
 - Review the [Deployment Guide](.github/DEPLOYMENT.md)
 - Check [GitHub Actions logs](../../actions) for build errors
-- Open an [issue](https://github.com/FRCTeam834/StrategyBoard2025/issues) on the original repository
+- Open an [issue](https://github.com/FRCTeam834/Strategy-Board/issues) on the original repository
 - Review [Vite documentation](https://vitejs.dev/)
 
 ## Quick Commands

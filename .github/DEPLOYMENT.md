@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This document provides detailed instructions for deploying the StrategyBoard2025 application to GitHub Pages.
+This document provides detailed instructions for deploying the Strategy Board application to GitHub Pages.
 
 ## Prerequisites
 
@@ -185,7 +185,7 @@ If you encounter issues not covered here:
 
 1. Check the [GitHub Actions documentation](https://docs.github.com/en/actions)
 2. Review the [Vite deployment guide](https://vitejs.dev/guide/static-deploy.html)
-3. Open an issue on the [repository](https://github.com/FRCTeam834/StrategyBoard2025/issues)
+3. Open an issue on the [repository](https://github.com/FRCTeam834/Strategy-Board/issues)
 
 ## Quick Reference
 
