@@ -1,5 +1,7 @@
 # FRC StrategyBoard 2025
 
+[![Deploy to GitHub Pages](https://github.com/FRCTeam834/StrategyBoard2025/actions/workflows/pages.yaml/badge.svg)](https://github.com/FRCTeam834/StrategyBoard2025/actions/workflows/pages.yaml)
+
 <a href="https://imgbox.com/TxsFBIir" target="_blank"><img src="https://images2.imgbox.com/85/8f/TxsFBIir_o.png" alt="image host"/></a>
 
 [StrategyBoard2025](https://frcteam834.github.io/StrategyBoard2025/) is a digital strategy whiteboard for FIRST Robotics competitions.
@@ -64,6 +66,47 @@ By nature, importing may take a few seconds. For the fastest imports:
 
 <a href="https://imgbox.com/xirEOutY" target="_blank"><img src="https://images2.imgbox.com/86/34/xirEOutY_o.png" alt="image host"/></a>
 
+## Deployment
+
+This project is configured to automatically deploy to GitHub Pages when changes are pushed to the `main` branch.
+
+### GitHub Pages Setup
+
+If you've forked this repository, you need to enable GitHub Pages:
+
+1. Go to your repository's **Settings**
+2. Navigate to **Pages** in the left sidebar
+3. Under **Source**, select **GitHub Actions**
+4. Push to `main` branch and the workflow will automatically deploy your site
+
+The site will be available at: `https://<your-username>.github.io/<repository-name>/`
+
+### Manual Deployment
+
+You can also trigger a deployment manually:
+
+1. Go to the **Actions** tab in your repository
+2. Select the **Deploy to GitHub Pages** workflow
+3. Click **Run workflow**
+
+### Local Development
+
+To run the project locally:
+
+```bash
+# Install dependencies
+npm ci
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
 ## Issues
 
 Please report any bugs on [GitHub](https://github.com/FRCTeam834/StrategyBoard2025/issues/new).
@@ -84,8 +127,10 @@ Updating the project for future games is easy:
 
 1. [Fork](https://github.com/FRCTeam834/StrategyBoard2025/fork) the project
 2. Replace `src/field.png` with the new field image
-3. Update `src/config.ts`
-4. Push the changes, the app should then be available on `https://<github-username\>.github.io/<fork-name>/`
+3. Update `src/config.ts` with new field dimensions
+4. Update the `base` path in `vite.config.ts` to match your repository name
+5. Enable GitHub Pages (see **Deployment** section above)
+6. Push the changes to `main`, and the app will automatically deploy to `https://<github-username>.github.io/<fork-name>/`
 
 ## Credits
 
