@@ -1,4 +1,5 @@
 import { View } from "@/view.ts";
+import { Analytics } from "@vercel/analytics/next";
 import { Model } from "@/model.ts";
 import { Whiteboard } from "@/whiteboard.ts";
 import { QRImport, QRExport } from "@/qr.ts";
