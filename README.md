@@ -1,1 +1,1 @@
-# FRC Strategy Board
+# Strategy Board
