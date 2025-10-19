@@ -1,24 +1,23 @@
 {
-    "type": "module",
-    "scripts": {
-        "dev": "vite --host",
-        "build": "tsc && vite build",
-        "preview": "vite preview --host"
-    },
-    "devDependencies": {
-        "autoprefixer": "^10.4.20",
-        "postcss": "^8.5.3",
-        "typescript": "^5.8.2",
-        "vite": "^6.2.1",
-        "vite-plugin-pwa": "^0.21.1"
-    },
-    "dependencies": {
-        "@tailwindcss/vite": "^4.0.12",
-        "gulp": "^5.0.1",
-        "idb-keyval": "^6.2.1",
-        "qr-scanner": "^1.4.2",
-        "qrcode": "^1.5.4",
-        "tailwindcss": "^4.0.12",
-        "uuidv4": "^6.2.13"
-    }
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.3",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.1",
+    "vite-plugin-pwa": "^0.21.1"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.12",
+    "idb-keyval": "^6.2.1",
+    "qr-scanner": "^1.4.2",
+    "qrcode": "^1.5.4",
+    "tailwindcss": "^4.0.12",
+    "uuid": "^11.0.3"
+  }
 }
