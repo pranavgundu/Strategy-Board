@@ -13,7 +13,7 @@
     "vite-plugin-pwa": "^0.21.1"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.12",
+    "@tailwindcss/vite": "^4.1.15",
     "@vercel/analytics": "^1.5.0",
     "idb-keyval": "^6.2.1",
     "qr-scanner": "^1.4.2",
