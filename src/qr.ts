@@ -3,138 +3,323 @@ import QRCode from "qrcode";
 import { Match } from "@/match.ts";
 
 const HEADER_SIZE = 4;
-const PACKET_ZERO_HEADER_SIZE = 4;
-const MAX_PAYLOAD_SIZE_BYTES = 78 - HEADER_SIZE;
-const MAX_PAYLOAD_SIZE_ALPHA = 114 - HEADER_SIZE;
-const STREAM_FPS = 15;
+// Number of characters reserved in the payload for the total chunk count
+const TOTAL_CHUNKS_HEADER_SIZE = 4;
+const CHUNK_HEADER_SIZE = HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE;
+
+// Conservative per-chunk payload size (characters). Keep small to maximize scan reliability.
+const MAX_CHUNK_PAYLOAD = 110;
+// Duration each QR image is shown on screen (milliseconds). Slower rotation improves scan reliability.
+const FRAME_DURATION_MS = 800;
+
+/**
+ * Helper: encode arbitrary UTF-8 string to a base64 payload in a browser-safe way.
+ */
+function encodeToBase64(input: string): string {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(input);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Helper: decode base64 back into a UTF-8 string.
+ */
+function decodeBase64ToString(b64: string): string {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  const decoder = new TextDecoder();
+  return decoder.decode(bytes);
+}
+
+/**
+ * Utility wrapper so we can consistently await QRCode.toCanvas whether the library
+ * provides a callback or a Promise. This makes rendering code easier to read/maintain.
+ */
+function toCanvasAsync(
+  payload: string,
+  options: Record<string, unknown>,
+): Promise<HTMLCanvasElement> {
+  return new Promise((resolve, reject) => {
+    try {
+      QRCode.toCanvas(
+        payload,
+        options,
+        (err: Error | null, canvas?: HTMLCanvasElement) => {
+          if (err) return reject(err);
+          if (!canvas)
+            return reject(new Error("QR code library did not return a canvas"));
+          resolve(canvas);
+        },
+      );
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
 
 type QRExportCallback = (data: unknown) => void;
 
 export class QRExport {
-  private pool: HTMLElement[];
+  // Allow null entries so we can re-resolve DOM nodes at export time and tolerate
+  // DOM re-renders or test-time DOM changes.
+  private pool: Array<HTMLElement | null> = [];
   private intervalId: number | null = null;
 
   constructor() {
-    this.pool = [
-      document.getElementById("qr-export-code-worker-0") as HTMLElement,
-      document.getElementById("qr-export-code-worker-1") as HTMLElement,
-      document.getElementById("qr-export-code-worker-2") as HTMLElement,
-    ];
+    // Don't eagerly resolve DOM nodes here; resolve them when an export is requested.
+    this.pool = [];
   }
 
   export(match: Match): void {
-    const packet = match.getAsPacket();
-    packet.splice(7, 1); // remove uuid
+    // Resolve the worker container elements at the moment of export so we don't
+    // hold stale references if the DOM has been re-rendered.
+    this.pool = [
+      document.getElementById("qr-export-code-worker-0"),
+      document.getElementById("qr-export-code-worker-1"),
+      document.getElementById("qr-export-code-worker-2"),
+    ];
 
-    let data = JSON.stringify(packet);
-    let dataBYTES = "";
-    let dataALPHA = "";
-
-    const lastQuoteIndex = data.lastIndexOf('"');
-    if (lastQuoteIndex === -1) {
-      alert("Possibly corrupted data... failed to export");
+    // Defensive: ensure at least one container exists before proceeding.
+    if (!this.pool || this.pool.every((el) => el === null)) {
+      console.error("QRExport: pool elements not available");
+      alert("QR export is currently unavailable");
       return;
     }
 
-    dataBYTES = data.substring(0, lastQuoteIndex + 1);
-    dataALPHA = data.substring(lastQuoteIndex + 1, data.length);
-    dataALPHA = dataALPHA.replaceAll("[", "$");
-    dataALPHA = dataALPHA.replaceAll("]", "/");
-    dataALPHA = dataALPHA.replaceAll(",", " ");
-
-    const payloadZERO = dataBYTES.slice(
-      0,
-      MAX_PAYLOAD_SIZE_BYTES - PACKET_ZERO_HEADER_SIZE,
-    );
-    const payloadBYTES = dataBYTES
-      .slice(MAX_PAYLOAD_SIZE_BYTES - PACKET_ZERO_HEADER_SIZE)
-      .match(new RegExp(".{1," + MAX_PAYLOAD_SIZE_BYTES + "}", "g"));
-    const payloadALPHA = dataALPHA.match(
-      new RegExp(".{1," + MAX_PAYLOAD_SIZE_ALPHA + "}", "g"),
-    );
-
-    let payloads = [payloadZERO];
-    if (payloadBYTES !== null) payloads = payloads.concat(payloadBYTES);
-    if (payloadALPHA !== null) payloads = payloads.concat(payloadALPHA);
-    payloads[0] = payloads.length.toString().padStart(4, "0") + payloads[0];
-
-    const payloadLength = payloads.length;
-    let poolIndex = 0;
-    let payloadNumber = 0;
-
-    const modulusPayloadNumber = (n: number): number => {
-      return (n + payloadLength) % payloadLength;
-    };
-
-    const modulusPoolIndex = (n: number): number => {
-      return (n + this.pool.length) % this.pool.length;
-    };
-
-    const getPayload = (n: number): string => {
-      let payload = "";
-      payload += n.toString().padStart(HEADER_SIZE, "0");
-      payload += payloads[n];
-      return payload;
-    };
-
-    // Initialize pool
-    for (let i = 0; i < this.pool.length; i++) {
-      this.pool[i].replaceChildren();
-      document
-        .getElementById(`qr-export-code-worker-${i}`)
-        ?.classList.add("hidden");
-      QRCode.toCanvas(
-        getPayload(i),
-        {
-          errorCorrectionLevel: "L",
-          width: Math.min(window.innerWidth, window.innerHeight),
-        },
-        (err, canvas) => {
-          if (err) throw err;
-          this.pool[i].appendChild(canvas);
-        },
-      );
+    // If an export is already running, stop it first to avoid races.
+    if (this.intervalId !== null) {
+      this.close();
     }
 
-    document
-      .getElementById(`qr-export-code-worker-0`)
-      ?.classList.remove("hidden");
+    // Prepare and chunk the payload (base64) for reliable transfer via QR frames.
+    const packet = match.getAsPacket();
+    packet.splice(7, 1); // remove uuid before export
+    const raw = JSON.stringify(packet);
+    const b64 = encodeToBase64(raw);
 
-    this.intervalId = window.setInterval(() => {
-      // Show current, hide previous
-      document
-        .getElementById(`qr-export-code-worker-${poolIndex}`)
-        ?.classList.remove("hidden");
-      document
-        .getElementById(
-          `qr-export-code-worker-${modulusPoolIndex(poolIndex - 1)}`,
-        )
-        ?.classList.add("hidden");
+    const chunks: string[] = [];
+    for (let i = 0; i < b64.length; i += MAX_CHUNK_PAYLOAD) {
+      chunks.push(b64.slice(i, i + MAX_CHUNK_PAYLOAD));
+    }
 
-      // Queue up previous for next
-      this.pool[modulusPoolIndex(poolIndex - 1)].replaceChildren();
-      QRCode.toCanvas(
-        getPayload(modulusPayloadNumber(payloadNumber + this.pool.length - 1)),
-        {
-          errorCorrectionLevel: "L",
-          width: Math.min(window.innerWidth, window.innerHeight),
-        },
-        (err, canvas) => {
-          if (err) throw err;
-          this.pool[modulusPoolIndex(poolIndex - 1)].appendChild(canvas);
-        },
-      );
+    const totalChunks = Math.max(1, chunks.length);
+    const getPayload = (index: number) =>
+      index.toString().padStart(HEADER_SIZE, "0") +
+      totalChunks.toString().padStart(TOTAL_CHUNKS_HEADER_SIZE, "0") +
+      (chunks[index] || "");
 
-      poolIndex = modulusPoolIndex(poolIndex + 1);
-      payloadNumber = modulusPayloadNumber(payloadNumber + 1);
-    }, 1000 / STREAM_FPS);
+    const qrCanvasPixelSize = Math.max(
+      256,
+      Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.8),
+    );
+
+    const updateOverlayStatus = (current: number, total: number) => {
+      const status = document.getElementById("qr-export-status");
+      if (status) status.textContent = `Page ${current} / ${total}`;
+    };
+
+    // If only one chunk, render a single QR and return early.
+    if (totalChunks === 1) {
+      (async () => {
+        const el = this.pool.find((x) => x) as HTMLElement | undefined;
+        if (!el) {
+          alert("QR export UI not available");
+          return;
+        }
+        try {
+          const canvas = await toCanvasAsync(getPayload(0), {
+            errorCorrectionLevel: "M",
+            width: qrCanvasPixelSize,
+            margin: 1,
+          });
+          el.replaceChildren();
+          el.appendChild(canvas);
+          updateOverlayStatus(1, totalChunks);
+        } catch (err) {
+          console.error("QRExport: failed to render single QR", err);
+          alert("Failed to render QR export");
+        }
+      })();
+      return;
+    }
+
+    // Multi-chunk streaming export: pre-render into a small pool of worker slots and cycle them.
+    let poolIndex = 0;
+    let payloadIndex = 0;
+    const poolSize = this.pool.length;
+    const modulus = (n: number, m: number) => ((n % m) + m) % m;
+
+    (async () => {
+      try {
+        // Pre-render canvases for the first set of payloads so the UI doesn't stutter.
+        for (let i = 0; i < poolSize; i++) {
+          const el = this.pool[i];
+          if (!el) continue;
+          el.replaceChildren();
+          const payloadIdx = modulus(i, totalChunks);
+          try {
+            const canvas = await toCanvasAsync(getPayload(payloadIdx), {
+              errorCorrectionLevel: "M",
+              width: qrCanvasPixelSize,
+              margin: 1,
+            });
+            const label = document.createElement("div");
+            label.className = "text-slate-100 font-semibold mt-2 select-none";
+            label.style.userSelect = "none";
+            label.textContent = `${payloadIdx + 1}/${totalChunks}`;
+            el.appendChild(canvas);
+            el.appendChild(label);
+            const slot = document.getElementById(`qr-export-code-worker-${i}`);
+            if (slot) slot.classList.add("hidden");
+          } catch (err) {
+            console.warn("QRExport: failed to render initial QR canvas", err);
+          }
+        }
+
+        // Reveal the first available worker and update status.
+        const firstEl = this.pool.find((x) => x) || null;
+        if (firstEl) {
+          const dom = document.getElementById(firstEl.id);
+          if (dom) dom.classList.remove("hidden");
+        }
+        updateOverlayStatus(1, totalChunks);
+
+        // Cycle through payloads at a conservative frame rate so cameras can scan reliably.
+        this.intervalId = window.setInterval(async () => {
+          try {
+            const currentEl = this.pool[poolIndex];
+            const prevEl = this.pool[modulus(poolIndex - 1, poolSize)];
+            if (currentEl) {
+              const domCur = document.getElementById(currentEl.id);
+              if (domCur) domCur.classList.remove("hidden");
+            }
+            if (prevEl) {
+              const domPrev = document.getElementById(prevEl.id);
+              if (domPrev) domPrev.classList.add("hidden");
+            }
+            updateOverlayStatus(payloadIndex + 1, totalChunks);
+
+            // Prepare next payload into the reused slot.
+            const reuseIndex = modulus(poolIndex - 1, poolSize);
+            const nextPayloadIndex = modulus(
+              payloadIndex + poolSize - 1,
+              totalChunks,
+            );
+            const reuseEl = this.pool[reuseIndex];
+            if (reuseEl) {
+              reuseEl.replaceChildren();
+              try {
+                const canvas = await toCanvasAsync(
+                  getPayload(nextPayloadIndex),
+                  {
+                    errorCorrectionLevel: "M",
+                    width: qrCanvasPixelSize,
+                    margin: 1,
+                  },
+                );
+                const label = document.createElement("div");
+                label.className =
+                  "text-slate-100 font-semibold mt-2 select-none";
+                label.style.userSelect = "none";
+                label.textContent = `${nextPayloadIndex + 1}/${totalChunks}`;
+                reuseEl.appendChild(canvas);
+                reuseEl.appendChild(label);
+              } catch (err) {
+                console.error("QRExport: failed to render QR canvas", err);
+                this.close();
+                alert(
+                  "QR export failed while rendering QR codes. Export stopped.",
+                );
+                return;
+              }
+            }
+
+            poolIndex = modulus(poolIndex + 1, poolSize);
+            payloadIndex = modulus(payloadIndex + 1, totalChunks);
+          } catch (err) {
+            console.error("QRExport: unexpected error in export loop", err);
+            this.close();
+            alert("QR export encountered an unexpected error and was stopped.");
+          }
+        }, FRAME_DURATION_MS);
+      } catch (err) {
+        console.error("QRExport: failed to start export", err);
+        alert(
+          "Failed to start QR export: " +
+            (err && (err as Error).message
+              ? (err as Error).message
+              : String(err)),
+        );
+        this.close();
+      }
+    })();
   }
 
   close(): void {
+    // Stop any running export loop.
     if (this.intervalId !== null) {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
+
+    // Best-effort cleanup of both cached elements and any DOM slots that remain.
+    try {
+      for (let i = 0; i < this.pool.length; i++) {
+        const el = this.pool[i];
+        if (el && typeof el.replaceChildren === "function") {
+          try {
+            el.replaceChildren();
+          } catch (_err) {
+            // ignore per-slot cleanup failures
+          }
+        }
+        const slot = document.getElementById(`qr-export-code-worker-${i}`);
+        if (slot) {
+          try {
+            slot.classList.add("hidden");
+            while (slot.firstChild) slot.removeChild(slot.firstChild);
+          } catch (_err) {
+            // ignore DOM cleanup failures
+          }
+        }
+      }
+
+      // Fallback: clear any DOM workers matching the id pattern
+      const domWorkers = document.querySelectorAll(
+        '[id^="qr-export-code-worker-"]',
+      );
+      domWorkers.forEach((w) => {
+        try {
+          const h = w as HTMLElement;
+          h.classList.add("hidden");
+          h.replaceChildren();
+        } catch (_err) {
+          // ignore
+        }
+      });
+    } catch (err) {
+      console.warn("QRExport: error during cleanup", err);
+    }
+
+    // Hide export overlay and clear status text so UI is consistent.
+    try {
+      const overlay = document.getElementById("qr-export-container");
+      if (overlay) overlay.classList.add("hidden");
+      const status = document.getElementById("qr-export-status");
+      if (status) status.textContent = "";
+    } catch (err) {
+      console.warn("QRExport: error hiding overlay or clearing status", err);
+    }
+
+    // Reset cached pool references so subsequent exports re-resolve nodes.
+    this.pool = [];
   }
 }
 
@@ -192,61 +377,189 @@ export class QRImport {
     this.received = {};
     this.receivedIds = [];
     this.expectedLength = -1;
-    await this.scanner.start();
-    this.getAvailableCameras();
+
+    // Provide immediate UI feedback so the user knows the import flow is starting.
+    const statusEl = document.getElementById("qr-import-status");
+    if (statusEl) statusEl.textContent = "Preparing camera…";
+
+    try {
+      // Attempt to enumerate cameras first (best-effort) so the UI can populate camera
+      // choices and pick a preferred device before starting the scanner.
+      try {
+        await this.getAvailableCameras();
+      } catch (enumErr) {
+        // Non-fatal: enumeration may fail in some constrained environments; continue to start the scanner.
+        console.warn("QRImport: camera enumeration failed", enumErr);
+      }
+
+      if (statusEl) statusEl.textContent = "Starting camera…";
+      await this.scanner.start();
+
+      if (statusEl) statusEl.textContent = "Scanning for QR codes…";
+    } catch (err) {
+      console.error("QRImport: failed to start scanner", err);
+      if (statusEl) statusEl.textContent = "Failed to start camera";
+      alert(
+        "Could not start camera for QR import: " +
+          (err && (err as Error).message
+            ? (err as Error).message
+            : String(err)),
+      );
+      this.callback = null;
+    }
   }
 
   public stop(): void {
-    this.scanner.stop();
+    try {
+      this.scanner.stop();
+    } catch (err) {
+      // Stop should be best-effort — don't throw if the scanner is already stopped.
+      console.warn("QRImport: error stopping scanner:", err);
+    }
+
+    // Clear any transient import status so UI is left in a consistent state.
+    const statusEl = document.getElementById("qr-import-status");
+    if (statusEl) statusEl.textContent = "";
   }
 
   private getResult(result: QrScanner.ScanResult): void {
-    const data = result.data;
-    const id = Number(data.slice(0, 4));
-    let payload: string;
+    try {
+      // Normalize the scanned data and provide live progress in the UI.
+      const data =
+        typeof result?.data === "string"
+          ? result.data
+          : String(result?.data || "");
+      const statusEl = document.getElementById("qr-import-status");
 
-    if (id === 0) {
-      payload = data.slice(HEADER_SIZE + PACKET_ZERO_HEADER_SIZE);
-      this.expectedLength = Number(data.slice(4, 8));
-    } else {
-      payload = data.slice(HEADER_SIZE);
-    }
+      if (!data || data.length < HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE) {
+        console.warn("QRImport: scanned payload too short", data);
+        if (statusEl) statusEl.textContent = "Scanned unexpected data";
+        return;
+      }
 
-    this.received[id] = payload;
-    if (this.receivedIds.indexOf(id) === -1) {
-      insertSorted(this.receivedIds, id);
-    }
+      const id = Number(data.slice(0, HEADER_SIZE));
+      const total = Number(
+        data.slice(HEADER_SIZE, HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE),
+      );
+      const payload = data.slice(HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE);
 
-    if (this.receivedIds.length === this.expectedLength) {
-      this.importFinished();
+      if (Number.isNaN(id) || Number.isNaN(total)) {
+        console.warn("QRImport: invalid header in scanned payload", data);
+        if (statusEl) statusEl.textContent = "Invalid QR header";
+        return;
+      }
+
+      // If we were previously receiving a different stream, reset state and accept
+      // the new stream. Notify the UI so users know progress restarted.
+      if (this.expectedLength !== -1 && this.expectedLength !== total) {
+        this.received = {};
+        this.receivedIds = [];
+        this.expectedLength = -1;
+        if (statusEl)
+          statusEl.textContent =
+            "New QR stream detected — resetting progress...";
+      }
+
+      if (this.expectedLength === -1) this.expectedLength = total;
+
+      if (id < 0 || id >= this.expectedLength) {
+        console.warn(
+          "QRImport: out-of-range chunk id",
+          id,
+          "expected",
+          this.expectedLength,
+        );
+        if (statusEl)
+          statusEl.textContent = `Out-of-range chunk (${id}). Waiting for valid stream...`;
+        return;
+      }
+
+      // Deduplicate: only accept the first instance of a chunk
+      if (!Object.prototype.hasOwnProperty.call(this.received, id)) {
+        this.received[id] = payload;
+        insertSorted(this.receivedIds, id);
+
+        // Update progress in the import overlay (e.g. "Receiving 3 / 12 chunks")
+        if (statusEl) {
+          statusEl.textContent = `Receiving ${this.receivedIds.length} / ${this.expectedLength} chunks`;
+        }
+      } else {
+        // If we saw a duplicate, still update the status so the user sees live activity.
+        if (statusEl) {
+          statusEl.textContent = `Receiving ${this.receivedIds.length} / ${this.expectedLength} chunks (duplicates ignored)`;
+        }
+      }
+
+      if (
+        this.expectedLength !== -1 &&
+        this.receivedIds.length === this.expectedLength
+      ) {
+        if (statusEl)
+          statusEl.textContent = "All chunks received — reconstructing data...";
+        this.importFinished();
+      }
+    } catch (err) {
+      console.error("QRImport: error processing scan result", err);
+      const statusEl = document.getElementById("qr-import-status");
+      if (statusEl) statusEl.textContent = "Scan processing error";
     }
   }
 
   private importFinished(): void {
+    // Stop the scanner immediately — we have everything we need to reconstruct.
     this.stop();
-    if (this.callback === null) return;
 
-    let data = "";
+    const statusEl = document.getElementById("qr-import-status");
+    if (statusEl) statusEl.textContent = "Reconstructing QR payload...";
 
-    for (const i of this.receivedIds) {
-      data += this.received[i];
+    if (this.callback === null) {
+      if (statusEl) statusEl.textContent = "No import handler registered";
+      return;
     }
 
-    const lastQuoteIndex = data.lastIndexOf('"');
+    try {
+      // Concatenate chunks in ascending order
+      let base64 = "";
+      for (const i of this.receivedIds) {
+        base64 += this.received[i];
+      }
 
-    const dataBYTES = data.substring(0, lastQuoteIndex + 1);
-    let dataALPHA = data.substring(lastQuoteIndex + 1, data.length);
-    dataALPHA = dataALPHA.replaceAll("$", "[");
-    dataALPHA = dataALPHA.replaceAll("/", "]");
-    dataALPHA = dataALPHA.replaceAll(" ", ",");
+      // Decode base64 back into a JSON string and parse
+      const json = decodeBase64ToString(base64);
+      const parsedData = JSON.parse(json);
 
-    data = dataBYTES + dataALPHA;
+      // Re-insert placeholder for uuid so Match.fromPacket / constructors generate a fresh id
+      parsedData.splice(7, 0, null);
 
-    const parsedData = JSON.parse(data);
-    parsedData.splice(7, 0, null);
+      // Notify UI of success before invoking the app callback so the user sees feedback.
+      if (statusEl) statusEl.textContent = "Import complete — applying data...";
+      this.callback(parsedData);
 
-    this.callback(parsedData);
-    this.callback = null;
+      // Keep a short user-visible success message, then clear the status.
+      if (statusEl) {
+        statusEl.textContent = "Import successful";
+        window.setTimeout(() => {
+          const s = document.getElementById("qr-import-status");
+          if (s) s.textContent = "";
+        }, 1500);
+      }
+    } catch (err) {
+      console.error("QRImport: failed to reconstruct data", err);
+      if (statusEl)
+        statusEl.textContent = "Import failed (corrupt/incomplete stream)";
+      alert(
+        "Failed to import QR data: " +
+          (err && (err as Error).message
+            ? (err as Error).message
+            : String(err)),
+      );
+    } finally {
+      // Reset internal state
+      this.callback = null;
+      this.received = {};
+      this.receivedIds = [];
+      this.expectedLength = -1;
+    }
   }
 }
 
