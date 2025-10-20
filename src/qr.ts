@@ -7,10 +7,10 @@ const HEADER_SIZE = 4;
 const TOTAL_CHUNKS_HEADER_SIZE = 4;
 const CHUNK_HEADER_SIZE = HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE;
 
-// Conservative per-chunk payload size (characters). Keep small to maximize scan reliability.
-const MAX_CHUNK_PAYLOAD = 110;
-// Duration each QR image is shown on screen (milliseconds). Slower rotation improves scan reliability.
-const FRAME_DURATION_MS = 800;
+// Per-chunk payload size (characters). Increased for faster data transfer.
+const MAX_CHUNK_PAYLOAD = 200;
+// Duration each QR image is shown on screen (milliseconds). Faster rotation for quicker scanning.
+const FRAME_DURATION_MS = 500;
 
 /**
  * Helper: encode arbitrary UTF-8 string to a base64 payload in a browser-safe way.
@@ -120,46 +120,33 @@ export class QRExport {
       Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.8),
     );
 
-    const updateOverlayStatus = (current: number, total: number) => {
-      const status = document.getElementById("qr-export-status");
-      if (status) status.textContent = `Page ${current} / ${total}`;
+    const shown = new Set<number>();
+    function markShown(idx: number): void {
+      // Add the payload index to the set of unique pages the user has actually seen.
+      // We only update the visible progress indicator when a previously-unseen page
+      // is shown so the progress bar fills monotonically and never rewinds.
+      if (!shown.has(idx)) {
+        shown.add(idx);
+        updateOverlayStatus(shown.size, totalChunks);
+      }
+    }
 
-      // Toggle top-area animated dots indicator (static in HTML) based on stream progress.
+    const updateOverlayStatus = (shownCount: number, total: number) => {
+      const status = document.getElementById("qr-export-status");
+      if (status) status.textContent = `Page ${shownCount} / ${total}`;
+
+      // Toggle the top-area animated dots while unique pages are still being shown.
       try {
         const dots = document.getElementById(
           "qr-export-dots",
         ) as HTMLElement | null;
         if (dots) {
-          if (total > 1 && current < total) {
+          if (total > 1 && shownCount < total)
             dots.style.display = "inline-flex";
-          } else {
-            dots.style.display = "none";
-          }
+          else dots.style.display = "none";
         }
       } catch (_err) {
-        // ignore errors updating top-area animation
-      }
-
-      // Update accessible labeling for the currently visible worker/canvas rather than
-      // rendering per-worker numeric labels. This keeps the UI clean on iPad/mobile
-      // while still providing screen-readers the necessary context.
-      try {
-        const visible = this.pool
-          ? this.pool.find((el) => el && !el.classList.contains("hidden"))
-          : null;
-        if (visible) {
-          const labelText = `QR export page ${current} of ${total}`;
-          const canvas = visible.querySelector("canvas");
-          if (canvas) {
-            canvas.setAttribute("role", "img");
-            canvas.setAttribute("aria-label", labelText);
-          }
-          visible.setAttribute("role", "group");
-          visible.setAttribute("aria-label", labelText);
-          visible.setAttribute("aria-live", "polite");
-        }
-      } catch (_err) {
-        // Ignore accessibility update failures to avoid breaking the export flow.
+        // ignore
       }
     };
 
@@ -179,7 +166,7 @@ export class QRExport {
           });
           el.replaceChildren();
           el.appendChild(canvas);
-          updateOverlayStatus(1, totalChunks);
+          markShown(0);
         } catch (err) {
           console.error("QRExport: failed to render single QR", err);
           alert("Failed to render QR export");
@@ -208,9 +195,6 @@ export class QRExport {
               width: qrCanvasPixelSize,
               margin: 1,
             });
-            const label = document.createElement("div");
-            label.className = "text-slate-100 font-semibold mt-2 select-none";
-            label.style.userSelect = "none";
             canvas.setAttribute(
               "aria-label",
               `QR export page ${payloadIdx + 1} of ${totalChunks}`,
@@ -224,13 +208,13 @@ export class QRExport {
           }
         }
 
-        // Reveal the first available worker and update status.
+        // Reveal the first available worker and mark it shown.
         const firstEl = this.pool.find((x) => x) || null;
         if (firstEl) {
           const dom = document.getElementById(firstEl.id);
           if (dom) dom.classList.remove("hidden");
         }
-        updateOverlayStatus(1, totalChunks);
+        markShown(0);
 
         // Cycle through payloads at a conservative frame rate so cameras can scan reliably.
         this.intervalId = window.setInterval(async () => {
@@ -245,7 +229,7 @@ export class QRExport {
               const domPrev = document.getElementById(prevEl.id);
               if (domPrev) domPrev.classList.add("hidden");
             }
-            updateOverlayStatus(payloadIndex + 1, totalChunks);
+            markShown(payloadIndex);
 
             // Prepare next payload into the reused slot.
             const reuseIndex = modulus(poolIndex - 1, poolSize);
