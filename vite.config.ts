@@ -1,7 +1,15 @@
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tailwindcss from "@tailwindcss/vite";
-import { fileURLToPath } from "url";
+// Compute a filesystem path for the ./src directory without importing the 'url' module.
+// This avoids TypeScript diagnostics in environments without node type declarations.
+const srcPath = (() => {
+  const p = new URL("./src", import.meta.url).pathname;
+  // On Windows the pathname may begin with /C:/... - strip the leading slash in that case.
+  return /^\/[A-Za-z]:\//.test(p)
+    ? decodeURIComponent(p.slice(1))
+    : decodeURIComponent(p);
+})();
 
 export default defineConfig({
   plugins: [
@@ -59,7 +67,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@": srcPath,
     },
   },
   base: "./",
