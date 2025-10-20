@@ -578,12 +578,32 @@
                         ENDGAME
                     </div>
                 </div>
-                <button
-                    id="whiteboard-toolbar-view-toggle"
-                    class="w-48 h-full mr-6 md:mr-12 text-xl md:text-3xl font-bold text-zinc-300 select-none touch-none"
-                >
-                    Toggle View
-                </button>
+                <div class="flex items-center gap-3 mr-6 md:mr-12">
+                    <button
+                        id="whiteboard-toolbar-view-toggle"
+                        class="w-48 h-full text-xl md:text-3xl font-bold text-zinc-300 select-none touch-none"
+                    >
+                        Toggle View
+                    </button>
+
+                    <!-- Export controls: export the composed field (background + items + drawing) -->
+                    <div class="flex items-center gap-2">
+                        <button
+                            id="whiteboard-toolbar-export-png"
+                            class="w-32 h-full text-sm md:text-base font-semibold text-white bg-blue-500 rounded-full px-3 py-1 select-none touch-none"
+                            title="Export field + annotations as PNG"
+                        >
+                            Export PNG
+                        </button>
+                        <button
+                            id="whiteboard-toolbar-export-pdf"
+                            class="w-32 h-full text-sm md:text-base font-semibold text-white bg-green-600 rounded-full px-3 py-1 select-none touch-none"
+                            title="Export field + annotations as PDF (uses print dialog)"
+                        >
+                            Export PDF
+                        </button>
+                    </div>
+                </div>
             </div>
             <div
                 id="whiteboard-wrapper"
@@ -762,6 +782,147 @@
                 </div>
             </div>
         </div>
+        <script>
+            // Inline export helpers: compose the three canvases (background, items, drawing)
+            // into a single image and either download as PNG or open a print dialog (PDF).
+            (function () {
+                function compositeCanvases() {
+                    var bg = document.getElementById(
+                        "whiteboard-canvas-background",
+                    );
+                    var items = document.getElementById(
+                        "whiteboard-canvas-items",
+                    );
+                    var drawing = document.getElementById(
+                        "whiteboard-canvas-drawing",
+                    );
+                    if (!bg || !items || !drawing) return null;
+
+                    var w = bg.width || bg.clientWidth || 3510;
+                    var h = bg.height || bg.clientHeight || 1610;
+                    var out = document.createElement("canvas");
+                    out.width = w;
+                    out.height = h;
+                    var ctx = out.getContext("2d");
+                    if (!ctx) return null;
+
+                    // Draw in the same order we render: background, items (robots), drawing (annotations)
+                    ctx.drawImage(bg, 0, 0);
+                    ctx.drawImage(items, 0, 0);
+                    ctx.drawImage(drawing, 0, 0);
+
+                    return out;
+                }
+
+                function downloadDataUrl(dataUrl, filename) {
+                    var a = document.createElement("a");
+                    a.href = dataUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                }
+
+                function exportPNG(filename) {
+                    var c = compositeCanvases();
+                    if (!c) {
+                        alert("Export failed: canvases not available");
+                        return;
+                    }
+                    var dataUrl = c.toDataURL("image/png");
+                    downloadDataUrl(dataUrl, filename || "strategy-board.png");
+                }
+
+                function exportPDF() {
+                    var c = compositeCanvases();
+                    if (!c) {
+                        alert("Export failed: canvases not available");
+                        return;
+                    }
+                    var dataUrl = c.toDataURL("image/png");
+
+                    // Open in a new window and trigger the print dialog; user can choose "Save as PDF".
+                    var w = window.open("", "_blank");
+                    if (!w) {
+                        alert(
+                            "Popup blocked. Please allow popups to export as PDF.",
+                        );
+                        return;
+                    }
+                    w.document.write(
+                        "<!doctype html><html><head><title>Strategy Board Export</title>",
+                    );
+                    w.document.write('</head><body style="margin:0">');
+                    w.document.write(
+                        '<img src="' +
+                            dataUrl +
+                            '" style="width:100%;height:auto;display:block" />',
+                    );
+                    w.document.write("</body></html>");
+                    w.document.close();
+                    w.focus();
+
+                    // Wait for the image to load before printing to ensure it renders correctly.
+                    var img = w.document.querySelector("img");
+                    if (img) {
+                        img.onload = function () {
+                            setTimeout(function () {
+                                try {
+                                    w.print();
+                                } catch (err) {
+                                    // print may throw in some environments; ignore.
+                                }
+                                try {
+                                    w.close();
+                                } catch (err) {}
+                            }, 250);
+                        };
+                    } else {
+                        setTimeout(function () {
+                            try {
+                                w.print();
+                            } catch (err) {}
+                            try {
+                                w.close();
+                            } catch (err) {}
+                        }, 500);
+                    }
+                }
+
+                function attachHandlers() {
+                    var pngBtn = document.getElementById(
+                        "whiteboard-toolbar-export-png",
+                    );
+                    var pdfBtn = document.getElementById(
+                        "whiteboard-toolbar-export-pdf",
+                    );
+                    if (pngBtn) {
+                        pngBtn.addEventListener("click", function () {
+                            var ts = new Date()
+                                .toISOString()
+                                .replace(/[:.]/g, "-");
+                            exportPNG("strategy-board-" + ts + ".png");
+                        });
+                    }
+                    if (pdfBtn) {
+                        pdfBtn.addEventListener("click", function () {
+                            exportPDF();
+                        });
+                    }
+                }
+
+                if (document.readyState === "loading") {
+                    document.addEventListener(
+                        "DOMContentLoaded",
+                        attachHandlers,
+                        { once: true },
+                    );
+                } else {
+                    attachHandlers();
+                }
+            })();
+        </script>
+
         <script
             type="module"
             src="./src/app.ts"
