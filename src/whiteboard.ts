@@ -103,14 +103,14 @@ const _canvasStub = (() => {
  * `background.getContext("2d")` or `background.width` continue to work.
  */
 const background = new Proxy({} as HTMLCanvasElement, {
-  get(_t, prop) {
+  get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
     const el = _backgroundEl || _canvasStub;
     const value = (el as any)[prop];
     if (typeof value === "function") return value.bind(el);
     return value;
   },
-  set(_t, prop, val) {
+  set(_t, prop: PropertyKey, val: any, receiver?: any) {
     ensureCanvases();
     if (_backgroundEl) (_backgroundEl as any)[prop] = val;
     return true;
@@ -118,14 +118,14 @@ const background = new Proxy({} as HTMLCanvasElement, {
 }) as unknown as HTMLCanvasElement;
 
 const items = new Proxy({} as HTMLCanvasElement, {
-  get(_t, prop) {
+  get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
     const el = _itemsEl || _canvasStub;
     const value = (el as any)[prop];
     if (typeof value === "function") return value.bind(el);
     return value;
   },
-  set(_t, prop, val) {
+  set(_t, prop: PropertyKey, val: any, receiver?: any) {
     ensureCanvases();
     if (_itemsEl) (_itemsEl as any)[prop] = val;
     return true;
@@ -133,14 +133,14 @@ const items = new Proxy({} as HTMLCanvasElement, {
 }) as unknown as HTMLCanvasElement;
 
 const drawing = new Proxy({} as HTMLCanvasElement, {
-  get(_t, prop) {
+  get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
     const el = _drawingEl || _canvasStub;
     const value = (el as any)[prop];
     if (typeof value === "function") return value.bind(el);
     return value;
   },
-  set(_t, prop, val) {
+  set(_t, prop: PropertyKey, val: any, receiver?: any) {
     ensureCanvases();
     if (_drawingEl) (_drawingEl as any)[prop] = val;
     return true;
@@ -151,34 +151,77 @@ const drawing = new Proxy({} as HTMLCanvasElement, {
  * Context proxies: these behave like real CanvasRenderingContext2D objects,
  * but are resolved lazily via ensureCanvases(). Method calls are forwarded
  * and bound so existing code using `BG`, `IT`, and `DR` can remain unchanged.
+ *
+ * Important enhancement: the proxies also implement the `set` trap so property
+ * assignments like `DR.lineWidth = 10` or `DR.strokeStyle = '#ff0000'` are
+ * forwarded to the actual rendering context. Without that, writing to the
+ * proxy would create properties on the proxy object instead of changing the
+ * real CanvasRenderingContext2D (which caused black lines / wrong colors).
  */
 const BG = new Proxy({} as CanvasRenderingContext2D, {
-  get(_t, prop) {
+  get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
     const ctx = _BGctx as any;
     const value = ctx[prop];
     if (typeof value === "function") return value.bind(ctx);
     return value;
   },
+  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+    ensureCanvases();
+    const ctx = _BGctx as any;
+    if (ctx) {
+      try {
+        ctx[prop as any] = val;
+      } catch (err) {
+        // Some properties are read-only on some contexts; swallowing errors to
+        // keep behavior consistent with assigning on a real context.
+      }
+    }
+    return true;
+  },
 }) as unknown as CanvasRenderingContext2D;
 
 const IT = new Proxy({} as CanvasRenderingContext2D, {
-  get(_t, prop) {
+  get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
     const ctx = _ITctx as any;
     const value = ctx[prop];
     if (typeof value === "function") return value.bind(ctx);
     return value;
   },
+  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+    ensureCanvases();
+    const ctx = _ITctx as any;
+    if (ctx) {
+      try {
+        ctx[prop as any] = val;
+      } catch (err) {
+        // ignore write errors; keep app stable
+      }
+    }
+    return true;
+  },
 }) as unknown as CanvasRenderingContext2D;
 
 const DR = new Proxy({} as CanvasRenderingContext2D, {
-  get(_t, prop) {
+  get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
     const ctx = _DRctx as any;
     const value = ctx[prop];
     if (typeof value === "function") return value.bind(ctx);
     return value;
+  },
+  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+    ensureCanvases();
+    const ctx = _DRctx as any;
+    if (ctx) {
+      try {
+        ctx[prop as any] = val;
+      } catch (err) {
+        // ignore
+      }
+    }
+    return true;
   },
 }) as unknown as CanvasRenderingContext2D;
 
@@ -290,13 +333,13 @@ export class Whiteboard {
           this.currentTool = "eraser";
           document
             .getElementById("whiteboard-draw-config-marker")
-            .style.setProperty("display", "none");
+            ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-draw-config-eraser")
-            .style.setProperty("display", "inline");
+            ?.style.setProperty("display", "inline");
           document
             .getElementById("whiteboard-draw-config-text")
-            .style.setProperty("display", "none");
+            ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-number-pad")
             ?.classList.add("hidden");
@@ -304,13 +347,13 @@ export class Whiteboard {
           this.currentTool = "text";
           document
             .getElementById("whiteboard-draw-config-marker")
-            .style.setProperty("display", "none");
+            ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-draw-config-eraser")
-            .style.setProperty("display", "none");
+            ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-draw-config-text")
-            .style.setProperty("display", "inline");
+            ?.style.setProperty("display", "inline");
           document
             .getElementById("whiteboard-number-pad")
             ?.classList.remove("hidden");
@@ -318,13 +361,13 @@ export class Whiteboard {
           this.currentTool = "marker";
           document
             .getElementById("whiteboard-draw-config-marker")
-            .style.setProperty("display", "inline");
+            ?.style.setProperty("display", "inline");
           document
             .getElementById("whiteboard-draw-config-eraser")
-            .style.setProperty("display", "none");
+            ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-draw-config-text")
-            .style.setProperty("display", "none");
+            ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-number-pad")
             ?.classList.add("hidden");
@@ -332,19 +375,71 @@ export class Whiteboard {
       });
 
     // Number pad event listeners
+    // NOTE: keep the pad visible after selecting a number so the user can
+    // place multiple annotations without reopening the pad. Also provide a
+    // small visual hint by toggling a ring class on the selected button.
     for (let i = 0; i <= 9; i++) {
-      document
-        .getElementById(`whiteboard-number-${i}`)
-        ?.addEventListener("click", (e) => {
-          e.stopPropagation();
-          this.currentTool = "text";
-          this.currentTextValue = String(i);
+      const btn = document.getElementById(`whiteboard-number-${i}`);
+      btn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.currentTool = "text";
+        this.currentTextValue = String(i);
+
+        // Keep the pad visible so multiple numbers can be chosen/placed.
+        document
+          .getElementById("whiteboard-number-pad")
+          ?.classList.remove("hidden");
+
+        // Remove any previous visual selection and mark the clicked button.
+        for (let k = 0; k <= 9; k++) {
           document
-            .getElementById("whiteboard-number-pad")
-            ?.classList.add("hidden");
-          // Re-show after placing text
-        });
+            .getElementById(`whiteboard-number-${k}`)
+            ?.classList.remove("ring-2", "ring-amber-400");
+        }
+        try {
+          (e.currentTarget as HTMLElement).classList.add(
+            "ring-2",
+            "ring-amber-400",
+          );
+        } catch (err) {
+          // defensive: if currentTarget isn't available for some reason, ignore.
+        }
+      });
     }
+
+    // Close button for number-pad: hides the pad and resets text-placement state.
+    document
+      .getElementById("whiteboard-number-close")
+      ?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // Clear any pending text selection.
+        this.currentTextValue = "";
+        // Exit text placement mode and return to marker (safer default).
+        this.currentTool = "marker";
+
+        // Update the draw-config icons so the UI reflects marker selected.
+        document
+          .getElementById("whiteboard-draw-config-marker")
+          ?.style.setProperty("display", "inline");
+        document
+          .getElementById("whiteboard-draw-config-eraser")
+          ?.style.setProperty("display", "none");
+        document
+          .getElementById("whiteboard-draw-config-text")
+          ?.style.setProperty("display", "none");
+
+        // Hide the number pad.
+        document
+          .getElementById("whiteboard-number-pad")
+          ?.classList.add("hidden");
+
+        // Remove visual selection from number buttons.
+        for (let k = 0; k <= 9; k++) {
+          document
+            .getElementById(`whiteboard-number-${k}`)
+            ?.classList.remove("ring-2", "ring-amber-400");
+        }
+      });
 
     const widthConfig = <HTMLInputElement>(
       document.getElementById("whiteboard-robot-config-width")
@@ -709,9 +804,12 @@ export class Whiteboard {
         }
       });
 
+    // Initialize drawing context defaults by writing to the real context
+    // via the proxy's `set` trap implemented above.
     DR.lineWidth = 10;
     DR.lineCap = "round";
     DR.lineJoin = "round";
+    DR.strokeStyle = "white";
 
     requestAnimationFrame(this.main.bind(this));
 
@@ -882,9 +980,31 @@ export class Whiteboard {
           );
         }
         this.redrawDrawing();
-      } else if (action.type === "text") {
-        // Remove last text annotation
-        this.getData()?.textAnnotations.pop();
+      }
+    } else if (action.type === "text") {
+      // Undo a text annotation. Prefer removing the exact referenced annotation
+      // if present; otherwise fall back to popping the last annotation.
+      const data = this.getData();
+      if (data !== null) {
+        if (action.ref) {
+          // action.ref is expected to be [x, y, colorId, text]
+          const ref = action.ref as any[];
+          const idx = data.textAnnotations.findIndex(
+            (t: any) =>
+              t[0] === ref[0] &&
+              t[1] === ref[1] &&
+              t[2] === ref[2] &&
+              String(t[3]) === String(ref[3]),
+          );
+          if (idx !== -1) {
+            data.textAnnotations.splice(idx, 1);
+          } else {
+            // If exact match not found, remove last as a graceful fallback.
+            data.textAnnotations.pop();
+          }
+        } else {
+          data.textAnnotations.pop();
+        }
         this.redrawDrawing();
       }
     }
@@ -911,58 +1031,93 @@ export class Whiteboard {
 
     if (this.match == null) return;
 
+    // Set the font and colors up-front. We'll clamp positions so the team
+    // numbers stay visible even when the driver station coordinates are
+    // placed outside the visible region.
     BG.font = "bold 64px sans-serif";
     BG.fillStyle = "white";
     BG.textAlign = "center";
     BG.textBaseline = "middle";
-    BG.save();
-    BG.translate(
-      Config.redOneStationX - (this.camera.x - width / 2),
-      Config.redOneStationY - (this.camera.y - height / 2),
+
+    // Helper to clamp a numeric value to a range.
+    const clamp = (v: number, lo: number, hi: number) =>
+      Math.max(lo, Math.min(v, hi));
+
+    // margin provides space to ensure text glyphs don't run off the canvas.
+    const margin = 48;
+
+    // Draw a station's text while keeping the center point inside the canvas bounds.
+    const drawStation = (
+      stationX: number,
+      stationY: number,
+      text: string,
+      rotation: number,
+    ) => {
+      // Compute the field-space position adjusted for camera
+      const px = stationX - (this.camera.x - width / 2);
+      const py = stationY - (this.camera.y - height / 2);
+
+      // Measure text to pick a conservative horizontal margin
+      let textWidth = 0;
+      try {
+        const metrics = BG.measureText(text);
+        textWidth = metrics.width || 0;
+      } catch (err) {
+        textWidth = 64;
+      }
+
+      // make margin at least half the text width + some padding so the text center
+      // doesn't place glyphs outside the canvas
+      const effectiveMarginX = Math.max(margin, Math.ceil(textWidth / 2) + 8);
+      const effectiveMarginY = margin;
+
+      const cx = clamp(px, effectiveMarginX, width - effectiveMarginX);
+      const cy = clamp(py, effectiveMarginY, height - effectiveMarginY);
+
+      BG.save();
+      BG.translate(cx, cy);
+      BG.rotate(rotation);
+      BG.fillText(text, 0, 0);
+      BG.restore();
+    };
+
+    // Place the six station labels, clamped so they remain visible.
+    drawStation(
+      Config.redOneStationX,
+      Config.redOneStationY,
+      this.match.redOne,
+      -Math.PI / 2,
     );
-    BG.rotate(-Math.PI / 2);
-    BG.fillText(this.match.redOne, 0, 0);
-    BG.restore();
-    BG.save();
-    BG.translate(
-      Config.redTwoStationX - (this.camera.x - width / 2),
-      Config.redTwoStationY - (this.camera.y - height / 2),
+    drawStation(
+      Config.redTwoStationX,
+      Config.redTwoStationY,
+      this.match.redTwo,
+      -Math.PI / 2,
     );
-    BG.rotate(-Math.PI / 2);
-    BG.fillText(this.match.redTwo, 0, 0);
-    BG.restore();
-    BG.save();
-    BG.translate(
-      Config.redThreeStationX - (this.camera.x - width / 2),
-      Config.redThreeStationY - (this.camera.y - height / 2),
+    drawStation(
+      Config.redThreeStationX,
+      Config.redThreeStationY,
+      this.match.redThree,
+      -Math.PI / 2,
     );
-    BG.rotate(-Math.PI / 2);
-    BG.fillText(this.match.redThree, 0, 0);
-    BG.restore();
-    BG.save();
-    BG.translate(
-      Config.blueOneStationX - (this.camera.x - width / 2),
-      Config.blueOneStationY - (this.camera.y - height / 2),
+    drawStation(
+      Config.blueOneStationX,
+      Config.blueOneStationY,
+      this.match.blueOne,
+      Math.PI / 2,
     );
-    BG.rotate(Math.PI / 2);
-    BG.fillText(this.match.blueOne, 0, 0);
-    BG.restore();
-    BG.save();
-    BG.translate(
-      Config.blueTwoStationX - (this.camera.x - width / 2),
-      Config.blueTwoStationY - (this.camera.y - height / 2),
+    drawStation(
+      Config.blueTwoStationX,
+      Config.blueTwoStationY,
+      this.match.blueTwo,
+      Math.PI / 2,
     );
-    BG.rotate(Math.PI / 2);
-    BG.fillText(this.match.blueTwo, 0, 0);
-    BG.restore();
-    BG.save();
-    BG.translate(
-      Config.blueThreeStationX - (this.camera.x - width / 2),
-      Config.blueThreeStationY - (this.camera.y - height / 2),
+    drawStation(
+      Config.blueThreeStationX,
+      Config.blueThreeStationY,
+      this.match.blueThree,
+      Math.PI / 2,
     );
-    BG.rotate(Math.PI / 2);
-    BG.fillText(this.match.blueThree, 0, 0);
-    BG.restore();
   }
 
   private drawRobot(name: string, robot: any, team: string, slot: string) {
@@ -1288,6 +1443,10 @@ export class Whiteboard {
         )
           return;
         this.currentStrokePoints.push([x, y]);
+        DR.lineWidth = 10;
+        DR.lineCap = "round";
+        DR.lineJoin = "round";
+        DR.strokeStyle = this.getStrokeColor(this.currentColor);
         DR.lineTo(
           x - (this.camera.x - width / 2),
           y - (this.camera.y - height / 2),
@@ -1438,6 +1597,9 @@ export class Whiteboard {
         .getElementById("whiteboard-robot-config")
         ?.classList.add("hidden");
       if (this.currentTool == "marker") {
+        DR.lineWidth = 10;
+        DR.lineCap = "round";
+        DR.lineJoin = "round";
         DR.strokeStyle = this.getStrokeColor(this.currentColor);
         DR.beginPath();
         DR.moveTo(

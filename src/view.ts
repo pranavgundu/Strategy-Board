@@ -377,8 +377,14 @@ export class View {
     const options = item.children[2].children[1] as HTMLElement;
     const exportOption = options.children[0] as HTMLElement;
     const deleteOption = options.children[1] as HTMLElement;
+    // Prevent clicks inside the kebab/options area from bubbling up to the
+    // match item. This avoids accidental opens when interacting with the menu.
+    options.addEventListener("click", (e) => e.stopPropagation());
 
-    kebab.addEventListener("click", () => {
+    kebab.addEventListener("click", (e) => {
+      // Prevent the click from bubbling up and being interpreted as an open
+      // request on the overall match item.
+      e.stopPropagation();
       this.hide(kebab);
       this.show(options);
       item.focus();
@@ -391,16 +397,23 @@ export class View {
       this.show(kebab);
     });
 
-    deleteOption.addEventListener("click", () => {
+    deleteOption.addEventListener("click", (e) => {
+      // Stop propagation so this click does not bubble up and open the match.
+      e.stopPropagation();
       this.deleteMatch(item.id);
     });
 
-    exportOption.addEventListener("click", () => {
+    exportOption.addEventListener("click", (e) => {
+      // Stop propagation so this click does not bubble up and open the match.
+      e.stopPropagation();
       const match = this.model.getMatch(id);
       if (match) {
         this.qrexport.export(match);
         this.show(E.Export);
       }
+      // Close the options and restore the kebab to keep the UI consistent.
+      this.hide(options);
+      this.show(kebab);
     });
 
     const openMatch = () => {
@@ -409,7 +422,23 @@ export class View {
         this.loadWhiteboard(match);
       }
     };
-    item.children[0].addEventListener("click", openMatch);
+    // Make the entire match item clickable (except the kebab/options) and add
+    // keyboard support for accessibility (Enter / Space).
+    item.addEventListener("click", (e) => {
+      const target = e.target as Node;
+      // If the click originated inside the kebab/options controls, ignore it.
+      if (kebab.contains(target) || options.contains(target)) return;
+      openMatch();
+    });
+    item.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault(); // prevent page scroll when Space is used
+        openMatch();
+      }
+    });
+    // Ensure the item is keyboard-focusable and announced as a control.
+    item.setAttribute("tabindex", "0");
+    item.setAttribute("role", "button");
 
     this.show(item);
     E.MatchList.prepend(item);
