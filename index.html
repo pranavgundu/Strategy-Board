@@ -254,6 +254,21 @@
                         setStatus("DOMContentLoaded — awaiting module load...");
                         // fallback: if module hasn't indicated success after a short period, attempt self-test
                         setTimeout(function () {
+                            // Only run the fallback self-test if the app hasn't signaled readiness.
+                            try {
+                                var appReady =
+                                    document.documentElement.getAttribute(
+                                        "data-app-ready",
+                                    );
+                                if (appReady === "true") {
+                                    setStatus(
+                                        "Fallback: app already initialized; skipping self-test",
+                                    );
+                                    return;
+                                }
+                            } catch (err) {
+                                // If there's an error checking readiness, proceed with the fallback.
+                            }
                             setStatus("Fallback: running self-test");
                             runSelfTest();
                         }, 1500);
@@ -635,6 +650,11 @@
                     class="fa fa-eraser text-xl md:text-2xl lg:text-3xl text-white"
                     style="display: none"
                 ></i>
+                <i
+                    id="whiteboard-draw-config-text"
+                    class="fa fa-font text-xl md:text-2xl lg:text-3xl text-white"
+                    style="display: none"
+                ></i>
             </div>
             <div
                 id="whiteboard-color-config"
@@ -667,6 +687,78 @@
                     <i
                         class="fa fa-close text-xl md:text-2xl lg:text-3xl text-red-500"
                     ></i>
+                </div>
+            </div>
+            <!-- Number pad for the text tool (hidden until text mode is active) -->
+            <div
+                id="whiteboard-number-pad"
+                class="hidden absolute bottom-24 right-4 bg-zinc-800 rounded-xl p-3 grid grid-cols-3 gap-2 z-50"
+                aria-hidden="true"
+            >
+                <button
+                    id="whiteboard-number-1"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    1
+                </button>
+                <button
+                    id="whiteboard-number-2"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    2
+                </button>
+                <button
+                    id="whiteboard-number-3"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    3
+                </button>
+
+                <button
+                    id="whiteboard-number-4"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    4
+                </button>
+                <button
+                    id="whiteboard-number-5"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    5
+                </button>
+                <button
+                    id="whiteboard-number-6"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    6
+                </button>
+
+                <button
+                    id="whiteboard-number-7"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    7
+                </button>
+                <button
+                    id="whiteboard-number-8"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    8
+                </button>
+                <button
+                    id="whiteboard-number-9"
+                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                >
+                    9
+                </button>
+
+                <div class="col-span-3 text-center mt-1">
+                    <button
+                        id="whiteboard-number-0"
+                        class="w-2/3 p-3 rounded bg-slate-700 text-white text-xl"
+                    >
+                        0
+                    </button>
                 </div>
             </div>
         </div>
