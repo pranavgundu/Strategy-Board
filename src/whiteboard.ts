@@ -265,7 +265,7 @@ export class Whiteboard {
   private model;
   private active = true;
   private match: Match | null = null;
-  private mode = "auton";
+  private mode = "auto";
   private currentView = "full";
   private camera = {
     x: width / 2,
@@ -289,7 +289,7 @@ export class Whiteboard {
   private currentColor = 0;
   private currentTextValue = "";
 
-  private autonActionHistory: Array<any> = [];
+  private autoActionHistory: Array<any> = [];
   private teleopActionHistory: Array<any> = [];
   private endgameActionHistory: Array<any> = [];
 
@@ -318,8 +318,8 @@ export class Whiteboard {
     drawing.addEventListener("pointerleave", this.onPointerLeave.bind(this));
 
     document
-      .getElementById("whiteboard-toolbar-mode-auton")
-      ?.addEventListener("click", (e) => this.toggleMode("auton"));
+      .getElementById("whiteboard-toolbar-mode-auto")
+      ?.addEventListener("click", (e) => this.toggleMode("auto"));
     document
       .getElementById("whiteboard-toolbar-mode-teleop")
       ?.addEventListener("click", (e) => this.toggleMode("teleop"));
@@ -451,7 +451,7 @@ export class Whiteboard {
           robotWidth = 30;
         }
         if (this.match === null) return;
-        this.match.auton[`${this.selected[0]}Robot`].w =
+        this.match.auto[`${this.selected[0]}Robot`].w =
           (robotWidth * width) / realWidth;
         this.match.teleop[`${this.selected[0]}Robot`].w =
           (robotWidth * width) / realWidth;
@@ -471,7 +471,7 @@ export class Whiteboard {
           robotHeight = 30;
         }
         if (this.match === null) return;
-        this.match.auton[`${this.selected[0]}Robot`].h =
+        this.match.auto[`${this.selected[0]}Robot`].h =
           (robotHeight * height) / realHeight;
         this.match.teleop[`${this.selected[0]}Robot`].h =
           (robotHeight * height) / realHeight;
@@ -881,7 +881,7 @@ export class Whiteboard {
       this.match = null;
       this.lastSelected = null;
       this.selected = null;
-      this.autonActionHistory = [];
+      this.autoActionHistory = [];
       this.teleopActionHistory = [];
       this.endgameActionHistory = [];
       document
@@ -908,8 +908,8 @@ export class Whiteboard {
   }
 
   private addUndoHistory(action: any) {
-    if (this.mode === "auton") {
-      this.autonActionHistory.push(action);
+    if (this.mode === "auto") {
+      this.autoActionHistory.push(action);
     }
     if (this.mode === "teleop") {
       this.teleopActionHistory.push(action);
@@ -927,8 +927,8 @@ export class Whiteboard {
   }
 
   private getCurrentUndoHistory() {
-    if (this.mode === "auton") {
-      return this.autonActionHistory;
+    if (this.mode === "auto") {
+      return this.autoActionHistory;
     }
     if (this.mode === "teleop") {
       return this.teleopActionHistory;
@@ -1176,8 +1176,8 @@ export class Whiteboard {
 
   private getData() {
     if (this.match === null) return null;
-    if (this.mode === "auton") {
-      return this.match.auton;
+    if (this.mode === "auto") {
+      return this.match.auto;
     }
     if (this.mode === "teleop") {
       return this.match.teleop;
