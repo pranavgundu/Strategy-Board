@@ -76,7 +76,7 @@ export class Match {
   public readonly blueThree: string;
   public readonly id: string;
 
-  public auton: PhaseData;
+  public auto: PhaseData;
   public teleop: PhaseData;
   public endgame: PhaseData;
 
@@ -101,7 +101,7 @@ export class Match {
     this.id = id ?? uuidv4();
 
     // Initialize default phase data
-    this.auton = this.createDefaultPhaseData();
+    this.auto = this.createDefaultPhaseData();
     this.teleop = this.createDefaultPhaseData();
     this.endgame = this.createDefaultPhaseData();
 
@@ -153,7 +153,7 @@ export class Match {
   }
 
   private applyOptions(options: MatchOptions): void {
-    this.applyPhaseOptions(this.auton, options.a, options.dim);
+    this.applyPhaseOptions(this.auto, options.a, options.dim);
     this.applyPhaseOptions(this.teleop, options.t, options.dim);
     this.applyPhaseOptions(this.endgame, options.e, options.dim);
   }
@@ -289,64 +289,64 @@ export class Match {
       [
         [
           [
-            Number(this.auton.redOneRobot.w.toFixed(1)),
-            Number(this.auton.redOneRobot.h.toFixed(1)),
+            Number(this.auto.redOneRobot.w.toFixed(1)),
+            Number(this.auto.redOneRobot.h.toFixed(1)),
           ],
           [
-            Number(this.auton.redTwoRobot.w.toFixed(1)),
-            Number(this.auton.redTwoRobot.h.toFixed(1)),
+            Number(this.auto.redTwoRobot.w.toFixed(1)),
+            Number(this.auto.redTwoRobot.h.toFixed(1)),
           ],
           [
-            Number(this.auton.redThreeRobot.w.toFixed(1)),
-            Number(this.auton.redThreeRobot.h.toFixed(1)),
+            Number(this.auto.redThreeRobot.w.toFixed(1)),
+            Number(this.auto.redThreeRobot.h.toFixed(1)),
           ],
           [
-            Number(this.auton.blueOneRobot.w.toFixed(1)),
-            Number(this.auton.blueOneRobot.h.toFixed(1)),
+            Number(this.auto.blueOneRobot.w.toFixed(1)),
+            Number(this.auto.blueOneRobot.h.toFixed(1)),
           ],
           [
-            Number(this.auton.blueTwoRobot.w.toFixed(1)),
-            Number(this.auton.blueTwoRobot.h.toFixed(1)),
+            Number(this.auto.blueTwoRobot.w.toFixed(1)),
+            Number(this.auto.blueTwoRobot.h.toFixed(1)),
           ],
           [
-            Number(this.auton.blueThreeRobot.w.toFixed(1)),
-            Number(this.auton.blueThreeRobot.h.toFixed(1)),
+            Number(this.auto.blueThreeRobot.w.toFixed(1)),
+            Number(this.auto.blueThreeRobot.h.toFixed(1)),
           ],
         ],
         [
           [
-            this.auton.redOneRobot.x,
-            this.auton.redOneRobot.y,
-            Number(this.auton.redOneRobot.r.toFixed(2)),
+            this.auto.redOneRobot.x,
+            this.auto.redOneRobot.y,
+            Number(this.auto.redOneRobot.r.toFixed(2)),
           ],
           [
-            this.auton.redTwoRobot.x,
-            this.auton.redTwoRobot.y,
-            Number(this.auton.redTwoRobot.r.toFixed(2)),
+            this.auto.redTwoRobot.x,
+            this.auto.redTwoRobot.y,
+            Number(this.auto.redTwoRobot.r.toFixed(2)),
           ],
           [
-            this.auton.redThreeRobot.x,
-            this.auton.redThreeRobot.y,
-            Number(this.auton.redThreeRobot.r.toFixed(2)),
+            this.auto.redThreeRobot.x,
+            this.auto.redThreeRobot.y,
+            Number(this.auto.redThreeRobot.r.toFixed(2)),
           ],
           [
-            this.auton.blueOneRobot.x,
-            this.auton.blueOneRobot.y,
-            Number(this.auton.blueOneRobot.r.toFixed(2)),
+            this.auto.blueOneRobot.x,
+            this.auto.blueOneRobot.y,
+            Number(this.auto.blueOneRobot.r.toFixed(2)),
           ],
           [
-            this.auton.blueTwoRobot.x,
-            this.auton.blueTwoRobot.y,
-            Number(this.auton.blueTwoRobot.r.toFixed(2)),
+            this.auto.blueTwoRobot.x,
+            this.auto.blueTwoRobot.y,
+            Number(this.auto.blueTwoRobot.r.toFixed(2)),
           ],
           [
-            this.auton.blueThreeRobot.x,
-            this.auton.blueThreeRobot.y,
-            Number(this.auton.blueThreeRobot.r.toFixed(2)),
+            this.auto.blueThreeRobot.x,
+            this.auto.blueThreeRobot.y,
+            Number(this.auto.blueThreeRobot.r.toFixed(2)),
           ],
-          this.auton.drawing,
-          this.auton.drawingBBox,
-          this.auton.textAnnotations,
+          this.auto.drawing,
+          this.auto.drawingBBox,
+          this.auto.textAnnotations,
         ],
         [
           [
