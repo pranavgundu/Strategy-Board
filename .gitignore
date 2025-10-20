@@ -1,3 +1,31 @@
-dist
-dev-dist
-node_modules
+# Node.js dependencies
+node_modules/
+
+# TypeScript build output
+dist/
+build/
+*.js
+*.js.map
+*.d.ts
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS and Editor specific files
+.DS_Store
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.local
+
+# Test coverage reports
+coverage/
+
+# Miscellaneous
+tmp/
