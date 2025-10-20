@@ -17,10 +17,12 @@ interface PhaseData {
   blueThreeRobot: RobotPosition;
   drawing: DrawingStroke[];
   drawingBBox: BoundingBox[];
+  textAnnotations: TextAnnotation[];
 }
 
 type DrawingStroke = [number, ...Array<[number, number]>];
 type BoundingBox = [number, number, number, number];
+type TextAnnotation = [number, number, number, string]; // [x, y, colorId, text]
 
 interface MatchOptions {
   dim: {
@@ -45,6 +47,7 @@ interface PhaseOptions {
   b3: { x: number; y: number; r: number };
   d: DrawingStroke[];
   dx: BoundingBox[];
+  txt?: TextAnnotation[];
 }
 
 const DEFAULT_ROBOT_WIDTH = 152.4;
@@ -135,6 +138,7 @@ export class Match {
       ),
       drawing: [],
       drawingBBox: [],
+      textAnnotations: [],
     };
   }
 
@@ -161,6 +165,7 @@ export class Match {
   ): void {
     phase.drawing = phaseOptions.d;
     phase.drawingBBox = phaseOptions.dx;
+    phase.textAnnotations = phaseOptions.txt || [];
 
     phase.redOneRobot = {
       x: phaseOptions.r1.x,
@@ -341,6 +346,7 @@ export class Match {
           ],
           this.auton.drawing,
           this.auton.drawingBBox,
+          this.auton.textAnnotations,
         ],
         [
           [
@@ -375,6 +381,7 @@ export class Match {
           ],
           this.teleop.drawing,
           this.teleop.drawingBBox,
+          this.teleop.textAnnotations,
         ],
         [
           [
@@ -409,6 +416,7 @@ export class Match {
           ],
           this.endgame.drawing,
           this.endgame.drawingBBox,
+          this.endgame.textAnnotations,
         ],
       ],
     ];

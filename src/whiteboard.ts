@@ -244,6 +244,7 @@ export class Whiteboard {
   private currentAction = "none";
   private currentTool = "marker";
   private currentColor = 0;
+  private currentTextValue = "";
 
   private autonActionHistory: Array<any> = [];
   private teleopActionHistory: Array<any> = [];
@@ -293,7 +294,27 @@ export class Whiteboard {
           document
             .getElementById("whiteboard-draw-config-eraser")
             .style.setProperty("display", "inline");
+          document
+            .getElementById("whiteboard-draw-config-text")
+            .style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-number-pad")
+            ?.classList.add("hidden");
         } else if (this.currentTool == "eraser") {
+          this.currentTool = "text";
+          document
+            .getElementById("whiteboard-draw-config-marker")
+            .style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-draw-config-eraser")
+            .style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-draw-config-text")
+            .style.setProperty("display", "inline");
+          document
+            .getElementById("whiteboard-number-pad")
+            ?.classList.remove("hidden");
+        } else if (this.currentTool == "text") {
           this.currentTool = "marker";
           document
             .getElementById("whiteboard-draw-config-marker")
@@ -301,8 +322,29 @@ export class Whiteboard {
           document
             .getElementById("whiteboard-draw-config-eraser")
             .style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-draw-config-text")
+            .style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-number-pad")
+            ?.classList.add("hidden");
         }
       });
+
+    // Number pad event listeners
+    for (let i = 0; i <= 9; i++) {
+      document
+        .getElementById(`whiteboard-number-${i}`)
+        ?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.currentTool = "text";
+          this.currentTextValue = String(i);
+          document
+            .getElementById("whiteboard-number-pad")
+            ?.classList.add("hidden");
+          // Re-show after placing text
+        });
+    }
 
     const widthConfig = <HTMLInputElement>(
       document.getElementById("whiteboard-robot-config-width")
@@ -828,13 +870,21 @@ export class Whiteboard {
       const data = this.getData();
       if (data !== null) {
         for (let i = action.erased.length - 1; i >= 0; i--) {
-          data.drawing.splice(action.indexes[i], 0, action.erased[i]);
-          data.drawingBBox.splice(
+          this.getData()?.drawing.splice(
+            action.indexes[i],
+            0,
+            action.erased[i],
+          );
+          this.getData()?.drawingBBox.splice(
             action.indexes[i],
             0,
             getBBox(action.erased[i]) as any,
           );
         }
+        this.redrawDrawing();
+      } else if (action.type === "text") {
+        // Remove last text annotation
+        this.getData()?.textAnnotations.pop();
         this.redrawDrawing();
       }
     }
@@ -1008,6 +1058,9 @@ export class Whiteboard {
     if (data === null || this.match === null) return;
 
     DR.clearRect(0, 0, width, height);
+    DR.lineWidth = 10;
+    DR.lineCap = "round";
+    DR.lineJoin = "round";
     for (let stroke of data.drawing) {
       DR.beginPath();
       DR.strokeStyle = this.getStrokeColor(stroke[0]);
@@ -1015,13 +1068,28 @@ export class Whiteboard {
         stroke[1][0] - (this.camera.x - width / 2),
         stroke[1][1] - (this.camera.y - height / 2),
       );
-      for (let i = 1; i < stroke.length; i++) {
+      for (let i = 2; i < stroke.length; i++) {
         DR.lineTo(
           stroke[i][0] - (this.camera.x - width / 2),
           stroke[i][1] - (this.camera.y - height / 2),
         );
       }
       DR.stroke();
+    }
+
+    // Draw text annotations
+    if (data.textAnnotations) {
+      DR.font = "bold 80px Arial";
+      DR.textAlign = "center";
+      DR.textBaseline = "middle";
+      for (let text of data.textAnnotations) {
+        DR.fillStyle = this.getStrokeColor(text[2]);
+        DR.fillText(
+          text[3],
+          text[0] - (this.camera.x - width / 2),
+          text[1] - (this.camera.y - height / 2),
+        );
+      }
     }
   }
 
@@ -1380,6 +1448,26 @@ export class Whiteboard {
         this.currentStrokePoints.push([x, y]);
       } else if (this.currentTool == "eraser") {
         this.currentErasePoint = { x: x, y: y };
+      } else if (this.currentTool == "text" && this.currentTextValue !== "") {
+        // Add text annotation
+        const data = this.getData();
+        if (data !== null) {
+          data.textAnnotations.push([
+            x,
+            y,
+            this.currentColor,
+            this.currentTextValue,
+          ]);
+          this.addUndoHistory({
+            type: "text",
+            ref: [x, y, this.currentColor, this.currentTextValue],
+          });
+          this.redrawDrawing();
+          this.currentTextValue = "";
+          document
+            .getElementById("whiteboard-number-pad")
+            ?.classList.remove("hidden");
+        }
       }
     }
     clickMovement = 0;
