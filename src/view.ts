@@ -260,6 +260,154 @@ export class View {
           } else {
             console.warn("Missing element: qr-export-close-btn");
           }
+
+          // Progress helpers: parse status text and update the top progress bar
+          // so small screens (including iPads) have a single authoritative progress indicator.
+          const parseProgressFromText = (text: string | null) => {
+            if (!text) return null;
+            const m = text.match(/(\d+)\s*\/\s*(\d+)/);
+            if (m) {
+              return { cur: Number(m[1]), total: Number(m[2]) };
+            }
+            // tolerate variants like 'Received 3 / 12 chunks'
+            const n = text.match(/Received\s*(\d+)\s*\/\s*(\d+)/i);
+            if (n) return { cur: Number(n[1]), total: Number(n[2]) };
+            return null;
+          };
+
+          const updateProgressBarFromStatus = (
+            statusId: string,
+            barId: string,
+          ) => {
+            try {
+              const statusEl = get(statusId);
+              const barEl = get(barId) as HTMLElement | null;
+              if (!statusEl || !barEl) return;
+              const info = parseProgressFromText(
+                statusEl.textContent || (statusEl as HTMLElement).innerText,
+              );
+              if (!info) {
+                barEl.style.width = "0%";
+                barEl.classList.remove("complete");
+                return;
+              }
+              const pct = Math.max(
+                0,
+                Math.min(100, Math.round((info.cur / info.total) * 100)),
+              );
+              barEl.style.width = pct + "%";
+              if (pct >= 100) barEl.classList.add("complete");
+              else barEl.classList.remove("complete");
+            } catch (_err) {
+              // non-fatal: keep textual status as the canonical source of truth
+            }
+          };
+
+          const observeStatusToProgress = (statusId: string, barId: string) => {
+            const statusEl = get(statusId);
+            if (!statusEl) return;
+            // Initial sync
+            updateProgressBarFromStatus(statusId, barId);
+            // Observe subsequent status text changes and update the progress bar accordingly.
+            try {
+              const mo = new MutationObserver(() => {
+                updateProgressBarFromStatus(statusId, barId);
+              });
+              mo.observe(statusEl, {
+                childList: true,
+                characterData: true,
+                subtree: true,
+              });
+            } catch (_err) {
+              // If MutationObserver is restricted, fall back to a short interval poll
+              const poll = window.setInterval(() => {
+                updateProgressBarFromStatus(statusId, barId);
+              }, 400);
+              // Try to clear poll when overlay closes
+              const overlay = get(
+                statusId === "qr-export-status"
+                  ? "qr-export-container"
+                  : "qr-import-container",
+              );
+              if (overlay) {
+                overlay.addEventListener(
+                  "click",
+                  () => {
+                    try {
+                      clearInterval(poll);
+                    } catch (_e) {}
+                  },
+                  { once: true },
+                );
+              }
+            }
+          };
+
+          // Start observing both export and import status text nodes so the top progress bars
+          // are kept in sync on small screens (including iPad) when the status text changes.
+          observeStatusToProgress("qr-export-status", "qr-export-progress-bar");
+          observeStatusToProgress("qr-import-status", "qr-import-progress-bar");
+
+          // Ensure overlay inner containers adapt to iPad / tablet layouts programmatically
+          // (CSS provides the baseline but this makes subtle breakpoints reliable at runtime).
+          const ensureOverlayLayout = () => {
+            try {
+              const isTablet = window.innerWidth <= 1024;
+              const exportInner = get(
+                "qr-export-inner-container",
+              ) as HTMLElement | null;
+              const importInner = get(
+                "qr-import-inner-container",
+              ) as HTMLElement | null;
+              if (exportInner) {
+                exportInner.style.maxWidth = isTablet ? "92vw" : "820px";
+                exportInner.style.width = isTablet ? "92vw" : "";
+              }
+              if (importInner) {
+                importInner.style.maxWidth = isTablet ? "92vw" : "820px";
+                importInner.style.width = isTablet ? "92vw" : "";
+              }
+            } catch (_err) {
+              // ignore layout adjustments on constrained environments
+            }
+          };
+          // Run immediately and on relevant events so orientation changes on iPad are handled.
+          try {
+            ensureOverlayLayout();
+            window.addEventListener("resize", ensureOverlayLayout);
+            window.addEventListener("orientationchange", ensureOverlayLayout);
+          } catch (_err) {}
+
+          // Reset progress bars when overlays are dismissed (backdrop / close)
+          const exportOverlay = get("qr-export-container");
+          if (exportOverlay) {
+            exportOverlay.addEventListener("click", () => {
+              const bar = get("qr-export-progress-bar") as HTMLElement | null;
+              if (bar) {
+                try {
+                  bar.style.width = "0%";
+                  bar.classList.remove("complete");
+                } catch (_err) {}
+              }
+            });
+            // keep the existing custom event hook used by tests / automation
+            exportOverlay.addEventListener("app:closeexport" as any, () => {
+              this.onCancelExport(new Event("click"));
+            });
+          }
+
+          const importOverlay = get("qr-import-container");
+          if (importOverlay) {
+            importOverlay.addEventListener("click", () => {
+              const bar = get("qr-import-progress-bar") as HTMLElement | null;
+              if (bar) {
+                try {
+                  bar.style.width = "0%";
+                  bar.classList.remove("complete");
+                } catch (_err) {}
+              }
+            });
+          }
           console.debug(
             "View: attached 'click' handler to #qr-export-container",
           );

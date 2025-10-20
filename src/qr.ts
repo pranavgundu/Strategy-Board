@@ -123,6 +123,44 @@ export class QRExport {
     const updateOverlayStatus = (current: number, total: number) => {
       const status = document.getElementById("qr-export-status");
       if (status) status.textContent = `Page ${current} / ${total}`;
+
+      // Toggle top-area animated dots indicator (static in HTML) based on stream progress.
+      try {
+        const dots = document.getElementById(
+          "qr-export-dots",
+        ) as HTMLElement | null;
+        if (dots) {
+          if (total > 1 && current < total) {
+            dots.style.display = "inline-flex";
+          } else {
+            dots.style.display = "none";
+          }
+        }
+      } catch (_err) {
+        // ignore errors updating top-area animation
+      }
+
+      // Update accessible labeling for the currently visible worker/canvas rather than
+      // rendering per-worker numeric labels. This keeps the UI clean on iPad/mobile
+      // while still providing screen-readers the necessary context.
+      try {
+        const visible = this.pool
+          ? this.pool.find((el) => el && !el.classList.contains("hidden"))
+          : null;
+        if (visible) {
+          const labelText = `QR export page ${current} of ${total}`;
+          const canvas = visible.querySelector("canvas");
+          if (canvas) {
+            canvas.setAttribute("role", "img");
+            canvas.setAttribute("aria-label", labelText);
+          }
+          visible.setAttribute("role", "group");
+          visible.setAttribute("aria-label", labelText);
+          visible.setAttribute("aria-live", "polite");
+        }
+      } catch (_err) {
+        // Ignore accessibility update failures to avoid breaking the export flow.
+      }
     };
 
     // If only one chunk, render a single QR and return early.
@@ -173,9 +211,12 @@ export class QRExport {
             const label = document.createElement("div");
             label.className = "text-slate-100 font-semibold mt-2 select-none";
             label.style.userSelect = "none";
-            label.textContent = `${payloadIdx + 1}/${totalChunks}`;
+            canvas.setAttribute(
+              "aria-label",
+              `QR export page ${payloadIdx + 1} of ${totalChunks}`,
+            );
             el.appendChild(canvas);
-            el.appendChild(label);
+            /* per-worker label intentionally suppressed; accessibility applied to canvas */
             const slot = document.getElementById(`qr-export-code-worker-${i}`);
             if (slot) slot.classList.add("hidden");
           } catch (err) {
@@ -228,9 +269,12 @@ export class QRExport {
                 label.className =
                   "text-slate-100 font-semibold mt-2 select-none";
                 label.style.userSelect = "none";
-                label.textContent = `${nextPayloadIndex + 1}/${totalChunks}`;
+                canvas.setAttribute(
+                  "aria-label",
+                  `QR export page ${nextPayloadIndex + 1} of ${totalChunks}`,
+                );
                 reuseEl.appendChild(canvas);
-                reuseEl.appendChild(label);
+                /* per-worker label intentionally suppressed; accessibility applied to canvas */
               } catch (err) {
                 console.error("QRExport: failed to render QR canvas", err);
                 this.close();
@@ -314,6 +358,13 @@ export class QRExport {
       if (overlay) overlay.classList.add("hidden");
       const status = document.getElementById("qr-export-status");
       if (status) status.textContent = "";
+      // Hide or remove the animated dots indicator if present so the overlay closes cleanly.
+      const dots = document.getElementById("qr-export-dots");
+      if (dots) {
+        try {
+          dots.style.display = "none";
+        } catch (_err) {}
+      }
     } catch (err) {
       console.warn("QRExport: error hiding overlay or clearing status", err);
     }
@@ -396,6 +447,13 @@ export class QRImport {
       await this.scanner.start();
 
       if (statusEl) statusEl.textContent = "Scanning for QR codes…";
+      // Show top animated dots to indicate active scanning (top-area control).
+      try {
+        const dots = document.getElementById(
+          "qr-import-dots",
+        ) as HTMLElement | null;
+        if (dots) dots.style.display = "inline-flex";
+      } catch (_err) {}
     } catch (err) {
       console.error("QRImport: failed to start scanner", err);
       if (statusEl) statusEl.textContent = "Failed to start camera";
@@ -420,6 +478,13 @@ export class QRImport {
     // Clear any transient import status so UI is left in a consistent state.
     const statusEl = document.getElementById("qr-import-status");
     if (statusEl) statusEl.textContent = "";
+    // Hide top-area import dots when scanner is stopped.
+    try {
+      const dots = document.getElementById(
+        "qr-import-dots",
+      ) as HTMLElement | null;
+      if (dots) dots.style.display = "none";
+    } catch (_err) {}
   }
 
   private getResult(result: QrScanner.ScanResult): void {
@@ -483,11 +548,37 @@ export class QRImport {
         if (statusEl) {
           statusEl.textContent = `Receiving ${this.receivedIds.length} / ${this.expectedLength} chunks`;
         }
+        // Show the top-area animated dots while scanning multiple frames.
+        try {
+          const dots = document.getElementById(
+            "qr-import-dots",
+          ) as HTMLElement | null;
+          if (
+            dots &&
+            this.expectedLength > 1 &&
+            this.receivedIds.length < this.expectedLength
+          ) {
+            dots.style.display = "inline-flex";
+          }
+        } catch (_err) {}
       } else {
         // If we saw a duplicate, still update the status so the user sees live activity.
         if (statusEl) {
           statusEl.textContent = `Receiving ${this.receivedIds.length} / ${this.expectedLength} chunks (duplicates ignored)`;
         }
+        // Keep dots visible even if we received a duplicate so user sees activity on the top bar.
+        try {
+          const dots = document.getElementById(
+            "qr-import-dots",
+          ) as HTMLElement | null;
+          if (
+            dots &&
+            this.expectedLength > 1 &&
+            this.receivedIds.length < this.expectedLength
+          ) {
+            dots.style.display = "inline-flex";
+          }
+        } catch (_err) {}
       }
 
       if (
@@ -495,7 +586,16 @@ export class QRImport {
         this.receivedIds.length === this.expectedLength
       ) {
         if (statusEl)
-          statusEl.textContent = "All chunks received — reconstructing data...";
+          if (statusEl)
+            statusEl.textContent =
+              "All chunks received — reconstructing data...";
+        // Hide the animated dots since we're now reconstructing the payload.
+        try {
+          const dots = document.getElementById(
+            "qr-import-dots",
+          ) as HTMLElement | null;
+          if (dots) dots.style.display = "none";
+        } catch (_err) {}
         this.importFinished();
       }
     } catch (err) {
@@ -511,6 +611,13 @@ export class QRImport {
 
     const statusEl = document.getElementById("qr-import-status");
     if (statusEl) statusEl.textContent = "Reconstructing QR payload...";
+    // Ensure top-area import dots are hidden while reconstructing.
+    try {
+      const dots = document.getElementById(
+        "qr-import-dots",
+      ) as HTMLElement | null;
+      if (dots) dots.style.display = "none";
+    } catch (_err) {}
 
     if (this.callback === null) {
       if (statusEl) statusEl.textContent = "No import handler registered";
