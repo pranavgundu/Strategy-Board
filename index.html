@@ -101,11 +101,45 @@
                 min-width: 0;
                 display: flex;
                 align-items: center;
+                gap: 0.5rem;
             }
             #whiteboard-toolbar #whiteboard-toolbar-mode-select {
                 justify-self: center;
                 white-space: nowrap;
                 min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* Collapsed/stacked toolbar variant used when the center would collide with the right
+               controls (applies automatically via JavaScript). This forces the mode selector onto its
+               own row so Toggle View / Endgame / etc. can't overlap it on narrow/tablet displays. */
+            #whiteboard-toolbar.toolbar-collapsed {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto;
+                gap: 6px;
+            }
+            #whiteboard-toolbar.toolbar-collapsed .toolbar-left {
+                grid-column: 1;
+                grid-row: 1;
+                justify-self: start;
+            }
+            #whiteboard-toolbar.toolbar-collapsed .toolbar-right {
+                grid-column: 2;
+                grid-row: 1;
+                justify-self: end;
+            }
+            #whiteboard-toolbar.toolbar-collapsed
+                #whiteboard-toolbar-mode-select {
+                grid-column: 1 / -1;
+                grid-row: 2;
+                justify-self: center;
+                white-space: normal;
+            }
+
+            /* Ensure right-side buttons don't shrink into the center label (avoid overlap) */
+            #whiteboard-toolbar .toolbar-right button {
+                flex-shrink: 0;
             }
 
             /* On tablets and smaller screens, stack controls into two rows so items don't collide */
@@ -117,25 +151,27 @@
                 #whiteboard-toolbar {
                     grid-template-columns: 1fr 1fr;
                     grid-template-rows: auto auto;
-                    gap: 6px;
+                    gap: 8px;
                     height: auto;
-                    padding: 6px 8px;
+                    padding: 8px 12px;
                     align-items: center;
                 }
                 #whiteboard-toolbar .toolbar-left {
                     grid-row: 1;
                     grid-column: 1 / 2;
                     justify-self: start;
-                    padding-left: 8px;
+                    padding-left: 0;
+                    display: flex;
+                    gap: 8px;
                 }
                 #whiteboard-toolbar .toolbar-right {
                     grid-row: 1;
                     grid-column: 2 / 3;
                     justify-self: end;
-                    padding-right: 8px;
+                    padding-right: 0;
                     display: flex;
                     justify-content: flex-end;
-                    gap: 6px;
+                    gap: 8px;
                 }
                 #whiteboard-toolbar #whiteboard-toolbar-mode-select {
                     /* Put mode labels on a dedicated row and allow them to span both columns. */
@@ -149,9 +185,12 @@
                 /* Slightly shrink toolbar button visuals on tablet so they don't collide. */
                 #whiteboard-toolbar .toolbar-right button,
                 #whiteboard-toolbar .toolbar-left button {
-                    padding: 6px 8px;
-                    font-size: 0.95rem;
+                    padding: 6px 10px;
+                    font-size: 0.9rem;
                     height: auto;
+                    min-width: 70px;
+                    white-space: nowrap;
+                    flex-shrink: 0;
                 }
             }
 
@@ -204,40 +243,28 @@
                 height: 100%;
                 border-radius: 999px;
                 background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 60%);
-                transition: width 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
-                background-size: 40px 40px;
+                transition: width 300ms ease-out;
                 position: relative;
                 overflow: hidden;
+                will-change: width;
             }
-            /* subtle moving stripe overlay on top of bar */
+            /* subtle sheen overlay on top of bar */
             .qr-progress-bar::after {
+                /* Single subtle sheen overlay for a continuous, fluid bar appearance.
+                   No stripes or animations to avoid visual segmentation on iPads. */
                 content: "";
                 position: absolute;
                 left: 0;
                 top: 0;
                 right: 0;
                 bottom: 0;
-                background-image: linear-gradient(
-                    45deg,
-                    rgba(255, 255, 255, 0.12) 25%,
-                    rgba(255, 255, 255, 0) 25%,
-                    rgba(255, 255, 255, 0) 50%,
-                    rgba(255, 255, 255, 0.12) 50%,
-                    rgba(255, 255, 255, 0.12) 75%,
-                    rgba(255, 255, 255, 0) 75%
+                background: linear-gradient(
+                    to right,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0)
                 );
-                background-size: 40px 40px;
-                animation: progress-stripes 1.5s linear infinite;
-                opacity: 0.4;
+                opacity: 0.15;
                 pointer-events: none;
-            }
-            @keyframes progress-stripes {
-                from {
-                    transform: translateX(0);
-                }
-                to {
-                    transform: translateX(40px);
-                }
             }
             /* completed state for a neat glow */
             .qr-progress-bar.complete {
@@ -769,6 +796,14 @@
                     aria-hidden="true"
                 >
                     <span id="qr-export-status-text" aria-hidden="false"></span>
+                    <!-- Hiddenprepared flag for automation / accessibility: the app can reveal this
+                         when the export is fully prepared (useful for keyboard users / AT). -->
+                    <span
+                        id="qr-export-prepared"
+                        class="hidden"
+                        aria-hidden="true"
+                        >Prepared</span
+                    >
                     <div
                         id="qr-export-dots"
                         class="qr-dots"

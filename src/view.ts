@@ -275,6 +275,9 @@ export class View {
             return null;
           };
 
+          // Track the last known progress value per bar to ensure monotonic increases
+          const lastProgressValues = new Map<string, number>();
+
           const updateProgressBarFromStatus = (
             statusId: string,
             barId: string,
@@ -286,16 +289,27 @@ export class View {
               const info = parseProgressFromText(
                 statusEl.textContent || (statusEl as HTMLElement).innerText,
               );
+              // Important: do not reset the bar when parsing temporarily fails.
+              // Many small status updates or transient text clearing previously caused
+              // flicker (width jumping to 0). Only update when parse yields a numeric value.
               if (!info) {
-                barEl.style.width = "0%";
-                barEl.classList.remove("complete");
                 return;
               }
               const pct = Math.max(
                 0,
                 Math.min(100, Math.round((info.cur / info.total) * 100)),
               );
-              barEl.style.width = pct + "%";
+
+              // Get the last known progress value for this specific bar
+              const lastPct = lastProgressValues.get(barId) || 0;
+
+              // Only update if progress has increased or reset to a new stream (decrease)
+              // This prevents multiple small transitions that create a segmented appearance
+              if (pct > lastPct || pct < lastPct - 10) {
+                barEl.style.width = pct + "%";
+                lastProgressValues.set(barId, pct);
+              }
+
               if (pct >= 100) barEl.classList.add("complete");
               else barEl.classList.remove("complete");
             } catch (_err) {
@@ -323,7 +337,7 @@ export class View {
               const poll = window.setInterval(() => {
                 updateProgressBarFromStatus(statusId, barId);
               }, 400);
-              // Try to clear poll when overlay closes
+              // Try to clear poll when overlay closes (best-effort)
               const overlay = get(
                 statusId === "qr-export-status"
                   ? "qr-export-container"
@@ -348,6 +362,26 @@ export class View {
           observeStatusToProgress("qr-export-status", "qr-export-progress-bar");
           observeStatusToProgress("qr-import-status", "qr-import-progress-bar");
 
+          // Reset progress tracking when overlays are closed to ensure clean state for next open
+          const exportOverlayProgress = get("qr-export-container");
+          const importOverlayProgress = get("qr-import-container");
+
+          if (exportOverlayProgress) {
+            exportOverlayProgress.addEventListener("click", (e) => {
+              if (e.target === exportOverlayProgress) {
+                lastProgressValues.delete("qr-export-progress-bar");
+              }
+            });
+          }
+
+          if (importOverlayProgress) {
+            importOverlayProgress.addEventListener("click", (e) => {
+              if (e.target === importOverlayProgress) {
+                lastProgressValues.delete("qr-import-progress-bar");
+              }
+            });
+          }
+
           // Ensure overlay inner containers adapt to iPad / tablet layouts programmatically
           // (CSS provides the baseline but this makes subtle breakpoints reliable at runtime).
           const ensureOverlayLayout = () => {
@@ -371,41 +405,138 @@ export class View {
               // ignore layout adjustments on constrained environments
             }
           };
+
+          // If toolbar mode labels and the right controls overlap on a particular device,
+          // force a compact/tablet layout for the toolbar so the labels never collide with
+          // the right-side buttons (this helps when device pixel scaling makes CSS breakpoints
+          // appear inaccurate for some iPads).
+          const ensureToolbarArrangement = () => {
+            try {
+              const toolbar = get("whiteboard-toolbar") as HTMLElement | null;
+              const mode = get(
+                "whiteboard-toolbar-mode-select",
+              ) as HTMLElement | null;
+              const left = document.querySelector(
+                "#whiteboard-toolbar .toolbar-left",
+              ) as HTMLElement | null;
+              const right = document.querySelector(
+                "#whiteboard-toolbar .toolbar-right",
+              ) as HTMLElement | null;
+              if (!toolbar || !mode || !left || !right) return;
+              const mRect = mode.getBoundingClientRect();
+              const rRect = right.getBoundingClientRect();
+              // If the mode area encroaches on the right controls, force a stacked layout.
+              if (mRect.right > rRect.left - 8) {
+                toolbar.style.gridTemplateColumns = "1fr 1fr";
+                toolbar.style.gridTemplateRows = "auto auto";
+                (mode as HTMLElement).style.gridColumn = "1 / -1";
+                (mode as HTMLElement).style.gridRow = "2";
+                left.style.gridColumn = "1";
+                left.style.gridRow = "1";
+                right.style.gridColumn = "2";
+                right.style.gridRow = "1";
+              } else {
+                // restore defaults (let CSS handle normal layout)
+                toolbar.style.gridTemplateColumns = "";
+                toolbar.style.gridTemplateRows = "";
+                (mode as HTMLElement).style.gridColumn = "";
+                (mode as HTMLElement).style.gridRow = "";
+                left.style.gridColumn = "";
+                left.style.gridRow = "";
+                right.style.gridColumn = "";
+                right.style.gridRow = "";
+              }
+            } catch (_err) {
+              // ignore layout calculation errors
+            }
+          };
+
+          // When an overlay is shown we want to reset the progress bar once (clean slate for the new export/import).
+          // We monkeypatch the instance `show` method so that we reset the correct UI elements only when an overlay opens;
+          // this ensures we do not frequently reset in response to transient text changes.
+          try {
+            const origShow = (this as any).show.bind(this);
+            (this as any).show = (e: HTMLElement | null) => {
+              try {
+                if (e === E.Export) {
+                  const bar = get(
+                    "qr-export-progress-bar",
+                  ) as HTMLElement | null;
+                  if (bar) {
+                    bar.style.width = "0%";
+                    bar.classList.remove("complete");
+                  }
+                  const dots = get("qr-export-dots") as HTMLElement | null;
+                  if (dots) dots.style.display = "inline-flex";
+                }
+                if (e === E.Import) {
+                  const bar = get(
+                    "qr-import-progress-bar",
+                  ) as HTMLElement | null;
+                  if (bar) {
+                    bar.style.width = "0%";
+                    bar.classList.remove("complete");
+                  }
+                  const dots = get("qr-import-dots") as HTMLElement | null;
+                  if (dots) dots.style.display = "inline-flex";
+                }
+              } catch (_err) {}
+              // Call original behavior (show element).
+              origShow(e);
+              // Re-evaluate toolbar layout after showing overlays to avoid overlap at unusual widths.
+              ensureOverlayLayout();
+              ensureToolbarArrangement();
+            };
+          } catch (_err) {
+            // If monkeypatching fails for any reason, we still proceed — show() will behave as before.
+          }
+
           // Run immediately and on relevant events so orientation changes on iPad are handled.
           try {
             ensureOverlayLayout();
-            window.addEventListener("resize", ensureOverlayLayout);
-            window.addEventListener("orientationchange", ensureOverlayLayout);
+            ensureToolbarArrangement();
+            window.addEventListener("resize", () => {
+              ensureOverlayLayout();
+              ensureToolbarArrangement();
+            });
+            window.addEventListener("orientationchange", () => {
+              ensureOverlayLayout();
+              ensureToolbarArrangement();
+            });
           } catch (_err) {}
 
-          // Reset progress bars when overlays are dismissed (backdrop / close)
+          // Backdrop handlers: do not reset the progress bar when the backdrop is clicked (that caused frequent flicker).
+          // Instead, hide the animated dots and use the centralized onCancel handlers to stop streaming/scanning cleanly.
           const exportOverlay = get("qr-export-container");
           if (exportOverlay) {
-            exportOverlay.addEventListener("click", () => {
-              const bar = get("qr-export-progress-bar") as HTMLElement | null;
-              if (bar) {
-                try {
-                  bar.style.width = "0%";
-                  bar.classList.remove("complete");
-                } catch (_err) {}
-              }
+            exportOverlay.addEventListener("click", (e) => {
+              try {
+                const dots = get("qr-export-dots") as HTMLElement | null;
+                if (dots) dots.style.display = "none";
+              } catch (_err) {}
+              // Close via the same centralized cancel path so the exporter can clean up safely.
+              try {
+                this.onCancelExport(e as Event);
+              } catch (_err) {}
             });
             // keep the existing custom event hook used by tests / automation
             exportOverlay.addEventListener("app:closeexport" as any, () => {
               this.onCancelExport(new Event("click"));
             });
+          } else {
+            console.warn("Missing element: qr-export-container");
           }
 
           const importOverlay = get("qr-import-container");
           if (importOverlay) {
-            importOverlay.addEventListener("click", () => {
-              const bar = get("qr-import-progress-bar") as HTMLElement | null;
-              if (bar) {
-                try {
-                  bar.style.width = "0%";
-                  bar.classList.remove("complete");
-                } catch (_err) {}
-              }
+            importOverlay.addEventListener("click", (e) => {
+              try {
+                const dots = get("qr-import-dots") as HTMLElement | null;
+                if (dots) dots.style.display = "none";
+              } catch (_err) {}
+              try {
+                this.onCancelImport(e as Event);
+              } catch (_err) {}
             });
           }
           console.debug(
