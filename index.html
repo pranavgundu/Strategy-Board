@@ -80,6 +80,186 @@
                 cursor: pointer;
                 border-radius: 6px;
             }
+
+            /* Responsive toolbar + QR overlay visuals and animations */
+            /* Keep the mode selector centered while allowing left/right controls to adapt */
+            #whiteboard-toolbar {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-items: center;
+                position: relative;
+                gap: 0.5rem;
+            }
+            #whiteboard-toolbar .toolbar-left {
+                justify-self: start;
+                min-width: 0;
+                display: flex;
+                align-items: center;
+            }
+            #whiteboard-toolbar .toolbar-right {
+                justify-self: end;
+                min-width: 0;
+                display: flex;
+                align-items: center;
+            }
+            #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+                justify-self: center;
+                white-space: nowrap;
+                min-width: 0;
+            }
+
+            /* On tablets and smaller screens, stack controls into two rows so items don't collide */
+            @media (max-width: 1024px) {
+                /* Tablet layout: left + right controls share the top row, mode selector
+                   is moved to its own second row and spans both columns so it cannot
+                   collide with Toggle/Endgame on iPad widths. Buttons are slightly
+                   reduced in padding/size to avoid overlap. */
+                #whiteboard-toolbar {
+                    grid-template-columns: 1fr 1fr;
+                    grid-template-rows: auto auto;
+                    gap: 6px;
+                    height: auto;
+                    padding: 6px 8px;
+                    align-items: center;
+                }
+                #whiteboard-toolbar .toolbar-left {
+                    grid-row: 1;
+                    grid-column: 1 / 2;
+                    justify-self: start;
+                    padding-left: 8px;
+                }
+                #whiteboard-toolbar .toolbar-right {
+                    grid-row: 1;
+                    grid-column: 2 / 3;
+                    justify-self: end;
+                    padding-right: 8px;
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 6px;
+                }
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+                    /* Put mode labels on a dedicated row and allow them to span both columns. */
+                    grid-row: 2;
+                    grid-column: 1 / -1; /* span both columns */
+                    justify-self: center;
+                    gap: 0.75rem;
+                    font-size: 1rem; /* slightly smaller on tablets */
+                    flex-wrap: nowrap;
+                }
+                /* Slightly shrink toolbar button visuals on tablet so they don't collide. */
+                #whiteboard-toolbar .toolbar-right button,
+                #whiteboard-toolbar .toolbar-left button {
+                    padding: 6px 8px;
+                    font-size: 0.95rem;
+                    height: auto;
+                }
+            }
+
+            /* On narrower phones, stack into three rows (left, mode, right) so items never overlap. */
+            @media (max-width: 640px) {
+                #whiteboard-toolbar {
+                    grid-template-columns: 1fr;
+                    grid-template-rows: auto auto auto;
+                    gap: 6px;
+                    height: auto;
+                    padding: 6px 8px;
+                }
+                #whiteboard-toolbar .toolbar-left {
+                    grid-row: 1;
+                    grid-column: 1;
+                    justify-self: start;
+                    padding-left: 8px;
+                }
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+                    grid-row: 2;
+                    grid-column: 1;
+                    gap: 0.5rem;
+                    font-size: 0.95rem;
+                }
+                #whiteboard-toolbar .toolbar-right {
+                    grid-row: 3;
+                    grid-column: 1;
+                    justify-self: center;
+                    padding-right: 0;
+                }
+                #whiteboard-toolbar .toolbar-right button,
+                #whiteboard-toolbar .toolbar-left button {
+                    padding: 5px 6px;
+                    font-size: 0.85rem;
+                }
+            }
+
+            /* Progress bar / QR overlay animations */
+            .qr-progress-wrap {
+                width: 90%;
+                height: 10px;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 999px;
+                overflow: hidden;
+                margin-top: 6px;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            }
+            .qr-progress-bar {
+                width: 0%;
+                height: 100%;
+                border-radius: 999px;
+                background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 60%);
+                transition: width 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+                background-size: 40px 40px;
+                position: relative;
+                overflow: hidden;
+            }
+            /* subtle moving stripe overlay on top of bar */
+            .qr-progress-bar::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                background-image: linear-gradient(
+                    45deg,
+                    rgba(255, 255, 255, 0.12) 25%,
+                    rgba(255, 255, 255, 0) 25%,
+                    rgba(255, 255, 255, 0) 50%,
+                    rgba(255, 255, 255, 0.12) 50%,
+                    rgba(255, 255, 255, 0.12) 75%,
+                    rgba(255, 255, 255, 0) 75%
+                );
+                background-size: 40px 40px;
+                animation: progress-stripes 1.5s linear infinite;
+                opacity: 0.4;
+                pointer-events: none;
+            }
+            @keyframes progress-stripes {
+                from {
+                    transform: translateX(0);
+                }
+                to {
+                    transform: translateX(40px);
+                }
+            }
+            /* completed state for a neat glow */
+            .qr-progress-bar.complete {
+                box-shadow:
+                    0 0 18px rgba(34, 197, 94, 0.25),
+                    inset 0 -1px 4px rgba(0, 0, 0, 0.12);
+            }
+
+            /* Hide the per-worker textual labels that were previously appended next to each canvas;
+                       keep the top status/progress bar as the single authoritative progress indicator. */
+            #qr-export-code-worker-0 > div,
+            #qr-export-code-worker-1 > div,
+            #qr-export-code-worker-2 > div {
+                display: none !important;
+            }
+
+            /* Small adjustments to ensure the export overlay scales on mobile/ipad */
+            #qr-export-inner-container,
+            #qr-import-inner-container {
+                max-width: min(92vw, 820px);
+                width: 92vw;
+            }
         </style>
         <script>
             (function () {
@@ -509,12 +689,49 @@
                     id="qr-import-status"
                     class="mb-3 text-slate-100 font-bold select-none"
                     aria-hidden="true"
-                ></div>
+                >
+                    <span id="qr-import-status-text" aria-hidden="false"></span>
+                    <div
+                        id="qr-import-dots"
+                        class="qr-dots"
+                        aria-hidden="true"
+                        style="display: none"
+                    >
+                        <div class="qr-dot"></div>
+                        <div class="qr-dot"></div>
+                        <div class="qr-dot"></div>
+                    </div>
+                </div>
+
+                <!-- Import progress bar (top, visible on iPad and mobile) -->
+                <div
+                    id="qr-import-progress-wrap"
+                    class="w-full flex justify-center"
+                >
+                    <div
+                        id="qr-import-progress"
+                        class="qr-progress-wrap"
+                        aria-hidden="true"
+                    >
+                        <div
+                            id="qr-import-progress-bar"
+                            class="qr-progress-bar"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                </div>
+
                 <select
                     id="qr-import-camera-select"
-                    class="text-md md:text-xl"
+                    class="text-md md:text-xl mt-3 w-full"
                 ></select>
-                <video id="qr-import-video" autoplay playsinline></video>
+                <video
+                    id="qr-import-video"
+                    autoplay
+                    playsinline
+                    class="w-full mt-3"
+                    style="max-height: 44vh"
+                ></video>
             </div>
         </div>
         <div
@@ -545,15 +762,46 @@
                     </button>
                 </div>
 
-                <!-- Status area updated by the QR export code (e.g. \"Page 1 / 3\"). -->
+                <!-- Status area updated by the QR export code (e.g. "Page 1 / 3"). -->
                 <div
                     id="qr-export-status"
                     class="mb-2 text-slate-100 font-bold select-none"
                     aria-hidden="true"
-                ></div>
+                >
+                    <span id="qr-export-status-text" aria-hidden="false"></span>
+                    <div
+                        id="qr-export-dots"
+                        class="qr-dots"
+                        aria-hidden="true"
+                        style="display: none"
+                    >
+                        <div class="qr-dot"></div>
+                        <div class="qr-dot"></div>
+                        <div class="qr-dot"></div>
+                    </div>
+                </div>
+
+                <!-- Top progress bar: the single authoritative visual for export progress -->
+                <div
+                    id="qr-export-progress-wrap"
+                    class="w-full flex justify-center"
+                >
+                    <div
+                        id="qr-export-progress"
+                        class="qr-progress-wrap"
+                        aria-hidden="true"
+                    >
+                        <div
+                            id="qr-export-progress-bar"
+                            class="qr-progress-bar"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                </div>
 
                 <!-- QR worker slots (kept as separate elements so the QR export code can
-                     rotate canvases into them). These are centered by the inner container. -->
+                     rotate canvases into them). The per-canvas numeric labels are hidden
+                     via CSS so the top progress is the only textual indicator. -->
                 <div
                     id="qr-export-code-worker-0"
                     class="hidden w-full flex items-center justify-center"
@@ -577,26 +825,27 @@
         >
             <div
                 id="whiteboard-toolbar"
-                class="grid grid-cols-3 items-center w-full h-12 md:h-16 bg-zinc-700"
+                class="relative items-center w-full h-12 md:h-16 bg-zinc-700"
                 style="z-index: 999"
             >
-                <div class="flex items-center">
+                <div class="toolbar-left flex items-center ml-6 md:ml-12">
                     <button
                         id="whiteboard-toolbar-back"
-                        class="ml-6 md:ml-12 text-xl md:text-3xl font-extrabold text-white select-none touch-none"
+                        class="ml-0 md:ml-0 text-xl md:text-3xl font-extrabold text-white select-none touch-none"
                     >
                         back
                     </button>
                     <button
                         id="whiteboard-toolbar-undo"
-                        class="w-24 h-full ml-6 md:ml-12 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none"
+                        class="w-24 h-full ml-3 md:ml-6 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none"
                     >
                         undo
                     </button>
                 </div>
+
                 <div
                     id="whiteboard-toolbar-mode-select"
-                    class="flex justify-center items-center gap-6"
+                    class="toolbar-center flex justify-center items-center gap-6"
                 >
                     <div
                         id="whiteboard-toolbar-mode-auto"
@@ -617,26 +866,29 @@
                         ENDGAME
                     </div>
                 </div>
-                <div class="flex items-center justify-end gap-3 mr-6 md:mr-12">
+
+                <div
+                    class="toolbar-right flex items-center justify-end gap-3 mr-6 md:mr-12"
+                >
                     <button
                         id="whiteboard-toolbar-view-toggle"
-                        class="w-48 h-full text-xl md:text-3xl font-bold text-zinc-300 select-none touch-none"
+                        class="w-44 md:w-48 h-full text-sm md:text-xl font-bold text-zinc-300 select-none touch-none"
                     >
                         Toggle View
                     </button>
 
                     <!-- Export controls: export the composed field (background + items + drawing) -->
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 ml-2">
                         <button
                             id="whiteboard-toolbar-export-png"
-                            class="w-32 h-full text-sm md:text-base font-semibold text-white bg-blue-500 rounded-full px-3 py-1 select-none touch-none"
+                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-blue-500 rounded-full px-3 py-1 select-none touch-none"
                             title="Export field + annotations as PNG"
                         >
                             Export PNG
                         </button>
                         <button
                             id="whiteboard-toolbar-export-pdf"
-                            class="w-32 h-full text-sm md:text-base font-semibold text-white bg-green-600 rounded-full px-3 py-1 select-none touch-none"
+                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-green-600 rounded-full px-3 py-1 select-none touch-none"
                             title="Export field + annotations as PDF (uses print dialog)"
                         >
                             Export PDF
@@ -928,6 +1180,12 @@
                     }
                 }
 
+                /* Progress observation moved to view.ts.
+                   Duplicate inline parsing/observer functions removed to avoid
+                   having two competing observers (index.html vs. view.ts).
+                   The View module now installs MutationObservers and updates
+                   the top progress bars (qr-export-progress-bar / qr-import-progress-bar). */
+
                 function attachHandlers() {
                     var pngBtn = document.getElementById(
                         "whiteboard-toolbar-export-png",
@@ -948,6 +1206,40 @@
                             exportPDF();
                         });
                     }
+
+                    // Reset progress when overlay is closed
+                    var exportOverlay = document.getElementById(
+                        "qr-export-container",
+                    );
+                    var exportProgressBar = document.getElementById(
+                        "qr-export-progress-bar",
+                    );
+                    if (exportOverlay && exportProgressBar) {
+                        // When overlay receives a click (backdrop) it will be closed by app's view logic.
+                        exportOverlay.addEventListener("click", function () {
+                            try {
+                                exportProgressBar.style.width = "0%";
+                                exportProgressBar.classList.remove("complete");
+                            } catch (_err) {}
+                        });
+                    }
+                    var importOverlay = document.getElementById(
+                        "qr-import-container",
+                    );
+                    var importProgressBar = document.getElementById(
+                        "qr-import-progress-bar",
+                    );
+                    if (importOverlay && importProgressBar) {
+                        importOverlay.addEventListener("click", function () {
+                            try {
+                                importProgressBar.style.width = "0%";
+                                importProgressBar.classList.remove("complete");
+                            } catch (_err) {}
+                        });
+                    }
+
+                    // Observe top status text nodes and animate progress accordingly.
+                    // Progress observation is handled by view.ts (no duplicate observers here).
                 }
 
                 if (document.readyState === "loading") {
