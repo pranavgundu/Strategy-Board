@@ -230,6 +230,36 @@ export class View {
             );
           } catch (_err) {}
           exportEl.addEventListener("click", (e) => this.onCancelExport(e));
+          // Also wire the inner close button to the same handler so keyboard users and
+          // assistive-technology users have a proper, discoverable control to dismiss the export
+          // overlay. We emit the same small instrumentation event used for other handlers.
+          const exportCloseBtn = get(
+            "qr-export-close-btn",
+          ) as HTMLElement | null;
+          if (exportCloseBtn) {
+            try {
+              window.dispatchEvent(
+                new CustomEvent("app:handlerattached", {
+                  detail: { id: "qr-export-close-btn", event: "click" },
+                }),
+              );
+            } catch (_err) {}
+            try {
+              exportCloseBtn.addEventListener("click", (e) =>
+                this.onCancelExport(e),
+              );
+              console.debug(
+                "View: attached 'click' handler to #qr-export-close-btn",
+              );
+            } catch (err) {
+              console.error(
+                "View: failed to attach 'click' handler to #qr-export-close-btn:",
+                err,
+              );
+            }
+          } else {
+            console.warn("Missing element: qr-export-close-btn");
+          }
           console.debug(
             "View: attached 'click' handler to #qr-export-container",
           );
@@ -276,6 +306,34 @@ export class View {
           "View: attaching 'click' handler to #qr-import-inner-container (stopPropagation)",
         );
         importInner.addEventListener("click", (e) => e.stopPropagation());
+
+        // Programmatically insert a small, accessible close button inside the import
+        // inner container so users can dismiss the import overlay without tapping the backdrop.
+        // We create it here (rather than editing static HTML) so the view remains
+        // resilient to small markup changes and tests can still locate/override it.
+        if (!document.getElementById("qr-import-close-btn")) {
+          try {
+            const closeBtn = document.createElement("button");
+            closeBtn.id = "qr-import-close-btn";
+            closeBtn.className =
+              "text-slate-300 bg-transparent px-3 py-1 rounded-md hover:bg-slate-700";
+            closeBtn.title = "Close import";
+            closeBtn.setAttribute("aria-label", "Close import dialog");
+            closeBtn.textContent = "Close";
+            // Keep position visually unobtrusive but accessible.
+            closeBtn.style.position = "absolute";
+            closeBtn.style.top = "8px";
+            closeBtn.style.right = "8px";
+            closeBtn.addEventListener("click", (ev) => {
+              ev.stopPropagation();
+              this.onCancelImport(ev);
+            });
+            importInner.appendChild(closeBtn);
+          } catch (err) {
+            console.warn("View: could not create import close button:", err);
+          }
+        }
+
         console.debug(
           "View: attached 'click' handler to #qr-import-inner-container",
         );
@@ -408,8 +466,19 @@ export class View {
       e.stopPropagation();
       const match = this.model.getMatch(id);
       if (match) {
-        this.qrexport.export(match);
+        // Show the export overlay immediately so users see feedback while QR frames
+        // are generated. Defer the heavy work slightly to allow the overlay to render.
         this.show(E.Export);
+        setTimeout(() => {
+          try {
+            this.qrexport.export(match);
+          } catch (err) {
+            console.error("View: failed to start QR export:", err);
+            alert("Failed to start QR export. See console for details.");
+            // Ensure overlay is closed if export cannot start.
+            this.hide(E.Export);
+          }
+        }, 50);
       }
       // Close the options and restore the kebab to keep the UI consistent.
       this.hide(options);
@@ -496,32 +565,179 @@ export class View {
     this.whiteboard.toggleView();
   }
 
-  private onClickImportMatch(e: Event): void {
-    this.qrimport.start(async (data) => {
-      const match = Match.fromPacket(data as any);
-      const id = await this.model.addMatch(match);
-      this.createNewMatch(
-        id,
-        match.matchName,
-        match.redOne,
-        match.redTwo,
-        match.redThree,
-        match.blueOne,
-        match.blueTwo,
-        match.blueThree,
+  private async onClickImportMatch(e: Event): Promise<void> {
+    // Start the import process but only show the overlay if the camera becomes active.
+    const videoEl = get("qr-import-video") as HTMLVideoElement | null;
+
+    // Start the scanner and install the callback that will be invoked when a full
+    // stream of QR frames has been decoded. We do not show the import overlay yet;
+    // we'll wait until the camera/video element reports activity so the user sees
+    // the live feed rather than an empty dialog.
+    try {
+      // Kick off the QR import; pass the existing callback behavior for when data arrives.
+      // Note: QRImport.start handles errors internally and may alert on permission errors.
+      // We still perform a lightweight readiness check below so we only show the overlay
+      // if a camera feed actually starts.
+      this.qrimport.start(async (data) => {
+        const match = Match.fromPacket(data as any);
+        const id = await this.model.addMatch(match);
+        this.createNewMatch(
+          id,
+          match.matchName,
+          match.redOne,
+          match.redTwo,
+          match.redThree,
+          match.blueOne,
+          match.blueTwo,
+          match.blueThree,
+        );
+        // Hide the import overlay after we successfully imported the match.
+        this.hide(E.Import);
+      });
+    } catch (err) {
+      // Defensive: QRImport.start may throw in some implementations; ensure we surface the error.
+      console.warn("View: qrimport.start threw an error:", err);
+    }
+
+    // If there is no video element to observe, bail out and let QRImport handle alerts.
+    if (!videoEl) {
+      console.warn(
+        "View: no video element to verify camera start; not showing import overlay",
       );
-      this.hide(E.Import);
+      return;
+    }
+
+    // Wait up to a short timeout for the video element to become active.
+    const started = await new Promise<boolean>((resolve) => {
+      let finished = false;
+      const timeout = window.setTimeout(() => {
+        if (!finished) {
+          finished = true;
+          cleanup();
+          resolve(false);
+        }
+      }, 2500);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        videoEl.removeEventListener("playing", onPlay);
+        videoEl.removeEventListener("loadeddata", onPlay);
+        videoEl.removeEventListener("error", onError);
+      }
+      function onPlay() {
+        if (!finished) {
+          finished = true;
+          cleanup();
+          resolve(true);
+        }
+      }
+      function onError() {
+        if (!finished) {
+          finished = true;
+          cleanup();
+          resolve(false);
+        }
+      }
+
+      // Immediate success if already in a usable ready state.
+      if (videoEl.readyState >= 2) {
+        finished = true;
+        cleanup();
+        resolve(true);
+        return;
+      }
+
+      videoEl.addEventListener("playing", onPlay);
+      videoEl.addEventListener("loadeddata", onPlay);
+      videoEl.addEventListener("error", onError);
     });
-    this.show(E.Import);
+
+    if (started) {
+      // Only show the import overlay once the camera feed is active.
+      this.show(E.Import);
+    } else {
+      // If the camera did not start in a timely manner, stop the scanner and inform the user.
+      try {
+        this.qrimport.stop();
+      } catch (err) {
+        console.warn("View: error stopping qrimport after failed start:", err);
+      }
+      alert(
+        "Could not access the camera for QR import. Please grant camera permissions and try again.",
+      );
+    }
   }
 
   private onCancelExport(e: Event): void {
-    this.qrexport.close();
+    try {
+      this.qrexport.close();
+    } catch (err) {
+      console.warn("View: failed to stop QR export:", err);
+    }
     this.hide(E.Export);
+
+    // Clear export status text to leave the UI in a consistent state.
+    const status = get("qr-export-status");
+    if (status) status.textContent = "";
   }
 
   private onCancelImport(e: Event): void {
-    this.qrimport.stop();
+    try {
+      this.qrimport.stop();
+    } catch (err) {
+      console.warn("View: error stopping QR import scanner:", err);
+    }
+
+    // Hide the import overlay.
     this.hide(E.Import);
+
+    // Clear camera selection dropdown so it will be repopulated fresh next time.
+    const cameraSelect = get(
+      "qr-import-camera-select",
+    ) as HTMLSelectElement | null;
+    if (cameraSelect) {
+      try {
+        for (let i = cameraSelect.options.length - 1; i >= 0; i--) {
+          cameraSelect.remove(i);
+        }
+      } catch (err) {
+        console.warn("View: failed to clear camera select options:", err);
+      }
+    }
+
+    // Ensure any active media stream attached to the video element is stopped and removed.
+    const video = get("qr-import-video") as HTMLVideoElement | null;
+    if (video) {
+      try {
+        video.pause();
+        const anyVid = video as any;
+        if (anyVid && anyVid.srcObject) {
+          const stream = anyVid.srcObject as MediaStream;
+          try {
+            for (const track of stream.getTracks ? stream.getTracks() : []) {
+              try {
+                track.stop();
+              } catch (_err) {}
+            }
+          } catch (_err) {}
+          try {
+            anyVid.srcObject = null;
+          } catch (_err) {}
+        } else {
+          try {
+            video.removeAttribute("src");
+            video.load();
+          } catch (_err) {}
+        }
+      } catch (err) {
+        console.warn("View: error while clearing import video element:", err);
+      }
+    }
+
+    // Clear any ephemeral status UI that might be present.
+    const exportStatus = get("qr-export-status");
+    if (exportStatus) exportStatus.textContent = "";
+    const importStatus = get("qr-import-status");
+    if (importStatus) importStatus.textContent = "";
   }
 }
