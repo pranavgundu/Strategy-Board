@@ -10,7 +10,7 @@ const CHUNK_HEADER_SIZE = HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE;
 // Per-chunk payload size (characters). Increased for faster data transfer.
 const MAX_CHUNK_PAYLOAD = 250;
 // Duration each QR image is shown on screen (milliseconds). Faster rotation for quicker scanning.
-const FRAME_DURATION_MS = 250;
+const FRAME_DURATION_MS = 400;
 
 /**
  * Helper: encode arbitrary UTF-8 string to a base64 payload in a browser-safe way.
