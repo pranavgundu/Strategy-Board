@@ -538,19 +538,19 @@
                 <div class="flex mr-12 text-lg md:text-2xl text-sky-200">
                     <button
                         id="home-toolbar-new-btn"
-                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500"
+                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-blue-500"
                     >
                         New
                     </button>
                     <button
                         id="home-toolbar-import-btn"
-                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-full bg-blue-500"
+                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-blue-500"
                     >
                         Import QR
                     </button>
                     <button
                         id="home-toolbar-clear-btn"
-                        class="flex items-center justify-center w-24 md:w-36 h-12 rounded-full bg-red-500"
+                        class="flex items-center justify-center w-24 md:w-36 h-12 rounded-2xl bg-red-500"
                     >
                         Clear
                     </button>
@@ -568,7 +568,7 @@
                 </div>
                 <div
                     id="home-match-list-item-template"
-                    class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center"
+                    class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center rounded-xl"
                 >
                     <div
                         class="ml-12 grow-1 basis-0 text-slate-200 font-bold text-xl md:text-2xl select-none"
@@ -602,12 +602,12 @@
                         </button>
                         <div class="hidden flex items-center justify-center">
                             <button
-                                class="w-24 p-1 mr-2 text-md md:text-xl text-slate-300 bg-blue-500 rounded-full"
+                                class="w-24 p-1 mr-2 text-md md:text-xl text-slate-300 bg-blue-500 rounded-xl"
                             >
                                 Export
                             </button>
                             <button
-                                class="w-24 p-1 text-md md:text-xl text-slate-300 bg-red-500 rounded-full"
+                                class="w-24 p-1 text-md md:text-xl text-slate-300 bg-red-500 rounded-xl"
                             >
                                 Delete
                             </button>
@@ -621,13 +621,13 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 bg-slate-600 rounded-xl"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 bg-slate-600 rounded-3xl"
             >
                 <input
                     id="create-match-name"
                     placeholder="Match Name"
                     maxlength="25"
-                    class="w-full pt-6 pb-6 text-3xl text-center text-slate-300 font-bold rounded-t-xl bg-slate-500 outline-0"
+                    class="w-full pt-6 pb-6 text-3xl text-center text-slate-300 font-bold rounded-t-2xl bg-slate-500 outline-0"
                     autocomplete="off"
                     autocapitalize="off"
                     spellcheck="false"
@@ -691,13 +691,13 @@
                 <div class="flex w-full">
                     <button
                         id="create-match-create-btn"
-                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-xl"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-2xl"
                     >
                         Create
                     </button>
                     <button
                         id="create-match-cancel-btn"
-                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-xl"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-2xl"
                     >
                         Cancel
                     </button>
@@ -710,7 +710,7 @@
         >
             <div
                 id="qr-import-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-slate-600 rounded-xl p-4"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-slate-600 rounded-3xl p-4"
             >
                 <div
                     id="qr-import-status"
@@ -750,13 +750,13 @@
 
                 <select
                     id="qr-import-camera-select"
-                    class="text-md md:text-xl mt-3 w-full"
+                    class="text-md md:text-xl mt-3 w-full rounded-xl p-2"
                 ></select>
                 <video
                     id="qr-import-video"
                     autoplay
                     playsinline
-                    class="w-full mt-3"
+                    class="w-full mt-3 rounded-xl"
                     style="max-height: 44vh"
                 ></video>
             </div>
@@ -770,7 +770,7 @@
                  handler only runs when the backdrop itself is clicked. -->
             <div
                 id="qr-export-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 bg-slate-600 rounded-xl p-6"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 bg-slate-600 rounded-3xl p-6"
                 onclick="event.stopPropagation()"
                 role="dialog"
                 aria-modal="true"
@@ -781,7 +781,7 @@
                 <div class="w-full flex justify-end">
                     <button
                         id="qr-export-close-btn"
-                        class="text-slate-300 bg-transparent px-3 py-1 rounded-md hover:bg-slate-700"
+                        class="text-slate-300 bg-transparent px-3 py-1 rounded-xl hover:bg-slate-700"
                         title="Close export"
                         onclick="document.getElementById('qr-export-container').click()"
                     >
@@ -866,13 +866,13 @@
                 <div class="toolbar-left flex items-center ml-6 md:ml-12">
                     <button
                         id="whiteboard-toolbar-back"
-                        class="ml-0 md:ml-0 text-xl md:text-3xl font-extrabold text-white select-none touch-none"
+                        class="ml-0 md:ml-0 text-xl md:text-3xl font-extrabold text-white select-none touch-none rounded-xl px-3 py-1"
                     >
                         back
                     </button>
                     <button
                         id="whiteboard-toolbar-undo"
-                        class="w-24 h-full ml-3 md:ml-6 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none"
+                        class="w-24 h-full ml-3 md:ml-6 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none rounded-xl"
                     >
                         undo
                     </button>
@@ -907,7 +907,7 @@
                 >
                     <button
                         id="whiteboard-toolbar-view-toggle"
-                        class="w-44 md:w-48 h-full text-sm md:text-xl font-bold text-zinc-300 select-none touch-none"
+                        class="w-44 md:w-48 h-full text-sm md:text-xl font-bold text-zinc-300 select-none touch-none rounded-xl px-3 py-1"
                     >
                         Toggle View
                     </button>
@@ -916,14 +916,14 @@
                     <div class="flex items-center gap-2 ml-2">
                         <button
                             id="whiteboard-toolbar-export-png"
-                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-blue-500 rounded-full px-3 py-1 select-none touch-none"
+                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-blue-500 rounded-2xl px-3 py-1 select-none touch-none"
                             title="Export field + annotations as PNG"
                         >
                             Export PNG
                         </button>
                         <button
                             id="whiteboard-toolbar-export-pdf"
-                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-green-600 rounded-full px-3 py-1 select-none touch-none"
+                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-green-600 rounded-2xl px-3 py-1 select-none touch-none"
                             title="Export field + annotations as PDF (uses print dialog)"
                         >
                             Export PDF
@@ -956,7 +956,7 @@
             </div>
             <div
                 id="whiteboard-robot-config"
-                class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-xl"
+                class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-3xl"
             >
                 <div class="text-2xl text-zinc-400 font-bold mb-4 select-none">
                     Robot Config (in.)
@@ -1038,62 +1038,62 @@
             <!-- Number pad for the text tool (hidden until text mode is active) -->
             <div
                 id="whiteboard-number-pad"
-                class="hidden absolute bottom-24 right-4 bg-zinc-800 rounded-xl p-3 grid grid-cols-3 gap-2 z-50"
+                class="hidden absolute bottom-24 right-4 bg-zinc-800 rounded-3xl p-3 grid grid-cols-3 gap-2 z-50"
                 aria-hidden="true"
             >
                 <button
                     id="whiteboard-number-1"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     1
                 </button>
                 <button
                     id="whiteboard-number-2"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     2
                 </button>
                 <button
                     id="whiteboard-number-3"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     3
                 </button>
 
                 <button
                     id="whiteboard-number-4"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     4
                 </button>
                 <button
                     id="whiteboard-number-5"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     5
                 </button>
                 <button
                     id="whiteboard-number-6"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     6
                 </button>
 
                 <button
                     id="whiteboard-number-7"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     7
                 </button>
                 <button
                     id="whiteboard-number-8"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     8
                 </button>
                 <button
                     id="whiteboard-number-9"
-                    class="p-3 rounded bg-slate-700 text-white text-xl"
+                    class="p-3 rounded-xl bg-slate-700 text-white text-xl"
                 >
                     9
                 </button>
@@ -1101,7 +1101,7 @@
                 <div class="col-span-3 text-center mt-1">
                     <button
                         id="whiteboard-number-0"
-                        class="w-2/3 p-3 rounded bg-slate-700 text-white text-xl"
+                        class="w-2/3 p-3 rounded-xl bg-slate-700 text-white text-xl"
                     >
                         0
                     </button>
