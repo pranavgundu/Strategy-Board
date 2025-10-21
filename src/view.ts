@@ -33,6 +33,8 @@ let I: {
   TBAApiKey?: HTMLInputElement | null;
   TBAEventKey?: HTMLInputElement | null;
   TBATeamNumber?: HTMLInputElement | null;
+  TBAEventSearch?: HTMLInputElement | null;
+  TBATeamSearch?: HTMLInputElement | null;
 } | null = null;
 
 let E: {
@@ -47,6 +49,10 @@ let E: {
   Import?: HTMLElement | null;
   ImportInner?: HTMLElement | null;
   TBAStatusMessage?: HTMLElement | null;
+  TBAEventDropdown?: HTMLElement | null;
+  TBAEventList?: HTMLElement | null;
+  TBATeamDropdown?: HTMLElement | null;
+  TBATeamList?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -94,6 +100,8 @@ export class View {
         TBAApiKey: get("tba-api-key") as HTMLInputElement | null,
         TBAEventKey: get("tba-event-key") as HTMLInputElement | null,
         TBATeamNumber: get("tba-team-number") as HTMLInputElement | null,
+        TBAEventSearch: get("tba-event-search") as HTMLInputElement | null,
+        TBATeamSearch: get("tba-team-search") as HTMLInputElement | null,
       };
 
       E = {
@@ -112,6 +120,10 @@ export class View {
         Import: get("qr-import-container") as HTMLElement | null,
         ImportInner: get("qr-import-inner-container") as HTMLElement | null,
         TBAStatusMessage: get("tba-status-message") as HTMLElement | null,
+        TBAEventDropdown: get("tba-event-dropdown") as HTMLElement | null,
+        TBAEventList: get("tba-event-list") as HTMLElement | null,
+        TBATeamDropdown: get("tba-team-dropdown") as HTMLElement | null,
+        TBATeamList: get("tba-team-list") as HTMLElement | null,
       };
 
       // Create existing match entries now that the list/template are available.
@@ -855,21 +867,35 @@ export class View {
     this.hideCreateMatchPanel();
   }
 
-  private onClickTBAImport(e: Event): void {
+  private async onClickTBAImport(e: Event): Promise<void> {
     this.show(E.TBAImportPanel);
     // Pre-fill API key if it exists
     if (I?.TBAApiKey && this.tbaService.hasApiKey()) {
       // Don't show the key for security, just indicate it's saved
       I.TBAApiKey.placeholder = "API Key (saved)";
     }
+
+    // Load current year's events
+    await this.loadTBAEvents();
+
+    // Setup event listeners for search/dropdown
+    this.setupTBADropdownListeners();
   }
 
   private onClickTBACancel(e: Event): void {
     this.hide(E.TBAImportPanel);
     this.hide(E.TBAStatusMessage);
+    this.hide(E.TBAEventDropdown);
+    this.hide(E.TBATeamDropdown);
     if (I?.TBAApiKey) I.TBAApiKey.value = "";
     if (I?.TBAEventKey) I.TBAEventKey.value = "";
     if (I?.TBATeamNumber) I.TBATeamNumber.value = "";
+    if (I?.TBAEventSearch) I.TBAEventSearch.value = "";
+    if (I?.TBATeamSearch) {
+      I.TBATeamSearch.value = "";
+      I.TBATeamSearch.disabled = true;
+      I.TBATeamSearch.placeholder = "Select event first...";
+    }
   }
 
   private async onClickTBAImportSubmit(e: Event): Promise<void> {
@@ -966,6 +992,238 @@ export class View {
       ? "w-full px-8 pb-4 text-center text-red-400"
       : "w-full px-8 pb-4 text-center text-slate-300";
     this.show(E.TBAStatusMessage);
+  }
+
+  private async loadTBAEvents(): Promise<void> {
+    if (!this.tbaService.hasApiKey()) return;
+
+    this.showTBAStatus("Loading events...", false);
+
+    try {
+      const currentYear = new Date().getFullYear();
+      const events = await this.tbaService.fetchAndParseEvents(currentYear);
+
+      if (!E?.TBAEventList) return;
+
+      // Clear existing items
+      E.TBAEventList.innerHTML = "";
+
+      // Add events to dropdown
+      for (const event of events) {
+        const item = document.createElement("div");
+        item.className = "tba-dropdown-item";
+        item.dataset.eventKey = event.key;
+
+        const name = document.createElement("div");
+        name.className = "tba-event-name";
+        name.textContent = event.name;
+
+        const details = document.createElement("div");
+        details.className = "tba-event-details";
+        details.textContent = `${event.location} • ${event.dateRange}`;
+
+        item.appendChild(name);
+        item.appendChild(details);
+
+        item.addEventListener("click", () =>
+          this.selectTBAEvent(event.key, event.name),
+        );
+
+        E.TBAEventList.appendChild(item);
+      }
+
+      this.hide(E.TBAStatusMessage);
+    } catch (error) {
+      console.error("Failed to load events:", error);
+      this.showTBAStatus("Failed to load events. Check API key.", true);
+    }
+  }
+
+  private async selectTBAEvent(
+    eventKey: string,
+    eventName: string,
+  ): Promise<void> {
+    if (!I?.TBAEventKey || !I?.TBAEventSearch || !I?.TBATeamSearch) return;
+
+    // Set the event key
+    I.TBAEventKey.value = eventKey;
+    I.TBAEventSearch.value = eventName;
+
+    // Hide event dropdown
+    this.hide(E.TBAEventDropdown);
+
+    // Enable team search
+    I.TBATeamSearch.disabled = false;
+    I.TBATeamSearch.placeholder = "Search teams...";
+
+    // Load teams for this event
+    await this.loadTBATeamsForEvent(eventKey);
+  }
+
+  private async loadTBATeamsForEvent(eventKey: string): Promise<void> {
+    this.showTBAStatus("Loading teams...", false);
+
+    try {
+      const teams = await this.tbaService.fetchTeamsAtEvent(eventKey);
+
+      if (!E?.TBATeamList) return;
+
+      // Clear existing items
+      E.TBATeamList.innerHTML = "";
+
+      // Sort teams numerically
+      const sortedTeams = teams.sort((a, b) => parseInt(a) - parseInt(b));
+
+      // Add teams to dropdown
+      for (const team of sortedTeams) {
+        const item = document.createElement("div");
+        item.className = "tba-team-item";
+        item.dataset.teamNumber = team;
+        item.textContent = `Team ${team}`;
+
+        item.addEventListener("click", () => this.selectTBATeam(team));
+
+        E.TBATeamList.appendChild(item);
+      }
+
+      this.hide(E.TBAStatusMessage);
+    } catch (error) {
+      console.error("Failed to load teams:", error);
+      this.showTBAStatus("Failed to load teams for this event.", true);
+    }
+  }
+
+  private selectTBATeam(teamNumber: string): void {
+    if (!I?.TBATeamNumber || !I?.TBATeamSearch) return;
+
+    // Set the team number
+    I.TBATeamNumber.value = teamNumber;
+    I.TBATeamSearch.value = `Team ${teamNumber}`;
+
+    // Hide team dropdown
+    this.hide(E.TBATeamDropdown);
+  }
+
+  private setupTBADropdownListeners(): void {
+    // Event search input
+    if (I?.TBAEventSearch) {
+      I.TBAEventSearch.addEventListener("input", (e) => {
+        const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+        this.filterTBAEvents(searchTerm);
+
+        if (searchTerm.length > 0) {
+          this.show(E.TBAEventDropdown);
+        } else {
+          this.hide(E.TBAEventDropdown);
+        }
+      });
+
+      I.TBAEventSearch.addEventListener("focus", () => {
+        if (E?.TBAEventList?.children.length) {
+          this.show(E.TBAEventDropdown);
+        }
+      });
+    }
+
+    // Team search input
+    if (I?.TBATeamSearch) {
+      I.TBATeamSearch.addEventListener("input", (e) => {
+        const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+        this.filterTBATeams(searchTerm);
+
+        if (searchTerm.length > 0 && !I.TBATeamSearch.disabled) {
+          this.show(E.TBATeamDropdown);
+        } else {
+          this.hide(E.TBATeamDropdown);
+        }
+      });
+
+      I.TBATeamSearch.addEventListener("focus", () => {
+        if (E?.TBATeamList?.children.length && !I.TBATeamSearch.disabled) {
+          this.show(E.TBATeamDropdown);
+        }
+      });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        !target.closest("#tba-event-search") &&
+        !target.closest("#tba-event-dropdown")
+      ) {
+        this.hide(E.TBAEventDropdown);
+      }
+      if (
+        !target.closest("#tba-team-search") &&
+        !target.closest("#tba-team-dropdown")
+      ) {
+        this.hide(E.TBATeamDropdown);
+      }
+    });
+  }
+
+  private filterTBAEvents(searchTerm: string): void {
+    if (!E?.TBAEventList) return;
+
+    const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
+    let visibleCount = 0;
+
+    items.forEach((item) => {
+      const name =
+        item.querySelector(".tba-event-name")?.textContent?.toLowerCase() || "";
+      const details =
+        item.querySelector(".tba-event-details")?.textContent?.toLowerCase() ||
+        "";
+      const eventKey =
+        (item as HTMLElement).dataset.eventKey?.toLowerCase() || "";
+
+      if (
+        name.includes(searchTerm) ||
+        details.includes(searchTerm) ||
+        eventKey.includes(searchTerm)
+      ) {
+        (item as HTMLElement).style.display = "";
+        visibleCount++;
+      } else {
+        (item as HTMLElement).style.display = "none";
+      }
+    });
+
+    // Show/hide dropdown based on results
+    if (visibleCount > 0) {
+      this.show(E.TBAEventDropdown);
+    } else {
+      this.hide(E.TBAEventDropdown);
+    }
+  }
+
+  private filterTBATeams(searchTerm: string): void {
+    if (!E?.TBATeamList) return;
+
+    const items = E.TBATeamList.querySelectorAll(".tba-team-item");
+    let visibleCount = 0;
+
+    items.forEach((item) => {
+      const teamNumber = (item as HTMLElement).dataset.teamNumber || "";
+
+      if (
+        teamNumber.includes(searchTerm) ||
+        item.textContent?.toLowerCase().includes(searchTerm)
+      ) {
+        (item as HTMLElement).style.display = "";
+        visibleCount++;
+      } else {
+        (item as HTMLElement).style.display = "none";
+      }
+    });
+
+    // Show/hide dropdown based on results
+    if (visibleCount > 0) {
+      this.show(E.TBATeamDropdown);
+    } else {
+      this.hide(E.TBATeamDropdown);
+    }
   }
 
   private async onClickCreateMatch(e: Event): Promise<void> {

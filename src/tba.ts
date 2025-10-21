@@ -17,6 +17,26 @@ export interface TBAMatch {
   };
 }
 
+export interface TBAEvent {
+  key: string;
+  name: string;
+  event_code: string;
+  event_type: number;
+  start_date: string;
+  end_date: string;
+  year: number;
+  city?: string;
+  state_prov?: string;
+  country?: string;
+}
+
+export interface TBASimpleEvent {
+  key: string;
+  name: string;
+  location: string;
+  dateRange: string;
+}
+
 export interface TBASimpleMatch {
   matchName: string;
   redTeams: string[];
@@ -63,6 +83,80 @@ export class TBAService {
     }
 
     return await response.json();
+  }
+
+  public async getEvents(year: number): Promise<TBAEvent[]> {
+    const endpoint = `/events/${year}`;
+    return await this.makeRequest(endpoint);
+  }
+
+  public async getTeamsAtEvent(eventKey: string): Promise<string[]> {
+    const endpoint = `/event/${eventKey}/teams/keys`;
+    return await this.makeRequest(endpoint);
+  }
+
+  public parseEventsToSimple(events: TBAEvent[]): TBASimpleEvent[] {
+    // Sort by start date (most recent first)
+    const sortedEvents = events.sort((a, b) => {
+      return (
+        new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
+      );
+    });
+
+    return sortedEvents.map((event) => {
+      // Format location
+      let location = "";
+      if (event.city && event.state_prov) {
+        location = `${event.city}, ${event.state_prov}`;
+      } else if (event.city) {
+        location = event.city;
+      } else if (event.state_prov) {
+        location = event.state_prov;
+      }
+      if (event.country && event.country !== "USA") {
+        location += `, ${event.country}`;
+      }
+
+      // Format date range
+      const startDate = new Date(event.start_date);
+      const endDate = new Date(event.end_date);
+      const dateRange = this.formatDateRange(startDate, endDate);
+
+      return {
+        key: event.key,
+        name: event.name,
+        location,
+        dateRange,
+      };
+    });
+  }
+
+  private formatDateRange(start: Date, end: Date): string {
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const startMonth = monthNames[start.getMonth()];
+    const startDay = start.getDate();
+    const endMonth = monthNames[end.getMonth()];
+    const endDay = end.getDate();
+
+    if (start.getMonth() === end.getMonth()) {
+      return `${startMonth} ${startDay}-${endDay}`;
+    } else {
+      return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
+    }
   }
 
   public async getTeamMatchesAtEvent(
@@ -157,5 +251,16 @@ export class TBAService {
   ): Promise<TBASimpleMatch[]> {
     const matches = await this.getTeamMatchesAtEvent(teamKey, eventKey);
     return this.parseMatchesToSimple(matches);
+  }
+
+  public async fetchAndParseEvents(year: number): Promise<TBASimpleEvent[]> {
+    const events = await this.getEvents(year);
+    return this.parseEventsToSimple(events);
+  }
+
+  public async fetchTeamsAtEvent(eventKey: string): Promise<string[]> {
+    const teamKeys = await this.getTeamsAtEvent(eventKey);
+    // Convert frc1234 to just 1234
+    return teamKeys.map((key) => key.replace("frc", ""));
   }
 }
