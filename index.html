@@ -574,8 +574,8 @@
                     }
                 }
                 function onAppInitialized() {
-                    setStatus("App initialized — running self-test");
-                    runSelfTest();
+                    setStatus("App initialized");
+                    // Self-test disabled to prevent flash on load
                 }
                 function onModuleError(detail) {
                     setStatus(
@@ -622,26 +622,8 @@
                     "DOMContentLoaded",
                     function () {
                         setStatus("DOMContentLoaded — awaiting module load...");
-                        // fallback: if module hasn't indicated success after a short period, attempt self-test
-                        setTimeout(function () {
-                            // Only run the fallback self-test if the app hasn't signaled readiness.
-                            try {
-                                var appReady =
-                                    document.documentElement.getAttribute(
-                                        "data-app-ready",
-                                    );
-                                if (appReady === "true") {
-                                    setStatus(
-                                        "Fallback: app already initialized; skipping self-test",
-                                    );
-                                    return;
-                                }
-                            } catch (err) {
-                                // If there's an error checking readiness, proceed with the fallback.
-                            }
-                            setStatus("Fallback: running self-test");
-                            runSelfTest();
-                        }, 1500);
+                        // Self-test disabled to prevent flash of create match panel on page load
+                        // Users can manually run self-test from debug overlay if needed
                         var selfBtn = qs("app-debug-selftest-btn");
                         if (selfBtn)
                             selfBtn.addEventListener("click", runSelfTest);
