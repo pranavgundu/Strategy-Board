@@ -2,7 +2,8 @@ import { Model } from "@/model.ts";
 import { Whiteboard, updateCanvasSize } from "@/whiteboard.ts";
 import { Match } from "@/match.ts";
 import { QRImport, QRExport } from "@/qr.ts";
-import { CLEAR } from "@/db.ts";
+import { CLEAR, SET, GET } from "@/db.ts";
+import { TBAService } from "@/tba.ts";
 
 const get = (id: string): HTMLElement | null => document.getElementById(id);
 
@@ -11,11 +12,14 @@ const get = (id: string): HTMLElement | null => document.getElementById(id);
 let B: {
   NewMatch?: HTMLElement | null;
   ImportMatch?: HTMLElement | null;
+  TBAImport?: HTMLElement | null;
   Clear?: HTMLElement | null;
   CreateMatch?: HTMLElement | null;
   CancelCreate?: HTMLElement | null;
   Back?: HTMLElement | null;
   ToggleView?: HTMLElement | null;
+  TBAImportBtn?: HTMLElement | null;
+  TBACancel?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -26,6 +30,9 @@ let I: {
   BlueOne?: HTMLInputElement | null;
   BlueTwo?: HTMLInputElement | null;
   BlueThree?: HTMLInputElement | null;
+  TBAApiKey?: HTMLInputElement | null;
+  TBAEventKey?: HTMLInputElement | null;
+  TBATeamNumber?: HTMLInputElement | null;
 } | null = null;
 
 let E: {
@@ -33,11 +40,13 @@ let E: {
   Whiteboard?: HTMLElement | null;
   MatchList?: HTMLElement | null;
   CreateMatchPanel?: HTMLElement | null;
+  TBAImportPanel?: HTMLElement | null;
   EmptyMatchListPlaceholder?: HTMLElement | null;
   MatchListItemTemplate?: HTMLElement | null;
   Export?: HTMLElement | null;
   Import?: HTMLElement | null;
   ImportInner?: HTMLElement | null;
+  TBAStatusMessage?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -45,6 +54,7 @@ export class View {
   private whiteboard: Whiteboard;
   private qrimport: QRImport;
   private qrexport: QRExport;
+  private tbaService: TBAService;
 
   constructor(
     model: Model,
@@ -63,11 +73,14 @@ export class View {
       B = {
         NewMatch: get("home-toolbar-new-btn") as HTMLElement | null,
         ImportMatch: get("home-toolbar-import-btn") as HTMLElement | null,
+        TBAImport: get("home-toolbar-tba-btn") as HTMLElement | null,
         Clear: get("home-toolbar-clear-btn") as HTMLElement | null,
         CreateMatch: get("create-match-create-btn") as HTMLElement | null,
         CancelCreate: get("create-match-cancel-btn") as HTMLElement | null,
         Back: get("whiteboard-toolbar-back") as HTMLElement | null,
         ToggleView: get("whiteboard-toolbar-view-toggle") as HTMLElement | null,
+        TBAImportBtn: get("tba-import-btn") as HTMLElement | null,
+        TBACancel: get("tba-cancel-btn") as HTMLElement | null,
       };
 
       I = {
@@ -78,6 +91,9 @@ export class View {
         BlueOne: get("create-match-blue-1") as HTMLInputElement | null,
         BlueTwo: get("create-match-blue-2") as HTMLInputElement | null,
         BlueThree: get("create-match-blue-3") as HTMLInputElement | null,
+        TBAApiKey: get("tba-api-key") as HTMLInputElement | null,
+        TBAEventKey: get("tba-event-key") as HTMLInputElement | null,
+        TBATeamNumber: get("tba-team-number") as HTMLInputElement | null,
       };
 
       E = {
@@ -85,6 +101,7 @@ export class View {
         Whiteboard: get("whiteboard-container") as HTMLElement | null,
         MatchList: get("home-match-list") as HTMLElement | null,
         CreateMatchPanel: get("create-match-container") as HTMLElement | null,
+        TBAImportPanel: get("tba-import-container") as HTMLElement | null,
         EmptyMatchListPlaceholder: get(
           "home-match-list-empty-placeholder",
         ) as HTMLElement | null,
@@ -94,6 +111,7 @@ export class View {
         Export: get("qr-export-container") as HTMLElement | null,
         Import: get("qr-import-container") as HTMLElement | null,
         ImportInner: get("qr-import-inner-container") as HTMLElement | null,
+        TBAStatusMessage: get("tba-status-message") as HTMLElement | null,
       };
 
       // Create existing match entries now that the list/template are available.
@@ -148,6 +166,24 @@ export class View {
           id: "home-toolbar-import-btn",
           evt: "click",
           fn: (e: Event) => this.onClickImportMatch(e),
+        },
+        {
+          el: B?.TBAImport,
+          id: "home-toolbar-tba-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickTBAImport(e),
+        },
+        {
+          el: B?.TBAImportBtn,
+          id: "tba-import-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickTBAImportSubmit(e),
+        },
+        {
+          el: B?.TBACancel,
+          id: "tba-cancel-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickTBACancel(e),
         },
       ];
 
@@ -627,6 +663,14 @@ export class View {
     } else {
       initDOM();
     }
+
+    // Initialize TBA service
+    this.tbaService = new TBAService();
+    this.loadTBAApiKey();
+  }
+
+  private async loadTBAApiKey(): Promise<void> {
+    await this.tbaService.loadApiKey();
   }
 
   private show(e: HTMLElement | null): void {
@@ -809,6 +853,119 @@ export class View {
 
   private onClickCancelCreateMatch(e: Event): void {
     this.hideCreateMatchPanel();
+  }
+
+  private onClickTBAImport(e: Event): void {
+    this.show(E.TBAImportPanel);
+    // Pre-fill API key if it exists
+    if (I?.TBAApiKey && this.tbaService.hasApiKey()) {
+      // Don't show the key for security, just indicate it's saved
+      I.TBAApiKey.placeholder = "API Key (saved)";
+    }
+  }
+
+  private onClickTBACancel(e: Event): void {
+    this.hide(E.TBAImportPanel);
+    this.hide(E.TBAStatusMessage);
+    if (I?.TBAApiKey) I.TBAApiKey.value = "";
+    if (I?.TBAEventKey) I.TBAEventKey.value = "";
+    if (I?.TBATeamNumber) I.TBATeamNumber.value = "";
+  }
+
+  private async onClickTBAImportSubmit(e: Event): Promise<void> {
+    if (!I?.TBAApiKey || !I?.TBAEventKey || !I?.TBATeamNumber) {
+      this.showTBAStatus("Missing required fields", true);
+      return;
+    }
+
+    const apiKey = I.TBAApiKey.value.trim();
+    const eventKey = I.TBAEventKey.value.trim();
+    const teamNumber = I.TBATeamNumber.value.trim();
+
+    if (!eventKey || !teamNumber) {
+      this.showTBAStatus("Please enter event key and team number", true);
+      return;
+    }
+
+    // Set and save API key if provided
+    if (apiKey) {
+      this.tbaService.setApiKey(apiKey);
+      await SET("tbaApiKey", apiKey, (e) => {
+        console.error("Failed to save TBA API key:", e);
+      });
+    } else if (!this.tbaService.hasApiKey()) {
+      this.showTBAStatus("Please enter your TBA API key", true);
+      return;
+    }
+
+    this.showTBAStatus("Fetching matches from The Blue Alliance...", false);
+
+    try {
+      const matches = await this.tbaService.fetchAndParseTeamMatches(
+        teamNumber,
+        eventKey,
+      );
+
+      if (matches.length === 0) {
+        this.showTBAStatus(
+          "No matches found for this team at this event",
+          true,
+        );
+        return;
+      }
+
+      this.showTBAStatus(`Importing ${matches.length} matches...`, false);
+
+      // Create all matches
+      for (const match of matches) {
+        const id = await this.model.createNewMatch(
+          match.matchName,
+          match.redTeams[0] || "",
+          match.redTeams[1] || "",
+          match.redTeams[2] || "",
+          match.blueTeams[0] || "",
+          match.blueTeams[1] || "",
+          match.blueTeams[2] || "",
+        );
+
+        this.createNewMatch(
+          id,
+          match.matchName,
+          match.redTeams[0] || "",
+          match.redTeams[1] || "",
+          match.redTeams[2] || "",
+          match.blueTeams[0] || "",
+          match.blueTeams[1] || "",
+          match.blueTeams[2] || "",
+        );
+      }
+
+      this.showTBAStatus(
+        `Successfully imported ${matches.length} matches!`,
+        false,
+      );
+
+      // Close the panel after a short delay
+      setTimeout(() => {
+        this.onClickTBACancel(e);
+      }, 1500);
+    } catch (error) {
+      console.error("TBA import error:", error);
+      this.showTBAStatus(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        true,
+      );
+    }
+  }
+
+  private showTBAStatus(message: string, isError: boolean): void {
+    if (!E?.TBAStatusMessage) return;
+
+    E.TBAStatusMessage.textContent = message;
+    E.TBAStatusMessage.className = isError
+      ? "w-full px-8 pb-4 text-center text-red-400"
+      : "w-full px-8 pb-4 text-center text-slate-300";
+    this.show(E.TBAStatusMessage);
   }
 
   private async onClickCreateMatch(e: Event): Promise<void> {
