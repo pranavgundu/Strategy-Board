@@ -826,17 +826,17 @@ export class Whiteboard {
       if (this.getCurrentUndoHistory().length < 1) {
         document
           .getElementById("whiteboard-toolbar-undo")
-          ?.classList.remove("text-amber-500");
+          ?.style.setProperty("opacity", "0.5");
         document
           .getElementById("whiteboard-toolbar-undo")
-          ?.classList.add("text-amber-700");
+          ?.style.setProperty("cursor", "not-allowed");
       } else {
         document
           .getElementById("whiteboard-toolbar-undo")
-          ?.classList.add("text-amber-500");
+          ?.style.setProperty("opacity", "1");
         document
           .getElementById("whiteboard-toolbar-undo")
-          ?.classList.remove("text-amber-700");
+          ?.style.setProperty("cursor", "pointer");
       }
       this.currentTool = "marker";
       this.currentColor = 0;
@@ -920,10 +920,10 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-toolbar-undo")
-      ?.classList.add("text-amber-500");
+      ?.style.setProperty("opacity", "1");
     document
       .getElementById("whiteboard-toolbar-undo")
-      ?.classList.remove("text-amber-700");
+      ?.style.setProperty("cursor", "pointer");
   }
 
   private getCurrentUndoHistory() {
@@ -1012,10 +1012,10 @@ export class Whiteboard {
     if (history.length < 1) {
       document
         .getElementById("whiteboard-toolbar-undo")
-        ?.classList.remove("text-amber-500");
+        ?.style.setProperty("opacity", "0.5");
       document
         .getElementById("whiteboard-toolbar-undo")
-        ?.classList.add("text-amber-700");
+        ?.style.setProperty("cursor", "not-allowed");
     }
   }
 
@@ -1305,17 +1305,17 @@ export class Whiteboard {
     if (this.getCurrentUndoHistory().length < 1) {
       document
         .getElementById("whiteboard-toolbar-undo")
-        ?.classList.remove("text-amber-500");
+        ?.style.setProperty("opacity", "0.5");
       document
         .getElementById("whiteboard-toolbar-undo")
-        ?.classList.add("text-amber-700");
+        ?.style.setProperty("cursor", "not-allowed");
     } else {
       document
         .getElementById("whiteboard-toolbar-undo")
-        ?.classList.add("text-amber-500");
+        ?.style.setProperty("opacity", "1");
       document
         .getElementById("whiteboard-toolbar-undo")
-        ?.classList.remove("text-amber-700");
+        ?.style.setProperty("cursor", "pointer");
     }
   }
 
