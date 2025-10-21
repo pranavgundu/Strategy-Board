@@ -324,6 +324,34 @@
                     inset 0 -2px 4px rgba(0, 0, 0, 0.3);
             }
 
+            /* Toolbar button enhancements */
+            #whiteboard-toolbar-back,
+            #whiteboard-toolbar-undo {
+                transition: all 0.3s ease;
+                box-shadow:
+                    0 4px 12px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            }
+
+            #whiteboard-toolbar-back:hover,
+            #whiteboard-toolbar-undo:hover {
+                transform: translateY(-2px);
+                box-shadow:
+                    0 6px 16px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            }
+
+            #whiteboard-toolbar-back:active,
+            #whiteboard-toolbar-undo:active {
+                transform: translateY(0);
+            }
+
+            /* Undo button disabled state */
+            #whiteboard-toolbar-undo[style*="opacity: 0.5"] {
+                pointer-events: none;
+                filter: grayscale(0.5);
+            }
+
             /* Glassmorphism Effects */
             .glass-button {
                 backdrop-filter: blur(10px);
@@ -998,18 +1026,18 @@
                 class="relative items-center w-full h-12 md:h-16 bg-zinc-700 glass-toolbar"
                 style="z-index: 999"
             >
-                <div class="toolbar-left flex items-center ml-6 md:ml-12">
+                <div class="toolbar-left flex items-center ml-6 md:ml-12 gap-3">
                     <button
                         id="whiteboard-toolbar-back"
-                        class="ml-0 md:ml-0 text-xl md:text-3xl font-extrabold text-white select-none touch-none rounded-xl px-3 py-1"
+                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-slate-600 glass-button glossy-shine"
                     >
-                        back
+                        BACK
                     </button>
                     <button
                         id="whiteboard-toolbar-undo"
-                        class="w-24 h-full ml-3 md:ml-6 text-center text-xl md:text-3xl font-bold text-amber-700 select-none touch-none rounded-xl"
+                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-amber-600 glass-button glossy-shine"
                     >
-                        undo
+                        UNDO
                     </button>
                 </div>
 
@@ -1042,9 +1070,9 @@
                 >
                     <button
                         id="whiteboard-toolbar-view-toggle"
-                        class="w-44 md:w-48 h-full text-sm md:text-xl font-bold text-zinc-300 select-none touch-none rounded-xl px-3 py-1"
+                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-slate-600 glass-button glossy-shine"
                     >
-                        Toggle View
+                        TOGGLE VIEW
                     </button>
 
                     <!-- Export controls: export the composed field (background + items + drawing) -->
@@ -1139,31 +1167,31 @@
             </div>
             <div
                 id="whiteboard-color-config"
-                class="absolute flex flex-col justify-center items-center bottom-4 left-4 bg-zinc-800 rounded-full glass-card"
+                class="absolute flex flex-col justify-center items-center bottom-4 left-4 bg-zinc-800 rounded-full glass-card p-2"
             >
                 <div
                     id="whiteboard-color-yellow"
-                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-yellow-500 rounded-full border-amber-600"
+                    class="size-8 m-2 md:size-12 lg:size-16 bg-yellow-500 rounded-full border-amber-600"
                 ></div>
                 <div
                     id="whiteboard-color-green"
-                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-green-500 rounded-full border-amber-500"
+                    class="size-8 m-2 md:size-12 lg:size-16 bg-green-500 rounded-full border-amber-500"
                 ></div>
                 <div
                     id="whiteboard-color-blue"
-                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-blue-500 rounded-full border-amber-500"
+                    class="size-8 m-2 md:size-12 lg:size-16 bg-blue-500 rounded-full border-amber-500"
                 ></div>
                 <div
                     id="whiteboard-color-red"
-                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-red-500 rounded-full border-amber-500"
+                    class="size-8 m-2 md:size-12 lg:size-16 bg-red-500 rounded-full border-amber-500"
                 ></div>
                 <div
                     id="whiteboard-color-white"
-                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 bg-white rounded-full border-amber-500"
+                    class="size-8 m-2 md:size-12 lg:size-16 bg-white rounded-full border-amber-500"
                 ></div>
                 <div
                     id="whiteboard-color-close"
-                    class="size-8 m-2 md:size-12 lg:size-16 bottom-4 right-4 flex justify-center items-center text-center rounded-full"
+                    class="size-8 m-2 md:size-12 lg:size-16 flex justify-center items-center text-center rounded-full"
                 >
                     <i
                         class="fa fa-close text-xl md:text-2xl lg:text-3xl text-red-500"
