@@ -287,6 +287,141 @@
                 max-width: min(92vw, 820px);
                 width: 92vw;
             }
+
+            /* Color picker glossy effects */
+            #whiteboard-color-config > div[id*="color"] {
+                position: relative;
+                overflow: hidden;
+                box-shadow:
+                    0 4px 12px rgba(0, 0, 0, 0.3),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            #whiteboard-color-config > div[id*="color"]::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 50%;
+                background: linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.4) 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 100%
+                );
+                border-radius: inherit;
+                pointer-events: none;
+            }
+
+            #whiteboard-color-config > div[id*="color"]:hover {
+                transform: scale(1.15);
+                box-shadow:
+                    0 6px 16px rgba(0, 0, 0, 0.4),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Glassmorphism Effects */
+            .glass-button {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                box-shadow:
+                    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .glass-button:hover {
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                box-shadow:
+                    0 12px 40px 0 rgba(0, 0, 0, 0.45),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+                transform: translateY(-2px);
+            }
+
+            .glass-card {
+                backdrop-filter: blur(16px) saturate(180%);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                background-color: rgba(51, 65, 85, 0.75);
+                border: 1px solid rgba(255, 255, 255, 0.125);
+                box-shadow:
+                    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                    inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            .glass-modal {
+                backdrop-filter: blur(20px) saturate(180%);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                background-color: rgba(71, 85, 105, 0.8);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow:
+                    0 16px 48px 0 rgba(0, 0, 0, 0.5),
+                    inset 0 2px 2px 0 rgba(255, 255, 255, 0.15),
+                    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.1);
+            }
+
+            .glass-toolbar {
+                backdrop-filter: blur(12px) saturate(150%);
+                -webkit-backdrop-filter: blur(12px) saturate(150%);
+                background-color: rgba(63, 63, 70, 0.85);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow:
+                    0 4px 24px 0 rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+            }
+
+            .glossy-shine {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .glossy-shine::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    transparent
+                );
+                transition: left 0.5s ease;
+            }
+
+            .glossy-shine:hover::before {
+                left: 100%;
+            }
+
+            .glossy-shine::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 50%;
+                background: linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.2) 0%,
+                    rgba(255, 255, 255, 0.05) 50%,
+                    transparent 100%
+                );
+                pointer-events: none;
+            }
+
+            /* Frosted glass effect for backdrops */
+            .backdrop-blur-xs {
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
         </style>
         <script>
             (function () {
@@ -538,19 +673,19 @@
                 <div class="flex mr-12 text-lg md:text-2xl text-sky-200">
                     <button
                         id="home-toolbar-new-btn"
-                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-blue-500"
+                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-blue-500 glass-button glossy-shine"
                     >
                         New
                     </button>
                     <button
                         id="home-toolbar-import-btn"
-                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-blue-500"
+                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-blue-500 glass-button glossy-shine"
                     >
                         Import QR
                     </button>
                     <button
                         id="home-toolbar-clear-btn"
-                        class="flex items-center justify-center w-24 md:w-36 h-12 rounded-2xl bg-red-500"
+                        class="flex items-center justify-center w-24 md:w-36 h-12 rounded-2xl bg-red-500 glass-button glossy-shine"
                     >
                         Clear
                     </button>
@@ -568,7 +703,7 @@
                 </div>
                 <div
                     id="home-match-list-item-template"
-                    class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center rounded-xl"
+                    class="hidden w-full h-24 bg-slate-700 flex shrink-0 justify-between items-center rounded-xl glass-card"
                 >
                     <div
                         class="ml-12 grow-1 basis-0 text-slate-200 font-bold text-xl md:text-2xl select-none"
@@ -602,12 +737,12 @@
                         </button>
                         <div class="hidden flex items-center justify-center">
                             <button
-                                class="w-24 p-1 mr-2 text-md md:text-xl text-slate-300 bg-blue-500 rounded-xl"
+                                class="w-24 p-1 mr-2 text-md md:text-xl text-slate-300 bg-blue-500 rounded-xl glass-button glossy-shine"
                             >
                                 Export
                             </button>
                             <button
-                                class="w-24 p-1 text-md md:text-xl text-slate-300 bg-red-500 rounded-xl"
+                                class="w-24 p-1 text-md md:text-xl text-slate-300 bg-red-500 rounded-xl glass-button glossy-shine"
                             >
                                 Delete
                             </button>
@@ -621,7 +756,7 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 bg-slate-600 rounded-3xl"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 bg-slate-600 rounded-3xl glass-modal"
             >
                 <input
                     id="create-match-name"
@@ -691,13 +826,13 @@
                 <div class="flex w-full">
                     <button
                         id="create-match-create-btn"
-                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-2xl"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-2xl glossy-shine"
                     >
                         Create
                     </button>
                     <button
                         id="create-match-cancel-btn"
-                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-2xl"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-2xl glossy-shine"
                     >
                         Cancel
                     </button>
@@ -710,7 +845,7 @@
         >
             <div
                 id="qr-import-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-slate-600 rounded-3xl p-4"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-slate-600 rounded-3xl p-4 glass-modal"
             >
                 <div
                     id="qr-import-status"
@@ -770,7 +905,7 @@
                  handler only runs when the backdrop itself is clicked. -->
             <div
                 id="qr-export-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 bg-slate-600 rounded-3xl p-6"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 bg-slate-600 rounded-3xl p-6 glass-modal"
                 onclick="event.stopPropagation()"
                 role="dialog"
                 aria-modal="true"
@@ -860,7 +995,7 @@
         >
             <div
                 id="whiteboard-toolbar"
-                class="relative items-center w-full h-12 md:h-16 bg-zinc-700"
+                class="relative items-center w-full h-12 md:h-16 bg-zinc-700 glass-toolbar"
                 style="z-index: 999"
             >
                 <div class="toolbar-left flex items-center ml-6 md:ml-12">
@@ -916,14 +1051,14 @@
                     <div class="flex items-center gap-2 ml-2">
                         <button
                             id="whiteboard-toolbar-export-png"
-                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-blue-500 rounded-2xl px-3 py-1 select-none touch-none"
+                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-blue-500 rounded-2xl px-3 py-1 select-none touch-none glass-button glossy-shine"
                             title="Export field + annotations as PNG"
                         >
                             Export PNG
                         </button>
                         <button
                             id="whiteboard-toolbar-export-pdf"
-                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-green-600 rounded-2xl px-3 py-1 select-none touch-none"
+                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-green-600 rounded-2xl px-3 py-1 select-none touch-none glass-button glossy-shine"
                             title="Export field + annotations as PDF (uses print dialog)"
                         >
                             Export PDF
@@ -956,7 +1091,7 @@
             </div>
             <div
                 id="whiteboard-robot-config"
-                class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-3xl"
+                class="hidden absolute flex flex-col justify-center items-center w-64 h-36 top-12 right-0 bg-zinc-800 rounded-b-3xl glass-card"
             >
                 <div class="text-2xl text-zinc-400 font-bold mb-4 select-none">
                     Robot Config (in.)
@@ -985,7 +1120,7 @@
             </div>
             <div
                 id="whiteboard-draw-config"
-                class="absolute flex flex-col justify-center items-center size-12 md:size-16 lg:size-24 bottom-4 right-4 bg-zinc-800 rounded-full"
+                class="absolute flex flex-col justify-center items-center size-12 md:size-16 lg:size-24 bottom-4 right-4 bg-zinc-800 rounded-full glass-card"
             >
                 <i
                     id="whiteboard-draw-config-marker"
@@ -1004,7 +1139,7 @@
             </div>
             <div
                 id="whiteboard-color-config"
-                class="absolute flex flex-col justify-center items-center bottom-4 left-4 bg-zinc-800 rounded-full"
+                class="absolute flex flex-col justify-center items-center bottom-4 left-4 bg-zinc-800 rounded-full glass-card"
             >
                 <div
                     id="whiteboard-color-yellow"
@@ -1038,7 +1173,7 @@
             <!-- Number pad for the text tool (hidden until text mode is active) -->
             <div
                 id="whiteboard-number-pad"
-                class="hidden absolute bottom-24 right-4 bg-zinc-800 rounded-3xl p-3 grid grid-cols-3 gap-2 z-50"
+                class="hidden absolute bottom-24 right-4 bg-zinc-800 rounded-3xl p-3 grid grid-cols-3 gap-2 z-50 glass-card"
                 aria-hidden="true"
             >
                 <button
