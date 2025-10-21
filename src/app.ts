@@ -6,7 +6,7 @@ registerSW({
   immediate: true,
   onOfflineReady() {
     console.log("PWA: Offline mode is now available!");
-    alert("Offline is now available!");
+    // Alert disabled to prevent popup on first load
   },
   onNeedRefresh() {
     console.log("PWA: New content available, please refresh.");
