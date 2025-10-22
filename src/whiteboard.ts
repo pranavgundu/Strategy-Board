@@ -3,22 +3,6 @@ import { Model } from "@/model.ts";
 import { Config } from "@/config.ts";
 import fieldUrl from "./field.png";
 
-/**
- * Lazily-resolved canvas elements and contexts.
- *
- * When the module is evaluated before the DOM is available (e.g. certain bundling
- * or early-import scenarios), directly querying for elements and contexts will
- * throw or return null. To make the whiteboard resilient we:
- *  - defer document lookups until first use,
- *  - provide offscreen-canvas fallbacks so drawing calls are no-ops (but safe),
- *  - and prefer real DOM canvases/contexts when they become available.
- *
- * The rest of the file can continue to use `background`, `items`, `drawing`,
- * `BG`, `IT` and `DR` exactly as before; these are proxies that forward to the
- * real elements/contexts (or to safe fallbacks) and will switch to real
- * instances when the DOM is present.
- */
-
 let _backgroundEl: HTMLCanvasElement | null = null;
 let _itemsEl: HTMLCanvasElement | null = null;
 let _drawingEl: HTMLCanvasElement | null = null;
@@ -27,13 +11,7 @@ let _BGctx: CanvasRenderingContext2D | null = null;
 let _ITctx: CanvasRenderingContext2D | null = null;
 let _DRctx: CanvasRenderingContext2D | null = null;
 
-/**
- * Ensure that element references and contexts exist. If real DOM elements are
- * present the real contexts are preferred; otherwise offscreen canvases are
- * created as safe fallbacks so the library can run without throwing.
- */
 function ensureCanvases(): void {
-  // Resolve DOM elements if available
   if (!_backgroundEl) {
     _backgroundEl = document.getElementById(
       "whiteboard-canvas-background",
@@ -50,7 +28,6 @@ function ensureCanvases(): void {
     ) as HTMLCanvasElement | null;
   }
 
-  // If a real element exists, prefer its 2D context
   if (_backgroundEl) {
     const ctx = _backgroundEl.getContext("2d");
     if (ctx) _BGctx = ctx;
@@ -64,10 +41,6 @@ function ensureCanvases(): void {
     if (ctx) _DRctx = ctx;
   }
 
-  // Create offscreen fallback contexts if any context is still missing.
-  // These ensure method calls like `BG.fillRect(...)` are safe before the real
-  // DOM canvas exists. If a real canvas appears later, `ensureCanvases()` will
-  // pick up the real context on the next call.
   if (!_BGctx) {
     const c = document.createElement("canvas");
     c.width = Config.fieldPNGPixelWidth;
@@ -88,7 +61,6 @@ function ensureCanvases(): void {
   }
 }
 
-// Minimal offscreen stub canvas used when DOM element isn't available yet
 const _canvasStub = (() => {
   const c = document.createElement("canvas");
   c.width = Config.fieldPNGPixelWidth;
@@ -147,17 +119,6 @@ const drawing = new Proxy({} as HTMLCanvasElement, {
   },
 }) as unknown as HTMLCanvasElement;
 
-/**
- * Context proxies: these behave like real CanvasRenderingContext2D objects,
- * but are resolved lazily via ensureCanvases(). Method calls are forwarded
- * and bound so existing code using `BG`, `IT`, and `DR` can remain unchanged.
- *
- * Important enhancement: the proxies also implement the `set` trap so property
- * assignments like `DR.lineWidth = 10` or `DR.strokeStyle = '#ff0000'` are
- * forwarded to the actual rendering context. Without that, writing to the
- * proxy would create properties on the proxy object instead of changing the
- * real CanvasRenderingContext2D (which caused black lines / wrong colors).
- */
 const BG = new Proxy({} as CanvasRenderingContext2D, {
   get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
@@ -172,10 +133,7 @@ const BG = new Proxy({} as CanvasRenderingContext2D, {
     if (ctx) {
       try {
         ctx[prop as any] = val;
-      } catch (err) {
-        // Some properties are read-only on some contexts; swallowing errors to
-        // keep behavior consistent with assigning on a real context.
-      }
+      } catch (err) {}
     }
     return true;
   },
@@ -195,9 +153,7 @@ const IT = new Proxy({} as CanvasRenderingContext2D, {
     if (ctx) {
       try {
         ctx[prop as any] = val;
-      } catch (err) {
-        // ignore write errors; keep app stable
-      }
+      } catch (err) {}
     }
     return true;
   },
@@ -217,9 +173,7 @@ const DR = new Proxy({} as CanvasRenderingContext2D, {
     if (ctx) {
       try {
         ctx[prop as any] = val;
-      } catch (err) {
-        // ignore
-      }
+      } catch (err) {}
     }
     return true;
   },
@@ -228,8 +182,8 @@ const DR = new Proxy({} as CanvasRenderingContext2D, {
 const dpr = window.devicePixelRatio || 1;
 const width = Config.fieldPNGPixelWidth;
 const height = Config.fieldPNGPixelHeight;
-const realWidth = Config.fieldRealWidthInches; // inches
-const realHeight = Config.fieldRealHeightInches; // inches
+const realWidth = Config.fieldRealWidthInches;
+const realHeight = Config.fieldRealHeightInches;
 
 let scaling = 1;
 
@@ -261,6 +215,7 @@ window.addEventListener("orientationchange", updateCanvasSize);
 
 let clickMovement = 0;
 
+// this class manages the drawing and interaction on the whiteboard
 export class Whiteboard {
   private model;
   private active = true;
@@ -278,7 +233,7 @@ export class Whiteboard {
   private rotControl: { x: number; y: number } | null = null;
   private isPointerDown = false;
 
-  private currentStrokePoints: Array<any> = []; // first index is the currentColor
+  private currentStrokePoints: Array<any> = [];
   private currentErasePoint: { x: number; y: number } | null = null;
   private lastErasePoint: { x: number; y: number } | null = null;
   private currentErasedStrokes: any = [];
@@ -374,10 +329,6 @@ export class Whiteboard {
         }
       });
 
-    // Number pad event listeners
-    // NOTE: keep the pad visible after selecting a number so the user can
-    // place multiple annotations without reopening the pad. Also provide a
-    // small visual hint by toggling a ring class on the selected button.
     for (let i = 0; i <= 9; i++) {
       const btn = document.getElementById(`whiteboard-number-${i}`);
       btn?.addEventListener("click", (e) => {
@@ -385,12 +336,10 @@ export class Whiteboard {
         this.currentTool = "text";
         this.currentTextValue = String(i);
 
-        // Keep the pad visible so multiple numbers can be chosen/placed.
         document
           .getElementById("whiteboard-number-pad")
           ?.classList.remove("hidden");
 
-        // Remove any previous visual selection and mark the clicked button.
         for (let k = 0; k <= 9; k++) {
           document
             .getElementById(`whiteboard-number-${k}`)
@@ -401,23 +350,19 @@ export class Whiteboard {
             "ring-2",
             "ring-amber-400",
           );
-        } catch (err) {
-          // defensive: if currentTarget isn't available for some reason, ignore.
-        }
+        } catch (err) {}
       });
     }
 
-    // Close button for number-pad: hides the pad and resets text-placement state.
     document
       .getElementById("whiteboard-number-close")
       ?.addEventListener("click", (e) => {
         e.stopPropagation();
-        // Clear any pending text selection.
+
         this.currentTextValue = "";
-        // Exit text placement mode and return to marker (safer default).
+
         this.currentTool = "marker";
 
-        // Update the draw-config icons so the UI reflects marker selected.
         document
           .getElementById("whiteboard-draw-config-marker")
           ?.style.setProperty("display", "inline");
@@ -428,12 +373,10 @@ export class Whiteboard {
           .getElementById("whiteboard-draw-config-text")
           ?.style.setProperty("display", "none");
 
-        // Hide the number pad.
         document
           .getElementById("whiteboard-number-pad")
           ?.classList.add("hidden");
 
-        // Remove visual selection from number buttons.
         for (let k = 0; k <= 9; k++) {
           document
             .getElementById(`whiteboard-number-${k}`)
@@ -804,8 +747,6 @@ export class Whiteboard {
         }
       });
 
-    // Initialize drawing context defaults by writing to the real context
-    // via the proxy's `set` trap implemented above.
     DR.lineWidth = 10;
     DR.lineCap = "round";
     DR.lineJoin = "round";
@@ -982,12 +923,9 @@ export class Whiteboard {
         this.redrawDrawing();
       }
     } else if (action.type === "text") {
-      // Undo a text annotation. Prefer removing the exact referenced annotation
-      // if present; otherwise fall back to popping the last annotation.
       const data = this.getData();
       if (data !== null) {
         if (action.ref) {
-          // action.ref is expected to be [x, y, colorId, text]
           const ref = action.ref as any[];
           const idx = data.textAnnotations.findIndex(
             (t: any) =>
@@ -999,7 +937,6 @@ export class Whiteboard {
           if (idx !== -1) {
             data.textAnnotations.splice(idx, 1);
           } else {
-            // If exact match not found, remove last as a graceful fallback.
             data.textAnnotations.pop();
           }
         } else {
@@ -1031,33 +968,25 @@ export class Whiteboard {
 
     if (this.match == null) return;
 
-    // Set the font and colors up-front. We'll clamp positions so the team
-    // numbers stay visible even when the driver station coordinates are
-    // placed outside the visible region.
     BG.font = "bold 64px sans-serif";
     BG.fillStyle = "white";
     BG.textAlign = "center";
     BG.textBaseline = "middle";
 
-    // Helper to clamp a numeric value to a range.
     const clamp = (v: number, lo: number, hi: number) =>
       Math.max(lo, Math.min(v, hi));
 
-    // margin provides space to ensure text glyphs don't run off the canvas.
     const margin = 48;
 
-    // Draw a station's text while keeping the center point inside the canvas bounds.
     const drawStation = (
       stationX: number,
       stationY: number,
       text: string,
       rotation: number,
     ) => {
-      // Compute the field-space position adjusted for camera
       const px = stationX - (this.camera.x - width / 2);
       const py = stationY - (this.camera.y - height / 2);
 
-      // Measure text to pick a conservative horizontal margin
       let textWidth = 0;
       try {
         const metrics = BG.measureText(text);
@@ -1066,8 +995,6 @@ export class Whiteboard {
         textWidth = 64;
       }
 
-      // make margin at least half the text width + some padding so the text center
-      // doesn't place glyphs outside the canvas
       const effectiveMarginX = Math.max(margin, Math.ceil(textWidth / 2) + 8);
       const effectiveMarginY = margin;
 
@@ -1081,7 +1008,6 @@ export class Whiteboard {
       BG.restore();
     };
 
-    // Place the six station labels, clamped so they remain visible.
     drawStation(
       Config.redOneStationX,
       Config.redOneStationY,
@@ -1121,8 +1047,6 @@ export class Whiteboard {
   }
 
   private drawRobot(name: string, robot: any, team: string, slot: string) {
-    // if (!name) return;
-
     const isSelected = this.selected !== null && this.selected[0] == slot;
 
     if (team === "red") {
@@ -1232,7 +1156,6 @@ export class Whiteboard {
       DR.stroke();
     }
 
-    // Draw text annotations
     if (data.textAnnotations) {
       DR.font = "bold 80px Arial";
       DR.textAlign = "center";
@@ -1391,7 +1314,7 @@ export class Whiteboard {
       Math.round(e.clientY / scaling - rect.top / scaling) -
       (height / 2 - this.camera.y);
     if (clickMovement > 30) return;
-    //const selected = this.getRobotAtPoint(x, y);
+
     if (this.selected == null) {
       document
         .getElementById("whiteboard-robot-config")
@@ -1584,8 +1507,7 @@ export class Whiteboard {
         y: this.selected[1].y,
       };
       this.drawRobots();
-      // document.getElementById("whiteboard-robot-config")?.classList.remove("hidden");
-      // document.getElementById("whiteboard-draw-config")?.classList.add("hidden");
+
       clickMovement = 0;
       return;
     }
@@ -1611,7 +1533,6 @@ export class Whiteboard {
       } else if (this.currentTool == "eraser") {
         this.currentErasePoint = { x: x, y: y };
       } else if (this.currentTool == "text" && this.currentTextValue !== "") {
-        // Add text annotation
         const data = this.getData();
         if (data !== null) {
           data.textAnnotations.push([
@@ -1646,7 +1567,6 @@ export class Whiteboard {
         });
       }
       this.currentAction = "none";
-      //this.previousRobotTransform = this.selected[1];
     } else if (this.currentStrokePoints.length > 2) {
       DR.closePath();
       this.addUndoHistory({

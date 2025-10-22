@@ -7,8 +7,6 @@ import { TBAService } from "./tba.ts";
 
 const get = (id: string): HTMLElement | null => document.getElementById(id);
 
-// Lazily resolve DOM elements at initialization time.
-// These placeholders are assigned once the DOM is ready.
 let B: {
   NewMatch?: HTMLElement | null;
   ImportMatch?: HTMLElement | null;
@@ -55,6 +53,7 @@ let E: {
   TBATeamList?: HTMLElement | null;
 } | null = null;
 
+// this class manages the user interface and interactions
 export class View {
   private model: Model;
   private whiteboard: Whiteboard;
@@ -73,12 +72,9 @@ export class View {
     this.qrimport = qrimport;
     this.qrexport = qrexport;
 
-    // Initialize TBA service
     this.tbaService = new TBAService();
 
-    // Initialize DOM-dependent state only after the DOM is ready.
     const initDOM = () => {
-      // Resolve element references now that the DOM exists.
       B = {
         NewMatch: get("home-toolbar-new-btn") as HTMLElement | null,
         ImportMatch: get("home-toolbar-import-btn") as HTMLElement | null,
@@ -129,7 +125,6 @@ export class View {
         TBATeamList: get("tba-team-list") as HTMLElement | null,
       };
 
-      // Create existing match entries now that the list/template are available.
       for (const match of this.model.matches) {
         this.createNewMatch(
           match.id,
@@ -143,8 +138,6 @@ export class View {
         );
       }
 
-      // Attach event listeners defensively (if element exists).
-      // Use consolidated registration to add debug logs when handlers are attached.
       const trackedHandlers = [
         {
           el: B?.NewMatch,
@@ -206,8 +199,6 @@ export class View {
         if (h.el) {
           console.debug(`View: attaching '${h.evt}' handler to #${h.id}`);
           try {
-            // Emit a lightweight event so the debug overlay or external monitors can see when
-            // handlers are attached. Ignore if dispatching fails in constrained environments.
             try {
               window.dispatchEvent(
                 new CustomEvent("app:handlerattached", {
@@ -232,7 +223,6 @@ export class View {
         }
       }
 
-      // Clear button has a special inline handler body; keep behavior but add logs.
       const clearBtn = B?.Clear;
       if (clearBtn) {
         console.debug(
@@ -261,7 +251,6 @@ export class View {
           );
         }
       } else {
-        // There might be an inline handler in index.html; still warn to help debugging.
         console.warn(
           "Missing element: home-toolbar-clear-btn (no clear handler attached here)",
         );
@@ -281,9 +270,7 @@ export class View {
             );
           } catch (_err) {}
           exportEl.addEventListener("click", (e) => this.onCancelExport(e));
-          // Also wire the inner close button to the same handler so keyboard users and
-          // assistive-technology users have a proper, discoverable control to dismiss the export
-          // overlay. We emit the same small instrumentation event used for other handlers.
+
           const exportCloseBtn = get(
             "qr-export-close-btn",
           ) as HTMLElement | null;
@@ -312,21 +299,18 @@ export class View {
             console.warn("Missing element: qr-export-close-btn");
           }
 
-          // Progress helpers: parse status text and update the top progress bar
-          // so small screens (including iPads) have a single authoritative progress indicator.
           const parseProgressFromText = (text: string | null) => {
             if (!text) return null;
             const m = text.match(/(\d+)\s*\/\s*(\d+)/);
             if (m) {
               return { cur: Number(m[1]), total: Number(m[2]) };
             }
-            // tolerate variants like 'Received 3 / 12 chunks'
+
             const n = text.match(/Received\s*(\d+)\s*\/\s*(\d+)/i);
             if (n) return { cur: Number(n[1]), total: Number(n[2]) };
             return null;
           };
 
-          // Track the last known progress value per bar to ensure monotonic increases
           const lastProgressValues = new Map<string, number>();
 
           const updateProgressBarFromStatus = (
@@ -340,9 +324,7 @@ export class View {
               const info = parseProgressFromText(
                 statusEl.textContent || (statusEl as HTMLElement).innerText,
               );
-              // Important: do not reset the bar when parsing temporarily fails.
-              // Many small status updates or transient text clearing previously caused
-              // flicker (width jumping to 0). Only update when parse yields a numeric value.
+
               if (!info) {
                 return;
               }
@@ -351,11 +333,8 @@ export class View {
                 Math.min(100, Math.round((info.cur / info.total) * 100)),
               );
 
-              // Get the last known progress value for this specific bar
               const lastPct = lastProgressValues.get(barId) || 0;
 
-              // Only update if progress has increased or reset to a new stream (decrease)
-              // This prevents multiple small transitions that create a segmented appearance
               if (pct > lastPct || pct < lastPct - 10) {
                 barEl.style.width = pct + "%";
                 lastProgressValues.set(barId, pct);
@@ -363,17 +342,15 @@ export class View {
 
               if (pct >= 100) barEl.classList.add("complete");
               else barEl.classList.remove("complete");
-            } catch (_err) {
-              // non-fatal: keep textual status as the canonical source of truth
-            }
+            } catch (_err) {}
           };
 
           const observeStatusToProgress = (statusId: string, barId: string) => {
             const statusEl = get(statusId);
             if (!statusEl) return;
-            // Initial sync
+
             updateProgressBarFromStatus(statusId, barId);
-            // Observe subsequent status text changes and update the progress bar accordingly.
+
             try {
               const mo = new MutationObserver(() => {
                 updateProgressBarFromStatus(statusId, barId);
@@ -384,11 +361,10 @@ export class View {
                 subtree: true,
               });
             } catch (_err) {
-              // If MutationObserver is restricted, fall back to a short interval poll
               const poll = window.setInterval(() => {
                 updateProgressBarFromStatus(statusId, barId);
               }, 400);
-              // Try to clear poll when overlay closes (best-effort)
+
               const overlay = get(
                 statusId === "qr-export-status"
                   ? "qr-export-container"
@@ -408,12 +384,9 @@ export class View {
             }
           };
 
-          // Start observing both export and import status text nodes so the top progress bars
-          // are kept in sync on small screens (including iPad) when the status text changes.
           observeStatusToProgress("qr-export-status", "qr-export-progress-bar");
           observeStatusToProgress("qr-import-status", "qr-import-progress-bar");
 
-          // Reset progress tracking when overlays are closed to ensure clean state for next open
           const exportOverlayProgress = get("qr-export-container");
           const importOverlayProgress = get("qr-import-container");
 
@@ -433,8 +406,6 @@ export class View {
             });
           }
 
-          // Ensure overlay inner containers adapt to iPad / tablet layouts programmatically
-          // (CSS provides the baseline but this makes subtle breakpoints reliable at runtime).
           const ensureOverlayLayout = () => {
             try {
               const isTablet = window.innerWidth <= 1024;
@@ -452,15 +423,9 @@ export class View {
                 importInner.style.maxWidth = isTablet ? "92vw" : "820px";
                 importInner.style.width = isTablet ? "92vw" : "";
               }
-            } catch (_err) {
-              // ignore layout adjustments on constrained environments
-            }
+            } catch (_err) {}
           };
 
-          // If toolbar mode labels and the right controls overlap on a particular device,
-          // force a compact/tablet layout for the toolbar so the labels never collide with
-          // the right-side buttons (this helps when device pixel scaling makes CSS breakpoints
-          // appear inaccurate for some iPads).
           const ensureToolbarArrangement = () => {
             try {
               const toolbar = get("whiteboard-toolbar") as HTMLElement | null;
@@ -476,7 +441,7 @@ export class View {
               if (!toolbar || !mode || !left || !right) return;
               const mRect = mode.getBoundingClientRect();
               const rRect = right.getBoundingClientRect();
-              // If the mode area encroaches on the right controls, force a stacked layout.
+
               if (mRect.right > rRect.left - 8) {
                 toolbar.style.gridTemplateColumns = "1fr 1fr";
                 toolbar.style.gridTemplateRows = "auto auto";
@@ -487,7 +452,6 @@ export class View {
                 right.style.gridColumn = "2";
                 right.style.gridRow = "1";
               } else {
-                // restore defaults (let CSS handle normal layout)
                 toolbar.style.gridTemplateColumns = "";
                 toolbar.style.gridTemplateRows = "";
                 (mode as HTMLElement).style.gridColumn = "";
@@ -497,14 +461,9 @@ export class View {
                 right.style.gridColumn = "";
                 right.style.gridRow = "";
               }
-            } catch (_err) {
-              // ignore layout calculation errors
-            }
+            } catch (_err) {}
           };
 
-          // When an overlay is shown we want to reset the progress bar once (clean slate for the new export/import).
-          // We monkeypatch the instance `show` method so that we reset the correct UI elements only when an overlay opens;
-          // this ensures we do not frequently reset in response to transient text changes.
           try {
             const origShow = (this as any).show.bind(this);
             (this as any).show = (e: HTMLElement | null) => {
@@ -532,17 +491,14 @@ export class View {
                   if (dots) dots.style.display = "inline-flex";
                 }
               } catch (_err) {}
-              // Call original behavior (show element).
+
               origShow(e);
-              // Re-evaluate toolbar layout after showing overlays to avoid overlap at unusual widths.
+
               ensureOverlayLayout();
               ensureToolbarArrangement();
             };
-          } catch (_err) {
-            // If monkeypatching fails for any reason, we still proceed — show() will behave as before.
-          }
+          } catch (_err) {}
 
-          // Run immediately and on relevant events so orientation changes on iPad are handled.
           try {
             ensureOverlayLayout();
             ensureToolbarArrangement();
@@ -556,8 +512,6 @@ export class View {
             });
           } catch (_err) {}
 
-          // Backdrop handlers: do not reset the progress bar when the backdrop is clicked (that caused frequent flicker).
-          // Instead, hide the animated dots and use the centralized onCancel handlers to stop streaming/scanning cleanly.
           const exportOverlay = get("qr-export-container");
           if (exportOverlay) {
             exportOverlay.addEventListener("click", (e) => {
@@ -565,12 +519,12 @@ export class View {
                 const dots = get("qr-export-dots") as HTMLElement | null;
                 if (dots) dots.style.display = "none";
               } catch (_err) {}
-              // Close via the same centralized cancel path so the exporter can clean up safely.
+
               try {
                 this.onCancelExport(e as Event);
               } catch (_err) {}
             });
-            // keep the existing custom event hook used by tests / automation
+
             exportOverlay.addEventListener("app:closeexport" as any, () => {
               this.onCancelExport(new Event("click"));
             });
@@ -637,10 +591,6 @@ export class View {
         );
         importInner.addEventListener("click", (e) => e.stopPropagation());
 
-        // Programmatically insert a small, accessible close button inside the import
-        // inner container so users can dismiss the import overlay without tapping the backdrop.
-        // We create it here (rather than editing static HTML) so the view remains
-        // resilient to small markup changes and tests can still locate/override it.
         if (!document.getElementById("qr-import-close-btn")) {
           try {
             const closeBtn = document.createElement("button");
@@ -650,7 +600,7 @@ export class View {
             closeBtn.title = "Close import";
             closeBtn.setAttribute("aria-label", "Close import dialog");
             closeBtn.textContent = "Close";
-            // Keep position visually unobtrusive but accessible.
+
             closeBtn.style.position = "absolute";
             closeBtn.style.top = "8px";
             closeBtn.style.right = "8px";
@@ -672,14 +622,12 @@ export class View {
       }
     };
 
-    // If the DOM hasn't loaded yet, wait for it; otherwise initialize immediately.
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", initDOM, { once: true });
     } else {
       initDOM();
     }
 
-    // Load TBA API key on startup
     this.initializeTBAService();
   }
 
@@ -733,7 +681,6 @@ export class View {
     blueTwo: string,
     blueThree: string,
   ): void {
-    // Defensive: ensure necessary DOM elements are available before proceeding.
     if (!E || !E.MatchList || !E.MatchListItemTemplate) {
       console.warn(
         "createNewMatch called before DOM initialization - skipping creation for",
@@ -776,13 +723,10 @@ export class View {
     const options = item.children[2].children[1] as HTMLElement;
     const exportOption = options.children[0] as HTMLElement;
     const deleteOption = options.children[1] as HTMLElement;
-    // Prevent clicks inside the kebab/options area from bubbling up to the
-    // match item. This avoids accidental opens when interacting with the menu.
+
     options.addEventListener("click", (e) => e.stopPropagation());
 
     kebab.addEventListener("click", (e) => {
-      // Prevent the click from bubbling up and being interpreted as an open
-      // request on the overall match item.
       e.stopPropagation();
       this.hide(kebab);
       this.show(options);
@@ -797,18 +741,14 @@ export class View {
     });
 
     deleteOption.addEventListener("click", (e) => {
-      // Stop propagation so this click does not bubble up and open the match.
       e.stopPropagation();
       this.deleteMatch(item.id);
     });
 
     exportOption.addEventListener("click", (e) => {
-      // Stop propagation so this click does not bubble up and open the match.
       e.stopPropagation();
       const match = this.model.getMatch(id);
       if (match) {
-        // Show the export overlay immediately so users see feedback while QR frames
-        // are generated. Defer the heavy work slightly to allow the overlay to render.
         this.show(E.Export);
         setTimeout(() => {
           try {
@@ -816,12 +756,12 @@ export class View {
           } catch (err) {
             console.error("View: failed to start QR export:", err);
             alert("Failed to start QR export. See console for details.");
-            // Ensure overlay is closed if export cannot start.
+
             this.hide(E.Export);
           }
         }, 50);
       }
-      // Close the options and restore the kebab to keep the UI consistent.
+
       this.hide(options);
       this.show(kebab);
     });
@@ -832,21 +772,20 @@ export class View {
         this.loadWhiteboard(match);
       }
     };
-    // Make the entire match item clickable (except the kebab/options) and add
-    // keyboard support for accessibility (Enter / Space).
+
     item.addEventListener("click", (e) => {
       const target = e.target as Node;
-      // If the click originated inside the kebab/options controls, ignore it.
+
       if (kebab.contains(target) || options.contains(target)) return;
       openMatch();
     });
     item.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault(); // prevent page scroll when Space is used
+        e.preventDefault();
         openMatch();
       }
     });
-    // Ensure the item is keyboard-focusable and announced as a control.
+
     item.setAttribute("tabindex", "0");
     item.setAttribute("role", "button");
 
@@ -912,19 +851,14 @@ export class View {
     console.log("TBA Import clicked");
     this.show(E.TBAImportPanel);
 
-    // Ensure API key is loaded (includes shared key fallback)
     await this.tbaService.loadApiKey();
 
-    // Pre-fill API key if it exists
     if (I?.TBAApiKey && this.tbaService.hasApiKey()) {
-      // Don't show the key for security, just indicate it's saved
       I.TBAApiKey.placeholder = "API Key (saved)";
     }
 
-    // Load current year's events
     await this.loadTBAEvents();
 
-    // Setup event listeners for search/dropdown
     this.setupTBADropdownListeners();
   }
 
@@ -960,7 +894,6 @@ export class View {
       return;
     }
 
-    // Set and save API key if provided
     if (apiKey) {
       this.tbaService.setApiKey(apiKey);
       await SET("tbaApiKey", apiKey, (e) => {
@@ -989,7 +922,6 @@ export class View {
 
       this.showTBAStatus(`Importing ${matches.length} matches...`, false);
 
-      // Create all matches with formatted title: "Match Number @ Event"
       for (const match of matches) {
         const formattedMatchName = this.selectedEventName
           ? `${match.matchName} @ ${this.selectedEventName}`
@@ -1022,7 +954,6 @@ export class View {
         false,
       );
 
-      // Close the panel after a short delay
       setTimeout(() => {
         this.onClickTBACancel(e);
       }, 1500);
@@ -1063,7 +994,6 @@ export class View {
       const currentYear = new Date().getFullYear();
       console.log("Fetching events for year:", currentYear);
 
-      // Fetch events for current year and previous years (last 3 years)
       const yearsToFetch = [currentYear, currentYear - 1, currentYear - 2];
       const allEventsPromises = yearsToFetch.map((year) =>
         this.tbaService.fetchAndParseEvents(year),
@@ -1076,10 +1006,8 @@ export class View {
 
       if (!E?.TBAEventList) return;
 
-      // Clear existing items
       E.TBAEventList.innerHTML = "";
 
-      // Add events to dropdown
       for (const event of events) {
         const item = document.createElement("div");
         item.className = "tba-dropdown-item";
@@ -1121,22 +1049,18 @@ export class View {
       return;
     }
 
-    // Store event name for use in match titles
     this.selectedEventName = eventName;
 
-    // Set the event key
     I.TBAEventKey.value = eventKey;
     I.TBAEventSearch.value = eventName;
 
-    // Hide event dropdown
     this.hide(E.TBAEventDropdown);
 
-    // Enable team search
     I.TBATeamSearch.disabled = false;
     I.TBATeamSearch.placeholder = "Search teams...";
 
     console.log("Loading teams for event:", eventKey);
-    // Load teams for this event
+
     await this.loadTBATeamsForEvent(eventKey);
   }
 
@@ -1154,14 +1078,11 @@ export class View {
         return;
       }
 
-      // Clear existing items
       E.TBATeamList.innerHTML = "";
 
-      // Sort teams numerically
       const sortedTeams = teams.sort((a, b) => parseInt(a) - parseInt(b));
       console.log("Sorted teams:", sortedTeams);
 
-      // Add teams to dropdown
       for (const team of sortedTeams) {
         const item = document.createElement("div");
         item.className = "tba-team-item";
@@ -1176,7 +1097,6 @@ export class View {
       console.log("Team items added to dropdown");
       this.hide(E.TBAStatusMessage);
 
-      // Show the dropdown automatically after loading teams
       if (sortedTeams.length > 0) {
         this.show(E.TBATeamDropdown);
       }
@@ -1189,16 +1109,13 @@ export class View {
   private selectTBATeam(teamNumber: string): void {
     if (!I?.TBATeamNumber || !I?.TBATeamSearch) return;
 
-    // Set the team number
     I.TBATeamNumber.value = teamNumber;
     I.TBATeamSearch.value = `Team ${teamNumber}`;
 
-    // Hide team dropdown
     this.hide(E.TBATeamDropdown);
   }
 
   private setupTBADropdownListeners(): void {
-    // Event search input
     if (I?.TBAEventSearch) {
       I.TBAEventSearch.addEventListener("input", (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
@@ -1218,7 +1135,6 @@ export class View {
       });
     }
 
-    // Team search input
     if (I?.TBATeamSearch) {
       I.TBATeamSearch.addEventListener("input", (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
@@ -1238,7 +1154,6 @@ export class View {
       });
     }
 
-    // Close dropdowns when clicking outside
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       if (
@@ -1283,7 +1198,6 @@ export class View {
       }
     });
 
-    // Show/hide dropdown based on results
     if (visibleCount > 0) {
       this.show(E.TBAEventDropdown);
     } else {
@@ -1311,7 +1225,6 @@ export class View {
       }
     });
 
-    // Show/hide dropdown based on results
     if (visibleCount > 0) {
       this.show(E.TBATeamDropdown);
     } else {
@@ -1320,18 +1233,9 @@ export class View {
   }
 
   private async onClickImportMatch(e: Event): Promise<void> {
-    // Start the import process but only show the overlay if the camera becomes active.
     const videoEl = get("qr-import-video") as HTMLVideoElement | null;
 
-    // Start the scanner and install the callback that will be invoked when a full
-    // stream of QR frames has been decoded. We do not show the import overlay yet;
-    // we'll wait until the camera/video element reports activity so the user sees
-    // the live feed rather than an empty dialog.
     try {
-      // Kick off the QR import; pass the existing callback behavior for when data arrives.
-      // Note: QRImport.start handles errors internally and may alert on permission errors.
-      // We still perform a lightweight readiness check below so we only show the overlay
-      // if a camera feed actually starts.
       this.qrimport.start(async (data) => {
         const match = Match.fromPacket(data as any);
         const id = await this.model.addMatch(match);
@@ -1345,15 +1249,13 @@ export class View {
           match.blueTwo,
           match.blueThree,
         );
-        // Hide the import overlay after we successfully imported the match.
+
         this.hide(E.Import);
       });
     } catch (err) {
-      // Defensive: QRImport.start may throw in some implementations; ensure we surface the error.
       console.warn("View: qrimport.start threw an error:", err);
     }
 
-    // If there is no video element to observe, bail out and let QRImport handle alerts.
     if (!videoEl) {
       console.warn(
         "View: no video element to verify camera start; not showing import overlay",
@@ -1361,7 +1263,6 @@ export class View {
       return;
     }
 
-    // Wait up to a short timeout for the video element to become active.
     const started = await new Promise<boolean>((resolve) => {
       let finished = false;
       const timeout = window.setTimeout(() => {
@@ -1393,7 +1294,6 @@ export class View {
         }
       }
 
-      // Immediate success if already in a usable ready state.
       if (videoEl.readyState >= 2) {
         finished = true;
         cleanup();
@@ -1407,10 +1307,8 @@ export class View {
     });
 
     if (started) {
-      // Only show the import overlay once the camera feed is active.
       this.show(E.Import);
     } else {
-      // If the camera did not start in a timely manner, stop the scanner and inform the user.
       try {
         this.qrimport.stop();
       } catch (err) {
@@ -1430,7 +1328,6 @@ export class View {
     }
     this.hide(E.Export);
 
-    // Clear export status text to leave the UI in a consistent state.
     const status = get("qr-export-status");
     if (status) status.textContent = "";
   }
@@ -1442,10 +1339,8 @@ export class View {
       console.warn("View: error stopping QR import scanner:", err);
     }
 
-    // Hide the import overlay.
     this.hide(E.Import);
 
-    // Clear camera selection dropdown so it will be repopulated fresh next time.
     const cameraSelect = get(
       "qr-import-camera-select",
     ) as HTMLSelectElement | null;
@@ -1459,7 +1354,6 @@ export class View {
       }
     }
 
-    // Ensure any active media stream attached to the video element is stopped and removed.
     const video = get("qr-import-video") as HTMLVideoElement | null;
     if (video) {
       try {
@@ -1488,7 +1382,6 @@ export class View {
       }
     }
 
-    // Clear any ephemeral status UI that might be present.
     const exportStatus = get("qr-export-status");
     if (exportStatus) exportStatus.textContent = "";
     const importStatus = get("qr-import-status");

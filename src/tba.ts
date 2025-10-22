@@ -44,7 +44,7 @@ export interface TBASimpleMatch {
   blueTeams: string[];
 }
 
-// Service for integrating with The Blue Alliance API to fetch event and match data
+// this class handles communication with the blue alliance api
 export class TBAService {
   private apiKey: string | null = null;
 
