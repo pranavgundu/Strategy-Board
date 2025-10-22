@@ -906,6 +906,8 @@ export class View {
     this.whiteboard.toggleView();
   }
 
+  private selectedEventName: string = "";
+
   private async onClickTBAImport(e: Event): Promise<void> {
     console.log("TBA Import clicked");
     this.show(E.TBAImportPanel);
@@ -931,6 +933,7 @@ export class View {
     this.hide(E.TBAStatusMessage);
     this.hide(E.TBAEventDropdown);
     this.hide(E.TBATeamDropdown);
+    this.selectedEventName = "";
     if (I?.TBAApiKey) I.TBAApiKey.value = "";
     if (I?.TBAEventKey) I.TBAEventKey.value = "";
     if (I?.TBATeamNumber) I.TBATeamNumber.value = "";
@@ -986,10 +989,14 @@ export class View {
 
       this.showTBAStatus(`Importing ${matches.length} matches...`, false);
 
-      // Create all matches
+      // Create all matches with formatted title: "Match Number @ Event"
       for (const match of matches) {
+        const formattedMatchName = this.selectedEventName
+          ? `${match.matchName} @ ${this.selectedEventName}`
+          : match.matchName;
+
         const id = await this.model.createNewMatch(
-          match.matchName,
+          formattedMatchName,
           match.redTeams[0] || "",
           match.redTeams[1] || "",
           match.redTeams[2] || "",
@@ -1000,7 +1007,7 @@ export class View {
 
         this.createNewMatch(
           id,
-          match.matchName,
+          formattedMatchName,
           match.redTeams[0] || "",
           match.redTeams[1] || "",
           match.redTeams[2] || "",
@@ -1113,6 +1120,9 @@ export class View {
       console.error("Missing input elements");
       return;
     }
+
+    // Store event name for use in match titles
+    this.selectedEventName = eventName;
 
     // Set the event key
     I.TBAEventKey.value = eventKey;
