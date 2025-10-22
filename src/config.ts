@@ -24,6 +24,6 @@ export const Config = {
   blueThreeStationX: -65,
   blueThreeStationY: 1155,
 
-  // Shared TBA API key - users can override with their own if desired
-  sharedTBAApiKey: "your_api_key_here", // Replace with your actual TBA API key
+  // Shared TBA API key - injected during build via environment variable
+  sharedTBAApiKey: import.meta.env.VITE_TBA_API_KEY || "",
 };
