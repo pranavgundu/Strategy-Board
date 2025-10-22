@@ -1,5 +1,7 @@
 import { get, getMany, set, clear, entries, del } from "idb-keyval";
 
+// IndexedDB wrapper functions with error handling for persistent storage
+
 export async function GET<T = unknown>(
   key: string,
   handler?: (err: Error) => void,

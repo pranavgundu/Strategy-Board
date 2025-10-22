@@ -44,6 +44,7 @@ export interface TBASimpleMatch {
   blueTeams: string[];
 }
 
+// Service for integrating with The Blue Alliance API to fetch event and match data
 export class TBAService {
   private apiKey: string | null = null;
 
@@ -55,7 +56,6 @@ export class TBAService {
     });
     this.apiKey = typeof key === "string" ? key : null;
 
-    // If no user API key, use shared key
     if (!this.apiKey && Config.sharedTBAApiKey) {
       this.apiKey = Config.sharedTBAApiKey;
     }
@@ -68,7 +68,6 @@ export class TBAService {
   }
 
   public hasApiKey(): boolean {
-    // Check if we have user key or shared key
     return (
       (this.apiKey !== null && this.apiKey.length > 0) ||
       (Config.sharedTBAApiKey && Config.sharedTBAApiKey.length > 0)
@@ -76,7 +75,6 @@ export class TBAService {
   }
 
   private async makeRequest(endpoint: string): Promise<any> {
-    // Use user API key if set, otherwise use shared key
     const apiKey = this.apiKey || Config.sharedTBAApiKey;
 
     if (!apiKey) {
@@ -110,7 +108,6 @@ export class TBAService {
   }
 
   public parseEventsToSimple(events: TBAEvent[]): TBASimpleEvent[] {
-    // Sort by start date (most recent first)
     const sortedEvents = events.sort((a, b) => {
       return (
         new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
@@ -118,7 +115,6 @@ export class TBAService {
     });
 
     return sortedEvents.map((event) => {
-      // Format location
       let location = "";
       if (event.city && event.state_prov) {
         location = `${event.city}, ${event.state_prov}`;
@@ -131,7 +127,6 @@ export class TBAService {
         location += `, ${event.country}`;
       }
 
-      // Format date range
       const startDate = new Date(event.start_date);
       const endDate = new Date(event.end_date);
       const dateRange = this.formatDateRange(startDate, endDate);
@@ -177,7 +172,6 @@ export class TBAService {
     teamKey: string,
     eventKey: string,
   ): Promise<TBAMatch[]> {
-    // Ensure team key is in correct format (frc1234)
     if (!teamKey.startsWith("frc")) {
       teamKey = `frc${teamKey}`;
     }
@@ -187,7 +181,6 @@ export class TBAService {
   }
 
   public parseMatchesToSimple(matches: TBAMatch[]): TBASimpleMatch[] {
-    // Sort matches by competition level and match number
     const sortedMatches = matches.sort((a, b) => {
       const levelOrder: { [key: string]: number } = {
         qm: 1,
@@ -274,7 +267,6 @@ export class TBAService {
 
   public async fetchTeamsAtEvent(eventKey: string): Promise<string[]> {
     const teamKeys = await this.getTeamsAtEvent(eventKey);
-    // Convert frc1234 to just 1234
     return teamKeys.map((key) => key.replace("frc", ""));
   }
 }

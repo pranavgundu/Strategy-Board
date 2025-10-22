@@ -3,18 +3,12 @@ import QRCode from "qrcode";
 import { Match } from "@/match.ts";
 
 const HEADER_SIZE = 4;
-// Number of characters reserved in the payload for the total chunk count
 const TOTAL_CHUNKS_HEADER_SIZE = 4;
 const CHUNK_HEADER_SIZE = HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE;
 
-// Per-chunk payload size (characters). Increased for faster data transfer.
 const MAX_CHUNK_PAYLOAD = 250;
-// Duration each QR image is shown on screen (milliseconds). Faster rotation for quicker scanning.
 const FRAME_DURATION_MS = 400;
 
-/**
- * Helper: encode arbitrary UTF-8 string to a base64 payload in a browser-safe way.
- */
 function encodeToBase64(input: string): string {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(input);
@@ -25,9 +19,6 @@ function encodeToBase64(input: string): string {
   return btoa(binary);
 }
 
-/**
- * Helper: decode base64 back into a UTF-8 string.
- */
 function decodeBase64ToString(b64: string): string {
   const binary = atob(b64);
   const bytes = new Uint8Array(binary.length);
@@ -38,10 +29,6 @@ function decodeBase64ToString(b64: string): string {
   return decoder.decode(bytes);
 }
 
-/**
- * Utility wrapper so we can consistently await QRCode.toCanvas whether the library
- * provides a callback or a Promise. This makes rendering code easier to read/maintain.
- */
 function toCanvasAsync(
   payload: string,
   options: Record<string, unknown>,
@@ -66,41 +53,34 @@ function toCanvasAsync(
 
 type QRExportCallback = (data: unknown) => void;
 
+// Exports match data as animated QR codes, chunking large data for reliable scanning
 export class QRExport {
-  // Allow null entries so we can re-resolve DOM nodes at export time and tolerate
-  // DOM re-renders or test-time DOM changes.
   private pool: Array<HTMLElement | null> = [];
   private intervalId: number | null = null;
 
   constructor() {
-    // Don't eagerly resolve DOM nodes here; resolve them when an export is requested.
     this.pool = [];
   }
 
   export(match: Match): void {
-    // Resolve the worker container elements at the moment of export so we don't
-    // hold stale references if the DOM has been re-rendered.
     this.pool = [
       document.getElementById("qr-export-code-worker-0"),
       document.getElementById("qr-export-code-worker-1"),
       document.getElementById("qr-export-code-worker-2"),
     ];
 
-    // Defensive: ensure at least one container exists before proceeding.
     if (!this.pool || this.pool.every((el) => el === null)) {
       console.error("QRExport: pool elements not available");
       alert("QR export is currently unavailable");
       return;
     }
 
-    // If an export is already running, stop it first to avoid races.
     if (this.intervalId !== null) {
       this.close();
     }
 
-    // Prepare and chunk the payload (base64) for reliable transfer via QR frames.
     const packet = match.getAsPacket();
-    packet.splice(7, 1); // remove uuid before export
+    packet.splice(7, 1);
     const raw = JSON.stringify(packet);
     const b64 = encodeToBase64(raw);
 
@@ -122,9 +102,6 @@ export class QRExport {
 
     const shown = new Set<number>();
     function markShown(idx: number): void {
-      // Add the payload index to the set of unique pages the user has actually seen.
-      // We only update the visible progress indicator when a previously-unseen page
-      // is shown so the progress bar fills monotonically and never rewinds.
       if (!shown.has(idx)) {
         shown.add(idx);
         updateOverlayStatus(shown.size, totalChunks);
@@ -135,7 +112,6 @@ export class QRExport {
       const status = document.getElementById("qr-export-status");
       if (status) status.textContent = `Page ${shownCount} / ${total}`;
 
-      // Toggle the top-area animated dots while unique pages are still being shown.
       try {
         const dots = document.getElementById(
           "qr-export-dots",
@@ -145,12 +121,9 @@ export class QRExport {
             dots.style.display = "inline-flex";
           else dots.style.display = "none";
         }
-      } catch (_err) {
-        // ignore
-      }
+      } catch (_err) {}
     };
 
-    // If only one chunk, render a single QR and return early.
     if (totalChunks === 1) {
       (async () => {
         const el = this.pool.find((x) => x) as HTMLElement | undefined;
@@ -175,7 +148,6 @@ export class QRExport {
       return;
     }
 
-    // Multi-chunk streaming export: pre-render into a small pool of worker slots and cycle them.
     let poolIndex = 0;
     let payloadIndex = 0;
     const poolSize = this.pool.length;
@@ -183,7 +155,6 @@ export class QRExport {
 
     (async () => {
       try {
-        // Pre-render canvases for the first set of payloads so the UI doesn't stutter.
         for (let i = 0; i < poolSize; i++) {
           const el = this.pool[i];
           if (!el) continue;
@@ -200,7 +171,6 @@ export class QRExport {
               `QR export page ${payloadIdx + 1} of ${totalChunks}`,
             );
             el.appendChild(canvas);
-            /* per-worker label intentionally suppressed; accessibility applied to canvas */
             const slot = document.getElementById(`qr-export-code-worker-${i}`);
             if (slot) slot.classList.add("hidden");
           } catch (err) {
@@ -208,7 +178,6 @@ export class QRExport {
           }
         }
 
-        // Reveal the first available worker and mark it shown.
         const firstEl = this.pool.find((x) => x) || null;
         if (firstEl) {
           const dom = document.getElementById(firstEl.id);
@@ -216,7 +185,6 @@ export class QRExport {
         }
         markShown(0);
 
-        // Cycle through payloads at a conservative frame rate so cameras can scan reliably.
         this.intervalId = window.setInterval(async () => {
           try {
             const currentEl = this.pool[poolIndex];
@@ -231,7 +199,6 @@ export class QRExport {
             }
             markShown(payloadIndex);
 
-            // Prepare next payload into the reused slot.
             const reuseIndex = modulus(poolIndex - 1, poolSize);
             const nextPayloadIndex = modulus(
               payloadIndex + poolSize - 1,
@@ -258,7 +225,6 @@ export class QRExport {
                   `QR export page ${nextPayloadIndex + 1} of ${totalChunks}`,
                 );
                 reuseEl.appendChild(canvas);
-                /* per-worker label intentionally suppressed; accessibility applied to canvas */
               } catch (err) {
                 console.error("QRExport: failed to render QR canvas", err);
                 this.close();
@@ -291,35 +257,28 @@ export class QRExport {
   }
 
   close(): void {
-    // Stop any running export loop.
     if (this.intervalId !== null) {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
 
-    // Best-effort cleanup of both cached elements and any DOM slots that remain.
     try {
       for (let i = 0; i < this.pool.length; i++) {
         const el = this.pool[i];
         if (el && typeof el.replaceChildren === "function") {
           try {
             el.replaceChildren();
-          } catch (_err) {
-            // ignore per-slot cleanup failures
-          }
+          } catch (_err) {}
         }
         const slot = document.getElementById(`qr-export-code-worker-${i}`);
         if (slot) {
           try {
             slot.classList.add("hidden");
             while (slot.firstChild) slot.removeChild(slot.firstChild);
-          } catch (_err) {
-            // ignore DOM cleanup failures
-          }
+          } catch (_err) {}
         }
       }
 
-      // Fallback: clear any DOM workers matching the id pattern
       const domWorkers = document.querySelectorAll(
         '[id^="qr-export-code-worker-"]',
       );
@@ -328,21 +287,17 @@ export class QRExport {
           const h = w as HTMLElement;
           h.classList.add("hidden");
           h.replaceChildren();
-        } catch (_err) {
-          // ignore
-        }
+        } catch (_err) {}
       });
     } catch (err) {
       console.warn("QRExport: error during cleanup", err);
     }
 
-    // Hide export overlay and clear status text so UI is consistent.
     try {
       const overlay = document.getElementById("qr-export-container");
       if (overlay) overlay.classList.add("hidden");
       const status = document.getElementById("qr-export-status");
       if (status) status.textContent = "";
-      // Hide or remove the animated dots indicator if present so the overlay closes cleanly.
       const dots = document.getElementById("qr-export-dots");
       if (dots) {
         try {
@@ -353,11 +308,11 @@ export class QRExport {
       console.warn("QRExport: error hiding overlay or clearing status", err);
     }
 
-    // Reset cached pool references so subsequent exports re-resolve nodes.
     this.pool = [];
   }
 }
 
+// Imports match data by scanning animated QR codes and reconstructing chunked data
 export class QRImport {
   private scanner: QrScanner;
   private received: Record<number, string> = {};
@@ -413,17 +368,13 @@ export class QRImport {
     this.receivedIds = [];
     this.expectedLength = -1;
 
-    // Provide immediate UI feedback so the user knows the import flow is starting.
     const statusEl = document.getElementById("qr-import-status");
     if (statusEl) statusEl.textContent = "Preparing camera…";
 
     try {
-      // Attempt to enumerate cameras first (best-effort) so the UI can populate camera
-      // choices and pick a preferred device before starting the scanner.
       try {
         await this.getAvailableCameras();
       } catch (enumErr) {
-        // Non-fatal: enumeration may fail in some constrained environments; continue to start the scanner.
         console.warn("QRImport: camera enumeration failed", enumErr);
       }
 
@@ -431,7 +382,6 @@ export class QRImport {
       await this.scanner.start();
 
       if (statusEl) statusEl.textContent = "Scanning for QR codes…";
-      // Show top animated dots to indicate active scanning (top-area control).
       try {
         const dots = document.getElementById(
           "qr-import-dots",
@@ -455,14 +405,11 @@ export class QRImport {
     try {
       this.scanner.stop();
     } catch (err) {
-      // Stop should be best-effort — don't throw if the scanner is already stopped.
       console.warn("QRImport: error stopping scanner:", err);
     }
 
-    // Clear any transient import status so UI is left in a consistent state.
     const statusEl = document.getElementById("qr-import-status");
     if (statusEl) statusEl.textContent = "";
-    // Hide top-area import dots when scanner is stopped.
     try {
       const dots = document.getElementById(
         "qr-import-dots",
@@ -473,7 +420,6 @@ export class QRImport {
 
   private getResult(result: QrScanner.ScanResult): void {
     try {
-      // Normalize the scanned data and provide live progress in the UI.
       const data =
         typeof result?.data === "string"
           ? result.data
@@ -498,8 +444,6 @@ export class QRImport {
         return;
       }
 
-      // If we were previously receiving a different stream, reset state and accept
-      // the new stream. Notify the UI so users know progress restarted.
       if (this.expectedLength !== -1 && this.expectedLength !== total) {
         this.received = {};
         this.receivedIds = [];
@@ -523,16 +467,13 @@ export class QRImport {
         return;
       }
 
-      // Deduplicate: only accept the first instance of a chunk
       if (!Object.prototype.hasOwnProperty.call(this.received, id)) {
         this.received[id] = payload;
         insertSorted(this.receivedIds, id);
 
-        // Update progress in the import overlay (e.g. "Receiving 3 / 12 chunks")
         if (statusEl) {
           statusEl.textContent = `Receiving ${this.receivedIds.length} / ${this.expectedLength} chunks`;
         }
-        // Show the top-area animated dots while scanning multiple frames.
         try {
           const dots = document.getElementById(
             "qr-import-dots",
@@ -546,11 +487,9 @@ export class QRImport {
           }
         } catch (_err) {}
       } else {
-        // If we saw a duplicate, still update the status so the user sees live activity.
         if (statusEl) {
           statusEl.textContent = `Receiving ${this.receivedIds.length} / ${this.expectedLength} chunks (duplicates ignored)`;
         }
-        // Keep dots visible even if we received a duplicate so user sees activity on the top bar.
         try {
           const dots = document.getElementById(
             "qr-import-dots",
@@ -573,7 +512,6 @@ export class QRImport {
           if (statusEl)
             statusEl.textContent =
               "All chunks received — reconstructing data...";
-        // Hide the animated dots since we're now reconstructing the payload.
         try {
           const dots = document.getElementById(
             "qr-import-dots",
@@ -590,12 +528,10 @@ export class QRImport {
   }
 
   private importFinished(): void {
-    // Stop the scanner immediately — we have everything we need to reconstruct.
     this.stop();
 
     const statusEl = document.getElementById("qr-import-status");
     if (statusEl) statusEl.textContent = "Reconstructing QR payload...";
-    // Ensure top-area import dots are hidden while reconstructing.
     try {
       const dots = document.getElementById(
         "qr-import-dots",
@@ -609,24 +545,19 @@ export class QRImport {
     }
 
     try {
-      // Concatenate chunks in ascending order
       let base64 = "";
       for (const i of this.receivedIds) {
         base64 += this.received[i];
       }
 
-      // Decode base64 back into a JSON string and parse
       const json = decodeBase64ToString(base64);
       const parsedData = JSON.parse(json);
 
-      // Re-insert placeholder for uuid so Match.fromPacket / constructors generate a fresh id
       parsedData.splice(7, 0, null);
 
-      // Notify UI of success before invoking the app callback so the user sees feedback.
       if (statusEl) statusEl.textContent = "Import complete — applying data...";
       this.callback(parsedData);
 
-      // Keep a short user-visible success message, then clear the status.
       if (statusEl) {
         statusEl.textContent = "Import successful";
         window.setTimeout(() => {
@@ -645,7 +576,6 @@ export class QRImport {
             : String(err)),
       );
     } finally {
-      // Reset internal state
       this.callback = null;
       this.received = {};
       this.receivedIds = [];
