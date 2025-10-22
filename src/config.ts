@@ -1,12 +1,11 @@
 export const Config = {
-  fieldPNGPixelWidth: 3510, // width in pixels of field.png
-  fieldPNGPixelHeight: 1610, // height in pixels of field.png
+  fieldPNGPixelWidth: 3510,
+  fieldPNGPixelHeight: 1610,
 
-  fieldRealWidthInches: 690.875, // real field width in inches (long side)
-  fieldRealHeightInches: 317, // real field height in inches (short side)
+  fieldRealWidthInches: 690.875,
+  fieldRealHeightInches: 317,
 
-  // renderred position of driver stations
-  redOneStationX: 3575, // pixels
+  redOneStationX: 3575,
   redOneStationY: 1155,
 
   redTwoStationX: 3575,
@@ -24,6 +23,5 @@ export const Config = {
   blueThreeStationX: -65,
   blueThreeStationY: 1155,
 
-  // Shared TBA API key - injected during build via environment variable
   sharedTBAApiKey: import.meta.env.VITE_TBA_API_KEY || "",
 };
