@@ -976,7 +976,7 @@ export class Whiteboard {
     const clamp = (v: number, lo: number, hi: number) =>
       Math.max(lo, Math.min(v, hi));
 
-    const margin = 48;
+    const margin = 96;
 
     const drawStation = (
       stationX: number,
