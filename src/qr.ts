@@ -53,7 +53,6 @@ function toCanvasAsync(
 
 type QRExportCallback = (data: unknown) => void;
 
-// Exports match data as animated QR codes, chunking large data for reliable scanning
 export class QRExport {
   private pool: Array<HTMLElement | null> = [];
   private intervalId: number | null = null;
@@ -312,7 +311,6 @@ export class QRExport {
   }
 }
 
-// Imports match data by scanning animated QR codes and reconstructing chunked data
 export class QRImport {
   private scanner: QrScanner;
   private received: Record<number, string> = {};

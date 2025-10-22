@@ -1,3 +1,4 @@
+// configuration for field dimensions and station positions
 export const Config = {
   fieldPNGPixelWidth: 3510,
   fieldPNGPixelHeight: 1610,

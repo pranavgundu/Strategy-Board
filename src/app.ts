@@ -1,7 +1,8 @@
 import { Model } from "@/model.ts";
+
+// the Model class handles application data and its persistence
 import { registerSW } from "virtual:pwa-register";
 
-// Register service worker for offline functionality
 registerSW({
   immediate: true,
   onOfflineReady() {
@@ -15,7 +16,6 @@ registerSW({
   },
 });
 
-// Initialize app: load data, wait for DOM, then import and create UI components
 async function initializeApp(): Promise<void> {
   console.log(
     "Application startup: initializing model and deferring UI until DOM is ready...",

@@ -1,8 +1,7 @@
 declare module "*.png";
 
-/// <reference types="vite/client" />
-
 interface ImportMetaEnv {
+  // defines environment variables available in the app
   readonly VITE_TBA_API_KEY: string;
 }
 

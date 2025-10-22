@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
+// the Match class represents a robotics match with teams and phases
+
 interface RobotPosition {
   x: number;
   y: number;
@@ -54,7 +56,6 @@ const DEFAULT_ROBOT_WIDTH = 152.4;
 const DEFAULT_ROBOT_HEIGHT = 152.4;
 const DEFAULT_ROBOT_ROTATION = 0;
 
-// Default starting positions for robots on the field (in pixels)
 const DEFAULT_RED_POSITIONS = {
   one: { x: 2055, y: 505 },
   two: { x: 2055, y: 805 },
@@ -211,7 +212,6 @@ export class Match {
     };
   }
 
-  // Deserialize match data from compact array format (used for QR import and storage)
   static fromPacket(packet: any): Match {
     return new Match(
       packet[0],
@@ -277,7 +277,6 @@ export class Match {
     };
   }
 
-  // Serialize match data to compact array format for QR export and storage
   getAsPacket(): any {
     return [
       this.matchName,
