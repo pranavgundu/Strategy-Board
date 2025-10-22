@@ -678,11 +678,15 @@ export class View {
 
     // Initialize TBA service
     this.tbaService = new TBAService();
-    this.loadTBAApiKey();
+    this.initializeTBAService();
   }
 
-  private async loadTBAApiKey(): Promise<void> {
+  private async initializeTBAService(): Promise<void> {
     await this.tbaService.loadApiKey();
+    console.log(
+      "TBA Service initialized, has key:",
+      this.tbaService.hasApiKey(),
+    );
   }
 
   private show(e: HTMLElement | null): void {
@@ -868,7 +872,12 @@ export class View {
   }
 
   private async onClickTBAImport(e: Event): Promise<void> {
+    console.log("TBA Import clicked");
     this.show(E.TBAImportPanel);
+
+    // Ensure API key is loaded (includes shared key fallback)
+    await this.tbaService.loadApiKey();
+
     // Pre-fill API key if it exists
     if (I?.TBAApiKey && this.tbaService.hasApiKey()) {
       // Don't show the key for security, just indicate it's saved
@@ -995,13 +1004,24 @@ export class View {
   }
 
   private async loadTBAEvents(): Promise<void> {
-    if (!this.tbaService.hasApiKey()) return;
+    console.log(
+      "Loading TBA events, has API key:",
+      this.tbaService.hasApiKey(),
+    );
+
+    if (!this.tbaService.hasApiKey()) {
+      console.error("No API key available");
+      this.showTBAStatus("No API key available", true);
+      return;
+    }
 
     this.showTBAStatus("Loading events...", false);
 
     try {
       const currentYear = new Date().getFullYear();
+      console.log("Fetching events for year:", currentYear);
       const events = await this.tbaService.fetchAndParseEvents(currentYear);
+      console.log("Loaded events:", events.length);
 
       if (!E?.TBAEventList) return;
 
@@ -1043,7 +1063,12 @@ export class View {
     eventKey: string,
     eventName: string,
   ): Promise<void> {
-    if (!I?.TBAEventKey || !I?.TBAEventSearch || !I?.TBATeamSearch) return;
+    console.log("Event selected:", eventKey, eventName);
+
+    if (!I?.TBAEventKey || !I?.TBAEventSearch || !I?.TBATeamSearch) {
+      console.error("Missing input elements");
+      return;
+    }
 
     // Set the event key
     I.TBAEventKey.value = eventKey;
@@ -1056,23 +1081,31 @@ export class View {
     I.TBATeamSearch.disabled = false;
     I.TBATeamSearch.placeholder = "Search teams...";
 
+    console.log("Loading teams for event:", eventKey);
     // Load teams for this event
     await this.loadTBATeamsForEvent(eventKey);
   }
 
   private async loadTBATeamsForEvent(eventKey: string): Promise<void> {
+    console.log("loadTBATeamsForEvent called with:", eventKey);
     this.showTBAStatus("Loading teams...", false);
 
     try {
+      console.log("Fetching teams from TBA...");
       const teams = await this.tbaService.fetchTeamsAtEvent(eventKey);
+      console.log("Teams loaded:", teams.length, teams);
 
-      if (!E?.TBATeamList) return;
+      if (!E?.TBATeamList) {
+        console.error("TBATeamList element not found");
+        return;
+      }
 
       // Clear existing items
       E.TBATeamList.innerHTML = "";
 
       // Sort teams numerically
       const sortedTeams = teams.sort((a, b) => parseInt(a) - parseInt(b));
+      console.log("Sorted teams:", sortedTeams);
 
       // Add teams to dropdown
       for (const team of sortedTeams) {
@@ -1086,7 +1119,13 @@ export class View {
         E.TBATeamList.appendChild(item);
       }
 
+      console.log("Team items added to dropdown");
       this.hide(E.TBAStatusMessage);
+
+      // Show the dropdown automatically after loading teams
+      if (sortedTeams.length > 0) {
+        this.show(E.TBATeamDropdown);
+      }
     } catch (error) {
       console.error("Failed to load teams:", error);
       this.showTBAStatus("Failed to load teams for this event.", true);

@@ -1,4 +1,5 @@
 import { GET } from "@/db.ts";
+import { Config } from "@/config.ts";
 
 const TBA_API_BASE = "https://www.thebluealliance.com/api/v3";
 
@@ -53,6 +54,12 @@ export class TBAService {
       console.error("Failed to load TBA API key:", e);
     });
     this.apiKey = typeof key === "string" ? key : null;
+
+    // If no user API key, use shared key
+    if (!this.apiKey && Config.sharedTBAApiKey) {
+      this.apiKey = Config.sharedTBAApiKey;
+    }
+
     return this.apiKey;
   }
 
@@ -61,18 +68,25 @@ export class TBAService {
   }
 
   public hasApiKey(): boolean {
-    return this.apiKey !== null && this.apiKey.length > 0;
+    // Check if we have user key or shared key
+    return (
+      (this.apiKey !== null && this.apiKey.length > 0) ||
+      (Config.sharedTBAApiKey && Config.sharedTBAApiKey.length > 0)
+    );
   }
 
   private async makeRequest(endpoint: string): Promise<any> {
-    if (!this.apiKey) {
+    // Use user API key if set, otherwise use shared key
+    const apiKey = this.apiKey || Config.sharedTBAApiKey;
+
+    if (!apiKey) {
       throw new Error("TBA API key not set");
     }
 
     const url = `${TBA_API_BASE}${endpoint}`;
     const response = await fetch(url, {
       headers: {
-        "X-TBA-Auth-Key": this.apiKey,
+        "X-TBA-Auth-Key": apiKey,
       },
     });
 
