@@ -721,8 +721,9 @@ export class View {
 
     const kebab = item.children[2].children[0] as HTMLElement;
     const options = item.children[2].children[1] as HTMLElement;
-    const exportOption = options.children[0] as HTMLElement;
-    const deleteOption = options.children[1] as HTMLElement;
+    const duplicateOption = options.children[0] as HTMLElement;
+    const exportOption = options.children[1] as HTMLElement;
+    const deleteOption = options.children[2] as HTMLElement;
 
     options.addEventListener("click", (e) => e.stopPropagation());
 
@@ -766,6 +767,13 @@ export class View {
       this.show(kebab);
     });
 
+    duplicateOption.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.duplicateMatch(item.id);
+      this.hide(options);
+      this.show(kebab);
+    });
+
     const openMatch = () => {
       const match = this.model.getMatch(id);
       if (match !== null) {
@@ -802,6 +810,42 @@ export class View {
     if (E.MatchList.children.length < 3) {
       this.show(E.EmptyMatchListPlaceholder);
     }
+  }
+
+  public async duplicateMatch(id: string): Promise<void> {
+    const match = this.model.getMatch(id);
+    if (!match) return;
+
+    const duplicatedMatchName = `Copy of ${match.matchName}`;
+    const newId = await this.model.createNewMatch(
+      duplicatedMatchName,
+      match.redOne,
+      match.redTwo,
+      match.redThree,
+      match.blueOne,
+      match.blueTwo,
+      match.blueThree,
+    );
+
+    const newMatch = this.model.getMatch(newId);
+    if (!newMatch) return;
+
+    newMatch.auto = JSON.parse(JSON.stringify(match.auto));
+    newMatch.teleop = JSON.parse(JSON.stringify(match.teleop));
+    newMatch.endgame = JSON.parse(JSON.stringify(match.endgame));
+
+    await this.model.updateMatch(newId);
+
+    this.createNewMatch(
+      newId,
+      duplicatedMatchName,
+      match.redOne,
+      match.redTwo,
+      match.redThree,
+      match.blueOne,
+      match.blueTwo,
+      match.blueThree,
+    );
   }
 
   private onClickNewMatch(e: Event): void {
