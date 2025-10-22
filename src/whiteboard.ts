@@ -987,15 +987,8 @@ export class Whiteboard {
       const px = stationX - (this.camera.x - width / 2);
       const py = stationY - (this.camera.y - height / 2);
 
-      let textWidth = 0;
-      try {
-        const metrics = BG.measureText(text);
-        textWidth = metrics.width || 0;
-      } catch (err) {
-        textWidth = 64;
-      }
-
-      const effectiveMarginX = Math.max(margin, Math.ceil(textWidth / 2) + 8);
+      // Use consistent margin for all numbers
+      const effectiveMarginX = margin;
       const effectiveMarginY = margin;
 
       const cx = clamp(px, effectiveMarginX, width - effectiveMarginX);
@@ -1008,23 +1001,24 @@ export class Whiteboard {
       BG.restore();
     };
 
+    // Red stations - reversed order (3, 2, 1 instead of 1, 2, 3)
     drawStation(
       Config.redOneStationX,
       Config.redOneStationY,
-      this.match.redOne,
-      -Math.PI / 2,
+      this.match.redThree,
+      Math.PI / 2,
     );
     drawStation(
       Config.redTwoStationX,
       Config.redTwoStationY,
       this.match.redTwo,
-      -Math.PI / 2,
+      Math.PI / 2,
     );
     drawStation(
       Config.redThreeStationX,
       Config.redThreeStationY,
-      this.match.redThree,
-      -Math.PI / 2,
+      this.match.redOne,
+      Math.PI / 2,
     );
     drawStation(
       Config.blueOneStationX,
