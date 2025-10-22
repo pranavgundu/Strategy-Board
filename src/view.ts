@@ -767,7 +767,7 @@ export class View {
     blueThree = blueThree || "---";
 
     item.children[0].textContent = matchName;
-    item.children[1].children[0].textContent = `${redOne} ${redTwo} ${redThree}`;
+    item.children[1].children[0].textContent = `${redThree} ${redTwo} ${redOne}`;
     item.children[1].children[2].textContent = `${blueOne} ${blueTwo} ${blueThree}`;
 
     item.setAttribute("tabindex", "0");
