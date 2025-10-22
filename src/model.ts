@@ -1,6 +1,7 @@
 import { GET, GETMANY, SET, DEL, CLEAR } from "@/db.ts";
 import { Match } from "@/match.ts";
 
+// Model manages all match data and persistence to IndexedDB
 export class Model {
   public matches: Array<Match> = [];
   private matchIds: Array<string> = [];

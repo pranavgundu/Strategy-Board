@@ -22,7 +22,7 @@ interface PhaseData {
 
 type DrawingStroke = [number, ...Array<[number, number]>];
 type BoundingBox = [number, number, number, number];
-type TextAnnotation = [number, number, number, string]; // [x, y, colorId, text]
+type TextAnnotation = [number, number, number, string];
 
 interface MatchOptions {
   dim: {
@@ -54,6 +54,7 @@ const DEFAULT_ROBOT_WIDTH = 152.4;
 const DEFAULT_ROBOT_HEIGHT = 152.4;
 const DEFAULT_ROBOT_ROTATION = 0;
 
+// Default starting positions for robots on the field (in pixels)
 const DEFAULT_RED_POSITIONS = {
   one: { x: 2055, y: 505 },
   two: { x: 2055, y: 805 },
@@ -100,7 +101,6 @@ export class Match {
     this.blueThree = blueThree;
     this.id = id ?? uuidv4();
 
-    // Initialize default phase data
     this.auto = this.createDefaultPhaseData();
     this.teleop = this.createDefaultPhaseData();
     this.endgame = this.createDefaultPhaseData();
@@ -211,6 +211,7 @@ export class Match {
     };
   }
 
+  // Deserialize match data from compact array format (used for QR import and storage)
   static fromPacket(packet: any): Match {
     return new Match(
       packet[0],
@@ -276,6 +277,7 @@ export class Match {
     };
   }
 
+  // Serialize match data to compact array format for QR export and storage
   getAsPacket(): any {
     return [
       this.matchName,
