@@ -1,12 +1,10 @@
 import { Model } from "@/model.ts";
 import { registerSW } from "virtual:pwa-register";
 
-// Register service worker for PWA functionality
 registerSW({
   immediate: true,
   onOfflineReady() {
     console.log("PWA: Offline mode is now available!");
-    // Alert disabled to prevent popup on first load
   },
   onNeedRefresh() {
     console.log("PWA: New content available, please refresh.");
@@ -27,7 +25,6 @@ async function initializeApp(): Promise<void> {
     await model.loadPersistentData();
     console.log("Persistent data loaded");
 
-    // Ensure DOM-dependent modules are only loaded after the document is ready.
     if (document.readyState === "loading") {
       console.log(
         "DOM not ready. Waiting for DOMContentLoaded to import UI modules...",
@@ -61,11 +58,9 @@ async function initializeApp(): Promise<void> {
 
     const app = new viewModule.View(model, whiteboard, qrimport, qrexport);
     console.log("Application initialized successfully");
-    // Mark document as ready and notify any listeners that the app initialized.
     try {
       document.documentElement.setAttribute("data-app-ready", "true");
     } catch (err) {
-      // Non-critical; ignore if we cannot set the attribute.
       console.warn("Could not set data-app-ready attribute:", err);
     }
     try {
@@ -75,12 +70,10 @@ async function initializeApp(): Promise<void> {
     }
   } catch (error) {
     console.error("Failed to initialize application:", error);
-    // Mark document as not-ready and dispatch a module error event so debugging overlays
-    // or remote monitors can react.
+
     try {
       document.documentElement.setAttribute("data-app-ready", "false");
     } catch (err) {
-      // ignore
     }
     try {
       window.dispatchEvent(
