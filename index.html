@@ -450,6 +450,82 @@
                 backdrop-filter: blur(8px);
                 -webkit-backdrop-filter: blur(8px);
             }
+
+            /* TBA dropdown styles */
+            .tba-dropdown-item {
+                padding: 12px 16px;
+                cursor: pointer;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                transition: background-color 0.2s;
+            }
+
+            .tba-dropdown-item:last-child {
+                border-bottom: none;
+            }
+
+            .tba-dropdown-item:hover {
+                background-color: rgba(59, 130, 246, 0.3);
+            }
+
+            .tba-dropdown-item.selected {
+                background-color: rgba(59, 130, 246, 0.5);
+            }
+
+            .tba-event-name {
+                font-size: 1rem;
+                font-weight: 600;
+                color: #e2e8f0;
+                margin-bottom: 4px;
+            }
+
+            .tba-event-details {
+                font-size: 0.875rem;
+                color: #94a3b8;
+            }
+
+            .tba-team-item {
+                padding: 12px 16px;
+                cursor: pointer;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                transition: background-color 0.2s;
+                text-align: center;
+                font-size: 1.125rem;
+                color: #e2e8f0;
+            }
+
+            .tba-team-item:last-child {
+                border-bottom: none;
+            }
+
+            .tba-team-item:hover {
+                background-color: rgba(59, 130, 246, 0.3);
+            }
+
+            .tba-team-item.selected {
+                background-color: rgba(59, 130, 246, 0.5);
+            }
+
+            #tba-event-dropdown::-webkit-scrollbar,
+            #tba-team-dropdown::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            #tba-event-dropdown::-webkit-scrollbar-track,
+            #tba-team-dropdown::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 4px;
+            }
+
+            #tba-event-dropdown::-webkit-scrollbar-thumb,
+            #tba-team-dropdown::-webkit-scrollbar-thumb {
+                background: rgba(59, 130, 246, 0.5);
+                border-radius: 4px;
+            }
+
+            #tba-event-dropdown::-webkit-scrollbar-thumb:hover,
+            #tba-team-dropdown::-webkit-scrollbar-thumb:hover {
+                background: rgba(59, 130, 246, 0.7);
+            }
         </style>
         <script>
             (function () {
@@ -688,6 +764,12 @@
                         New
                     </button>
                     <button
+                        id="home-toolbar-tba-btn"
+                        class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-green-500 glass-button glossy-shine"
+                    >
+                        TBA
+                    </button>
+                    <button
                         id="home-toolbar-import-btn"
                         class="flex items-center justify-center mr-4 w-24 md:w-36 h-12 rounded-2xl bg-blue-500 glass-button glossy-shine"
                     >
@@ -842,6 +924,94 @@
                     </button>
                     <button
                         id="create-match-cancel-btn"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-2xl glossy-shine"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div
+            id="tba-import-container"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
+        >
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-1/2 max-w-2xl bg-slate-600 rounded-3xl glass-modal max-h-[90vh] overflow-hidden"
+            >
+                <div
+                    class="w-full pt-6 pb-4 text-2xl text-center text-slate-200 font-bold"
+                >
+                    Import from The Blue Alliance
+                </div>
+                <div class="w-full px-8 pb-4">
+                    <input
+                        id="tba-api-key"
+                        placeholder="TBA API Key (optional - shared key available)"
+                        type="password"
+                        class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <div class="text-sm text-slate-400 text-center mt-2">
+                        Using shared API key. Add your own at
+                        <a
+                            href="https://www.thebluealliance.com/account"
+                            target="_blank"
+                            class="text-blue-400 underline"
+                            >thebluealliance.com/account</a
+                        >
+                        for higher rate limits
+                    </div>
+                </div>
+                <div class="w-full px-8 pb-4 relative">
+                    <input
+                        id="tba-event-search"
+                        placeholder="Search events..."
+                        class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <div
+                        id="tba-event-dropdown"
+                        class="hidden absolute top-full left-8 right-8 mt-1 bg-slate-700 rounded-xl max-h-64 overflow-y-auto z-10 shadow-lg"
+                    >
+                        <div id="tba-event-list" class="flex flex-col"></div>
+                    </div>
+                    <input id="tba-event-key" type="hidden" />
+                </div>
+                <div class="w-full px-8 pb-6 relative">
+                    <input
+                        id="tba-team-search"
+                        placeholder="Select event first..."
+                        disabled
+                        class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0 disabled:opacity-50"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <div
+                        id="tba-team-dropdown"
+                        class="hidden absolute top-full left-8 right-8 mt-1 bg-slate-700 rounded-xl max-h-64 overflow-y-auto z-10 shadow-lg"
+                    >
+                        <div id="tba-team-list" class="flex flex-col"></div>
+                    </div>
+                    <input id="tba-team-number" type="hidden" />
+                </div>
+                <div
+                    id="tba-status-message"
+                    class="hidden w-full px-8 pb-4 text-center text-slate-300"
+                ></div>
+                <div class="flex w-full">
+                    <button
+                        id="tba-import-btn"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-green-500 p-6 rounded-bl-2xl glossy-shine"
+                    >
+                        Import
+                    </button>
+                    <button
+                        id="tba-cancel-btn"
                         class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-red-500 p-6 rounded-br-2xl glossy-shine"
                     >
                         Cancel
