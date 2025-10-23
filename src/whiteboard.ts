@@ -433,73 +433,86 @@ export class Whiteboard {
     document
       .getElementById("whiteboard-color-close")
       ?.addEventListener("click", (e) => {
+        // Add animation class to hide the picker with animation
         document
-          .getElementById("whiteboard-color-white")
-          ?.classList.add("hidden");
-        document
-          .getElementById("whiteboard-color-white")
-          ?.classList.remove("border-4");
-        document
-          .getElementById("whiteboard-color-red")
-          ?.classList.add("hidden");
-        document
-          .getElementById("whiteboard-color-red")
-          ?.classList.remove("border-4");
-        document
-          .getElementById("whiteboard-color-blue")
-          ?.classList.add("hidden");
-        document
-          .getElementById("whiteboard-color-blue")
-          ?.classList.remove("border-4");
-        document
-          .getElementById("whiteboard-color-green")
-          ?.classList.add("hidden");
-        document
-          .getElementById("whiteboard-color-green")
-          ?.classList.remove("border-4");
-        document
-          .getElementById("whiteboard-color-yellow")
-          ?.classList.add("hidden");
-        document
-          .getElementById("whiteboard-color-yellow")
-          ?.classList.remove("border-4");
-        document
-          .getElementById("whiteboard-color-close")
-          ?.classList.add("hidden");
-        switch (this.currentColor) {
-          case 0: {
-            document
-              .getElementById("whiteboard-color-white")
-              ?.classList.remove("hidden");
-            break;
+          .getElementById("whiteboard-color-config")
+          ?.classList.add("color-picker-hidden");
+        
+        // After animation, hide individual items and show only the selected color
+        setTimeout(() => {
+          document
+            .getElementById("whiteboard-color-white")
+            ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-white")
+            ?.classList.remove("border-4");
+          document
+            .getElementById("whiteboard-color-red")
+            ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-red")
+            ?.classList.remove("border-4");
+          document
+            .getElementById("whiteboard-color-blue")
+            ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-blue")
+            ?.classList.remove("border-4");
+          document
+            .getElementById("whiteboard-color-green")
+            ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-green")
+            ?.classList.remove("border-4");
+          document
+            .getElementById("whiteboard-color-yellow")
+            ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-yellow")
+            ?.classList.remove("border-4");
+          document
+            .getElementById("whiteboard-color-close")
+            ?.classList.add("hidden");
+          switch (this.currentColor) {
+            case 0: {
+              document
+                .getElementById("whiteboard-color-white")
+                ?.classList.remove("hidden");
+              break;
+            }
+            case 1: {
+              document
+                .getElementById("whiteboard-color-red")
+                ?.classList.remove("hidden");
+              break;
+            }
+            case 2: {
+              document
+                .getElementById("whiteboard-color-blue")
+                ?.classList.remove("hidden");
+              break;
+            }
+            case 3: {
+              document
+                .getElementById("whiteboard-color-green")
+                ?.classList.remove("hidden");
+              break;
+            }
+            case 4: {
+              document
+                .getElementById("whiteboard-color-yellow")
+                ?.classList.remove("hidden");
+              break;
+            }
+            default:
+              break;
           }
-          case 1: {
-            document
-              .getElementById("whiteboard-color-red")
-              ?.classList.remove("hidden");
-            break;
-          }
-          case 2: {
-            document
-              .getElementById("whiteboard-color-blue")
-              ?.classList.remove("hidden");
-            break;
-          }
-          case 3: {
-            document
-              .getElementById("whiteboard-color-green")
-              ?.classList.remove("hidden");
-            break;
-          }
-          case 4: {
-            document
-              .getElementById("whiteboard-color-yellow")
-              ?.classList.remove("hidden");
-            break;
-          }
-          default:
-            break;
-        }
+          
+          // Remove animation class to prepare for next opening
+          document
+            .getElementById("whiteboard-color-config")
+            ?.classList.remove("color-picker-hidden");
+        }, 300); // Match the CSS transition duration
       });
 
     document
