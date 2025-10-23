@@ -1085,7 +1085,9 @@ export class Whiteboard {
     if (this.selected !== null && this.selected[0] == slot) {
       IT.beginPath();
       IT.fillStyle = "white";
-      IT.arc(robot.w / 2, 0, 20, 0, Math.PI * 2);
+      // Position rotation control on right for red team, left for blue team
+      const rotControlX = team === "blue" ? -robot.w / 2 : robot.w / 2;
+      IT.arc(rotControlX, 0, 20, 0, Math.PI * 2);
       IT.fill();
     }
 
@@ -1424,24 +1426,35 @@ export class Whiteboard {
       if (this.selectedType === "robot") {
         this.selected[1].x = x + this.selected[2];
         this.selected[1].y = y + this.selected[3];
+        
+        // Position rotation control based on team (left for blue, right for red)
+        const slot = this.selected[0];
+        const isBlueTeam = slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
+        const rotControlDistance = isBlueTeam ? -this.selected[1].w / 2 : this.selected[1].w / 2;
+        
         this.rotControl = {
           x:
             this.selected[1].x +
-            (this.selected[1].w / 2) * Math.cos(this.selected[1].r),
+            rotControlDistance * Math.cos(this.selected[1].r),
           y:
             this.selected[1].y +
-            (this.selected[1].w / 2) * Math.sin(this.selected[1].r),
+            rotControlDistance * Math.sin(this.selected[1].r),
         };
         this.currentAction = "transform";
         this.drawRobots();
       } else if (this.selectedType === "rot") {
+        // Position rotation control based on team (left for blue, right for red)
+        const slot = this.selected[0];
+        const isBlueTeam = slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
+        const rotControlDistance = isBlueTeam ? -this.selected[1].w / 2 : this.selected[1].w / 2;
+        
         this.rotControl = {
           x:
             this.selected[1].x +
-            (this.selected[1].w / 2) * Math.cos(this.selected[1].r),
+            rotControlDistance * Math.cos(this.selected[1].r),
           y:
             this.selected[1].y +
-            (this.selected[1].w / 2) * Math.sin(this.selected[1].r),
+            rotControlDistance * Math.sin(this.selected[1].r),
         };
         this.selected[1].r = Math.atan2(
           y - this.selected[1].y,
@@ -1488,13 +1501,19 @@ export class Whiteboard {
       this.lastSelected = this.selected;
       this.selected = selected;
       this.selectedType = "robot";
+      
+      // Position rotation control based on team (left for blue, right for red)
+      const slot = this.selected[0];
+      const isBlueTeam = slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
+      const rotControlDistance = isBlueTeam ? -this.selected[1].w / 2 : this.selected[1].w / 2;
+      
       this.rotControl = {
         x:
           this.selected[1].x +
-          (this.selected[1].w / 2) * Math.cos(this.selected[1].r),
+          rotControlDistance * Math.cos(this.selected[1].r),
         y:
           this.selected[1].y +
-          (this.selected[1].w / 2) * Math.sin(this.selected[1].r),
+          rotControlDistance * Math.sin(this.selected[1].r),
       };
       this.previousRobotTransform = {
         x: this.selected[1].x,
