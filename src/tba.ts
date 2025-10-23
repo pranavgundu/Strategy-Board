@@ -107,6 +107,14 @@ export class TBAService {
     return await this.makeRequest(endpoint);
   }
 
+  public async getTeamEvents(teamKey: string, year: number): Promise<TBAEvent[]> {
+    if (!teamKey.startsWith("frc")) {
+      teamKey = `frc${teamKey}`;
+    }
+    const endpoint = `/team/${teamKey}/events/${year}`;
+    return await this.makeRequest(endpoint);
+  }
+
   public parseEventsToSimple(events: TBAEvent[]): TBASimpleEvent[] {
     const sortedEvents = events.sort((a, b) => {
       return (
