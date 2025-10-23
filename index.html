@@ -142,7 +142,37 @@
                 flex-shrink: 0;
             }
 
-            /* On tablets and smaller screens, stack controls into two rows so items don't collide */
+            /* On tablets and iPads, make toolbar more compact and responsive */
+            @media (max-width: 1280px) {
+                /* Reduce spacing and font sizes for better fit on tablets/iPads */
+                #whiteboard-toolbar {
+                    gap: 0.375rem;
+                    padding: 6px 12px;
+                }
+                #whiteboard-toolbar .toolbar-left,
+                #whiteboard-toolbar .toolbar-right {
+                    gap: 0.375rem;
+                    margin-left: 0.75rem;
+                    margin-right: 0.75rem;
+                }
+                #whiteboard-toolbar .toolbar-right button,
+                #whiteboard-toolbar .toolbar-left button {
+                    padding: 6px 12px;
+                    font-size: 0.875rem;
+                    min-width: auto;
+                    white-space: nowrap;
+                }
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+                    gap: 0.5rem;
+                    font-size: 1.25rem;
+                }
+                /* Make mode select text smaller on iPads */
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+                    font-size: 1.125rem !important;
+                }
+            }
+
+            /* For standard tablets and landscape phones */
             @media (max-width: 1024px) {
                 /* Tablet layout: left + right controls share the top row, mode selector
                    is moved to its own second row and spans both columns so it cannot
@@ -151,9 +181,9 @@
                 #whiteboard-toolbar {
                     grid-template-columns: 1fr 1fr;
                     grid-template-rows: auto auto;
-                    gap: 8px;
+                    gap: 6px;
                     height: auto;
-                    padding: 8px 12px;
+                    padding: 6px 10px;
                     align-items: center;
                 }
                 #whiteboard-toolbar .toolbar-left {
@@ -161,36 +191,90 @@
                     grid-column: 1 / 2;
                     justify-self: start;
                     padding-left: 0;
+                    margin-left: 0.5rem;
                     display: flex;
-                    gap: 8px;
+                    gap: 6px;
                 }
                 #whiteboard-toolbar .toolbar-right {
                     grid-row: 1;
                     grid-column: 2 / 3;
                     justify-self: end;
                     padding-right: 0;
+                    margin-right: 0.5rem;
                     display: flex;
                     justify-content: flex-end;
-                    gap: 8px;
+                    gap: 6px;
+                    flex-wrap: wrap;
                 }
                 #whiteboard-toolbar #whiteboard-toolbar-mode-select {
                     /* Put mode labels on a dedicated row and allow them to span both columns. */
                     grid-row: 2;
                     grid-column: 1 / -1; /* span both columns */
                     justify-self: center;
-                    gap: 0.75rem;
+                    gap: 0.625rem;
                     font-size: 1rem; /* slightly smaller on tablets */
                     flex-wrap: nowrap;
                 }
-                /* Slightly shrink toolbar button visuals on tablet so they don't collide. */
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+                    font-size: 1rem !important;
+                }
+                /* Shrink toolbar buttons on tablet so they don't collide. */
                 #whiteboard-toolbar .toolbar-right button,
                 #whiteboard-toolbar .toolbar-left button {
-                    padding: 6px 10px;
-                    font-size: 0.9rem;
+                    padding: 5px 8px;
+                    font-size: 0.75rem;
                     height: auto;
-                    min-width: 70px;
+                    min-width: 55px;
                     white-space: nowrap;
                     flex-shrink: 0;
+                }
+                /* Make export buttons even more compact */
+                #whiteboard-toolbar-export-png,
+                #whiteboard-toolbar-export-pdf {
+                    min-width: 70px !important;
+                    width: auto !important;
+                    padding: 4px 6px !important;
+                    font-size: 0.7rem !important;
+                }
+                /* Make export buttons container more compact */
+                #whiteboard-toolbar .toolbar-right .flex.items-center {
+                    gap: 0.25rem;
+                    margin-left: 0.25rem;
+                }
+            }
+
+            /* Portrait tablets and landscape phones - stack into two rows */
+            @media (max-width: 834px) {
+                #whiteboard-toolbar {
+                    grid-template-columns: 1fr 1fr;
+                    grid-template-rows: auto auto;
+                    gap: 5px;
+                    padding: 5px 8px;
+                }
+                #whiteboard-toolbar .toolbar-left {
+                    grid-row: 1;
+                    grid-column: 1;
+                    justify-self: start;
+                }
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+                    grid-row: 2;
+                    grid-column: 1 / -1;
+                    justify-self: center;
+                    gap: 0.5rem;
+                    font-size: 0.95rem;
+                }
+                #whiteboard-toolbar .toolbar-right {
+                    grid-row: 1;
+                    grid-column: 2;
+                    justify-self: end;
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                }
+                #whiteboard-toolbar .toolbar-right button,
+                #whiteboard-toolbar .toolbar-left button {
+                    padding: 4px 6px;
+                    font-size: 0.75rem;
+                    min-width: 50px;
                 }
             }
 
@@ -220,6 +304,8 @@
                     grid-column: 1;
                     justify-self: center;
                     padding-right: 0;
+                    flex-wrap: wrap;
+                    justify-content: center;
                 }
                 #whiteboard-toolbar .toolbar-right button,
                 #whiteboard-toolbar .toolbar-left button {
