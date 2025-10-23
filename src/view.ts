@@ -439,27 +439,32 @@ export class View {
                 "#whiteboard-toolbar .toolbar-right",
               ) as HTMLElement | null;
               if (!toolbar || !mode || !left || !right) return;
+              
+              // Get bounding rectangles
               const mRect = mode.getBoundingClientRect();
+              const lRect = left.getBoundingClientRect();
               const rRect = right.getBoundingClientRect();
+              
+              // Calculate required space and available space
+              const leftWidth = lRect.width;
+              const modeWidth = mRect.width;
+              const rightWidth = rRect.width;
+              const toolbarWidth = toolbar.getBoundingClientRect().width;
+              const padding = 48; // Extra padding to prevent overlap, especially on iPads
+              const requiredWidth = leftWidth + modeWidth + rightWidth + (padding * 2);
 
-              if (mRect.right > rRect.left - 8) {
-                toolbar.style.gridTemplateColumns = "1fr 1fr";
-                toolbar.style.gridTemplateRows = "auto auto";
-                (mode as HTMLElement).style.gridColumn = "1 / -1";
-                (mode as HTMLElement).style.gridRow = "2";
-                left.style.gridColumn = "1";
-                left.style.gridRow = "1";
-                right.style.gridColumn = "2";
-                right.style.gridRow = "1";
+              // Check if elements would overlap or are too close
+              const shouldCollapse = 
+                (mRect.right > rRect.left - padding) || 
+                (mRect.left < lRect.right + padding) ||
+                (requiredWidth > toolbarWidth);
+
+              if (shouldCollapse) {
+                // Apply collapsed layout using CSS class
+                toolbar.classList.add("toolbar-collapsed");
               } else {
-                toolbar.style.gridTemplateColumns = "";
-                toolbar.style.gridTemplateRows = "";
-                (mode as HTMLElement).style.gridColumn = "";
-                (mode as HTMLElement).style.gridRow = "";
-                left.style.gridColumn = "";
-                left.style.gridRow = "";
-                right.style.gridColumn = "";
-                right.style.gridRow = "";
+                // Remove collapsed layout
+                toolbar.classList.remove("toolbar-collapsed");
               }
             } catch (_err) {}
           };
