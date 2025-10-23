@@ -1469,10 +1469,19 @@ export class Whiteboard {
             this.selected[1].y +
             rotControlDistance * Math.sin(this.selected[1].r),
         };
-        this.selected[1].r = Math.atan2(
+        
+        // Calculate angle based on which side the rotation control is on
+        let angle = Math.atan2(
           y - this.selected[1].y,
           x - this.selected[1].x,
         );
+        
+        // For blue robots (control on left), add π to flip the angle
+        if (isBlueTeam) {
+          angle += Math.PI;
+        }
+        
+        this.selected[1].r = angle;
         this.currentAction = "rot";
         this.drawRobots();
       }
