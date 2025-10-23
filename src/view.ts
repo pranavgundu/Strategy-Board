@@ -901,6 +901,12 @@ export class View {
       I.TBAApiKey.placeholder = "API Key (saved)";
     }
 
+    // Enable team search from the start
+    if (I?.TBATeamSearch) {
+      I.TBATeamSearch.disabled = false;
+      I.TBATeamSearch.placeholder = "Search teams...";
+    }
+
     await this.loadTBAEvents();
 
     this.setupTBADropdownListeners();
@@ -918,8 +924,8 @@ export class View {
     if (I?.TBAEventSearch) I.TBAEventSearch.value = "";
     if (I?.TBATeamSearch) {
       I.TBATeamSearch.value = "";
-      I.TBATeamSearch.disabled = true;
-      I.TBATeamSearch.placeholder = "Select event first...";
+      I.TBATeamSearch.disabled = false;
+      I.TBATeamSearch.placeholder = "Search teams...";
     }
   }
 
@@ -1180,19 +1186,32 @@ export class View {
     }
 
     if (I?.TBATeamSearch) {
-      I.TBATeamSearch.addEventListener("input", (e) => {
+      I.TBATeamSearch.addEventListener("input", async (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
-        this.filterTBATeams(searchTerm);
+        
+        // If team search has content and no event is selected, filter events by team
+        if (searchTerm.length > 0 && (!I?.TBAEventKey || !I.TBAEventKey.value)) {
+          await this.filterEventsByTeam(searchTerm);
+        } else {
+          // Otherwise, filter teams normally
+          this.filterTBATeams(searchTerm);
+        }
 
-        if (searchTerm.length > 0 && !I.TBATeamSearch.disabled) {
-          this.show(E.TBATeamDropdown);
+        if (searchTerm.length > 0) {
+          // Show team dropdown if event is selected, otherwise show event dropdown
+          if (I?.TBAEventKey && I.TBAEventKey.value) {
+            this.show(E.TBATeamDropdown);
+          } else {
+            this.show(E.TBAEventDropdown);
+          }
         } else {
           this.hide(E.TBATeamDropdown);
+          this.hide(E.TBAEventDropdown);
         }
       });
 
       I.TBATeamSearch.addEventListener("focus", () => {
-        if (E?.TBATeamList?.children.length && !I.TBATeamSearch.disabled) {
+        if (E?.TBATeamList?.children.length) {
           this.show(E.TBATeamDropdown);
         }
       });
@@ -1273,6 +1292,62 @@ export class View {
       this.show(E.TBATeamDropdown);
     } else {
       this.hide(E.TBATeamDropdown);
+    }
+  }
+
+  private async filterEventsByTeam(searchTerm: string): Promise<void> {
+    if (!E?.TBAEventList) return;
+    
+    // Extract team number from search term (remove "team" prefix if present)
+    const teamNumber = searchTerm.replace(/^team\s*/i, '').trim();
+    
+    if (!teamNumber || !this.tbaService.hasApiKey()) {
+      this.filterTBAEvents(searchTerm);
+      return;
+    }
+
+    this.showTBAStatus("Searching for events with this team...", false);
+
+    try {
+      // Fetch team's events
+      const currentYear = new Date().getFullYear();
+      const yearsToFetch = [currentYear, currentYear - 1, currentYear - 2];
+      
+      const allTeamEventsPromises = yearsToFetch.map((year) =>
+        this.tbaService.getTeamEvents(teamNumber, year).catch(() => [])
+      );
+
+      const allTeamEventsArrays = await Promise.all(allTeamEventsPromises);
+      const teamEventKeys = new Set(allTeamEventsArrays.flat().map(e => e.key));
+
+      // Filter the event list to show only events this team is attending
+      const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
+      let visibleCount = 0;
+
+      items.forEach((item) => {
+        const eventKey = (item as HTMLElement).dataset.eventKey || "";
+        
+        if (teamEventKeys.has(eventKey)) {
+          (item as HTMLElement).style.display = "";
+          visibleCount++;
+        } else {
+          (item as HTMLElement).style.display = "none";
+        }
+      });
+
+      this.hide(E.TBAStatusMessage);
+
+      if (visibleCount > 0) {
+        this.show(E.TBAEventDropdown);
+      } else {
+        this.hide(E.TBAEventDropdown);
+        this.showTBAStatus(`No events found for team ${teamNumber}`, true);
+      }
+    } catch (error) {
+      console.error("Failed to filter events by team:", error);
+      this.showTBAStatus("Failed to search for team events", true);
+      // Fallback to regular event filtering
+      this.filterTBAEvents(searchTerm);
     }
   }
 
