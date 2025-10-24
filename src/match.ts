@@ -38,6 +38,7 @@ interface MatchOptions {
   a: PhaseOptions;
   t: PhaseOptions;
   e: PhaseOptions;
+  n?: PhaseOptions;
 }
 
 interface PhaseOptions {
@@ -81,6 +82,7 @@ export class Match {
   public auto: PhaseData;
   public teleop: PhaseData;
   public endgame: PhaseData;
+  public notes: PhaseData;
 
   constructor(
     matchName: string,
@@ -105,6 +107,7 @@ export class Match {
     this.auto = this.createDefaultPhaseData();
     this.teleop = this.createDefaultPhaseData();
     this.endgame = this.createDefaultPhaseData();
+    this.notes = this.createDefaultPhaseData();
 
     if (options) {
       this.applyOptions(options);
@@ -157,6 +160,9 @@ export class Match {
     this.applyPhaseOptions(this.auto, options.a, options.dim);
     this.applyPhaseOptions(this.teleop, options.t, options.dim);
     this.applyPhaseOptions(this.endgame, options.e, options.dim);
+    if (options.n) {
+      this.applyPhaseOptions(this.notes, options.n, options.dim);
+    }
   }
 
   private applyPhaseOptions(
@@ -418,6 +424,41 @@ export class Match {
           this.endgame.drawing,
           this.endgame.drawingBBox,
           this.endgame.textAnnotations,
+        ],
+        [
+          [
+            this.notes.redOneRobot.x,
+            this.notes.redOneRobot.y,
+            Number(this.notes.redOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.notes.redTwoRobot.x,
+            this.notes.redTwoRobot.y,
+            Number(this.notes.redTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.notes.redThreeRobot.x,
+            this.notes.redThreeRobot.y,
+            Number(this.notes.redThreeRobot.r.toFixed(2)),
+          ],
+          [
+            this.notes.blueOneRobot.x,
+            this.notes.blueOneRobot.y,
+            Number(this.notes.blueOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.notes.blueTwoRobot.x,
+            this.notes.blueTwoRobot.y,
+            Number(this.notes.blueTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.notes.blueThreeRobot.x,
+            this.notes.blueThreeRobot.y,
+            Number(this.notes.blueThreeRobot.r.toFixed(2)),
+          ],
+          this.notes.drawing,
+          this.notes.drawingBBox,
+          this.notes.textAnnotations,
         ],
       ],
     ];
