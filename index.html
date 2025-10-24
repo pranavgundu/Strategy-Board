@@ -384,6 +384,17 @@
             #qr-export-code-worker-2 > div {
                 display: none !important;
             }
+            
+            /* Scale QR code canvases to fit properly */
+            #qr-export-code-worker-0 canvas,
+            #qr-export-code-worker-1 canvas,
+            #qr-export-code-worker-2 canvas {
+                max-width: 100%;
+                max-height: 55vh;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+            }
 
             /* Small adjustments to ensure the export overlay scales on mobile/ipad */
             #qr-export-inner-container,
@@ -1300,7 +1311,7 @@
                  handler only runs when the backdrop itself is clicked. -->
             <div
                 id="qr-export-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 bg-slate-600 rounded-3xl p-6 glass-modal max-h-[90vh] overflow-y-auto"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 bg-slate-600 rounded-3xl p-6 glass-modal max-h-[85vh] max-w-[90vw]"
                 onclick="event.stopPropagation()"
                 role="dialog"
                 aria-modal="true"
@@ -1319,69 +1330,83 @@
                     </button>
                 </div>
 
-                <!-- Status area updated by the QR export code (e.g. "Page 1 / 3"). -->
-                <div
-                    id="qr-export-status"
-                    class="mb-2 text-slate-100 font-bold select-none"
-                    aria-hidden="true"
-                >
-                    <span id="qr-export-status-text" aria-hidden="false"></span>
-                    <!-- Hiddenprepared flag for automation / accessibility: the app can reveal this
-                         when the export is fully prepared (useful for keyboard users / AT). -->
-                    <span
-                        id="qr-export-prepared"
-                        class="hidden"
-                        aria-hidden="true"
-                        >Prepared</span
+                <!-- Start button to begin QR code display (will be replaced by progress indicators) -->
+                <div class="w-full flex flex-col items-center min-h-[60px]">
+                    <button
+                        id="qr-export-start-btn"
+                        class="px-8 py-3 text-xl font-bold text-white bg-green-500 rounded-xl glass-button glossy-shine hover:bg-green-600 transition-colors"
                     >
+                        Start
+                    </button>
+
+                    <!-- Status area updated by the QR export code (e.g. "Page 1 / 3"). -->
                     <div
-                        id="qr-export-dots"
-                        class="qr-dots"
+                        id="qr-export-status"
+                        class="text-slate-100 font-bold select-none"
                         aria-hidden="true"
                         style="display: none"
                     >
-                        <div class="qr-dot"></div>
-                        <div class="qr-dot"></div>
-                        <div class="qr-dot"></div>
+                        <span id="qr-export-status-text" aria-hidden="false"></span>
+                        <!-- Hiddenprepared flag for automation / accessibility: the app can reveal this
+                             when the export is fully prepared (useful for keyboard users / AT). -->
+                        <span
+                            id="qr-export-prepared"
+                            class="hidden"
+                            aria-hidden="true"
+                            >Prepared</span
+                        >
+                        <div
+                            id="qr-export-dots"
+                            class="qr-dots"
+                            aria-hidden="true"
+                            style="display: none"
+                        >
+                            <div class="qr-dot"></div>
+                            <div class="qr-dot"></div>
+                            <div class="qr-dot"></div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Top progress bar: the single authoritative visual for export progress -->
-                <div
-                    id="qr-export-progress-wrap"
-                    class="w-full flex justify-center"
-                >
+                    <!-- Top progress bar: the single authoritative visual for export progress -->
                     <div
-                        id="qr-export-progress"
-                        class="qr-progress-wrap"
-                        aria-hidden="true"
+                        id="qr-export-progress-wrap"
+                        class="w-full flex justify-center"
+                        style="display: none"
                     >
                         <div
-                            id="qr-export-progress-bar"
-                            class="qr-progress-bar"
-                            style="width: 0%"
-                        ></div>
+                            id="qr-export-progress"
+                            class="qr-progress-wrap"
+                            aria-hidden="true"
+                        >
+                            <div
+                                id="qr-export-progress-bar"
+                                class="qr-progress-bar"
+                                style="width: 0%"
+                            ></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- QR worker slots (kept as separate elements so the QR export code can
                      rotate canvases into them). The per-canvas numeric labels are hidden
                      via CSS so the top progress is the only textual indicator. -->
-                <div
-                    id="qr-export-code-worker-0"
-                    class="hidden w-full flex items-center justify-center"
-                    style="z-index: 1"
-                ></div>
-                <div
-                    id="qr-export-code-worker-1"
-                    class="hidden w-full flex items-center justify-center"
-                    style="z-index: 2"
-                ></div>
-                <div
-                    id="qr-export-code-worker-2"
-                    class="hidden w-full flex items-center justify-center"
-                    style="z-index: 3"
-                ></div>
+                <div class="w-full flex items-center justify-center" style="max-height: 55vh;">
+                    <div
+                        id="qr-export-code-worker-0"
+                        class="hidden w-full flex items-center justify-center"
+                        style="z-index: 1"
+                    ></div>
+                    <div
+                        id="qr-export-code-worker-1"
+                        class="hidden w-full flex items-center justify-center"
+                        style="z-index: 2"
+                    ></div>
+                    <div
+                        id="qr-export-code-worker-2"
+                        class="hidden w-full flex items-center justify-center"
+                        style="z-index: 3"
+                    ></div>
+                </div>
             </div>
         </div>
         <div

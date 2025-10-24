@@ -56,12 +56,13 @@ type QRExportCallback = (data: unknown) => void;
 export class QRExport {
   private pool: Array<HTMLElement | null> = [];
   private intervalId: number | null = null;
+  private startCallback: (() => void) | null = null;
 
   constructor() {
     this.pool = [];
   }
 
-  export(match: Match): void {
+  export(match: Match, onReadyToStart?: () => void): void {
     this.pool = [
       document.getElementById("qr-export-code-worker-0"),
       document.getElementById("qr-export-code-worker-1"),
@@ -96,7 +97,7 @@ export class QRExport {
 
     const qrCanvasPixelSize = Math.max(
       256,
-      Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.8),
+      Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.5),
     );
 
     const shown = new Set<number>();
@@ -109,7 +110,10 @@ export class QRExport {
 
     const updateOverlayStatus = (shownCount: number, total: number) => {
       const status = document.getElementById("qr-export-status");
-      if (status) status.textContent = `Page ${shownCount} / ${total}`;
+      if (status) {
+        status.textContent = `Page ${shownCount} / ${total}`;
+        status.style.display = "block";
+      }
 
       try {
         const dots = document.getElementById(
@@ -121,6 +125,10 @@ export class QRExport {
           else dots.style.display = "none";
         }
       } catch (_err) {}
+      
+      // Show progress bar when animation starts
+      const progressWrap = document.getElementById("qr-export-progress-wrap");
+      if (progressWrap) progressWrap.style.display = "flex";
     };
 
     if (totalChunks === 1) {
@@ -138,7 +146,31 @@ export class QRExport {
           });
           el.replaceChildren();
           el.appendChild(canvas);
-          markShown(0);
+          
+          // Show the first QR code immediately
+          const dom = document.getElementById(el.id);
+          if (dom) dom.classList.remove("hidden");
+          
+          // Wait for start button click before starting animation
+          const startExport = () => {
+            markShown(0);
+            
+            // Hide start button
+            const startBtn = document.getElementById("qr-export-start-btn");
+            if (startBtn) startBtn.style.display = "none";
+          };
+          
+          if (onReadyToStart) {
+            onReadyToStart();
+            // Set up the start callback
+            const startBtn = document.getElementById("qr-export-start-btn");
+            if (startBtn) {
+              startBtn.onclick = startExport;
+            }
+          } else {
+            // Fallback: start immediately if no callback provided
+            startExport();
+          }
         } catch (err) {
           console.error("QRExport: failed to render single QR", err);
           alert("Failed to render QR export");
@@ -154,6 +186,7 @@ export class QRExport {
 
     (async () => {
       try {
+        // Pre-render initial QR codes
         for (let i = 0; i < poolSize; i++) {
           const el = this.pool[i];
           if (!el) continue;
@@ -177,71 +210,98 @@ export class QRExport {
           }
         }
 
+        // Define the start function that begins the animation
+        const startAnimation = () => {
+          // Show the first QR code and mark as shown
+          const firstEl = this.pool.find((x) => x) || null;
+          if (firstEl) {
+            const dom = document.getElementById(firstEl.id);
+            if (dom) dom.classList.remove("hidden");
+          }
+          markShown(0);
+          
+          // Hide start button
+          const startBtn = document.getElementById("qr-export-start-btn");
+          if (startBtn) startBtn.style.display = "none";
+
+          this.intervalId = window.setInterval(async () => {
+            try {
+              const currentEl = this.pool[poolIndex];
+              const prevEl = this.pool[modulus(poolIndex - 1, poolSize)];
+              if (currentEl) {
+                const domCur = document.getElementById(currentEl.id);
+                if (domCur) domCur.classList.remove("hidden");
+              }
+              if (prevEl) {
+                const domPrev = document.getElementById(prevEl.id);
+                if (domPrev) domPrev.classList.add("hidden");
+              }
+              markShown(payloadIndex);
+
+              const reuseIndex = modulus(poolIndex - 1, poolSize);
+              const nextPayloadIndex = modulus(
+                payloadIndex + poolSize - 1,
+                totalChunks,
+              );
+              const reuseEl = this.pool[reuseIndex];
+              if (reuseEl) {
+                reuseEl.replaceChildren();
+                try {
+                  const canvas = await toCanvasAsync(
+                    getPayload(nextPayloadIndex),
+                    {
+                      errorCorrectionLevel: "M",
+                      width: qrCanvasPixelSize,
+                      margin: 1,
+                    },
+                  );
+                  const label = document.createElement("div");
+                  label.className =
+                    "text-slate-100 font-semibold mt-2 select-none";
+                  label.style.userSelect = "none";
+                  canvas.setAttribute(
+                    "aria-label",
+                    `QR export page ${nextPayloadIndex + 1} of ${totalChunks}`,
+                  );
+                  reuseEl.appendChild(canvas);
+                } catch (err) {
+                  console.error("QRExport: failed to render QR canvas", err);
+                  this.close();
+                  alert(
+                    "QR export failed while rendering QR codes. Export stopped.",
+                  );
+                  return;
+                }
+              }
+
+              poolIndex = modulus(poolIndex + 1, poolSize);
+              payloadIndex = modulus(payloadIndex + 1, totalChunks);
+            } catch (err) {
+              console.error("QRExport: unexpected error in export loop", err);
+              this.close();
+              alert("QR export encountered an unexpected error and was stopped.");
+            }
+          }, FRAME_DURATION_MS);
+        };
+        
+        // Show the first QR code immediately
         const firstEl = this.pool.find((x) => x) || null;
         if (firstEl) {
           const dom = document.getElementById(firstEl.id);
           if (dom) dom.classList.remove("hidden");
         }
-        markShown(0);
-
-        this.intervalId = window.setInterval(async () => {
-          try {
-            const currentEl = this.pool[poolIndex];
-            const prevEl = this.pool[modulus(poolIndex - 1, poolSize)];
-            if (currentEl) {
-              const domCur = document.getElementById(currentEl.id);
-              if (domCur) domCur.classList.remove("hidden");
-            }
-            if (prevEl) {
-              const domPrev = document.getElementById(prevEl.id);
-              if (domPrev) domPrev.classList.add("hidden");
-            }
-            markShown(payloadIndex);
-
-            const reuseIndex = modulus(poolIndex - 1, poolSize);
-            const nextPayloadIndex = modulus(
-              payloadIndex + poolSize - 1,
-              totalChunks,
-            );
-            const reuseEl = this.pool[reuseIndex];
-            if (reuseEl) {
-              reuseEl.replaceChildren();
-              try {
-                const canvas = await toCanvasAsync(
-                  getPayload(nextPayloadIndex),
-                  {
-                    errorCorrectionLevel: "M",
-                    width: qrCanvasPixelSize,
-                    margin: 1,
-                  },
-                );
-                const label = document.createElement("div");
-                label.className =
-                  "text-slate-100 font-semibold mt-2 select-none";
-                label.style.userSelect = "none";
-                canvas.setAttribute(
-                  "aria-label",
-                  `QR export page ${nextPayloadIndex + 1} of ${totalChunks}`,
-                );
-                reuseEl.appendChild(canvas);
-              } catch (err) {
-                console.error("QRExport: failed to render QR canvas", err);
-                this.close();
-                alert(
-                  "QR export failed while rendering QR codes. Export stopped.",
-                );
-                return;
-              }
-            }
-
-            poolIndex = modulus(poolIndex + 1, poolSize);
-            payloadIndex = modulus(payloadIndex + 1, totalChunks);
-          } catch (err) {
-            console.error("QRExport: unexpected error in export loop", err);
-            this.close();
-            alert("QR export encountered an unexpected error and was stopped.");
+        
+        // Wait for start button click or start immediately
+        if (onReadyToStart) {
+          onReadyToStart();
+          const startBtn = document.getElementById("qr-export-start-btn");
+          if (startBtn) {
+            startBtn.onclick = startAnimation;
           }
-        }, FRAME_DURATION_MS);
+        } else {
+          // Fallback: start immediately if no callback provided
+          startAnimation();
+        }
       } catch (err) {
         console.error("QRExport: failed to start export", err);
         alert(
@@ -296,12 +356,24 @@ export class QRExport {
       const overlay = document.getElementById("qr-export-container");
       if (overlay) overlay.classList.add("hidden");
       const status = document.getElementById("qr-export-status");
-      if (status) status.textContent = "";
+      if (status) {
+        status.textContent = "";
+        status.style.display = "none";
+      }
       const dots = document.getElementById("qr-export-dots");
       if (dots) {
         try {
           dots.style.display = "none";
         } catch (_err) {}
+      }
+      const progressWrap = document.getElementById("qr-export-progress-wrap");
+      if (progressWrap) progressWrap.style.display = "none";
+      
+      // Reset start button
+      const startBtn = document.getElementById("qr-export-start-btn");
+      if (startBtn) {
+        startBtn.style.display = "block";
+        startBtn.onclick = null;
       }
     } catch (err) {
       console.warn("QRExport: error hiding overlay or clearing status", err);

@@ -758,7 +758,14 @@ export class View {
         this.show(E.Export);
         setTimeout(() => {
           try {
-            this.qrexport.export(match);
+            // Show the start button and reset UI
+            const startBtn = document.getElementById("qr-export-start-btn");
+            if (startBtn) startBtn.style.display = "block";
+            
+            this.qrexport.export(match, () => {
+              // Callback when QR codes are ready - the start button is now functional
+              console.log("QR export ready - waiting for user to click Start");
+            });
           } catch (err) {
             console.error("View: failed to start QR export:", err);
             alert("Failed to start QR export. See console for details.");
