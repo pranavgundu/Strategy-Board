@@ -1,31 +1,24 @@
-# Node.js dependencies
-node_modules/
-
-# TypeScript build output
-dist/
-build/
-*.js
-*.js.map
-*.d.ts
-
 # Logs
-logs/
+logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# OS and Editor specific files
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# Environment variables
-.env
-.env.local
-
-# Test coverage reports
-coverage/
-
-# Miscellaneous
-tmp/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
