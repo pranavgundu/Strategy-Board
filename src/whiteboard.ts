@@ -247,6 +247,7 @@ export class Whiteboard {
   private autoActionHistory: Array<any> = [];
   private teleopActionHistory: Array<any> = [];
   private endgameActionHistory: Array<any> = [];
+  private notesActionHistory: Array<any> = [];
 
   static camera_presets: { [key: string]: { x: number; y: number } } = {
     full: { x: width / 2, y: height / 2 },
@@ -281,6 +282,9 @@ export class Whiteboard {
     document
       .getElementById("whiteboard-toolbar-mode-endgame")
       ?.addEventListener("click", (e) => this.toggleMode("endgame"));
+    document
+      .getElementById("whiteboard-toolbar-mode-notes")
+      ?.addEventListener("click", (e) => this.toggleMode("notes"));
     document
       .getElementById("whiteboard-draw-config")
       ?.addEventListener("click", (e) => {
@@ -838,6 +842,7 @@ export class Whiteboard {
       this.autoActionHistory = [];
       this.teleopActionHistory = [];
       this.endgameActionHistory = [];
+      this.notesActionHistory = [];
       document
         .getElementById("whiteboard-robot-config")
         ?.classList.add("hidden");
@@ -871,6 +876,9 @@ export class Whiteboard {
     if (this.mode === "endgame") {
       this.endgameActionHistory.push(action);
     }
+    if (this.mode === "notes") {
+      this.notesActionHistory.push(action);
+    }
 
     document
       .getElementById("whiteboard-toolbar-undo")
@@ -889,6 +897,9 @@ export class Whiteboard {
     }
     if (this.mode === "endgame") {
       return this.endgameActionHistory;
+    }
+    if (this.mode === "notes") {
+      return this.notesActionHistory;
     }
 
     return [];
@@ -972,6 +983,40 @@ export class Whiteboard {
   private drawBackground() {
     BG.save();
     BG.clearRect(0, 0, width, height);
+    
+    // Check if we're in notes mode
+    if (this.mode === "notes") {
+      // Draw plain black background
+      BG.fillStyle = "#000000";
+      BG.fillRect(0, 0, width, height);
+      
+      // Draw subtle white grid lines for aesthetics
+      BG.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      BG.lineWidth = 1;
+      
+      const gridSpacing = 100;
+      
+      // Draw vertical lines
+      for (let x = 0; x < width; x += gridSpacing) {
+        BG.beginPath();
+        BG.moveTo(x, 0);
+        BG.lineTo(x, height);
+        BG.stroke();
+      }
+      
+      // Draw horizontal lines
+      for (let y = 0; y < height; y += gridSpacing) {
+        BG.beginPath();
+        BG.moveTo(0, y);
+        BG.lineTo(width, y);
+        BG.stroke();
+      }
+      
+      BG.restore();
+      return; // Don't draw field or team numbers in notes mode
+    }
+    
+    // Normal field drawing for other modes
     BG.fillStyle = "#18181b";
     BG.fillRect(0, 0, width, height);
     BG.translate(width / 2 - this.camera.x, height / 2 - this.camera.y);
@@ -1118,6 +1163,9 @@ export class Whiteboard {
     if (this.mode === "endgame") {
       return this.match.endgame;
     }
+    if (this.mode === "notes") {
+      return this.match.notes;
+    }
     return null;
   }
 
@@ -1125,6 +1173,12 @@ export class Whiteboard {
     const data = this.getData();
 
     if (data === null || this.match === null) return;
+    
+    // Don't draw robots in notes mode
+    if (this.mode === "notes") {
+      IT.clearRect(0, 0, width, height);
+      return;
+    }
 
     IT.clearRect(0, 0, width, height);
     this.drawRobot(this.match.redOne, data.redOneRobot, "red", "redOne");
