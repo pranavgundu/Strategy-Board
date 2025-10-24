@@ -1,5 +1,5 @@
 # Strategy Board
 
-**This is a continuation of [StrategyBoard2025](https://github.com/FRCTeam834/StrategyBoard2025) by Team 834.**
+<img width="690" height="388" alt="image" src="https://github.com/user-attachments/assets/bb049aef-19a5-44c0-8b29-64799408ee6a" />
 
 If you have any questions please contact me at pranav@strategyboard.app
