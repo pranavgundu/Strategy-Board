@@ -1476,7 +1476,6 @@ export class Whiteboard {
           x - this.selected[1].x,
         );
         
-        // For blue robots (control on left), add π to flip the angle
         if (isBlueTeam) {
           angle += Math.PI;
         }
