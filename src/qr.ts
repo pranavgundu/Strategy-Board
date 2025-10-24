@@ -95,9 +95,11 @@ export class QRExport {
       totalChunks.toString().padStart(TOTAL_CHUNKS_HEADER_SIZE, "0") +
       (chunks[index] || "");
 
+    // Make QR code very large to fill most of the screen
+    // Use smaller multiplier to account for padding and UI elements
     const qrCanvasPixelSize = Math.max(
-      256,
-      Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.5),
+      512,
+      Math.floor(Math.min(window.innerWidth * 0.80, window.innerHeight * 0.65)),
     );
 
     const shown = new Set<number>();

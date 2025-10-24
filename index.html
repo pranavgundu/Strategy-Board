@@ -385,15 +385,17 @@
                 display: none !important;
             }
             
-            /* Scale QR code canvases to fit properly */
+            /* Scale QR code canvases to fill the screen without clipping */
             #qr-export-code-worker-0 canvas,
             #qr-export-code-worker-1 canvas,
             #qr-export-code-worker-2 canvas {
-                max-width: 100%;
-                max-height: 55vh;
-                width: auto;
-                height: auto;
+                max-width: 85vw;
+                max-height: 65vh;
+                width: auto !important;
+                height: auto !important;
                 object-fit: contain;
+                display: block;
+                margin: 0 auto;
             }
 
             /* Small adjustments to ensure the export overlay scales on mobile/ipad */
@@ -1311,7 +1313,8 @@
                  handler only runs when the backdrop itself is clicked. -->
             <div
                 id="qr-export-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 bg-slate-600 rounded-3xl p-6 glass-modal max-h-[85vh] max-w-[90vw]"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 bg-slate-600 rounded-3xl p-6 glass-modal"
+                style="max-height: 95vh; max-width: 95vw; overflow: hidden;"
                 onclick="event.stopPropagation()"
                 role="dialog"
                 aria-modal="true"
@@ -1390,7 +1393,7 @@
                 <!-- QR worker slots (kept as separate elements so the QR export code can
                      rotate canvases into them). The per-canvas numeric labels are hidden
                      via CSS so the top progress is the only textual indicator. -->
-                <div class="w-full flex items-center justify-center" style="max-height: 55vh;">
+                <div class="w-full flex items-center justify-center" style="min-height: 65vh; max-height: 65vh; overflow: hidden;">
                     <div
                         id="qr-export-code-worker-0"
                         class="hidden w-full flex items-center justify-center"
