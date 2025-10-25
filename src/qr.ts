@@ -160,6 +160,10 @@ export class QRExport {
             // Hide start button
             const startBtn = document.getElementById("qr-export-start-btn");
             if (startBtn) startBtn.style.display = "none";
+
+            // Hide PDF export button
+            const pdfBtn = document.getElementById("qr-export-pdf-btn");
+            if (pdfBtn) pdfBtn.style.display = "none";
           };
 
           if (onReadyToStart) {
@@ -224,6 +228,10 @@ export class QRExport {
 
           // Hide start button
           const startBtn = document.getElementById("qr-export-start-btn");
+
+          // Hide PDF export button
+          const pdfBtn = document.getElementById("qr-export-pdf-btn");
+          if (pdfBtn) pdfBtn.style.display = "none";
           if (startBtn) startBtn.style.display = "none";
 
           this.intervalId = window.setInterval(async () => {
