@@ -119,34 +119,7 @@ export class TBAService {
   }
 
   public parseEventsToSimple(events: TBAEvent[]): TBASimpleEvent[] {
-    const now = new Date();
-    const oneMonthFromNow = new Date(now);
-    oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-
-    // Filter events: include currently active events or upcoming events within 1 month
-    const filteredEvents = events.filter((event) => {
-      const startDate = new Date(event.start_date);
-      const endDate = new Date(event.end_date);
-
-      // Include if event is currently happening (regardless of start date)
-      // OR if event is upcoming and starts within the next month
-      const isCurrentlyActive = startDate <= now && endDate >= now;
-      const isUpcomingWithinMonth =
-        startDate > now && startDate <= oneMonthFromNow;
-
-      return isCurrentlyActive || isUpcomingWithinMonth;
-    });
-
-    // Sort by relevance using a scoring algorithm
-    const sortedEvents = filteredEvents.sort((a, b) => {
-      const scoreA = this.calculateEventRelevance(a, now);
-      const scoreB = this.calculateEventRelevance(b, now);
-
-      // Higher score = more relevant
-      return scoreB - scoreA;
-    });
-
-    return sortedEvents.map((event) => {
+    return events.map((event) => {
       let location = "";
       if (event.city && event.state_prov) {
         location = `${event.city}, ${event.state_prov}`;
@@ -170,55 +143,6 @@ export class TBAService {
         dateRange,
       };
     });
-  }
-
-  /**
-   * Calculate event relevance score based on multiple factors:
-   * - Events happening now get highest priority
-   * - Events happening soon get higher priority
-   * - Past events (but still within range) get lower priority
-   * - Regional/District events get slight boost over other types
-   */
-  private calculateEventRelevance(event: TBAEvent, now: Date): number {
-    const startDate = new Date(event.start_date);
-    const endDate = new Date(event.end_date);
-
-    let score = 0;
-
-    // 1. Time-based scoring (most important factor)
-    if (now >= startDate && now <= endDate) {
-      // Event is happening RIGHT NOW - highest priority
-      score += 1000;
-    } else if (startDate > now) {
-      // Future event - closer = higher score
-      const daysUntilStart =
-        (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-
-      if (daysUntilStart <= 3) {
-        score += 500; // Happening within 3 days
-      } else if (daysUntilStart <= 7) {
-        score += 300; // Happening within a week
-      } else if (daysUntilStart <= 14) {
-        score += 200; // Happening within 2 weeks
-      } else {
-        score += 100 - daysUntilStart; // Further events get lower score
-      }
-    } else {
-      // Past event (but end date is after now, so it might still be ongoing)
-      const daysSinceStart =
-        (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
-      score += 50 - daysSinceStart; // Recent past events still visible but lower priority
-    }
-
-    // 2. Event type scoring (regional/district events are more common for teams)
-    // Event types: 0=Regional, 1=District, 2=District Championship, 3=Championship, 4=District CMP Division, 99=Offseason, 100=Preseason
-    if (event.event_type === 0 || event.event_type === 1) {
-      score += 10; // Regional or District
-    } else if (event.event_type === 2 || event.event_type === 3) {
-      score += 5; // Championship events
-    }
-
-    return score;
   }
 
   private formatDateRange(start: Date, end: Date): string {
