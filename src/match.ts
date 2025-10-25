@@ -58,15 +58,15 @@ const DEFAULT_ROBOT_HEIGHT = 152.4;
 const DEFAULT_ROBOT_ROTATION = 0;
 
 const DEFAULT_RED_POSITIONS = {
-  one: { x: 2055, y: 1105 },
+  one: { x: 2055, y: 1155 },
   two: { x: 2055, y: 805 },
-  three: { x: 2055, y: 505 },
+  three: { x: 2055, y: 455 },
 };
 
 const DEFAULT_BLUE_POSITIONS = {
-  one: { x: 1455, y: 505 },
+  one: { x: 1455, y: 455 },
   two: { x: 1455, y: 805 },
-  three: { x: 1455, y: 1105 },
+  three: { x: 1455, y: 1155 },
 };
 
 export class Match {
