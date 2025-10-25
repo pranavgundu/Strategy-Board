@@ -1003,9 +1003,9 @@ export class View {
         this.createNewMatch(
           id,
           formattedMatchName,
-          match.redTeams[2] || "",
-          match.redTeams[1] || "",
           match.redTeams[0] || "",
+          match.redTeams[1] || "",
+          match.redTeams[2] || "",
           match.blueTeams[0] || "",
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
