@@ -1335,13 +1335,23 @@
                 </div>
 
                 <!-- Start button to begin QR code display (will be replaced by progress indicators) -->
-                <div class="w-full flex flex-col items-center min-h-[60px]">
-                    <button
-                        id="qr-export-start-btn"
-                        class="px-8 py-3 text-xl font-bold text-white bg-green-500 rounded-xl glass-button glossy-shine hover:bg-green-600 transition-colors"
-                    >
-                        Start
-                    </button>
+                <div
+                    class="w-full flex flex-col items-center min-h-[60px] gap-3"
+                >
+                    <div class="flex gap-3">
+                        <button
+                            id="qr-export-start-btn"
+                            class="px-8 py-3 text-xl font-bold text-white bg-green-500 rounded-xl glass-button glossy-shine hover:bg-green-600 transition-colors"
+                        >
+                            Start
+                        </button>
+                        <button
+                            id="qr-export-pdf-btn"
+                            class="px-8 py-3 text-xl font-bold text-white bg-purple-500 rounded-xl glass-button glossy-shine hover:bg-purple-600 transition-colors"
+                        >
+                            Export as PDF
+                        </button>
+                    </div>
 
                     <!-- Status area updated by the QR export code (e.g. "Page 1 / 3"). -->
                     <div
