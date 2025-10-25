@@ -940,8 +940,8 @@ export class View {
       const originalText = pdfBtn?.textContent || "Export as PDF";
       if (pdfBtn) pdfBtn.textContent = "Generating PDF...";
 
-      // Generate PDF
-      await this.pdfExport.exportToPDF(
+      // Generate PDF with large layout (one QR per page)
+      await this.pdfExport.exportToPDFLarge(
         chunks,
         this.currentExportMatch.matchName,
       );
