@@ -7,13 +7,13 @@ export const Config = {
   fieldRealHeightInches: 317,
 
   redOneStationX: 3575,
-  redOneStationY: 1155,
+  redOneStationY: 455,
 
   redTwoStationX: 3575,
   redTwoStationY: 805,
 
   redThreeStationX: 3575,
-  redThreeStationY: 455,
+  redThreeStationY: 1155,
 
   blueOneStationX: -65,
   blueOneStationY: 455,
