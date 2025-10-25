@@ -4,6 +4,7 @@ import { Match } from "@/match.ts";
 import { QRImport, QRExport } from "@/qr.ts";
 import { CLEAR, SET, GET } from "@/db.ts";
 import { TBAService } from "./tba.ts";
+import { PDFExport } from "./pdf-export.ts";
 
 const get = (id: string): HTMLElement | null => document.getElementById(id);
 
@@ -60,6 +61,8 @@ export class View {
   private qrimport: QRImport;
   private qrexport: QRExport;
   private tbaService: TBAService;
+  private pdfExport: PDFExport;
+  private currentExportMatch: Match | null = null;
 
   constructor(
     model: Model,
@@ -73,6 +76,7 @@ export class View {
     this.qrexport = qrexport;
 
     this.tbaService = new TBAService();
+    this.pdfExport = new PDFExport();
 
     const initDOM = () => {
       B = {
@@ -563,6 +567,19 @@ export class View {
         console.warn("Missing element: qr-export-container");
       }
 
+      // Add PDF export button listener
+      const pdfExportBtn = get("qr-export-pdf-btn");
+      if (pdfExportBtn) {
+        console.debug("View: attaching 'click' handler to #qr-export-pdf-btn");
+        pdfExportBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          await this.onClickExportPDF();
+        });
+        console.debug("View: attached 'click' handler to #qr-export-pdf-btn");
+      } else {
+        console.warn("Missing element: qr-export-pdf-btn");
+      }
+
       const importEl = E?.Import;
       if (importEl) {
         console.debug(
@@ -759,9 +776,16 @@ export class View {
         this.show(E.Export);
         setTimeout(() => {
           try {
+            // Store the current match for PDF export
+            this.currentExportMatch = match;
+
             // Show the start button and reset UI
             const startBtn = document.getElementById("qr-export-start-btn");
             if (startBtn) startBtn.style.display = "block";
+
+            // Show the PDF export button
+            const pdfBtn = document.getElementById("qr-export-pdf-btn");
+            if (pdfBtn) pdfBtn.style.display = "block";
 
             this.qrexport.export(match, () => {
               // Callback when QR codes are ready - the start button is now functional
@@ -889,7 +913,51 @@ export class View {
       I.BlueTwo.value,
       I.BlueThree.value,
     );
-    this.hideCreateMatchPanel();
+    this.hide(E.CreateMatchPanel);
+  }
+
+  private async onClickExportPDF(): Promise<void> {
+    if (!this.currentExportMatch) {
+      console.error("No match available for PDF export");
+      alert("No match data available for export");
+      return;
+    }
+
+    try {
+      // Get the match data that was encoded into QR codes
+      const matchPacket = this.currentExportMatch.getAsPacket();
+      const dataString = JSON.stringify(matchPacket);
+
+      // Split data into chunks (same as QR export)
+      const chunkSize = 2000;
+      const chunks: string[] = [];
+      for (let i = 0; i < dataString.length; i += chunkSize) {
+        chunks.push(dataString.substring(i, i + chunkSize));
+      }
+
+      // Show progress
+      const pdfBtn = document.getElementById("qr-export-pdf-btn");
+      const originalText = pdfBtn?.textContent || "Export as PDF";
+      if (pdfBtn) pdfBtn.textContent = "Generating PDF...";
+
+      // Generate PDF
+      await this.pdfExport.exportToPDF(
+        chunks,
+        this.currentExportMatch.matchName,
+      );
+
+      // Reset button
+      if (pdfBtn) pdfBtn.textContent = originalText;
+
+      console.log("PDF export completed successfully");
+    } catch (error) {
+      console.error("Failed to export PDF:", error);
+      alert("Failed to generate PDF. Please try again.");
+
+      // Reset button
+      const pdfBtn = document.getElementById("qr-export-pdf-btn");
+      if (pdfBtn) pdfBtn.textContent = "Export as PDF";
+    }
   }
 
   private onClickBack(e: Event): void {
@@ -1467,6 +1535,11 @@ export class View {
 
     const status = get("qr-export-status");
     if (status) status.textContent = "";
+
+    // Hide PDF export button and clear current match
+    const pdfBtn = document.getElementById("qr-export-pdf-btn");
+    if (pdfBtn) pdfBtn.style.display = "none";
+    this.currentExportMatch = null;
   }
 
   private onCancelImport(e: Event): void {
