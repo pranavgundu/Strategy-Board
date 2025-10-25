@@ -441,7 +441,7 @@ export class Whiteboard {
         document
           .getElementById("whiteboard-color-config")
           ?.classList.add("color-picker-hidden");
-        
+
         // After animation, hide individual items and show only the selected color
         setTimeout(() => {
           document
@@ -511,7 +511,7 @@ export class Whiteboard {
             default:
               break;
           }
-          
+
           // Remove animation class to prepare for next opening
           document
             .getElementById("whiteboard-color-config")
@@ -983,19 +983,19 @@ export class Whiteboard {
   private drawBackground() {
     BG.save();
     BG.clearRect(0, 0, width, height);
-    
+
     // Check if we're in notes mode
     if (this.mode === "notes") {
       // Draw plain black background
       BG.fillStyle = "#000000";
       BG.fillRect(0, 0, width, height);
-      
+
       // Draw subtle white grid lines for aesthetics
       BG.strokeStyle = "rgba(255, 255, 255, 0.1)";
       BG.lineWidth = 1;
-      
+
       const gridSpacing = 100;
-      
+
       // Draw vertical lines
       for (let x = 0; x < width; x += gridSpacing) {
         BG.beginPath();
@@ -1003,7 +1003,7 @@ export class Whiteboard {
         BG.lineTo(x, height);
         BG.stroke();
       }
-      
+
       // Draw horizontal lines
       for (let y = 0; y < height; y += gridSpacing) {
         BG.beginPath();
@@ -1011,11 +1011,11 @@ export class Whiteboard {
         BG.lineTo(width, y);
         BG.stroke();
       }
-      
+
       BG.restore();
       return; // Don't draw field or team numbers in notes mode
     }
-    
+
     // Normal field drawing for other modes
     BG.fillStyle = "#18181b";
     BG.fillRect(0, 0, width, height);
@@ -1059,11 +1059,11 @@ export class Whiteboard {
       BG.restore();
     };
 
-    // Red stations - reversed order (3, 2, 1 instead of 1, 2, 3)
+    // Red stations - normal order (1, 2, 3)
     drawStation(
       Config.redOneStationX,
       Config.redOneStationY,
-      this.match.redThree,
+      this.match.redOne,
       Math.PI / 2,
     );
     drawStation(
@@ -1075,7 +1075,7 @@ export class Whiteboard {
     drawStation(
       Config.redThreeStationX,
       Config.redThreeStationY,
-      this.match.redOne,
+      this.match.redThree,
       Math.PI / 2,
     );
     drawStation(
@@ -1173,7 +1173,7 @@ export class Whiteboard {
     const data = this.getData();
 
     if (data === null || this.match === null) return;
-    
+
     // Don't draw robots in notes mode
     if (this.mode === "notes") {
       IT.clearRect(0, 0, width, height);
@@ -1493,12 +1493,15 @@ export class Whiteboard {
       if (this.selectedType === "robot") {
         this.selected[1].x = x + this.selected[2];
         this.selected[1].y = y + this.selected[3];
-        
+
         // Position rotation control based on team (left for blue, right for red)
         const slot = this.selected[0];
-        const isBlueTeam = slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
-        const rotControlDistance = isBlueTeam ? -this.selected[1].w / 2 : this.selected[1].w / 2;
-        
+        const isBlueTeam =
+          slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
+        const rotControlDistance = isBlueTeam
+          ? -this.selected[1].w / 2
+          : this.selected[1].w / 2;
+
         this.rotControl = {
           x:
             this.selected[1].x +
@@ -1512,9 +1515,12 @@ export class Whiteboard {
       } else if (this.selectedType === "rot") {
         // Position rotation control based on team (left for blue, right for red)
         const slot = this.selected[0];
-        const isBlueTeam = slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
-        const rotControlDistance = isBlueTeam ? -this.selected[1].w / 2 : this.selected[1].w / 2;
-        
+        const isBlueTeam =
+          slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
+        const rotControlDistance = isBlueTeam
+          ? -this.selected[1].w / 2
+          : this.selected[1].w / 2;
+
         this.rotControl = {
           x:
             this.selected[1].x +
@@ -1523,17 +1529,14 @@ export class Whiteboard {
             this.selected[1].y +
             rotControlDistance * Math.sin(this.selected[1].r),
         };
-        
+
         // Calculate angle based on which side the rotation control is on
-        let angle = Math.atan2(
-          y - this.selected[1].y,
-          x - this.selected[1].x,
-        );
-        
+        let angle = Math.atan2(y - this.selected[1].y, x - this.selected[1].x);
+
         if (isBlueTeam) {
           angle += Math.PI;
         }
-        
+
         this.selected[1].r = angle;
         this.currentAction = "rot";
         this.drawRobots();
@@ -1576,12 +1579,15 @@ export class Whiteboard {
       this.lastSelected = this.selected;
       this.selected = selected;
       this.selectedType = "robot";
-      
+
       // Position rotation control based on team (left for blue, right for red)
       const slot = this.selected[0];
-      const isBlueTeam = slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
-      const rotControlDistance = isBlueTeam ? -this.selected[1].w / 2 : this.selected[1].w / 2;
-      
+      const isBlueTeam =
+        slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
+      const rotControlDistance = isBlueTeam
+        ? -this.selected[1].w / 2
+        : this.selected[1].w / 2;
+
       this.rotControl = {
         x:
           this.selected[1].x +
