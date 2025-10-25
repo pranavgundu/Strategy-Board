@@ -924,15 +924,40 @@ export class View {
     }
 
     try {
-      // Get the match data that was encoded into QR codes
-      const matchPacket = this.currentExportMatch.getAsPacket();
-      const dataString = JSON.stringify(matchPacket);
+      // Use the SAME encoding as live QR export
+      const packet = this.currentExportMatch.getAsPacket();
+      packet.splice(7, 1); // Remove the same element as QR export does
+      const raw = JSON.stringify(packet);
 
-      // Split data into chunks (same as QR export)
-      const chunkSize = 2000;
+      // Encode to base64 (same as QR export)
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode(raw);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const b64 = btoa(binary);
+
+      // Split into chunks using the SAME system as QR export
+      const MAX_CHUNK_PAYLOAD = 200;
+      const HEADER_SIZE = 4;
+      const TOTAL_CHUNKS_HEADER_SIZE = 4;
+
       const chunks: string[] = [];
-      for (let i = 0; i < dataString.length; i += chunkSize) {
-        chunks.push(dataString.substring(i, i + chunkSize));
+      for (let i = 0; i < b64.length; i += MAX_CHUNK_PAYLOAD) {
+        chunks.push(b64.slice(i, i + MAX_CHUNK_PAYLOAD));
+      }
+
+      const totalChunks = Math.max(1, chunks.length);
+
+      // Create payloads with headers (same format as QR export)
+      const payloads: string[] = [];
+      for (let i = 0; i < totalChunks; i++) {
+        const payload =
+          i.toString().padStart(HEADER_SIZE, "0") +
+          totalChunks.toString().padStart(TOTAL_CHUNKS_HEADER_SIZE, "0") +
+          (chunks[i] || "");
+        payloads.push(payload);
       }
 
       // Show progress
@@ -942,7 +967,7 @@ export class View {
 
       // Generate PDF with large layout (one QR per page)
       await this.pdfExport.exportToPDFLarge(
-        chunks,
+        payloads,
         this.currentExportMatch.matchName,
       );
 
