@@ -6,8 +6,8 @@ const HEADER_SIZE = 4;
 const TOTAL_CHUNKS_HEADER_SIZE = 4;
 const CHUNK_HEADER_SIZE = HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE;
 
-const MAX_CHUNK_PAYLOAD = 250;
-const FRAME_DURATION_MS = 400;
+const MAX_CHUNK_PAYLOAD = 200;
+const FRAME_DURATION_MS = 600;
 
 function encodeToBase64(input: string): string {
   const encoder = new TextEncoder();
@@ -99,7 +99,7 @@ export class QRExport {
     // Use smaller multiplier to account for padding and UI elements
     const qrCanvasPixelSize = Math.max(
       512,
-      Math.floor(Math.min(window.innerWidth * 0.80, window.innerHeight * 0.65)),
+      Math.floor(Math.min(window.innerWidth * 0.8, window.innerHeight * 0.65)),
     );
 
     const shown = new Set<number>();
@@ -127,7 +127,7 @@ export class QRExport {
           else dots.style.display = "none";
         }
       } catch (_err) {}
-      
+
       // Show progress bar when animation starts
       const progressWrap = document.getElementById("qr-export-progress-wrap");
       if (progressWrap) progressWrap.style.display = "flex";
@@ -148,20 +148,20 @@ export class QRExport {
           });
           el.replaceChildren();
           el.appendChild(canvas);
-          
+
           // Show the first QR code immediately
           const dom = document.getElementById(el.id);
           if (dom) dom.classList.remove("hidden");
-          
+
           // Wait for start button click before starting animation
           const startExport = () => {
             markShown(0);
-            
+
             // Hide start button
             const startBtn = document.getElementById("qr-export-start-btn");
             if (startBtn) startBtn.style.display = "none";
           };
-          
+
           if (onReadyToStart) {
             onReadyToStart();
             // Set up the start callback
@@ -221,7 +221,7 @@ export class QRExport {
             if (dom) dom.classList.remove("hidden");
           }
           markShown(0);
-          
+
           // Hide start button
           const startBtn = document.getElementById("qr-export-start-btn");
           if (startBtn) startBtn.style.display = "none";
@@ -281,18 +281,20 @@ export class QRExport {
             } catch (err) {
               console.error("QRExport: unexpected error in export loop", err);
               this.close();
-              alert("QR export encountered an unexpected error and was stopped.");
+              alert(
+                "QR export encountered an unexpected error and was stopped.",
+              );
             }
           }, FRAME_DURATION_MS);
         };
-        
+
         // Show the first QR code immediately
         const firstEl = this.pool.find((x) => x) || null;
         if (firstEl) {
           const dom = document.getElementById(firstEl.id);
           if (dom) dom.classList.remove("hidden");
         }
-        
+
         // Wait for start button click or start immediately
         if (onReadyToStart) {
           onReadyToStart();
@@ -370,7 +372,7 @@ export class QRExport {
       }
       const progressWrap = document.getElementById("qr-export-progress-wrap");
       if (progressWrap) progressWrap.style.display = "none";
-      
+
       // Reset start button
       const startBtn = document.getElementById("qr-export-start-btn");
       if (startBtn) {
