@@ -375,7 +375,7 @@
             #qr-export-code-worker-2 > div {
                 display: none !important;
             }
-            
+
             /* Scale QR code canvases to fill the screen without clipping */
             #qr-export-code-worker-0 canvas,
             #qr-export-code-worker-1 canvas,
@@ -398,17 +398,18 @@
 
             /* Color picker glossy effects */
             #whiteboard-color-config {
-                transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                            opacity 0.3s ease;
+                transition:
+                    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    opacity 0.3s ease;
                 transform-origin: bottom left;
             }
-            
+
             #whiteboard-color-config.color-picker-hidden {
                 transform: scale(0);
                 opacity: 0;
                 pointer-events: none;
             }
-            
+
             #whiteboard-color-config > div[id*="color"] {
                 position: relative;
                 overflow: hidden;
@@ -417,9 +418,10 @@
                     inset 0 2px 4px rgba(255, 255, 255, 0.3),
                     inset 0 -2px 4px rgba(0, 0, 0, 0.3);
                 transition: all 0.3s ease;
-                animation: colorItemSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+                animation: colorItemSlideUp 0.4s
+                    cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
             }
-            
+
             /* Yellow appears first (at bottom of container) */
             #whiteboard-color-yellow {
                 animation-delay: 0s !important;
@@ -444,7 +446,7 @@
             #whiteboard-color-close {
                 animation-delay: 0.32s !important;
             }
-            
+
             @keyframes colorItemSlideUp {
                 from {
                     opacity: 0;
@@ -597,8 +599,13 @@
             }
 
             @keyframes rotateDevice {
-                0%, 100% { transform: rotate(0deg); }
-                50% { transform: rotate(90deg); }
+                0%,
+                100% {
+                    transform: rotate(0deg);
+                }
+                50% {
+                    transform: rotate(90deg);
+                }
             }
 
             /* Show warning only on mobile devices in portrait mode */
@@ -1135,7 +1142,7 @@
                 <div class="flex w-full">
                     <button
                         id="create-match-create-btn"
-                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-blue-500 p-6 rounded-bl-2xl glossy-shine"
+                        class="w-1/2 text-center text-2xl font-bold text-slate-300 bg-green-500 p-6 rounded-bl-2xl glossy-shine"
                     >
                         Create
                     </button>
@@ -1161,66 +1168,69 @@
                     Import from The Blue Alliance
                 </div>
                 <div class="w-full flex-1 overflow-y-auto">
-                <div class="w-full px-8 pb-4">
-                    <input
-                        id="tba-api-key"
-                        placeholder="TBA API Key (optional - shared key available)"
-                        type="password"
-                        class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0"
-                        autocomplete="off"
-                        autocapitalize="off"
-                        spellcheck="false"
-                    />
-                    <div class="text-sm text-slate-400 text-center mt-2">
-                        Using shared API key. Add your own at
-                        <a
-                            href="https://www.thebluealliance.com/account"
-                            target="_blank"
-                            class="text-blue-400 underline"
-                            >thebluealliance.com/account</a
+                    <div class="w-full px-8 pb-4">
+                        <input
+                            id="tba-api-key"
+                            placeholder="TBA API Key (optional - shared key available)"
+                            type="password"
+                            class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                        />
+                        <div class="text-sm text-slate-400 text-center mt-2">
+                            Using shared API key. Add your own at
+                            <a
+                                href="https://www.thebluealliance.com/account"
+                                target="_blank"
+                                class="text-blue-400 underline"
+                                >thebluealliance.com/account</a
+                            >
+                            for higher rate limits
+                        </div>
+                    </div>
+                    <div class="w-full px-8 pb-4 relative">
+                        <input
+                            id="tba-event-search"
+                            placeholder="Search events..."
+                            class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                        />
+                        <div
+                            id="tba-event-dropdown"
+                            class="hidden absolute top-full left-8 right-8 mt-1 bg-slate-700 rounded-xl max-h-96 overflow-y-auto z-50 shadow-2xl"
                         >
-                        for higher rate limits
+                            <div
+                                id="tba-event-list"
+                                class="flex flex-col"
+                            ></div>
+                        </div>
+                        <input id="tba-event-key" type="hidden" />
                     </div>
-                </div>
-                <div class="w-full px-8 pb-4 relative">
-                    <input
-                        id="tba-event-search"
-                        placeholder="Search events..."
-                        class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0"
-                        autocomplete="off"
-                        autocapitalize="off"
-                        spellcheck="false"
-                    />
+                    <div class="w-full px-8 pb-6 relative">
+                        <input
+                            id="tba-team-search"
+                            placeholder="Select event first..."
+                            disabled
+                            class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0 disabled:opacity-50"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                        />
+                        <div
+                            id="tba-team-dropdown"
+                            class="hidden absolute top-full left-8 right-8 mt-1 bg-slate-700 rounded-xl max-h-96 overflow-y-auto z-50 shadow-2xl"
+                        >
+                            <div id="tba-team-list" class="flex flex-col"></div>
+                        </div>
+                        <input id="tba-team-number" type="hidden" />
+                    </div>
                     <div
-                        id="tba-event-dropdown"
-                        class="hidden absolute top-full left-8 right-8 mt-1 bg-slate-700 rounded-xl max-h-96 overflow-y-auto z-50 shadow-2xl"
-                    >
-                        <div id="tba-event-list" class="flex flex-col"></div>
-                    </div>
-                    <input id="tba-event-key" type="hidden" />
-                </div>
-                <div class="w-full px-8 pb-6 relative">
-                    <input
-                        id="tba-team-search"
-                        placeholder="Select event first..."
-                        disabled
-                        class="w-full p-4 text-xl text-center text-slate-300 rounded-xl bg-slate-700 outline-0 disabled:opacity-50"
-                        autocomplete="off"
-                        autocapitalize="off"
-                        spellcheck="false"
-                    />
-                    <div
-                        id="tba-team-dropdown"
-                        class="hidden absolute top-full left-8 right-8 mt-1 bg-slate-700 rounded-xl max-h-96 overflow-y-auto z-50 shadow-2xl"
-                    >
-                        <div id="tba-team-list" class="flex flex-col"></div>
-                    </div>
-                    <input id="tba-team-number" type="hidden" />
-                </div>
-                <div
-                    id="tba-status-message"
-                    class="hidden w-full px-8 pb-4 text-center text-slate-300"
-                ></div>
+                        id="tba-status-message"
+                        class="hidden w-full px-8 pb-4 text-center text-slate-300"
+                    ></div>
                 </div>
                 <div class="flex w-full flex-shrink-0">
                     <button
@@ -1305,7 +1315,7 @@
             <div
                 id="qr-export-inner-container"
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 bg-slate-600 rounded-3xl p-6 glass-modal"
-                style="max-height: 95vh; max-width: 95vw; overflow: hidden;"
+                style="max-height: 95vh; max-width: 95vw; overflow: hidden"
                 onclick="event.stopPropagation()"
                 role="dialog"
                 aria-modal="true"
@@ -1340,7 +1350,10 @@
                         aria-hidden="true"
                         style="display: none"
                     >
-                        <span id="qr-export-status-text" aria-hidden="false"></span>
+                        <span
+                            id="qr-export-status-text"
+                            aria-hidden="false"
+                        ></span>
                         <!-- Hiddenprepared flag for automation / accessibility: the app can reveal this
                              when the export is fully prepared (useful for keyboard users / AT). -->
                         <span
@@ -1384,7 +1397,10 @@
                 <!-- QR worker slots (kept as separate elements so the QR export code can
                      rotate canvases into them). The per-canvas numeric labels are hidden
                      via CSS so the top progress is the only textual indicator. -->
-                <div class="w-full flex items-center justify-center" style="min-height: 65vh; max-height: 65vh; overflow: hidden;">
+                <div
+                    class="w-full flex items-center justify-center"
+                    style="min-height: 65vh; max-height: 65vh; overflow: hidden"
+                >
                     <div
                         id="qr-export-code-worker-0"
                         class="hidden w-full flex items-center justify-center"
@@ -1846,29 +1862,37 @@
 
         <script>
             // Lock screen orientation to landscape on mobile devices
-            (function() {
+            (function () {
                 // Try to lock orientation when the page loads
                 async function lockOrientation() {
                     try {
                         if (screen.orientation && screen.orientation.lock) {
-                            await screen.orientation.lock('landscape');
-                            console.log('Screen orientation locked to landscape');
+                            await screen.orientation.lock("landscape");
+                            console.log(
+                                "Screen orientation locked to landscape",
+                            );
                         }
                     } catch (error) {
-                        console.log('Screen orientation lock not supported or failed:', error);
+                        console.log(
+                            "Screen orientation lock not supported or failed:",
+                            error,
+                        );
                     }
                 }
 
                 // Lock orientation when the page loads
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', lockOrientation);
+                if (document.readyState === "loading") {
+                    document.addEventListener(
+                        "DOMContentLoaded",
+                        lockOrientation,
+                    );
                 } else {
                     lockOrientation();
                 }
 
                 // Also try to lock when entering fullscreen (for PWA)
-                document.addEventListener('fullscreenchange', lockOrientation);
-                
+                document.addEventListener("fullscreenchange", lockOrientation);
+
                 // For iOS Safari (which doesn't support screen.orientation.lock)
                 // We rely on CSS media query to show the warning instead
             })();
