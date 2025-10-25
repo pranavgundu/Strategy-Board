@@ -439,25 +439,26 @@ export class View {
                 "#whiteboard-toolbar .toolbar-right",
               ) as HTMLElement | null;
               if (!toolbar || !mode || !left || !right) return;
-              
+
               // Get bounding rectangles
               const mRect = mode.getBoundingClientRect();
               const lRect = left.getBoundingClientRect();
               const rRect = right.getBoundingClientRect();
-              
+
               // Calculate required space and available space
               const leftWidth = lRect.width;
               const modeWidth = mRect.width;
               const rightWidth = rRect.width;
               const toolbarWidth = toolbar.getBoundingClientRect().width;
               const padding = 48; // Extra padding to prevent overlap, especially on iPads
-              const requiredWidth = leftWidth + modeWidth + rightWidth + (padding * 2);
+              const requiredWidth =
+                leftWidth + modeWidth + rightWidth + padding * 2;
 
               // Check if elements would overlap or are too close
-              const shouldCollapse = 
-                (mRect.right > rRect.left - padding) || 
-                (mRect.left < lRect.right + padding) ||
-                (requiredWidth > toolbarWidth);
+              const shouldCollapse =
+                mRect.right > rRect.left - padding ||
+                mRect.left < lRect.right + padding ||
+                requiredWidth > toolbarWidth;
 
               if (shouldCollapse) {
                 // Apply collapsed layout using CSS class
@@ -761,7 +762,7 @@ export class View {
             // Show the start button and reset UI
             const startBtn = document.getElementById("qr-export-start-btn");
             if (startBtn) startBtn.style.display = "block";
-            
+
             this.qrexport.export(match, () => {
               // Callback when QR codes are ready - the start button is now functional
               console.log("QR export ready - waiting for user to click Start");
@@ -991,9 +992,9 @@ export class View {
 
         const id = await this.model.createNewMatch(
           formattedMatchName,
-          match.redTeams[0] || "",
-          match.redTeams[1] || "",
           match.redTeams[2] || "",
+          match.redTeams[1] || "",
+          match.redTeams[0] || "",
           match.blueTeams[0] || "",
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
@@ -1002,9 +1003,9 @@ export class View {
         this.createNewMatch(
           id,
           formattedMatchName,
-          match.redTeams[0] || "",
-          match.redTeams[1] || "",
           match.redTeams[2] || "",
+          match.redTeams[1] || "",
+          match.redTeams[0] || "",
           match.blueTeams[0] || "",
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
@@ -1200,9 +1201,12 @@ export class View {
     if (I?.TBATeamSearch) {
       I.TBATeamSearch.addEventListener("input", async (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
-        
+
         // If team search has content and no event is selected, filter events by team
-        if (searchTerm.length > 0 && (!I?.TBAEventKey || !I.TBAEventKey.value)) {
+        if (
+          searchTerm.length > 0 &&
+          (!I?.TBAEventKey || !I.TBAEventKey.value)
+        ) {
           await this.filterEventsByTeam(searchTerm);
         } else {
           // Otherwise, filter teams normally
@@ -1309,10 +1313,10 @@ export class View {
 
   private async filterEventsByTeam(searchTerm: string): Promise<void> {
     if (!E?.TBAEventList) return;
-    
+
     // Extract team number from search term (remove "team" prefix if present)
-    const teamNumber = searchTerm.replace(/^team\s*/i, '').trim();
-    
+    const teamNumber = searchTerm.replace(/^team\s*/i, "").trim();
+
     if (!teamNumber || !this.tbaService.hasApiKey()) {
       this.filterTBAEvents(searchTerm);
       return;
@@ -1324,13 +1328,15 @@ export class View {
       // Fetch team's events
       const currentYear = new Date().getFullYear();
       const yearsToFetch = [currentYear, currentYear - 1, currentYear - 2];
-      
+
       const allTeamEventsPromises = yearsToFetch.map((year) =>
-        this.tbaService.getTeamEvents(teamNumber, year).catch(() => [])
+        this.tbaService.getTeamEvents(teamNumber, year).catch(() => []),
       );
 
       const allTeamEventsArrays = await Promise.all(allTeamEventsPromises);
-      const teamEventKeys = new Set(allTeamEventsArrays.flat().map(e => e.key));
+      const teamEventKeys = new Set(
+        allTeamEventsArrays.flat().map((e) => e.key),
+      );
 
       // Filter the event list to show only events this team is attending
       const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
@@ -1338,7 +1344,7 @@ export class View {
 
       items.forEach((item) => {
         const eventKey = (item as HTMLElement).dataset.eventKey || "";
-        
+
         if (teamEventKeys.has(eventKey)) {
           (item as HTMLElement).style.display = "";
           visibleCount++;
