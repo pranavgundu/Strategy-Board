@@ -103,8 +103,40 @@ export class TBAService {
   }
 
   public async getTeamsAtEvent(eventKey: string): Promise<string[]> {
-    const endpoint = `/event/${eventKey}/teams/keys`;
+    try {
+      const endpoint = `/event/${eventKey}/teams/keys`;
+      return await this.makeRequest(endpoint);
+    } catch (error) {
+      // If teams endpoint fails, try to extract teams from match schedule
+      console.warn(
+        "Failed to fetch teams directly, falling back to match schedule:",
+        error,
+      );
+      return await this.getTeamsFromMatches(eventKey);
+    }
+  }
+
+  public async getMatchesAtEvent(eventKey: string): Promise<TBAMatch[]> {
+    const endpoint = `/event/${eventKey}/matches`;
     return await this.makeRequest(endpoint);
+  }
+
+  private async getTeamsFromMatches(eventKey: string): Promise<string[]> {
+    const matches = await this.getMatchesAtEvent(eventKey);
+    const teamSet = new Set<string>();
+
+    for (const match of matches) {
+      // Add red alliance teams
+      for (const teamKey of match.alliances.red.team_keys) {
+        teamSet.add(teamKey);
+      }
+      // Add blue alliance teams
+      for (const teamKey of match.alliances.blue.team_keys) {
+        teamSet.add(teamKey);
+      }
+    }
+
+    return Array.from(teamSet);
   }
 
   public async getTeamEvents(
