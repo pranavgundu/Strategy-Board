@@ -3,9 +3,13 @@ import { Model } from "@/model.ts";
 // the Model class handles application data and its persistence
 import { registerSW } from "virtual:pwa-register";
 import { inject } from "@vercel/analytics";
+import { injectSpeedInsights } from "@vercel/speed-insights";
 
 // Initialize Vercel Analytics
 inject();
+
+// Initialize Vercel Speed Insights
+injectSpeedInsights();
 
 registerSW({
   immediate: true,
