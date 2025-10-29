@@ -155,6 +155,7 @@ Pranav Gundu
 
 - Email: [pranav@strategyboard.app](mailto:pranav@strategyboard.app)
 - Website: [strategyboard.app](https://strategyboard.app)
+- Website: [strategyboard.vercel.app](https://strategyboard.vercel.app)
 
 ---
 
