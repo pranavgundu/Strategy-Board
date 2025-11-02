@@ -1175,7 +1175,7 @@ export class View {
 
         const details = document.createElement("div");
         details.className = "tba-event-details";
-        details.textContent = `${event.location} • ${event.dateRange}`;
+        details.textContent = `${event.location} • ${event.dateRange} • ${event.year}`;
 
         item.appendChild(name);
         item.appendChild(details);
