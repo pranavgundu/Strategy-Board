@@ -36,6 +36,7 @@ export interface TBASimpleEvent {
   name: string;
   location: string;
   dateRange: string;
+  year: number;
 }
 
 export interface TBASimpleMatch {
@@ -173,6 +174,7 @@ export class TBAService {
         name: event.name,
         location,
         dateRange,
+        year: event.year,
       };
     });
   }
