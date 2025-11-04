@@ -542,6 +542,22 @@
                     inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
             }
 
+            /* Match item hover effect */
+            #home-match-list > div:hover {
+                background-color: rgba(71, 85, 105, 0.85);
+                border-color: rgba(255, 255, 255, 0.2);
+                box-shadow:
+                    0 12px 40px 0 rgba(0, 0, 0, 0.45),
+                    inset 0 1px 2px 0 rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+                transition: all 0.2s ease;
+                cursor: pointer;
+            }
+
+            #home-match-list > div {
+                transition: all 0.2s ease;
+            }
+
             .glass-modal {
                 backdrop-filter: blur(20px) saturate(180%);
                 -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -1068,7 +1084,7 @@
             </div>
             <div
                 id="home-bottom-bar"
-                class="w-full h-16 bg-slate-700 flex items-center justify-center border-t border-slate-600 transition-all duration-300"
+                class="w-full h-16 bg-slate-700 flex items-center justify-center border-t border-slate-600 transition-all duration-300 relative"
             >
                 <a
                     href="https://github.com/pranavgundu/Strategy-Board"
@@ -1078,6 +1094,14 @@
                 >
                     <i class="fab fa-github text-2xl"></i>
                     <span class="text-lg font-semibold"></span>
+                </a>
+                <a
+                    href="https://strategyboard.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="absolute right-6 text-slate-300 hover:text-white transition-colors text-lg font-semibold"
+                >
+                    strategyboard.app
                 </a>
             </div>
         </div>
