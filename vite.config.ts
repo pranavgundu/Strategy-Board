@@ -47,18 +47,7 @@ export default defineConfig({
         short_name: "Strategy Board",
         description: "Strategy Board",
         theme_color: "#ffffff",
-        icons: [
-          {
-            src: "favicon/andriod-chrome-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "favicon/andriod-chrome-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-        ],
+        icons: [],
       },
     }),
   ],
