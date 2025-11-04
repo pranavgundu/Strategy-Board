@@ -598,8 +598,9 @@
 
             #orientation-warning .rotate-icon {
                 font-size: 80px;
-                margin-bottom: 20px;
+                margin-bottom: 40px;
                 animation: rotateDevice 2s ease-in-out infinite;
+                color: white;
             }
 
             #orientation-warning .message {
@@ -607,11 +608,30 @@
                 font-size: 24px;
                 font-weight: 600;
                 margin-bottom: 10px;
+                margin-top: 20px;
             }
 
             #orientation-warning .submessage {
                 color: rgba(255, 255, 255, 0.7);
                 font-size: 16px;
+                margin-bottom: 30px;
+            }
+
+            #orientation-warning .dismiss-button {
+                padding: 12px 24px;
+                background-color: rgba(100, 116, 139, 0.8);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            #orientation-warning .dismiss-button:hover {
+                background-color: rgba(71, 85, 105, 0.9);
+                border-color: rgba(255, 255, 255, 0.3);
             }
 
             @keyframes rotateDevice {
@@ -624,9 +644,13 @@
                 }
             }
 
+            #orientation-warning.dismissed {
+                display: none !important;
+            }
+
             /* Show warning only on mobile devices in portrait mode */
             @media (max-width: 1024px) and (orientation: portrait) {
-                #orientation-warning {
+                #orientation-warning:not(.dismissed) {
                     display: flex !important;
                 }
             }
@@ -951,9 +975,12 @@
     <body class="overflow-hidden">
         <!-- Landscape orientation warning for mobile devices -->
         <div id="orientation-warning">
-            <div class="rotate-icon">📱➜🔄</div>
+            <div class="rotate-icon"><i class="fas fa-mobile-alt"></i></div>
             <div class="message">Please rotate your device</div>
             <div class="submessage">This app works best in landscape mode</div>
+            <button class="dismiss-button" onclick="document.getElementById('orientation-warning').classList.add('dismissed')">
+                Continue in Portrait
+            </button>
         </div>
 
         <div id="app-debug-overlay" class="hidden" aria-hidden="true">
