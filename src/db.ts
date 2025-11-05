@@ -1,6 +1,5 @@
 import { get, getMany, set, clear, entries, del } from "idb-keyval";
 
-// retrieves a value from the database using the provided key
 export async function GET<T = unknown>(
   key: string,
   handler?: (err: Error) => void,

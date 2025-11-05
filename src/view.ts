@@ -57,7 +57,6 @@ let E: {
   ClearConfirmPanel?: HTMLElement | null;
 } | null = null;
 
-// this class manages the user interface and interactions
 export class View {
   private model: Model;
   private whiteboard: Whiteboard;
@@ -264,7 +263,6 @@ export class View {
         );
       }
 
-      // Clear confirmation modal handlers
       const clearConfirmClear = B?.ClearConfirmClear;
       if (clearConfirmClear) {
         console.debug(
@@ -490,31 +488,26 @@ export class View {
               ) as HTMLElement | null;
               if (!toolbar || !mode || !left || !right) return;
 
-              // Get bounding rectangles
               const mRect = mode.getBoundingClientRect();
               const lRect = left.getBoundingClientRect();
               const rRect = right.getBoundingClientRect();
 
-              // Calculate required space and available space
               const leftWidth = lRect.width;
               const modeWidth = mRect.width;
               const rightWidth = rRect.width;
               const toolbarWidth = toolbar.getBoundingClientRect().width;
-              const padding = 48; // Extra padding to prevent overlap, especially on iPads
+              const padding = 48;
               const requiredWidth =
                 leftWidth + modeWidth + rightWidth + padding * 2;
 
-              // Check if elements would overlap or are too close
               const shouldCollapse =
                 mRect.right > rRect.left - padding ||
                 mRect.left < lRect.right + padding ||
                 requiredWidth > toolbarWidth;
 
               if (shouldCollapse) {
-                // Apply collapsed layout using CSS class
                 toolbar.classList.add("toolbar-collapsed");
               } else {
-                // Remove collapsed layout
                 toolbar.classList.remove("toolbar-collapsed");
               }
             } catch (_err) {}
@@ -613,7 +606,6 @@ export class View {
         console.warn("Missing element: qr-export-container");
       }
 
-      // Add PDF export button listener
       const pdfExportBtn = get("qr-export-pdf-btn");
       if (pdfExportBtn) {
         console.debug("View: attaching 'click' handler to #qr-export-pdf-btn");
@@ -822,19 +814,15 @@ export class View {
         this.show(E.Export);
         setTimeout(() => {
           try {
-            // Store the current match for PDF export
             this.currentExportMatch = match;
 
-            // Show the start button and reset UI
             const startBtn = document.getElementById("qr-export-start-btn");
             if (startBtn) startBtn.style.display = "block";
 
-            // Show the PDF export button
             const pdfBtn = document.getElementById("qr-export-pdf-btn");
             if (pdfBtn) pdfBtn.style.display = "block";
 
             this.qrexport.export(match, () => {
-              // Callback when QR codes are ready - the start button is now functional
               console.log("QR export ready - waiting for user to click Start");
             });
           } catch (err) {
@@ -970,12 +958,10 @@ export class View {
     }
 
     try {
-      // Use the SAME encoding as live QR export
       const packet = this.currentExportMatch.getAsPacket();
-      packet.splice(7, 1); // Remove the same element as QR export does
+      packet.splice(7, 1);
       const raw = JSON.stringify(packet);
 
-      // Encode to base64 (same as QR export)
       const encoder = new TextEncoder();
       const bytes = encoder.encode(raw);
       let binary = "";
@@ -984,7 +970,6 @@ export class View {
       }
       const b64 = btoa(binary);
 
-      // Split into chunks using the SAME system as QR export
       const MAX_CHUNK_PAYLOAD = 200;
       const HEADER_SIZE = 4;
       const TOTAL_CHUNKS_HEADER_SIZE = 4;
@@ -996,7 +981,6 @@ export class View {
 
       const totalChunks = Math.max(1, chunks.length);
 
-      // Create payloads with headers (same format as QR export)
       const payloads: string[] = [];
       for (let i = 0; i < totalChunks; i++) {
         const payload =
@@ -1006,18 +990,15 @@ export class View {
         payloads.push(payload);
       }
 
-      // Show progress
       const pdfBtn = document.getElementById("qr-export-pdf-btn");
       const originalText = pdfBtn?.textContent || "Export as PDF";
       if (pdfBtn) pdfBtn.textContent = "Generating PDF...";
 
-      // Generate PDF with large layout (one QR per page)
       await this.pdfExport.exportToPDFLarge(
         payloads,
         this.currentExportMatch.matchName,
       );
 
-      // Reset button
       if (pdfBtn) pdfBtn.textContent = originalText;
 
       console.log("PDF export completed successfully");
@@ -1025,7 +1006,6 @@ export class View {
       console.error("Failed to export PDF:", error);
       alert("Failed to generate PDF. Please try again.");
 
-      // Reset button
       const pdfBtn = document.getElementById("qr-export-pdf-btn");
       if (pdfBtn) pdfBtn.textContent = "Export as PDF";
     }
@@ -1053,7 +1033,6 @@ export class View {
       I.TBAApiKey.placeholder = "API Key (saved)";
     }
 
-    // Enable team search from the start
     if (I?.TBATeamSearch) {
       I.TBATeamSearch.disabled = false;
       I.TBATeamSearch.placeholder = "Search teams...";

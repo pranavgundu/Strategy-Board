@@ -68,12 +68,6 @@ const _canvasStub = (() => {
   return c;
 })();
 
-/**
- * Proxies for the three canvases. These forward property access and method
- * calls to the real DOM element when available; otherwise they operate on the
- * fallback stub. Methods are bound correctly so existing calls like
- * `background.getContext("2d")` or `background.width` continue to work.
- */
 const background = new Proxy({} as HTMLCanvasElement, {
   get(_t, prop: PropertyKey, receiver?: any) {
     ensureCanvases();
@@ -197,18 +191,14 @@ export function updateCanvasSize() {
   const fillWidth = wrapper.clientWidth;
   const fillHeight = wrapper.clientHeight;
 
-  // Calculate scaling to fit the canvas within the wrapper while maintaining aspect ratio
   const ratioWidth = fillWidth / background.width;
   const ratioHeight = fillHeight / background.height;
 
-  // Use the smaller ratio to ensure the entire canvas fits
   scaling = Math.min(ratioWidth, ratioHeight);
   
-  // Calculate the actual displayed size after scaling
   const scaledWidth = background.width * scaling;
   const scaledHeight = background.height * scaling;
   
-  // Center the canvas in the wrapper
   const leftOffset = (fillWidth - scaledWidth) / 2;
   const topOffset = (fillHeight - scaledHeight) / 2;
   
@@ -225,7 +215,6 @@ window.addEventListener("orientationchange", updateCanvasSize);
 
 let clickMovement = 0;
 
-// this class manages the drawing and interaction on the whiteboard
 export class Whiteboard {
   private model;
   private active = true;
@@ -447,12 +436,10 @@ export class Whiteboard {
     document
       .getElementById("whiteboard-color-close")
       ?.addEventListener("click", (e) => {
-        // Add animation class to hide the picker with animation
         document
           .getElementById("whiteboard-color-config")
           ?.classList.add("color-picker-hidden");
 
-        // After animation, hide individual items and show only the selected color
         setTimeout(() => {
           document
             .getElementById("whiteboard-color-white")
@@ -522,11 +509,10 @@ export class Whiteboard {
               break;
           }
 
-          // Remove animation class to prepare for next opening
           document
             .getElementById("whiteboard-color-config")
             ?.classList.remove("color-picker-hidden");
-        }, 300); // Match the CSS transition duration
+        }, 300);
       });
 
     document
@@ -994,19 +980,15 @@ export class Whiteboard {
     BG.save();
     BG.clearRect(0, 0, width, height);
 
-    // Check if we're in notes mode
     if (this.mode === "notes") {
-      // Draw plain black background
       BG.fillStyle = "#000000";
       BG.fillRect(0, 0, width, height);
 
-      // Draw subtle white grid lines for aesthetics
       BG.strokeStyle = "rgba(255, 255, 255, 0.2)";
       BG.lineWidth = 1;
 
       const gridSpacing = 100;
 
-      // Draw vertical lines
       for (let x = 0; x < width; x += gridSpacing) {
         BG.beginPath();
         BG.moveTo(x, 0);
@@ -1014,7 +996,6 @@ export class Whiteboard {
         BG.stroke();
       }
 
-      // Draw horizontal lines
       for (let y = 0; y < height; y += gridSpacing) {
         BG.beginPath();
         BG.moveTo(0, y);
@@ -1023,10 +1004,9 @@ export class Whiteboard {
       }
 
       BG.restore();
-      return; // Don't draw field or team numbers in notes mode
+      return;
     }
 
-    // Normal field drawing for other modes
     BG.fillStyle = "#18181b";
     BG.fillRect(0, 0, width, height);
     BG.translate(width / 2 - this.camera.x, height / 2 - this.camera.y);
@@ -1055,7 +1035,6 @@ export class Whiteboard {
       const px = stationX - (this.camera.x - width / 2);
       const py = stationY - (this.camera.y - height / 2);
 
-      // Use consistent margin for all numbers
       const effectiveMarginX = margin;
       const effectiveMarginY = margin;
 
@@ -1069,7 +1048,6 @@ export class Whiteboard {
       BG.restore();
     };
 
-    // Red stations - normal order (1, 2, 3)
     drawStation(
       Config.redOneStationX,
       Config.redOneStationY,
@@ -1153,7 +1131,6 @@ export class Whiteboard {
     if (this.selected !== null && this.selected[0] == slot) {
       IT.beginPath();
       IT.fillStyle = "white";
-      // Position rotation control on right for red team, left for blue team
       const rotControlX = team === "blue" ? -robot.w / 2 : robot.w / 2;
       IT.arc(rotControlX, 0, 20, 0, Math.PI * 2);
       IT.fill();
@@ -1184,7 +1161,6 @@ export class Whiteboard {
 
     if (data === null || this.match === null) return;
 
-    // Don't draw robots in notes mode
     if (this.mode === "notes") {
       IT.clearRect(0, 0, width, height);
       return;
@@ -1504,7 +1480,6 @@ export class Whiteboard {
         this.selected[1].x = x + this.selected[2];
         this.selected[1].y = y + this.selected[3];
 
-        // Position rotation control based on team (left for blue, right for red)
         const slot = this.selected[0];
         const isBlueTeam =
           slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
@@ -1523,7 +1498,6 @@ export class Whiteboard {
         this.currentAction = "transform";
         this.drawRobots();
       } else if (this.selectedType === "rot") {
-        // Position rotation control based on team (left for blue, right for red)
         const slot = this.selected[0];
         const isBlueTeam =
           slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
@@ -1540,7 +1514,6 @@ export class Whiteboard {
             rotControlDistance * Math.sin(this.selected[1].r),
         };
 
-        // Calculate angle based on which side the rotation control is on
         let angle = Math.atan2(y - this.selected[1].y, x - this.selected[1].x);
 
         if (isBlueTeam) {
@@ -1590,7 +1563,6 @@ export class Whiteboard {
       this.selected = selected;
       this.selectedType = "robot";
 
-      // Position rotation control based on team (left for blue, right for red)
       const slot = this.selected[0];
       const isBlueTeam =
         slot === "blueOne" || slot === "blueTwo" || slot === "blueThree";
