@@ -192,21 +192,31 @@ fieldImage.src = fieldUrl;
 
 export function updateCanvasSize() {
   const wrapper = <HTMLElement>document.getElementById("whiteboard-wrapper");
+  if (!wrapper) return;
 
   const fillWidth = wrapper.clientWidth;
   const fillHeight = wrapper.clientHeight;
 
+  // Calculate scaling to fit the canvas within the wrapper while maintaining aspect ratio
   const ratioWidth = fillWidth / background.width;
   const ratioHeight = fillHeight / background.height;
 
-  const leftOffset = (fillWidth - background.width) / 2;
-  const topOffset =
-    (fillHeight - background.height) / 2 + wrapper.getBoundingClientRect().top;
-  scaling = ratioWidth > ratioHeight ? ratioHeight : ratioWidth;
+  // Use the smaller ratio to ensure the entire canvas fits
+  scaling = Math.min(ratioWidth, ratioHeight);
+  
+  // Calculate the actual displayed size after scaling
+  const scaledWidth = background.width * scaling;
+  const scaledHeight = background.height * scaling;
+  
+  // Center the canvas in the wrapper
+  const leftOffset = (fillWidth - scaledWidth) / 2;
+  const topOffset = (fillHeight - scaledHeight) / 2;
+  
   [background, items, drawing].forEach((e) => {
     e.style.scale = `${scaling}`;
     e.style.left = `${leftOffset}px`;
     e.style.top = `${topOffset}px`;
+    e.style.transformOrigin = 'top left';
   });
 }
 
