@@ -19,6 +19,8 @@ let B: {
   ToggleView?: HTMLElement | null;
   TBAImportBtn?: HTMLElement | null;
   TBACancel?: HTMLElement | null;
+  ClearConfirmClear?: HTMLElement | null;
+  ClearConfirmCancel?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -52,6 +54,7 @@ let E: {
   TBAEventList?: HTMLElement | null;
   TBATeamDropdown?: HTMLElement | null;
   TBATeamList?: HTMLElement | null;
+  ClearConfirmPanel?: HTMLElement | null;
 } | null = null;
 
 // this class manages the user interface and interactions
@@ -90,6 +93,8 @@ export class View {
         ToggleView: get("whiteboard-toolbar-view-toggle") as HTMLElement | null,
         TBAImportBtn: get("tba-import-btn") as HTMLElement | null,
         TBACancel: get("tba-cancel-btn") as HTMLElement | null,
+        ClearConfirmClear: get("clear-confirm-clear-btn") as HTMLElement | null,
+        ClearConfirmCancel: get("clear-confirm-cancel-btn") as HTMLElement | null,
       };
 
       I = {
@@ -127,6 +132,7 @@ export class View {
         TBAEventList: get("tba-event-list") as HTMLElement | null,
         TBATeamDropdown: get("tba-team-dropdown") as HTMLElement | null,
         TBATeamList: get("tba-team-list") as HTMLElement | null,
+        ClearConfirmPanel: get("clear-confirm-container") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -241,9 +247,7 @@ export class View {
             );
           } catch (_err) {}
           clearBtn.addEventListener("click", (e) => {
-            if (!confirm("Are you sure you want to clear all data?")) return;
-            CLEAR();
-            location.reload();
+            this.show(E.ClearConfirmPanel);
           });
           console.debug(
             "View: attached 'click' handler to #home-toolbar-clear-btn",
@@ -258,6 +262,48 @@ export class View {
         console.warn(
           "Missing element: home-toolbar-clear-btn (no clear handler attached here)",
         );
+      }
+
+      // Clear confirmation modal handlers
+      const clearConfirmClear = B?.ClearConfirmClear;
+      if (clearConfirmClear) {
+        console.debug(
+          "View: attaching 'click' handler to #clear-confirm-clear-btn",
+        );
+        try {
+          clearConfirmClear.addEventListener("click", (e) => {
+            CLEAR();
+            location.reload();
+          });
+          console.debug(
+            "View: attached 'click' handler to #clear-confirm-clear-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #clear-confirm-clear-btn:",
+            err,
+          );
+        }
+      }
+
+      const clearConfirmCancel = B?.ClearConfirmCancel;
+      if (clearConfirmCancel) {
+        console.debug(
+          "View: attaching 'click' handler to #clear-confirm-cancel-btn",
+        );
+        try {
+          clearConfirmCancel.addEventListener("click", (e) => {
+            this.hide(E.ClearConfirmPanel);
+          });
+          console.debug(
+            "View: attached 'click' handler to #clear-confirm-cancel-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #clear-confirm-cancel-btn:",
+            err,
+          );
+        }
       }
 
       const exportEl = E?.Export;
