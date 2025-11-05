@@ -1,6 +1,6 @@
-# Strategy Board
-
 <div align="center">
+
+# Strategy Board
 
 ![Strategy Board Banner](https://github.com/user-attachments/assets/bb049aef-19a5-44c0-8b29-64799408ee6a)
 

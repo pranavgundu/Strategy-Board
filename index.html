@@ -772,6 +772,28 @@
             #tba-team-dropdown::-webkit-scrollbar-thumb:hover {
                 background: rgba(59, 130, 246, 0.7);
             }
+
+            /* Glow effect for strategyboard.app and GitHub logo on hover */
+            #home-bottom-bar {
+                overflow: visible !important;
+            }
+
+            #home-bottom-bar a {
+                transition: all 0.3s ease-in-out;
+            }
+
+            #home-bottom-bar a:hover {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                            0 0 20px rgba(255, 255, 255, 0.6),
+                            0 0 30px rgba(255, 255, 255, 0.4),
+                            0 0 40px rgba(255, 255, 255, 0.2);
+            }
+
+            #home-bottom-bar a:hover i {
+                filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5))
+                        drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))
+                        drop-shadow(0 0 18px rgba(255, 255, 255, 0.2));
+            }
         </style>
         <script>
             (function () {
