@@ -1001,7 +1001,7 @@ export class Whiteboard {
       BG.fillRect(0, 0, width, height);
 
       // Draw subtle white grid lines for aesthetics
-      BG.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      BG.strokeStyle = "rgba(255, 255, 255, 0.2)";
       BG.lineWidth = 1;
 
       const gridSpacing = 100;
