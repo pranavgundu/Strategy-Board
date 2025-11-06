@@ -16,13 +16,13 @@ A powerful strategy planning tool for FIRST Robotics Competition teams
 
 ## Features
 
-- Interactive Field Drawing - Visualize your strategy with intuitive drawing tools
-- Robot Positioning - Place and orient robots on the field for each match phase
-- The Blue Alliance Integration - Import match schedules and team data directly from TBA
-- QR Code Export/Import - Share strategies instantly with your team via QR codes
-- Multi-Phase Planning - Separate views for Auto, Teleop, Endgame, and Notes
-- Auto-Save - Your work is automatically saved to local storage
-- Match Management - Create, organize, and manage multiple match strategies
+- Interactive Field Drawing 
+- Robot Positioning 
+- The Blue Alliance Integration 
+- QR Code Export/Import
+- Multi-Phase Planning
+- Auto-Save
+- Match Management
 
 ---
 
@@ -169,6 +169,14 @@ Pranav Gundu
 ---
 
 <div align="center">
+
+<a href="https://www.star-history.com/#pranavgundu/Strategy-Board&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&legend=top-left" />
+ </picture>
+</a>
 
 Made for the FRC community
 
