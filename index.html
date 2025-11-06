@@ -430,16 +430,35 @@
 
             /* Color picker glossy effects */
             #whiteboard-color-config {
-                transition:
-                    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                    opacity 0.3s ease;
-                transform-origin: bottom left;
+                transform-origin: bottom center;
+                animation: colorPickerSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
 
             #whiteboard-color-config.color-picker-hidden {
-                transform: scale(0);
-                opacity: 0;
+                animation: colorPickerSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
                 pointer-events: none;
+            }
+
+            @keyframes colorPickerSlideUp {
+                from {
+                    transform: translateY(20px) scale(0.8);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes colorPickerSlideDown {
+                from {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(20px) scale(0.8);
+                    opacity: 0;
+                }
             }
 
             #whiteboard-color-config > div[id*="color"] {
@@ -449,44 +468,80 @@
                     0 4px 12px rgba(0, 0, 0, 0.3),
                     inset 0 2px 4px rgba(255, 255, 255, 0.3),
                     inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-                transition: all 0.3s ease;
-                animation: colorItemSlideUp 0.4s
-                    cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+                animation: colorItemSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+            }
+
+            #whiteboard-color-config.color-picker-hidden > div[id*="color"] {
+                animation: colorItemSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             }
 
             /* Yellow appears first (at bottom of container) */
             #whiteboard-color-yellow {
-                animation-delay: 0s !important;
+                animation-delay: 0s;
             }
+            #whiteboard-color-config.color-picker-hidden #whiteboard-color-yellow {
+                animation-delay: 0.2s;
+            }
+            
             /* Green appears second */
             #whiteboard-color-green {
-                animation-delay: 0.08s !important;
+                animation-delay: 0.05s;
             }
+            #whiteboard-color-config.color-picker-hidden #whiteboard-color-green {
+                animation-delay: 0.15s;
+            }
+            
             /* Blue appears third */
             #whiteboard-color-blue {
-                animation-delay: 0.16s !important;
+                animation-delay: 0.1s;
             }
+            #whiteboard-color-config.color-picker-hidden #whiteboard-color-blue {
+                animation-delay: 0.1s;
+            }
+            
             /* Red appears fourth */
             #whiteboard-color-red {
-                animation-delay: 0.24s !important;
+                animation-delay: 0.15s;
             }
+            #whiteboard-color-config.color-picker-hidden #whiteboard-color-red {
+                animation-delay: 0.05s;
+            }
+            
             /* White appears fifth (at top) */
             #whiteboard-color-white {
-                animation-delay: 0.32s !important;
+                animation-delay: 0.2s;
             }
+            #whiteboard-color-config.color-picker-hidden #whiteboard-color-white {
+                animation-delay: 0s;
+            }
+            
             /* Close button appears with white */
             #whiteboard-color-close {
-                animation-delay: 0.32s !important;
+                animation-delay: 0.2s;
+            }
+            #whiteboard-color-config.color-picker-hidden #whiteboard-color-close {
+                animation-delay: 0s;
             }
 
             @keyframes colorItemSlideUp {
                 from {
                     opacity: 0;
-                    transform: translateY(30px) scale(0.5);
+                    transform: translateY(20px) scale(0.5);
                 }
                 to {
                     opacity: 1;
                     transform: translateY(0) scale(1);
+                }
+            }
+
+            @keyframes colorItemSlideDown {
+                from {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateY(20px) scale(0.5);
                 }
             }
 

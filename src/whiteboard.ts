@@ -194,7 +194,8 @@ export function updateCanvasSize() {
   const ratioWidth = fillWidth / background.width;
   const ratioHeight = fillHeight / background.height;
 
-  scaling = Math.min(ratioWidth, ratioHeight);
+  // Apply zoom factor to add padding (0.95 = 5% padding on each side)
+  scaling = Math.min(ratioWidth, ratioHeight) * 0.95;
   
   const scaledWidth = background.width * scaling;
   const scaledHeight = background.height * scaling;
