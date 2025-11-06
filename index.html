@@ -443,6 +443,30 @@
                 transform: scale(1.05);
             }
 
+            /* Draw config morphing animation */
+            #whiteboard-draw-config {
+                transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            }
+
+            #whiteboard-draw-config:active {
+                transform: scale(0.85) rotate(180deg);
+            }
+
+            #whiteboard-draw-config i {
+                position: absolute;
+                transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            }
+
+            #whiteboard-draw-config i[style*="display: none"] {
+                opacity: 0;
+                transform: scale(0) rotate(-180deg);
+            }
+
+            #whiteboard-draw-config i:not([style*="display: none"]) {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+
             /* Color picker glossy effects */
             #whiteboard-color-config {
                 transform-origin: bottom center;
