@@ -2,11 +2,6 @@ import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 
 export class PDFExport {
-  /**
-   * Exports QR codes as a PDF with evenly spaced codes for easy scanning
-   * @param data The data array to encode into QR codes
-   * @param matchName The name of the match for the PDF title
-   */
   public async exportToPDF(data: string[], matchName: string): Promise<void> {
     try {
       const pdf = new jsPDF({
