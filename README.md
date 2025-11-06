@@ -170,6 +170,12 @@ Pranav Gundu
 
 <div align="center">
 
+
+
+Made for the FRC community
+
+Star this repo if you find it helpful!
+
 <a href="https://www.star-history.com/#pranavgundu/Strategy-Board&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&theme=dark&legend=top-left" />
@@ -177,9 +183,5 @@ Pranav Gundu
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&legend=top-left" />
  </picture>
 </a>
-
-Made for the FRC community
-
-Star this repo if you find it helpful!
 
 </div>
