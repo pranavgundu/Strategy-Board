@@ -19,6 +19,7 @@ let B: {
   ToggleView?: HTMLElement | null;
   TBAImportBtn?: HTMLElement | null;
   TBACancel?: HTMLElement | null;
+  TBAAllMatchesBtn?: HTMLElement | null;
   ClearConfirmClear?: HTMLElement | null;
   ClearConfirmCancel?: HTMLElement | null;
 } | null = null;
@@ -92,6 +93,7 @@ export class View {
         ToggleView: get("whiteboard-toolbar-view-toggle") as HTMLElement | null,
         TBAImportBtn: get("tba-import-btn") as HTMLElement | null,
         TBACancel: get("tba-cancel-btn") as HTMLElement | null,
+        TBAAllMatchesBtn: get("tba-all-matches-btn") as HTMLElement | null,
         ClearConfirmClear: get("clear-confirm-clear-btn") as HTMLElement | null,
         ClearConfirmCancel: get("clear-confirm-cancel-btn") as HTMLElement | null,
       };
@@ -201,6 +203,12 @@ export class View {
           id: "tba-cancel-btn",
           evt: "click",
           fn: (e: Event) => this.onClickTBACancel(e),
+        },
+        {
+          el: B?.TBAAllMatchesBtn,
+          id: "tba-all-matches-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickTBAAllMatches(e),
         },
       ];
 
@@ -1140,6 +1148,86 @@ export class View {
       }, 1500);
     } catch (error) {
       console.error("TBA import error:", error);
+      this.showTBAStatus(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        true,
+      );
+    }
+  }
+
+  private async onClickTBAAllMatches(e: Event): Promise<void> {
+    if (!I?.TBAApiKey || !I?.TBAEventKey) {
+      this.showTBAStatus("Missing required fields", true);
+      return;
+    }
+
+    const apiKey = I.TBAApiKey.value.trim();
+    const eventKey = I.TBAEventKey.value.trim();
+
+    if (!eventKey) {
+      this.showTBAStatus("Please select an event first", true);
+      return;
+    }
+
+    if (apiKey) {
+      this.tbaService.setApiKey(apiKey);
+      await SET("tbaApiKey", apiKey, (e) => {
+        console.error("Failed to save TBA API key:", e);
+      });
+    } else if (!this.tbaService.hasApiKey()) {
+      this.showTBAStatus("Please enter your TBA API key", true);
+      return;
+    }
+
+    this.showTBAStatus("Fetching all matches from The Blue Alliance...", false);
+
+    try {
+      const matches = await this.tbaService.fetchAndParseAllMatches(eventKey);
+
+      if (matches.length === 0) {
+        this.showTBAStatus("No matches found for this event", true);
+        return;
+      }
+
+      this.showTBAStatus(`Importing ${matches.length} matches...`, false);
+
+      for (const match of matches) {
+        const formattedMatchName = this.selectedEventName
+          ? `${match.matchName} @ ${this.selectedEventName}`
+          : match.matchName;
+
+        const id = await this.model.createNewMatch(
+          formattedMatchName,
+          match.redTeams[2] || "",
+          match.redTeams[1] || "",
+          match.redTeams[0] || "",
+          match.blueTeams[0] || "",
+          match.blueTeams[1] || "",
+          match.blueTeams[2] || "",
+        );
+
+        this.createNewMatch(
+          id,
+          formattedMatchName,
+          match.redTeams[2] || "",
+          match.redTeams[1] || "",
+          match.redTeams[0] || "",
+          match.blueTeams[0] || "",
+          match.blueTeams[1] || "",
+          match.blueTeams[2] || "",
+        );
+      }
+
+      this.showTBAStatus(
+        `Successfully imported ${matches.length} matches!`,
+        false,
+      );
+
+      setTimeout(() => {
+        this.onClickTBACancel(e);
+      }, 1500);
+    } catch (error) {
+      console.error("TBA all matches import error:", error);
       this.showTBAStatus(
         `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
         true,

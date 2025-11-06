@@ -304,4 +304,11 @@ export class TBAService {
     const teamKeys = await this.getTeamsAtEvent(eventKey);
     return teamKeys.map((key) => key.replace("frc", ""));
   }
+
+  public async fetchAndParseAllMatches(
+    eventKey: string,
+  ): Promise<TBASimpleMatch[]> {
+    const matches = await this.getMatchesAtEvent(eventKey);
+    return this.parseMatchesToSimple(matches);
+  }
 }
