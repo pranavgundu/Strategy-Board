@@ -1223,9 +1223,7 @@ export class View {
         false,
       );
 
-      setTimeout(() => {
-        this.onClickTBACancel(e);
-      }, 1500);
+      this.onClickTBACancel(e);
     } catch (error) {
       console.error("TBA all matches import error:", error);
       this.showTBAStatus(
