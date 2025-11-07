@@ -508,15 +508,21 @@ export class View {
               const requiredWidth =
                 leftWidth + modeWidth + rightWidth + padding * 2;
 
-              const shouldCollapse =
-                mRect.right > rRect.left - padding ||
-                mRect.left < lRect.right + padding ||
-                requiredWidth > toolbarWidth;
+              // Remove any previous layout classes first
+              toolbar.classList.remove(
+                "toolbar-collapsed",
+                "toolbar-condensed",
+                "toolbar-ultra",
+              );
 
-              if (shouldCollapse) {
-                toolbar.classList.add("toolbar-collapsed");
-              } else {
-                toolbar.classList.remove("toolbar-collapsed");
+              const slack = toolbarWidth - requiredWidth; // positive = space remaining
+              if (slack < 0) {
+                // Not enough space: apply progressive scaling classes but keep single row
+                if (slack < -120) {
+                  toolbar.classList.add("toolbar-ultra");
+                } else {
+                  toolbar.classList.add("toolbar-condensed");
+                }
               }
             } catch (_err) {}
           };

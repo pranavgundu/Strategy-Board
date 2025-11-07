@@ -1209,13 +1209,13 @@ export class Whiteboard {
     if (data.textAnnotations) {
       DR.font = "bold 80px Arial";
       DR.textAlign = "center";
-      DR.textBaseline = "middle";
+      DR.textBaseline = "top";
       for (let text of data.textAnnotations) {
         DR.fillStyle = this.getStrokeColor(text[2]);
         DR.fillText(
           text[3],
           text[0] - (this.camera.x - width / 2),
-          text[1] - (this.camera.y - height / 2),
+          text[1] - (this.camera.y - height / 2) - 40,
         );
       }
     }

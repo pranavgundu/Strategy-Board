@@ -12,7 +12,7 @@
         />
         <meta
             name="viewport"
-            content="width=device-width,initial-scale=1,user-scalable=no"
+            content="width=device-width, initial-scale=1.0, user-scalable=no"
         />
         <meta name="theme-color" content="#000000" />
         <meta name="screen-orientation" content="landscape" />
@@ -25,27 +25,26 @@
                 --breakpoint-lg: 80rem;
             }
 
-            /* Base responsive font sizing */
-            html {
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            }
+
+            body {
                 font-size: 16px;
-            }
-
-            @media (max-width: 1024px) {
-                html {
-                    font-size: 14px;
-                }
-            }
-
-            @media (max-width: 768px) {
-                html {
-                    font-size: 13px;
-                }
-            }
-
-            @media (max-width: 640px) {
-                html {
-                    font-size: 12px;
-                }
             }
         </style>
         <!-- Clear button click handler removed from inline HTML.
@@ -125,41 +124,61 @@
             }
             #whiteboard-toolbar #whiteboard-toolbar-mode-select {
                 justify-self: center;
+                align-self: center;
                 white-space: nowrap;
                 min-width: 0;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
             }
 
-            /* Collapsed/stacked toolbar variant used when the center would collide with the right
-               controls (applies automatically via JavaScript). This forces the mode selector onto its
-               own row so Toggle View / Endgame / etc. can't overlap it on narrow/tablet displays. */
+            /* Condensed/ultra variants shrink content but keep a single toolbar row. */
             #whiteboard-toolbar.toolbar-collapsed {
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: auto auto;
-                gap: 6px;
+                /* No-op now: keep single-row layout to prevent height growth */
+                grid-template-columns: 1fr auto 1fr;
+                grid-template-rows: none;
+                gap: 0.5rem;
             }
-            #whiteboard-toolbar.toolbar-collapsed .toolbar-left {
-                grid-column: 1;
-                grid-row: 1;
-                justify-self: start;
+            #whiteboard-toolbar.toolbar-condensed {
+                gap: 0.4rem;
+                padding: 0 8px;
             }
-            #whiteboard-toolbar.toolbar-collapsed .toolbar-right {
-                grid-column: 2;
-                grid-row: 1;
-                justify-self: end;
+            #whiteboard-toolbar.toolbar-ultra {
+                gap: 0.25rem;
+                padding: 0 6px;
             }
-            #whiteboard-toolbar.toolbar-collapsed
-                #whiteboard-toolbar-mode-select {
-                grid-column: 1 / -1;
-                grid-row: 2;
-                justify-self: center;
-                white-space: normal;
+            #whiteboard-toolbar.toolbar-condensed #whiteboard-toolbar-mode-select {
+                transform: scale(0.92);
+                transform-origin: center;
+            }
+            #whiteboard-toolbar.toolbar-ultra #whiteboard-toolbar-mode-select {
+                transform: scale(0.85);
+                transform-origin: center;
             }
 
-            /* Ensure right-side buttons don't shrink into the center label (avoid overlap) */
+            /* Ensure right-side buttons don't wrap and avoid overlap */
             #whiteboard-toolbar .toolbar-right button {
                 flex-shrink: 0;
+                white-space: nowrap;
+            }
+
+            /* Mode labels: text only, with glow matching GitHub and strategyboard.app */
+            #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+                font-size: clamp(0.95rem, 2vw, 1.75rem);
+                line-height: 1.1;
+                cursor: pointer;
+                transition: all 0.3s ease-in-out;
+
+                /* Keep the same tap/click area and round corners, but clip any glow
+                   or text-shadow so it doesn't "slop" outside the text rectangle. */
+                position: relative;
+                padding: 8px 16px;
+                border-radius: 12px;
+                overflow: hidden; /* <-- clips text-shadow / glow to the element rect */
+                will-change: transform, color;
+                -webkit-font-smoothing: antialiased;
             }
 
             /* For laptops - slightly reduce spacing but keep horizontal layout */
@@ -201,69 +220,38 @@
 
             /* For standard tablets and landscape iPads */
             @media (max-width: 1024px) {
-                /* Tablet layout: left + right controls share the top row, mode selector
-                   is moved to its own second row and spans both columns so it cannot
-                   collide with Toggle/Endgame on iPad widths. Buttons are slightly
-                   reduced in padding/size to avoid overlap. */
+                /* Keep single-row toolbar; just reduce spacing and sizes */
                 #whiteboard-toolbar {
-                    grid-template-columns: 1fr 1fr;
-                    grid-template-rows: auto auto;
-                    gap: 6px;
-                    height: auto;
-                    padding: 6px 10px;
+                    grid-template-columns: 1fr auto 1fr;
                     align-items: center;
+                    gap: 0.5rem;
+                    padding: 0 10px;
                 }
-                #whiteboard-toolbar .toolbar-left {
-                    grid-row: 1;
-                    grid-column: 1 / 2;
-                    justify-self: start;
-                    padding-left: 0;
-                    margin-left: 0.5rem;
-                    display: flex;
-                    gap: 6px;
-                }
+                #whiteboard-toolbar .toolbar-left,
                 #whiteboard-toolbar .toolbar-right {
-                    grid-row: 1;
-                    grid-column: 2 / 3;
-                    justify-self: end;
-                    padding-right: 0;
-                    margin-right: 0.5rem;
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 6px;
-                    flex-wrap: wrap;
-                }
-                #whiteboard-toolbar #whiteboard-toolbar-mode-select {
-                    /* Put mode labels on a dedicated row and allow them to span both columns. */
-                    grid-row: 2;
-                    grid-column: 1 / -1; /* span both columns */
-                    justify-self: center;
-                    gap: 0.625rem;
-                    font-size: 1rem; /* slightly smaller on tablets */
+                    gap: 0.4rem;
+                    margin: 0 0.5rem;
                     flex-wrap: nowrap;
                 }
-                #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
-                    font-size: 1rem !important;
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+                    gap: 0.5rem;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    padding: 0 4px;
                 }
-                /* Shrink toolbar buttons on tablet so they don't collide. */
                 #whiteboard-toolbar .toolbar-right button,
                 #whiteboard-toolbar .toolbar-left button {
                     padding: 5px 8px;
-                    font-size: 0.75rem;
-                    height: auto;
-                    min-width: 55px;
-                    white-space: nowrap;
-                    flex-shrink: 0;
+                    font-size: 0.8rem;
+                    min-width: 52px;
                 }
-                /* Make export buttons even more compact */
                 #whiteboard-toolbar-export-png,
                 #whiteboard-toolbar-export-pdf {
-                    min-width: 70px !important;
+                    min-width: 64px !important;
                     width: auto !important;
                     padding: 4px 6px !important;
                     font-size: 0.7rem !important;
                 }
-                /* Make export buttons container more compact */
                 #whiteboard-toolbar .toolbar-right .flex.items-center {
                     gap: 0.25rem;
                     margin-left: 0.25rem;
@@ -273,71 +261,42 @@
             /* Portrait tablets and landscape phones - stack into two rows */
             @media (max-width: 834px) {
                 #whiteboard-toolbar {
-                    grid-template-columns: 1fr 1fr;
-                    grid-template-rows: auto auto;
-                    gap: 5px;
-                    padding: 5px 8px;
-                }
-                #whiteboard-toolbar .toolbar-left {
-                    grid-row: 1;
-                    grid-column: 1;
-                    justify-self: start;
+                    grid-template-columns: 1fr auto 1fr;
+                    gap: 0.4rem;
+                    padding: 0 8px;
                 }
                 #whiteboard-toolbar #whiteboard-toolbar-mode-select {
-                    grid-row: 2;
-                    grid-column: 1 / -1;
-                    justify-self: center;
-                    gap: 0.5rem;
-                    font-size: 0.95rem;
-                }
-                #whiteboard-toolbar .toolbar-right {
-                    grid-row: 1;
-                    grid-column: 2;
-                    justify-self: end;
-                    flex-wrap: wrap;
-                    justify-content: flex-end;
+                    gap: 0.45rem;
+                    font-size: 0.9rem;
+                    white-space: nowrap;
+                    overflow: hidden;
                 }
                 #whiteboard-toolbar .toolbar-right button,
                 #whiteboard-toolbar .toolbar-left button {
                     padding: 4px 6px;
                     font-size: 0.75rem;
-                    min-width: 50px;
+                    min-width: 48px;
                 }
             }
 
             /* On narrower phones, stack into three rows (left, mode, right) so items never overlap. */
             @media (max-width: 640px) {
                 #whiteboard-toolbar {
-                    grid-template-columns: 1fr;
-                    grid-template-rows: auto auto auto;
-                    gap: 6px;
-                    height: auto;
-                    padding: 6px 8px;
-                }
-                #whiteboard-toolbar .toolbar-left {
-                    grid-row: 1;
-                    grid-column: 1;
-                    justify-self: start;
-                    padding-left: 8px;
+                    grid-template-columns: 1fr auto 1fr;
+                    gap: 0.35rem;
+                    padding: 0 6px;
                 }
                 #whiteboard-toolbar #whiteboard-toolbar-mode-select {
-                    grid-row: 2;
-                    grid-column: 1;
-                    gap: 0.5rem;
-                    font-size: 0.95rem;
-                }
-                #whiteboard-toolbar .toolbar-right {
-                    grid-row: 3;
-                    grid-column: 1;
-                    justify-self: center;
-                    padding-right: 0;
-                    flex-wrap: wrap;
-                    justify-content: center;
+                    gap: 0.4rem;
+                    font-size: 0.85rem;
+                    white-space: nowrap;
+                    overflow: hidden;
                 }
                 #whiteboard-toolbar .toolbar-right button,
                 #whiteboard-toolbar .toolbar-left button {
-                    padding: 5px 6px;
-                    font-size: 0.85rem;
+                    padding: 4px 5px;
+                    font-size: 0.8rem;
+                    min-width: 44px;
                 }
             }
 
@@ -428,12 +387,12 @@
                 left: 0;
             }
 
-            /* Mode selector hover glow effects */
+            /* Mode selector hover glow effects from GitHub */
             #whiteboard-toolbar-mode-select > div {
                 cursor: pointer;
-                transition: all 0.3s ease;
                 padding: 8px 16px;
                 border-radius: 12px;
+                transition: all 0.3s ease;
             }
 
             #whiteboard-toolbar-mode-select > div:hover {
@@ -799,6 +758,22 @@
             .glossy-shine {
                 position: relative;
                 overflow: hidden;
+            }
+
+            /* Mode selector buttons hover glow effect */
+            #whiteboard-toolbar-mode-auto,
+            #whiteboard-toolbar-mode-teleop,
+            #whiteboard-toolbar-mode-endgame,
+            #whiteboard-toolbar-mode-notes {
+                cursor: pointer;
+                transition: color 0.3s ease;
+            }
+
+            #whiteboard-toolbar-mode-auto:hover,
+            #whiteboard-toolbar-mode-teleop:hover,
+            #whiteboard-toolbar-mode-endgame:hover,
+            #whiteboard-toolbar-mode-notes:hover {
+                color: white !important;
             }
 
             .glossy-shine::before {
@@ -1808,7 +1783,7 @@
             </div>
             <div
                 id="whiteboard-wrapper"
-                class="w-full h-full m-0 p-0 bg-zinc-900"
+                class="w-full flex-1 min-h-0 m-0 p-0 bg-zinc-900"
             >
                 <canvas
                     id="whiteboard-canvas-background"
