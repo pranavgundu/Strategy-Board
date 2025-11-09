@@ -5,6 +5,7 @@ import { QRImport, QRExport } from "@/qr.ts";
 import { CLEAR, SET, GET } from "@/db.ts";
 import { TBAService } from "./tba.ts";
 import { PDFExport } from "./pdf-export.ts";
+import { ContributorsService } from "./contributors.ts";
 
 const get = (id: string): HTMLElement | null => document.getElementById(id);
 
@@ -22,6 +23,9 @@ let B: {
   TBAAllMatchesBtn?: HTMLElement | null;
   ClearConfirmClear?: HTMLElement | null;
   ClearConfirmCancel?: HTMLElement | null;
+  ContributorsLink?: HTMLElement | null;
+  ContributorsClose?: HTMLElement | null;
+  ContributorsRetry?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -56,6 +60,10 @@ let E: {
   TBATeamDropdown?: HTMLElement | null;
   TBATeamList?: HTMLElement | null;
   ClearConfirmPanel?: HTMLElement | null;
+  ContributorsPanel?: HTMLElement | null;
+  ContributorsLoading?: HTMLElement | null;
+  ContributorsError?: HTMLElement | null;
+  ContributorsList?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -65,6 +73,7 @@ export class View {
   private qrexport: QRExport;
   private tbaService: TBAService;
   private pdfExport: PDFExport;
+  private contributorsService: ContributorsService;
   private currentExportMatch: Match | null = null;
 
   constructor(
@@ -80,6 +89,7 @@ export class View {
 
     this.tbaService = new TBAService();
     this.pdfExport = new PDFExport();
+    this.contributorsService = new ContributorsService();
 
     const initDOM = () => {
       B = {
@@ -96,6 +106,9 @@ export class View {
         TBAAllMatchesBtn: get("tba-all-matches-btn") as HTMLElement | null,
         ClearConfirmClear: get("clear-confirm-clear-btn") as HTMLElement | null,
         ClearConfirmCancel: get("clear-confirm-cancel-btn") as HTMLElement | null,
+        ContributorsLink: get("contributors-link-btn") as HTMLElement | null,
+        ContributorsClose: get("contributors-close-btn") as HTMLElement | null,
+        ContributorsRetry: get("contributors-retry-btn") as HTMLElement | null,
       };
 
       I = {
@@ -134,6 +147,10 @@ export class View {
         TBATeamDropdown: get("tba-team-dropdown") as HTMLElement | null,
         TBATeamList: get("tba-team-list") as HTMLElement | null,
         ClearConfirmPanel: get("clear-confirm-container") as HTMLElement | null,
+        ContributorsPanel: get("contributors-container") as HTMLElement | null,
+        ContributorsLoading: get("contributors-loading") as HTMLElement | null,
+        ContributorsError: get("contributors-error") as HTMLElement | null,
+        ContributorsList: get("contributors-list") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -307,6 +324,93 @@ export class View {
         } catch (err) {
           console.error(
             "View: failed to attach 'click' handler to #clear-confirm-cancel-btn:",
+            err,
+          );
+        }
+      }
+
+      // Contributors link button
+      const contributorsLinkBtn = B?.ContributorsLink;
+      if (contributorsLinkBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #contributors-link-btn",
+        );
+        try {
+          contributorsLinkBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            this.showContributors();
+          });
+          console.debug(
+            "View: attached 'click' handler to #contributors-link-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #contributors-link-btn:",
+            err,
+          );
+        }
+      }
+
+      // Contributors close button
+      const contributorsCloseBtn = B?.ContributorsClose;
+      if (contributorsCloseBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #contributors-close-btn",
+        );
+        try {
+          contributorsCloseBtn.addEventListener("click", (e) => {
+            this.hide(E.ContributorsPanel);
+          });
+          console.debug(
+            "View: attached 'click' handler to #contributors-close-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #contributors-close-btn:",
+            err,
+          );
+        }
+      }
+
+      // Contributors retry button
+      const contributorsRetryBtn = B?.ContributorsRetry;
+      if (contributorsRetryBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #contributors-retry-btn",
+        );
+        try {
+          contributorsRetryBtn.addEventListener("click", (e) => {
+            this.loadContributors();
+          });
+          console.debug(
+            "View: attached 'click' handler to #contributors-retry-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #contributors-retry-btn:",
+            err,
+          );
+        }
+      }
+
+      // Contributors panel backdrop click
+      const contributorsPanel = E?.ContributorsPanel;
+      if (contributorsPanel) {
+        console.debug(
+          "View: attaching 'click' handler to #contributors-container",
+        );
+        try {
+          contributorsPanel.addEventListener("click", (e) => {
+            if (e.target === contributorsPanel) {
+              this.hide(E.ContributorsPanel);
+            }
+          });
+          console.debug(
+            "View: attached 'click' handler to #contributors-container",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #contributors-container:",
             err,
           );
         }
@@ -1739,4 +1843,84 @@ export class View {
     const importStatus = get("qr-import-status");
     if (importStatus) importStatus.textContent = "";
   }
+
+  private async showContributors() {
+    this.show(E.ContributorsPanel);
+    await this.loadContributors();
+  }
+
+  private async loadContributors() {
+    if (!E.ContributorsLoading || !E.ContributorsError || !E.ContributorsList) {
+      return;
+    }
+
+    // Show loading state
+    E.ContributorsLoading.classList.remove("hidden");
+    E.ContributorsError.classList.add("hidden");
+    E.ContributorsList.classList.add("hidden");
+
+    try {
+      const contributors = await this.contributorsService.fetchContributors();
+      
+      // Clear existing contributors
+      E.ContributorsList.innerHTML = "";
+
+      // Render contributors
+      contributors.slice(0, 10).forEach((contributor, index) => {
+        const contributorCard = document.createElement("div");
+        contributorCard.className = `
+          flex items-center gap-4 p-4 bg-slate-700 rounded-xl
+          glass-card transition-all cursor-pointer
+        `;
+        
+        // Add the same hover style as match items
+        contributorCard.style.transition = "all 0.2s ease";
+
+        const rank = index + 1;
+        const medalEmoji = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "";
+
+        contributorCard.innerHTML = `
+          <div class="flex-shrink-0 relative">
+            ${medalEmoji ? `<div class="absolute -top-2 -right-2 text-2xl">${medalEmoji}</div>` : ""}
+            <img 
+              src="${contributor.avatar_url}" 
+              alt="${contributor.login}"
+              class="w-16 h-16 rounded-full border-2 ${rank === 1 ? "border-yellow-400" : rank === 2 ? "border-gray-400" : rank === 3 ? "border-orange-400" : "border-slate-500"}"
+            />
+          </div>
+          <div class="flex-grow min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <a 
+                href="${contributor.html_url}" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="text-lg font-bold text-white hover:text-blue-400 transition-colors truncate"
+              >
+                ${contributor.name || contributor.login}
+              </a>
+            </div>
+            <p class="text-sm text-slate-400 truncate">@${contributor.login}</p>
+            ${contributor.bio ? `<p class="text-sm text-slate-300 mt-1 line-clamp-2">${contributor.bio}</p>` : ""}
+          </div>
+          <div class="flex-shrink-0 text-right">
+            <div class="text-2xl font-bold text-white">${contributor.contributions}</div>
+            <div class="text-xs text-slate-400">commits</div>
+          </div>
+        `;
+
+        E.ContributorsList?.appendChild(contributorCard);
+      });
+
+      // Hide loading, show list
+      E.ContributorsLoading.classList.add("hidden");
+      E.ContributorsList.classList.remove("hidden");
+    } catch (error) {
+      console.error("Error loading contributors:", error);
+      
+      // Show error state
+      E.ContributorsLoading.classList.add("hidden");
+      E.ContributorsError.classList.remove("hidden");
+    }
+  }
 }
+
