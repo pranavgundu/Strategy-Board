@@ -97,27 +97,27 @@ Alternatively, users can enter their own API key in the application settings.
 
 ### Drawing and Planning
 
-- Auto/Teleop/Endgame Tabs - Switch between match phases
-- Drawing Tools - Marker and eraser for field annotations
-- Robot Controls - Drag robots to position them, use rotation handles to orient
-- Text Annotations - Add notes directly on the field
-- Color Options - Multiple colors for different alliance strategies
+- Auto/Teleop/Endgame Tabs
+- Drawing Tools
+- Robot Controls
+- Text Annotations
+- Color Options
 
 ### Sharing Strategies
 
-- Export via QR - Generate QR codes for quick sharing with team members
-- Import via QR - Scan QR codes to load strategies on other devices
+- Export via QR
+- Import via QR
 
 ---
 
 ## Tech Stack
 
-- TypeScript - Type-safe development
-- Vite - Fast build tool and dev server
-- Canvas API - High-performance field rendering
-- IndexedDB - Local data persistence
-- Tailwind CSS - Utility-first styling
-- The Blue Alliance API - FRC match data integration
+- TypeScript
+- Vite
+- Canvas API
+- IndexedDB
+- Tailwind CSS
+- The Blue Alliance API
 
 ---
 
