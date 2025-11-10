@@ -12,7 +12,7 @@
         />
         <meta
             name="viewport"
-            content="width=device-width, initial-scale=1.0, user-scalable=no"
+            content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"
         />
         <meta name="theme-color" content="#000000" />
         <meta name="screen-orientation" content="landscape" />
@@ -32,7 +32,9 @@
             html,
             body {
                 width: 100vw;
+                width: 100dvw;
                 height: 100vh;
+                height: 100dvh;
                 margin: 0;
                 padding: 0;
                 overflow: hidden;
@@ -41,10 +43,17 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
+                /* Support for iPhone notch and safe areas */
+                padding-top: env(safe-area-inset-top);
+                padding-right: env(safe-area-inset-right);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
             }
 
             body {
                 font-size: 16px;
+                /* Ensure scrolling works smoothly on mobile */
+                -webkit-overflow-scrolling: touch;
             }
         </style>
         <!-- Clear button click handler removed from inline HTML.
@@ -170,15 +179,13 @@
                 line-height: 1.1;
                 cursor: pointer;
                 transition: all 0.3s ease-in-out;
-
-                /* Keep the same tap/click area and round corners, but clip any glow
-                   or text-shadow so it doesn't "slop" outside the text rectangle. */
                 position: relative;
                 padding: 8px 16px;
-                border-radius: 12px;
-                overflow: hidden; /* <-- clips text-shadow / glow to the element rect */
-                will-change: transform, color;
+                will-change: color, text-shadow;
                 -webkit-font-smoothing: antialiased;
+                background: transparent;
+                border: none;
+                box-shadow: none;
             }
 
             /* For laptops - slightly reduce spacing but keep horizontal layout */
@@ -300,6 +307,30 @@
                 }
             }
 
+            /* Extra small phones - improve touch targets and readability */
+            @media (max-width: 480px) {
+                #whiteboard-toolbar .toolbar-right button,
+                #whiteboard-toolbar .toolbar-left button {
+                    min-width: 40px;
+                    font-size: 0.7rem;
+                    padding: 3px 4px;
+                }
+                #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+                    font-size: 0.75rem;
+                    padding: 6px 12px;
+                }
+            }
+
+            /* Very small screens - ensure all content fits */
+            @media (max-width: 375px) {
+                #home-toolbar {
+                    padding: 0.5rem;
+                }
+                #home-toolbar-logo {
+                    font-size: 1rem !important;
+                }
+            }
+
             /* Progress bar / QR overlay animations */
             .qr-progress-wrap {
                 width: 90%;
@@ -373,6 +404,30 @@
                 width: 92vw;
             }
 
+            /* Better QR overlay sizing for small devices */
+            @media (max-width: 640px) {
+                #qr-export-inner-container,
+                #qr-import-inner-container {
+                    max-width: 95vw;
+                    width: 95vw;
+                    padding: 1rem;
+                }
+
+                #qr-export-code-worker-0 canvas,
+                #qr-export-code-worker-1 canvas,
+                #qr-export-code-worker-2 canvas {
+                    max-width: 90vw;
+                    max-height: 60vh;
+                }
+            }
+
+            /* Improve video sizing for QR import on mobile */
+            @media (max-width: 640px) {
+                #qr-import-video {
+                    max-height: 40vh !important;
+                }
+            }
+
             /* Ensure canvas wrapper fills available space */
             #whiteboard-wrapper {
                 position: relative;
@@ -385,21 +440,6 @@
                 position: absolute;
                 top: 0;
                 left: 0;
-            }
-
-            /* Mode selector hover glow effects from GitHub */
-            #whiteboard-toolbar-mode-select > div {
-                cursor: pointer;
-                padding: 8px 16px;
-                border-radius: 12px;
-                transition: all 0.3s ease;
-            }
-
-            #whiteboard-toolbar-mode-select > div:hover {
-                color: #ffffff !important;
-                text-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
-                             0 0 30px rgba(255, 255, 255, 0.5);
-                transform: scale(1.05);
             }
 
             /* Draw config morphing animation */
@@ -570,15 +610,32 @@
 
             /* Toolbar button enhancements */
             #whiteboard-toolbar-back,
-            #whiteboard-toolbar-undo {
+            #whiteboard-toolbar-undo,
+            #whiteboard-toolbar-view-toggle {
                 transition: all 0.3s ease;
                 box-shadow:
                     0 4px 12px rgba(0, 0, 0, 0.3),
                     inset 0 1px 2px rgba(255, 255, 255, 0.2);
             }
 
-            #whiteboard-toolbar-back:hover,
+            #whiteboard-toolbar-back:hover {
+                background-color: rgb(168 85 247) !important; /* purple-600 */
+                transform: translateY(-2px);
+                box-shadow:
+                    0 6px 16px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            }
+
             #whiteboard-toolbar-undo:hover {
+                background-color: rgb(249 115 22) !important; /* orange-600 */
+                transform: translateY(-2px);
+                box-shadow:
+                    0 6px 16px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            }
+
+            #whiteboard-toolbar-view-toggle:hover {
+                background-color: rgb(168 85 247) !important; /* purple-600 */
                 transform: translateY(-2px);
                 box-shadow:
                     0 6px 16px rgba(0, 0, 0, 0.4),
@@ -586,7 +643,8 @@
             }
 
             #whiteboard-toolbar-back:active,
-            #whiteboard-toolbar-undo:active {
+            #whiteboard-toolbar-undo:active,
+            #whiteboard-toolbar-view-toggle:active {
                 transform: translateY(0);
             }
 
@@ -769,18 +827,38 @@
                 }
             }
 
+            /* Landscape optimizations for mobile */
+            @media (max-width: 1024px) and (orientation: landscape) {
+                #home-toolbar {
+                    height: 3.5rem !important;
+                    padding: 0 1rem;
+                }
+
+                #home-bottom-bar {
+                    height: 3rem !important;
+                }
+
+                /* Make better use of screen space in landscape */
+                #home-match-list {
+                    padding: 0.75rem;
+                }
+            }
+
             .glossy-shine {
                 position: relative;
                 overflow: hidden;
             }
 
-            /* Mode selector buttons hover glow effect */
+            /* Mode selector buttons hover glow effect - exact copy of #home-bottom-bar a:hover */
             #whiteboard-toolbar-mode-auto,
             #whiteboard-toolbar-mode-teleop,
             #whiteboard-toolbar-mode-endgame,
             #whiteboard-toolbar-mode-notes {
                 cursor: pointer;
-                transition: color 0.3s ease;
+                transition: all 0.3s ease-in-out;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
             }
 
             #whiteboard-toolbar-mode-auto:hover,
@@ -788,6 +866,13 @@
             #whiteboard-toolbar-mode-endgame:hover,
             #whiteboard-toolbar-mode-notes:hover {
                 color: white !important;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 20px rgba(255, 255, 255, 0.6),
+                             0 0 30px rgba(255, 255, 255, 0.4),
+                             0 0 40px rgba(255, 255, 255, 0.2);
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
             }
 
             .glossy-shine::before {
@@ -953,6 +1038,202 @@
                 filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5))
                         drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))
                         drop-shadow(0 0 18px rgba(255, 255, 255, 0.2));
+            }
+
+            /* Ensure proper scrolling on all mobile devices */
+            .overflow-y-auto {
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+
+            /* Fix for iOS Safari address bar hiding */
+            @supports (-webkit-touch-callout: none) {
+                html, body {
+                    height: -webkit-fill-available;
+                }
+            }
+
+            /* Improve modal responsiveness on very small screens */
+            @media (max-height: 600px) {
+                .glass-modal {
+                    max-height: 95vh !important;
+                }
+            }
+
+            /* Fix for horizontal overflow on mobile */
+            @media (max-width: 640px) {
+                * {
+                    max-width: 100vw;
+                }
+
+                /* Allow specific elements to have full width */
+                canvas, img, video {
+                    max-width: none;
+                }
+            }
+
+            /* Better touch interaction for buttons */
+            button, a, [role="button"] {
+                -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+                touch-action: manipulation;
+            }
+
+            /* Prevent zoom on input focus for iOS */
+            @media screen and (max-width: 768px) {
+                input, select, textarea {
+                    font-size: 16px !important;
+                }
+            }
+
+            /* Tablet-specific optimizations */
+            @media (min-width: 768px) and (max-width: 1024px) {
+                /* Better toolbar spacing on tablets */
+                #home-toolbar {
+                    padding: 1rem 1.5rem;
+                }
+
+                /* Optimize match list for tablet screens */
+                #home-match-list {
+                    gap: 1rem;
+                    padding: 1.5rem;
+                }
+
+                /* Better modal sizing on tablets */
+                .glass-modal {
+                    max-width: 85vw !important;
+                }
+            }
+
+            /* Whiteboard canvas responsive improvements */
+            @media (max-width: 1024px) {
+                #whiteboard-draw-config,
+                #whiteboard-color-config {
+                    /* Make controls slightly larger on touch devices */
+                    transform: scale(1.1);
+                }
+
+                #whiteboard-number-pad {
+                    /* Better positioning on small screens */
+                    bottom: 4rem;
+                    right: 0.5rem;
+                }
+            }
+
+            /* High-DPI display improvements */
+            @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+                /* Ensure crisp rendering on retina displays */
+                canvas {
+                    image-rendering: -webkit-optimize-contrast;
+                    image-rendering: crisp-edges;
+                }
+            }
+
+            /* Improve text readability on all devices */
+            @media screen {
+                html {
+                    -webkit-text-size-adjust: 100%;
+                    -moz-text-size-adjust: 100%;
+                    text-size-adjust: 100%;
+                }
+            }
+
+            /* Better dropdown sizing on mobile */
+            @media (max-width: 640px) {
+                #tba-event-dropdown,
+                #tba-team-dropdown {
+                    max-height: 50vh !important;
+                    left: 0.5rem !important;
+                    right: 0.5rem !important;
+                }
+
+                .tba-dropdown-item,
+                .tba-team-item {
+                    padding: 0.75rem 0.5rem;
+                }
+            }
+
+            /* Contributors modal responsive improvements */
+            @media (max-width: 768px) {
+                #contributors-inner-container {
+                    width: 95vw !important;
+                    max-width: 95vw !important;
+                }
+
+                #contributors-list {
+                    grid-template-columns: 1fr !important;
+                }
+
+                #contributors-content {
+                    padding: 1rem;
+                }
+            }
+
+            /* Foldable phone support */
+            @media (max-width: 653px) and (max-height: 280px) {
+                /* Samsung Galaxy Z Fold and similar in landscape */
+                #home-toolbar {
+                    height: 2.5rem !important;
+                }
+
+                #home-bottom-bar {
+                    height: 2.5rem !important;
+                }
+
+                .glass-modal {
+                    max-height: 90vh !important;
+                    max-width: 90vw !important;
+                }
+            }
+
+            /* Ultra-wide displays */
+            @media (min-width: 1920px) {
+                #home-container,
+                #whiteboard-container {
+                    max-width: 100vw;
+                }
+
+                .glass-modal {
+                    max-width: 1200px !important;
+                }
+            }
+
+            /* Accessibility improvements */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Dark mode improvements (for devices that support it) */
+            @media (prefers-color-scheme: dark) {
+                /* Already using dark theme, but ensure proper contrast */
+                input, select, textarea {
+                    color-scheme: dark;
+                }
+            }
+
+            /* Fix contributors close button - make it crisp and consistent */
+            #contributors-close-btn,
+            #qr-export-close-btn {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                text-rendering: optimizeLegibility;
+            }
+
+            #contributors-close-btn:hover,
+            #qr-export-close-btn:hover {
+                background-color: rgb(220 38 38) !important; /* red-600 */
+            }
+
+            /* Make all buttons crisp and clear */
+            .glass-button {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                text-rendering: optimizeLegibility;
             }
         </style>
         <script>
@@ -1330,13 +1611,13 @@
                 <div class="flex w-full">
                     <button
                         id="clear-confirm-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-slate-300 bg-slate-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine hover:bg-slate-600 transition-colors"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-blue-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine hover:bg-blue-600 transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         id="clear-confirm-clear-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-600 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine hover:bg-red-700 transition-colors"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine hover:bg-red-600 transition-colors"
                     >
                         Clear All
                     </button>
@@ -1608,7 +1889,7 @@
                 <div class="w-full flex justify-end">
                     <button
                         id="qr-export-close-btn"
-                        class="text-white bg-red-600 px-3 py-1 rounded-xl hover:bg-red-700 glass-button glossy-shine"
+                        class="text-white bg-red-500 px-3 py-1 rounded-xl hover:bg-red-600 glass-button glossy-shine"
                         title="Close export"
                         onclick="document.getElementById('qr-export-container').click()"
                     >
@@ -1629,7 +1910,7 @@
                         </button>
                         <button
                             id="qr-export-pdf-btn"
-                            class="px-8 py-3 text-xl font-bold text-white bg-purple-500 rounded-xl glass-button glossy-shine hover:bg-purple-600 transition-colors"
+                            class="px-8 py-3 text-xl font-bold text-white bg-blue-500 rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors"
                         >
                             Export as PDF
                         </button>
@@ -1726,7 +2007,7 @@
                     </h2>
                     <button
                         id="contributors-close-btn"
-                        class="text-white bg-red-600 px-4 py-2 rounded-xl hover:bg-red-700 transition-colors glass-button glossy-shine font-semibold"
+                        class="text-white bg-red-500 px-4 py-2 rounded-xl hover:bg-red-600 transition-colors glass-button glossy-shine font-semibold"
                     >
                         Close
                     </button>
@@ -1742,7 +2023,7 @@
                         <p class="text-red-400 text-lg mb-4">Failed to load contributors</p>
                         <button
                             id="contributors-retry-btn"
-                            class="px-6 py-3 bg-blue-500 text-white rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors font-semibold"
+                            class="px-6 py-3 bg-green-500 text-white rounded-xl glass-button glossy-shine hover:bg-green-600 transition-colors font-semibold"
                         >
                             Retry
                         </button>
@@ -1766,13 +2047,13 @@
                 <div class="toolbar-left flex items-center ml-6 md:ml-12 gap-3">
                     <button
                         id="whiteboard-toolbar-back"
-                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-slate-600 glass-button glossy-shine"
+                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-purple-500 glass-button glossy-shine"
                     >
                         BACK
                     </button>
                     <button
                         id="whiteboard-toolbar-undo"
-                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-amber-600 glass-button glossy-shine"
+                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-orange-500 glass-button glossy-shine"
                     >
                         UNDO
                     </button>
@@ -1813,7 +2094,7 @@
                 >
                     <button
                         id="whiteboard-toolbar-view-toggle"
-                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-slate-600 glass-button glossy-shine"
+                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-purple-500 glass-button glossy-shine"
                     >
                         TOGGLE VIEW
                     </button>
@@ -1829,7 +2110,7 @@
                         </button>
                         <button
                             id="whiteboard-toolbar-export-pdf"
-                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-green-600 rounded-2xl px-3 py-1 select-none touch-none glass-button glossy-shine"
+                            class="w-28 md:w-32 h-full text-xs md:text-sm font-semibold text-white bg-green-500 rounded-2xl px-3 py-1 select-none touch-none glass-button glossy-shine"
                             title="Export field + annotations as PDF (uses print dialog)"
                         >
                             Export PDF
