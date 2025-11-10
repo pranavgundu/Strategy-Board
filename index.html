@@ -700,20 +700,6 @@
                 transition: all 0.2s ease;
             }
 
-            /* Kebab menu glow effect on hover */
-            #home-match-list > div button:hover {
-                filter: drop-shadow(0 0 16px rgba(255, 255, 255, 1))
-                        drop-shadow(0 0 32px rgba(255, 255, 255, 1))
-                        drop-shadow(0 0 48px rgba(255, 255, 255, 0.9))
-                        drop-shadow(0 0 64px rgba(255, 255, 255, 0.7))
-                        drop-shadow(0 0 80px rgba(255, 255, 255, 0.5));
-                transition: filter 0.3s ease;
-                transform: scale(1.05);
-            }
-
-            #home-match-list > div button {
-                transition: filter 0.3s ease, transform 0.3s ease;
-            }
 
             /* Contributors list hover effect - same as match items */
             #contributors-list > div:hover {
@@ -1476,7 +1462,7 @@
                 >
                     Strategy Board
                 </div>
-                <div class="flex gap-2 sm:gap-3 md:gap-4 text-base sm:text-xl md:text-2xl text-sky-200">
+                <div class="flex gap-2 sm:gap-3 md:gap-4 text-base sm:text-xl md:text-2xl text-white">
                     <button
                         id="home-toolbar-new-btn"
                         class="flex items-center justify-center w-16 sm:w-20 md:w-24 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-green-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
@@ -1551,17 +1537,17 @@
                         </button>
                         <div class="hidden flex items-center justify-center gap-2">
                             <button
-                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-slate-300 bg-green-500 rounded-xl glass-button"
+                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-green-500 rounded-xl glass-button glossy-shine"
                             >
                                 Duplicate
                             </button>
                             <button
-                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-slate-300 bg-orange-500 rounded-xl glass-button whitespace-nowrap"
+                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-orange-500 rounded-xl glass-button glossy-shine whitespace-nowrap"
                             >
                                 Export QR
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-slate-300 bg-red-500 rounded-xl glass-button"
+                                class="w-20 sm:w-24 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-red-500 rounded-xl glass-button glossy-shine"
                             >
                                 Delete
                             </button>
@@ -1699,13 +1685,13 @@
                 <div class="flex w-full">
                     <button
                         id="create-match-create-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-slate-300 bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
                     >
                         Create
                     </button>
                     <button
                         id="create-match-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-slate-300 bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
                     >
                         Cancel
                     </button>
@@ -1798,13 +1784,13 @@
                 <div class="flex w-full flex-shrink-0">
                     <button
                         id="tba-import-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-slate-300 bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
                     >
                         Import
                     </button>
                     <button
                         id="tba-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-slate-300 bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
                     >
                         Cancel
                     </button>
