@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import QRCode from "qrcode";
+import * as QRCode from "qrcode";
 
 export class PDFExport {
   public async exportToPDF(data: string[], matchName: string): Promise<void> {

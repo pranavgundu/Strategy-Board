@@ -1,6 +1,23 @@
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tailwindcss from "@tailwindcss/vite";
+
+// Plugin to stub out core-js imports from canvg
+const stubCoreJs = (): Plugin => ({
+  name: "stub-core-js",
+  resolveId(id) {
+    if (id.startsWith("core-js/")) {
+      return id;
+    }
+    return null;
+  },
+  load(id) {
+    if (id.startsWith("core-js/")) {
+      return "export default {};";
+    }
+    return null;
+  },
+});
 // Compute a filesystem path for the ./src directory without importing the 'url' module.
 // This avoids TypeScript diagnostics in environments without node type declarations.
 const srcPath = (() => {
@@ -13,6 +30,7 @@ const srcPath = (() => {
 
 export default defineConfig({
   plugins: [
+    stubCoreJs(),
     tailwindcss(),
     VitePWA({
       injectRegister: "auto",
@@ -53,6 +71,16 @@ export default defineConfig({
   ],
   build: {
     target: "es2022",
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true,
+    },
+  },
+  optimizeDeps: {
+    include: ["qrcode", "rgbcolor"],
+    esbuildOptions: {
+      mainFields: ["module", "main"],
+    },
   },
   resolve: {
     alias: {
