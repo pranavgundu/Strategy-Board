@@ -1273,6 +1273,15 @@ export class Whiteboard {
       .getElementById(`whiteboard-toolbar-mode-${mode}`)
       ?.classList.remove("text-zinc-300");
     this.mode = mode;
+    
+    // Hide toggle view button when in notes mode, show it otherwise
+    const toggleViewButton = document.getElementById("whiteboard-toolbar-view-toggle");
+    if (mode === "notes") {
+      toggleViewButton?.classList.add("hidden");
+    } else {
+      toggleViewButton?.classList.remove("hidden");
+    }
+    
     this.redrawAll();
 
     if (this.getCurrentUndoHistory().length < 1) {
