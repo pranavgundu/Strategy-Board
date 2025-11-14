@@ -1882,17 +1882,18 @@ export class View {
         contributorCard.innerHTML = `
           <div class="flex-shrink-0 relative">
             ${medalEmoji ? `<div class="absolute -top-2 -right-2 text-2xl">${medalEmoji}</div>` : ""}
-            <img 
-              src="${contributor.avatar_url}" 
+            <img
+              src="${contributor.avatar_url}?s=128"
               alt="${contributor.login}"
               class="w-16 h-16 rounded-full border-2 ${rank === 1 ? "border-yellow-400" : rank === 2 ? "border-gray-400" : rank === 3 ? "border-orange-400" : "border-slate-500"}"
+              style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; backface-visibility: hidden; transform: translateZ(0); will-change: transform;"
             />
           </div>
           <div class="flex-grow min-w-0">
             <div class="flex items-center gap-2 mb-1">
-              <a 
-                href="${contributor.html_url}" 
-                target="_blank" 
+              <a
+                href="${contributor.html_url}"
+                target="_blank"
                 rel="noopener noreferrer"
                 class="text-lg font-bold text-white hover:text-blue-400 transition-colors truncate"
               >
