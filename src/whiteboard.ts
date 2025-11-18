@@ -289,18 +289,12 @@ export class Whiteboard {
     drawing.addEventListener("pointerdown", this.onPointerDown.bind(this));
     drawing.addEventListener("pointerleave", this.onPointerLeave.bind(this));
 
-    // Add click handlers for undo and redo buttons
+    // Add click handler for undo button
     document
       .getElementById("whiteboard-toolbar-undo")
       ?.addEventListener("click", (e) => {
         e.preventDefault();
         this.undo();
-      });
-    document
-      .getElementById("whiteboard-toolbar-redo")
-      ?.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.redo();
       });
 
     document
