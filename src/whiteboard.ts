@@ -249,6 +249,11 @@ export class Whiteboard {
   private endgameActionHistory: Array<any> = [];
   private notesActionHistory: Array<any> = [];
 
+  private autoRedoHistory: Array<any> = [];
+  private teleopRedoHistory: Array<any> = [];
+  private endgameRedoHistory: Array<any> = [];
+  private notesRedoHistory: Array<any> = [];
+
   static camera_presets: { [key: string]: { x: number; y: number } } = {
     full: { x: width / 2, y: height / 2 },
     red: { x: (3 * width) / 4, y: height / 2 },
@@ -263,8 +268,19 @@ export class Whiteboard {
     window.addEventListener("resize", this.redrawAll.bind(this));
     window.addEventListener("orientationchange", this.redrawAll.bind(this));
     window.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.code == "KeyZ") {
+      // Support both Cmd (Mac) and Ctrl (Windows/Linux)
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const modifier = isMac ? e.metaKey : e.ctrlKey;
+      
+      // Undo: Cmd+Z or Ctrl+Z
+      if (modifier && e.code === "KeyZ" && !e.shiftKey) {
+        e.preventDefault();
         this.undo();
+      }
+      // Redo: Cmd+Shift+Z or Ctrl+Shift+Z or Cmd+Y or Ctrl+Y
+      else if (modifier && (e.code === "KeyY" || (e.code === "KeyZ" && e.shiftKey))) {
+        e.preventDefault();
+        this.redo();
       }
     });
     drawing.addEventListener("click", (e) => this.onClick(e));
@@ -272,6 +288,20 @@ export class Whiteboard {
     drawing.addEventListener("pointerup", this.onPointerUp.bind(this));
     drawing.addEventListener("pointerdown", this.onPointerDown.bind(this));
     drawing.addEventListener("pointerleave", this.onPointerLeave.bind(this));
+
+    // Add click handlers for undo and redo buttons
+    document
+      .getElementById("whiteboard-toolbar-undo")
+      ?.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.undo();
+      });
+    document
+      .getElementById("whiteboard-toolbar-redo")
+      ?.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.redo();
+      });
 
     document
       .getElementById("whiteboard-toolbar-mode-auto")
@@ -840,6 +870,10 @@ export class Whiteboard {
       this.teleopActionHistory = [];
       this.endgameActionHistory = [];
       this.notesActionHistory = [];
+      this.autoRedoHistory = [];
+      this.teleopRedoHistory = [];
+      this.endgameRedoHistory = [];
+      this.notesRedoHistory = [];
       document
         .getElementById("whiteboard-robot-config")
         ?.classList.add("hidden");
@@ -849,6 +883,8 @@ export class Whiteboard {
   public setMatch(match: Match) {
     this.match = match;
     this.redrawAll();
+    // Update undo/redo button states when a new match is loaded
+    this.updateUndoRedoButtons();
   }
 
   public toggleView() {
@@ -864,6 +900,9 @@ export class Whiteboard {
   }
 
   private addUndoHistory(action: any) {
+    // Clear redo history when a new action is performed
+    this.clearCurrentRedoHistory();
+    
     if (this.mode === "auto") {
       this.autoActionHistory.push(action);
     }
@@ -877,12 +916,68 @@ export class Whiteboard {
       this.notesActionHistory.push(action);
     }
 
-    document
-      .getElementById("whiteboard-toolbar-undo")
-      ?.style.setProperty("opacity", "1");
-    document
-      .getElementById("whiteboard-toolbar-undo")
-      ?.style.setProperty("cursor", "pointer");
+    this.updateUndoRedoButtons();
+  }
+
+  private clearCurrentRedoHistory() {
+    if (this.mode === "auto") {
+      this.autoRedoHistory = [];
+    }
+    if (this.mode === "teleop") {
+      this.teleopRedoHistory = [];
+    }
+    if (this.mode === "endgame") {
+      this.endgameRedoHistory = [];
+    }
+    if (this.mode === "notes") {
+      this.notesRedoHistory = [];
+    }
+  }
+
+  private getCurrentRedoHistory() {
+    if (this.mode === "auto") {
+      return this.autoRedoHistory;
+    }
+    if (this.mode === "teleop") {
+      return this.teleopRedoHistory;
+    }
+    if (this.mode === "endgame") {
+      return this.endgameRedoHistory;
+    }
+    if (this.mode === "notes") {
+      return this.notesRedoHistory;
+    }
+
+    return [];
+  }
+
+  private updateUndoRedoButtons() {
+    const undoHistory = this.getCurrentUndoHistory();
+    const redoHistory = this.getCurrentRedoHistory();
+    
+    // Update undo button
+    const undoBtn = document.getElementById("whiteboard-toolbar-undo");
+    if (undoBtn) {
+      if (undoHistory.length > 0) {
+        undoBtn.style.opacity = "1";
+        undoBtn.style.cursor = "pointer";
+      } else {
+        undoBtn.style.opacity = "0.5";
+        undoBtn.style.cursor = "not-allowed";
+      }
+    }
+    
+    // Update redo button
+    const redoBtn = document.getElementById("whiteboard-toolbar-redo");
+    if (redoBtn) {
+      if (redoHistory.length > 0) {
+        redoBtn.style.opacity = "1";
+        redoBtn.style.cursor = "pointer";
+      } else {
+        redoBtn.style.opacity = "0.5";
+        redoBtn.style.cursor = "not-allowed";
+      }
+    }
   }
 
   private getCurrentUndoHistory() {
@@ -907,6 +1002,11 @@ export class Whiteboard {
     if (history.length < 1) return;
 
     const action = history.pop();
+    
+    // Add to redo history
+    const redoHistory = this.getCurrentRedoHistory();
+    redoHistory.push(action);
+    
     if (action.type == "stroke") {
       const data = this.getData();
       if (data !== null) {
@@ -967,14 +1067,61 @@ export class Whiteboard {
       }
     }
 
-    if (history.length < 1) {
-      document
-        .getElementById("whiteboard-toolbar-undo")
-        ?.style.setProperty("opacity", "0.5");
-      document
-        .getElementById("whiteboard-toolbar-undo")
-        ?.style.setProperty("cursor", "not-allowed");
+    this.updateUndoRedoButtons();
+  }
+
+  private redo() {
+    const redoHistory = this.getCurrentRedoHistory();
+    if (redoHistory.length < 1) return;
+
+    const action = redoHistory.pop();
+    
+    // Add back to undo history
+    const undoHistory = this.getCurrentUndoHistory();
+    undoHistory.push(action);
+    
+    if (action.type == "stroke") {
+      const data = this.getData();
+      if (data !== null) {
+        data.drawing.push(action.ref);
+        data.drawingBBox.push(getBBox(action.ref) as any);
+        this.redrawDrawing();
+      }
+    } else if (action.type == "transform") {
+      const data = this.getData();
+      if (data !== null) {
+        const robot = data[`${action.slot}Robot`];
+        if (action.new.x != undefined) robot.x = action.new.x;
+        if (action.new.y != undefined) robot.y = action.new.y;
+        if (action.new.r != undefined) robot.r = action.new.r;
+        this.drawRobots();
+      }
+    } else if (action.type == "erase") {
+      const data = this.getData();
+      if (data !== null) {
+        // Re-apply the erase by removing the strokes in reverse order
+        for (let i = 0; i < action.indexes.length; i++) {
+          const idx = action.indexes[i];
+          // Find the stroke in the current drawing array
+          const currentIdx = data.drawing.findIndex((s: any) => s === action.erased[i]);
+          if (currentIdx !== -1) {
+            data.drawing.splice(currentIdx, 1);
+            data.drawingBBox.splice(currentIdx, 1);
+          }
+        }
+        this.redrawDrawing();
+      }
+    } else if (action.type === "text") {
+      const data = this.getData();
+      if (data !== null) {
+        if (action.ref) {
+          data.textAnnotations.push(action.ref);
+        }
+        this.redrawDrawing();
+      }
     }
+
+    this.updateUndoRedoButtons();
   }
 
   private drawBackground() {
@@ -1284,21 +1431,8 @@ export class Whiteboard {
     
     this.redrawAll();
 
-    if (this.getCurrentUndoHistory().length < 1) {
-      document
-        .getElementById("whiteboard-toolbar-undo")
-        ?.style.setProperty("opacity", "0.5");
-      document
-        .getElementById("whiteboard-toolbar-undo")
-        ?.style.setProperty("cursor", "not-allowed");
-    } else {
-      document
-        .getElementById("whiteboard-toolbar-undo")
-        ?.style.setProperty("opacity", "1");
-      document
-        .getElementById("whiteboard-toolbar-undo")
-        ?.style.setProperty("cursor", "pointer");
-    }
+    // Update undo/redo buttons for the new mode
+    this.updateUndoRedoButtons();
   }
 
   private isRobotAtPoint(robot: any, x: number, y: number) {

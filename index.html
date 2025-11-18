@@ -611,6 +611,7 @@
             /* Toolbar button enhancements */
             #whiteboard-toolbar-back,
             #whiteboard-toolbar-undo,
+            #whiteboard-toolbar-redo,
             #whiteboard-toolbar-view-toggle {
                 transition: all 0.3s ease;
                 box-shadow:
@@ -626,7 +627,8 @@
                     inset 0 1px 2px rgba(255, 255, 255, 0.3);
             }
 
-            #whiteboard-toolbar-undo:hover {
+            #whiteboard-toolbar-undo:hover,
+            #whiteboard-toolbar-redo:hover {
                 background-color: rgb(249 115 22) !important; /* orange-600 */
                 transform: translateY(-2px);
                 box-shadow:
@@ -644,12 +646,14 @@
 
             #whiteboard-toolbar-back:active,
             #whiteboard-toolbar-undo:active,
+            #whiteboard-toolbar-redo:active,
             #whiteboard-toolbar-view-toggle:active {
                 transform: translateY(0);
             }
 
-            /* Undo button disabled state */
-            #whiteboard-toolbar-undo[style*="opacity: 0.5"] {
+            /* Undo and Redo button disabled state */
+            #whiteboard-toolbar-undo[style*="opacity: 0.5"],
+            #whiteboard-toolbar-redo[style*="opacity: 0.5"] {
                 pointer-events: none;
                 filter: grayscale(0.5);
             }
@@ -2042,6 +2046,12 @@
                         class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-orange-500 glass-button glossy-shine"
                     >
                         UNDO
+                    </button>
+                    <button
+                        id="whiteboard-toolbar-redo"
+                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-orange-500 glass-button glossy-shine"
+                    >
+                        REDO
                     </button>
                 </div>
 
