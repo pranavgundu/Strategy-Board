@@ -2,7 +2,7 @@
 
 # Strategy Board
 
-![Strategy Board Banner](https://github.com/user-attachments/assets/bb049aef-19a5-44c0-8b29-64799408ee6a)
+![Strategy Board Banner](https://github.com/user-attachments/assets/68c6635c-eaad-45e4-87e1-3e189cd4fb50)
 
 A powerful strategy planning tool for FIRST Robotics Competition teams
 
