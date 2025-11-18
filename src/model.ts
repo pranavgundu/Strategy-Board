@@ -80,7 +80,7 @@ export class Model {
     await SET("matchIds", this.matchIds, (e) => {
       console.error("Failed to update match IDs after deletion:", e);
     });
-    DEL(id);
+    await DEL(id);
   }
 
   public getMatch(id: string): Match | null {
@@ -102,6 +102,6 @@ export class Model {
   public async clear(): Promise<void> {
     this.matches = [];
     this.matchIds = [];
-    CLEAR();
+    await CLEAR();
   }
 }

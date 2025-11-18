@@ -21,7 +21,6 @@ export class ContributorsService {
     this.hasError = false;
 
     try {
-      // Fetch contributors from GitHub API
       const response = await fetch(
         "https://api.github.com/repos/pranavgundu/Strategy-Board/contributors"
       );
@@ -32,7 +31,6 @@ export class ContributorsService {
 
       this.contributors = await response.json();
 
-      // Fetch additional user details for top contributors
       const detailedContributors = await Promise.all(
         this.contributors.slice(0, 10).map(async (contributor) => {
           try {
@@ -54,7 +52,6 @@ export class ContributorsService {
         })
       );
 
-      // Update with detailed info
       detailedContributors.forEach((detailed, index) => {
         this.contributors[index] = detailed;
       });

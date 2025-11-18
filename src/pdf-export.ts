@@ -83,10 +83,6 @@ export class PDFExport {
     }
   }
 
-  /**
-   * Alternative layout: One QR code per page for maximum visibility
-   * Useful for displaying on tablets or projecting
-   */
   public async exportToPDFLarge(
     data: string[],
     matchName: string

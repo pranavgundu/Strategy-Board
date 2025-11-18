@@ -591,9 +591,8 @@ export class QRImport {
         this.receivedIds.length === this.expectedLength
       ) {
         if (statusEl)
-          if (statusEl)
-            statusEl.textContent =
-              "All chunks received — reconstructing data...";
+          statusEl.textContent =
+            "All chunks received — reconstructing data...";
         try {
           const dots = document.getElementById(
             "qr-import-dots",
