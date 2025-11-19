@@ -738,6 +738,91 @@ export class View {
         console.warn("Missing element: qr-export-pdf-btn");
       }
 
+      // Setup dropdown export buttons (for tablet/mobile)
+      const exportDropdownToggle = get("export-dropdown-toggle");
+      const exportDropdownMenu = get("export-dropdown-menu");
+      const exportDropdownArrow = get("export-dropdown-arrow");
+      const exportStartBtnDropdown = get("qr-export-start-btn-dropdown");
+      const exportPdfBtnDropdown = get("qr-export-pdf-btn-dropdown");
+
+      if (exportDropdownToggle && exportDropdownMenu) {
+        console.debug("View: attaching dropdown toggle handler");
+        exportDropdownToggle.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isVisible = exportDropdownMenu.style.display === "block";
+          exportDropdownMenu.style.display = isVisible ? "none" : "block";
+          if (exportDropdownArrow) {
+            if (isVisible) {
+              exportDropdownArrow.classList.remove("rotated");
+            } else {
+              exportDropdownArrow.classList.add("rotated");
+            }
+          }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+          const target = e.target as Node;
+          if (
+            exportDropdownMenu &&
+            exportDropdownToggle &&
+            !exportDropdownToggle.contains(target) &&
+            !exportDropdownMenu.contains(target)
+          ) {
+            exportDropdownMenu.style.display = "none";
+            if (exportDropdownArrow) {
+              exportDropdownArrow.classList.remove("rotated");
+            }
+          }
+        });
+
+        console.debug("View: attached dropdown toggle handler");
+      }
+
+      if (exportStartBtnDropdown) {
+        console.debug(
+          "View: attaching 'click' handler to #qr-export-start-btn-dropdown",
+        );
+        exportStartBtnDropdown.addEventListener("click", (e) => {
+          e.stopPropagation();
+          // Trigger the same action as the desktop Start button
+          const startBtn = get("qr-export-start-btn");
+          if (startBtn) {
+            startBtn.click();
+          }
+          // Close dropdown
+          if (exportDropdownMenu) {
+            exportDropdownMenu.style.display = "none";
+          }
+          if (exportDropdownArrow) {
+            exportDropdownArrow.classList.remove("rotated");
+          }
+        });
+        console.debug(
+          "View: attached 'click' handler to #qr-export-start-btn-dropdown",
+        );
+      }
+
+      if (exportPdfBtnDropdown) {
+        console.debug(
+          "View: attaching 'click' handler to #qr-export-pdf-btn-dropdown",
+        );
+        exportPdfBtnDropdown.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          await this.onClickExportPDF();
+          // Close dropdown
+          if (exportDropdownMenu) {
+            exportDropdownMenu.style.display = "none";
+          }
+          if (exportDropdownArrow) {
+            exportDropdownArrow.classList.remove("rotated");
+          }
+        });
+        console.debug(
+          "View: attached 'click' handler to #qr-export-pdf-btn-dropdown",
+        );
+      }
+
       const importEl = E?.Import;
       if (importEl) {
         console.debug(
@@ -990,6 +1075,12 @@ export class View {
 
             const pdfBtn = document.getElementById("qr-export-pdf-btn");
             if (pdfBtn) pdfBtn.style.display = "block";
+
+            const desktopContainer = document.getElementById("export-buttons-desktop");
+            if (desktopContainer) desktopContainer.style.display = "";
+
+            const dropdownContainer = document.getElementById("export-dropdown-container");
+            if (dropdownContainer) dropdownContainer.style.display = "";
 
             this.qrexport.export(match, () => {
               console.log("QR export ready - waiting for user to click Start");
@@ -1836,6 +1927,14 @@ export class View {
     // Hide PDF export button and clear current match
     const pdfBtn = document.getElementById("qr-export-pdf-btn");
     if (pdfBtn) pdfBtn.style.display = "none";
+
+    // Reset dropdown state
+    const exportDropdownMenu = get("export-dropdown-menu");
+    if (exportDropdownMenu) exportDropdownMenu.style.display = "none";
+
+    const exportDropdownArrow = get("export-dropdown-arrow");
+    if (exportDropdownArrow) exportDropdownArrow.classList.remove("rotated");
+
     this.currentExportMatch = null;
   }
 
