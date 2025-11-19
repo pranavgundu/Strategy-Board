@@ -64,6 +64,7 @@ let E: {
   ContributorsLoading?: HTMLElement | null;
   ContributorsError?: HTMLElement | null;
   ContributorsList?: HTMLElement | null;
+  LastCommitInfo?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -151,6 +152,7 @@ export class View {
         ContributorsLoading: get("contributors-loading") as HTMLElement | null,
         ContributorsError: get("contributors-error") as HTMLElement | null,
         ContributorsList: get("contributors-list") as HTMLElement | null,
+        LastCommitInfo: get("last-commit-info") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -808,6 +810,7 @@ export class View {
     }
 
     this.initializeTBAService();
+    this.initializeLastCommit();
   }
 
   private async initializeTBAService(): Promise<void> {
@@ -816,6 +819,54 @@ export class View {
       "TBA Service initialized, has key:",
       this.tbaService.hasApiKey(),
     );
+  }
+
+  private async initializeLastCommit(): Promise<void> {
+    if (!E?.LastCommitInfo) return;
+
+    try {
+      const commit = await this.contributorsService.fetchLastCommit();
+      if (commit) {
+        const date = new Date(commit.date);
+        const timeAgo = this.getTimeAgo(date);
+        
+        E.LastCommitInfo.innerHTML = `
+          <a href="${commit.url}" target="_blank" rel="noopener noreferrer" 
+             class="hover:text-slate-300 transition-colors flex items-center gap-2"
+             title="${commit.message}">
+            <span class="font-mono">${commit.sha}</span>
+            <span>•</span>
+            <span>${timeAgo}</span>
+          </a>
+        `;
+        E.LastCommitInfo.classList.remove("hidden");
+        E.LastCommitInfo.querySelector("span")?.classList.remove("opacity-0");
+      }
+    } catch (error) {
+      console.error("Error fetching last commit:", error);
+    }
+  }
+
+  private getTimeAgo(date: Date): string {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    
+    const intervals = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60,
+    };
+
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+      const interval = Math.floor(seconds / secondsInUnit);
+      if (interval >= 1) {
+        return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+      }
+    }
+    
+    return 'just now';
   }
 
   private show(e: HTMLElement | null): void {
@@ -1881,7 +1932,7 @@ export class View {
 
         contributorCard.innerHTML = `
           <div class="flex-shrink-0 relative">
-            ${medalEmoji ? `<div class="absolute -top-2 -right-2 text-2xl">${medalEmoji}</div>` : ""}
+            ${medalEmoji ? `<div class="absolute -top-3 left-1/2 -translate-x-1/2 text-3xl z-10" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${medalEmoji}</div>` : ""}
             <img
               src="${contributor.avatar_url}?s=128"
               alt="${contributor.login}"

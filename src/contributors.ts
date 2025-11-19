@@ -7,10 +7,19 @@ export interface Contributor {
   bio?: string;
 }
 
+export interface LastCommit {
+  sha: string;
+  message: string;
+  author: string;
+  date: string;
+  url: string;
+}
+
 export class ContributorsService {
   private contributors: Contributor[] = [];
   private isLoading = false;
   private hasError = false;
+  private lastCommit: LastCommit | null = null;
 
   async fetchContributors(): Promise<Contributor[]> {
     if (this.contributors.length > 0) {
@@ -76,5 +85,37 @@ export class ContributorsService {
 
   hasLoadError(): boolean {
     return this.hasError;
+  }
+
+  async fetchLastCommit(): Promise<LastCommit | null> {
+    if (this.lastCommit) {
+      return this.lastCommit;
+    }
+
+    try {
+      const response = await fetch(
+        "https://api.github.com/repos/pranavgundu/Strategy-Board/commits?per_page=1"
+      );
+
+      if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.status}`);
+      }
+
+      const commits = await response.json();
+      if (commits.length > 0) {
+        const commit = commits[0];
+        this.lastCommit = {
+          sha: commit.sha.substring(0, 7),
+          message: commit.commit.message.split('\n')[0], // First line only
+          author: commit.commit.author.name,
+          date: commit.commit.author.date,
+          url: commit.html_url,
+        };
+        return this.lastCommit;
+      }
+    } catch (error) {
+      console.error("Error fetching last commit:", error);
+    }
+    return null;
   }
 }
