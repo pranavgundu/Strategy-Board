@@ -4,7 +4,7 @@ import { Match } from "@/match.ts";
 import { QRImport, QRExport } from "@/qr.ts";
 import { CLEAR, SET, GET } from "@/db.ts";
 import { TBAService } from "./tba.ts";
-import { PDFExport } from "./pdf-export.ts";
+import { PDFExport } from "./pdf.ts";
 import { ContributorsService } from "./contributors.ts";
 
 const get = (id: string): HTMLElement | null => document.getElementById(id);
