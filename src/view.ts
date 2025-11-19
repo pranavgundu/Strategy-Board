@@ -726,102 +726,7 @@ export class View {
         console.warn("Missing element: qr-export-container");
       }
 
-      const pdfExportBtn = get("qr-export-pdf-btn");
-      if (pdfExportBtn) {
-        console.debug("View: attaching 'click' handler to #qr-export-pdf-btn");
-        pdfExportBtn.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          await this.onClickExportPDF();
-        });
-        console.debug("View: attached 'click' handler to #qr-export-pdf-btn");
-      } else {
-        console.warn("Missing element: qr-export-pdf-btn");
-      }
-
-      // Setup dropdown export buttons (for tablet/mobile)
-      const exportDropdownToggle = get("export-dropdown-toggle");
-      const exportDropdownMenu = get("export-dropdown-menu");
-      const exportDropdownArrow = get("export-dropdown-arrow");
-      const exportStartBtnDropdown = get("qr-export-start-btn-dropdown");
-      const exportPdfBtnDropdown = get("qr-export-pdf-btn-dropdown");
-
-      if (exportDropdownToggle && exportDropdownMenu) {
-        console.debug("View: attaching dropdown toggle handler");
-        exportDropdownToggle.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const isVisible = exportDropdownMenu.style.display === "block";
-          exportDropdownMenu.style.display = isVisible ? "none" : "block";
-          if (exportDropdownArrow) {
-            if (isVisible) {
-              exportDropdownArrow.classList.remove("rotated");
-            } else {
-              exportDropdownArrow.classList.add("rotated");
-            }
-          }
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener("click", (e) => {
-          const target = e.target as Node;
-          if (
-            exportDropdownMenu &&
-            exportDropdownToggle &&
-            !exportDropdownToggle.contains(target) &&
-            !exportDropdownMenu.contains(target)
-          ) {
-            exportDropdownMenu.style.display = "none";
-            if (exportDropdownArrow) {
-              exportDropdownArrow.classList.remove("rotated");
-            }
-          }
-        });
-
-        console.debug("View: attached dropdown toggle handler");
-      }
-
-      if (exportStartBtnDropdown) {
-        console.debug(
-          "View: attaching 'click' handler to #qr-export-start-btn-dropdown",
-        );
-        exportStartBtnDropdown.addEventListener("click", (e) => {
-          e.stopPropagation();
-          // Trigger the same action as the desktop Start button
-          const startBtn = get("qr-export-start-btn");
-          if (startBtn) {
-            startBtn.click();
-          }
-          // Close dropdown
-          if (exportDropdownMenu) {
-            exportDropdownMenu.style.display = "none";
-          }
-          if (exportDropdownArrow) {
-            exportDropdownArrow.classList.remove("rotated");
-          }
-        });
-        console.debug(
-          "View: attached 'click' handler to #qr-export-start-btn-dropdown",
-        );
-      }
-
-      if (exportPdfBtnDropdown) {
-        console.debug(
-          "View: attaching 'click' handler to #qr-export-pdf-btn-dropdown",
-        );
-        exportPdfBtnDropdown.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          await this.onClickExportPDF();
-          // Close dropdown
-          if (exportDropdownMenu) {
-            exportDropdownMenu.style.display = "none";
-          }
-          if (exportDropdownArrow) {
-            exportDropdownArrow.classList.remove("rotated");
-          }
-        });
-        console.debug(
-          "View: attached 'click' handler to #qr-export-pdf-btn-dropdown",
-        );
-      }
+      // No longer need PDF button click handler here since export is now triggered from kebab menu
 
       const importEl = E?.Import;
       if (importEl) {
@@ -1037,8 +942,10 @@ export class View {
     const kebab = item.children[2].children[0] as HTMLElement;
     const options = item.children[2].children[1] as HTMLElement;
     const duplicateOption = options.children[0] as HTMLElement;
-    const exportOption = options.children[1] as HTMLElement;
-    const deleteOption = options.children[2] as HTMLElement;
+    const exportQROption = options.children[1] as HTMLElement;
+    const exportPNGOption = options.children[2] as HTMLElement;
+    const exportPDFOption = options.children[3] as HTMLElement;
+    const deleteOption = options.children[4] as HTMLElement;
 
     options.addEventListener("click", (e) => e.stopPropagation());
 
@@ -1061,37 +968,69 @@ export class View {
       this.deleteMatch(item.id);
     });
 
-    exportOption.addEventListener("click", (e) => {
+    // Export QR - directly start QR code animation
+    exportQROption.addEventListener("click", (e) => {
       e.stopPropagation();
       const match = this.model.getMatch(id);
       if (match) {
+        // Hide the options menu first
+        this.hide(options);
+        this.show(kebab);
+        
+        // Then show the export overlay
         this.show(E.Export);
         setTimeout(() => {
           try {
             this.currentExportMatch = match;
 
-            const startBtn = document.getElementById("qr-export-start-btn");
-            if (startBtn) startBtn.style.display = "block";
-
-            const pdfBtn = document.getElementById("qr-export-pdf-btn");
-            if (pdfBtn) pdfBtn.style.display = "block";
-
-            const desktopContainer = document.getElementById("export-buttons-desktop");
-            if (desktopContainer) desktopContainer.style.display = "";
-
-            const dropdownContainer = document.getElementById("export-dropdown-container");
-            if (dropdownContainer) dropdownContainer.style.display = "";
-
+            // Prepare QR export - let user click Start button manually
             this.qrexport.export(match, () => {
               console.log("QR export ready - waiting for user to click Start");
             });
           } catch (err) {
             console.error("View: failed to start QR export:", err);
             alert("Failed to start QR export. See console for details.");
-
             this.hide(E.Export);
           }
         }, 50);
+      } else {
+        this.hide(options);
+        this.show(kebab);
+      }
+    });
+
+    // Export PNG - directly export to PNG
+    exportPNGOption.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const match = this.model.getMatch(id);
+      if (match) {
+        try {
+          this.currentExportMatch = match;
+          this.onClickExportPNG();
+          this.currentExportMatch = null;
+        } catch (err) {
+          console.error("View: failed to export PNG:", err);
+          alert("Failed to export PNG. See console for details.");
+        }
+      }
+
+      this.hide(options);
+      this.show(kebab);
+    });
+
+    // Export PDF - directly export to PDF
+    exportPDFOption.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const match = this.model.getMatch(id);
+      if (match) {
+        try {
+          this.currentExportMatch = match;
+          await this.onClickExportPDF();
+          this.currentExportMatch = null;
+        } catch (err) {
+          console.error("View: failed to export PDF:", err);
+          alert("Failed to export PDF. See console for details.");
+        }
       }
 
       this.hide(options);
@@ -1208,6 +1147,31 @@ export class View {
       I.BlueThree.value,
     );
     this.hide(E.CreateMatchPanel);
+  }
+
+  private onClickExportPNG(): void {
+    if (!this.currentExportMatch) {
+      console.error("No match available for PNG export");
+      alert("No match data available for export");
+      return;
+    }
+
+    try {
+      // Call the global exportPNG function defined in index.html
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const filename = `strategy-board-${this.currentExportMatch.matchName}-${timestamp}.png`;
+      
+      // Access the global exportPNG function
+      const win = window as any;
+      if (typeof win.exportPNG === "function") {
+        win.exportPNG(filename);
+      } else {
+        throw new Error("exportPNG function not available");
+      }
+    } catch (err) {
+      console.error("View: PNG export failed:", err);
+      alert("Failed to export PNG. See console for details.");
+    }
   }
 
   private async onClickExportPDF(): Promise<void> {
@@ -1923,17 +1887,6 @@ export class View {
 
     const status = get("qr-export-status");
     if (status) status.textContent = "";
-
-    // Hide PDF export button and clear current match
-    const pdfBtn = document.getElementById("qr-export-pdf-btn");
-    if (pdfBtn) pdfBtn.style.display = "none";
-
-    // Reset dropdown state
-    const exportDropdownMenu = get("export-dropdown-menu");
-    if (exportDropdownMenu) exportDropdownMenu.style.display = "none";
-
-    const exportDropdownArrow = get("export-dropdown-arrow");
-    if (exportDropdownArrow) exportDropdownArrow.classList.remove("rotated");
 
     this.currentExportMatch = null;
   }
