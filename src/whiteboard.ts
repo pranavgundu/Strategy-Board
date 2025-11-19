@@ -45,19 +45,22 @@ function ensureCanvases(): void {
     const c = document.createElement("canvas");
     c.width = Config.fieldPNGPixelWidth;
     c.height = Config.fieldPNGPixelHeight;
-    _BGctx = c.getContext("2d");
+    const ctx = c.getContext("2d");
+    if (ctx) _BGctx = ctx;
   }
   if (!_ITctx) {
     const c = document.createElement("canvas");
     c.width = Config.fieldPNGPixelWidth;
     c.height = Config.fieldPNGPixelHeight;
-    _ITctx = c.getContext("2d");
+    const ctx = c.getContext("2d");
+    if (ctx) _ITctx = ctx;
   }
   if (!_DRctx) {
     const c = document.createElement("canvas");
     c.width = Config.fieldPNGPixelWidth;
     c.height = Config.fieldPNGPixelHeight;
-    _DRctx = c.getContext("2d");
+    const ctx = c.getContext("2d");
+    if (ctx) _DRctx = ctx;
   }
 }
 
@@ -254,6 +257,8 @@ export class Whiteboard {
   private endgameRedoHistory: Array<any> = [];
   private notesRedoHistory: Array<any> = [];
 
+  private updateInterval: number | null = null;
+
   static camera_presets: { [key: string]: { x: number; y: number } } = {
     full: { x: width / 2, y: height / 2 },
     red: { x: (3 * width) / 4, y: height / 2 },
@@ -295,6 +300,14 @@ export class Whiteboard {
       ?.addEventListener("click", (e) => {
         e.preventDefault();
         this.undo();
+      });
+
+    // Add click handler for redo button
+    document
+      .getElementById("whiteboard-toolbar-redo")
+      ?.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.redo();
       });
 
     document
@@ -792,7 +805,7 @@ export class Whiteboard {
 
     requestAnimationFrame(this.main.bind(this));
 
-    setInterval(() => {
+    this.updateInterval = window.setInterval(() => {
       if (this.match !== null) {
         this.model.updateMatch(this.match.id);
       }
@@ -821,10 +834,10 @@ export class Whiteboard {
       this.currentColor = 0;
       document
         .getElementById("whiteboard-draw-config-marker")
-        .style.setProperty("display", "inline");
+        ?.style.setProperty("display", "inline");
       document
         .getElementById("whiteboard-draw-config-eraser")
-        .style.setProperty("display", "none");
+        ?.style.setProperty("display", "none");
 
       document
         .getElementById("whiteboard-color-white")
@@ -871,6 +884,12 @@ export class Whiteboard {
       document
         .getElementById("whiteboard-robot-config")
         ?.classList.add("hidden");
+      
+      // Clean up interval to prevent memory leak
+      if (this.updateInterval !== null) {
+        clearInterval(this.updateInterval);
+        this.updateInterval = null;
+      }
     }
   }
 
@@ -1093,14 +1112,13 @@ export class Whiteboard {
     } else if (action.type == "erase") {
       const data = this.getData();
       if (data !== null) {
-        // Re-apply the erase by removing the strokes in reverse order
-        for (let i = 0; i < action.indexes.length; i++) {
-          const idx = action.indexes[i];
-          // Find the stroke in the current drawing array
-          const currentIdx = data.drawing.findIndex((s: any) => s === action.erased[i]);
-          if (currentIdx !== -1) {
-            data.drawing.splice(currentIdx, 1);
-            data.drawingBBox.splice(currentIdx, 1);
+        // Re-apply the erase by removing the strokes at the stored indexes
+        // Sort indexes in descending order to avoid index shifting issues
+        const sortedIndexes = [...action.indexes].sort((a, b) => b - a);
+        for (let idx of sortedIndexes) {
+          if (idx < data.drawing.length) {
+            data.drawing.splice(idx, 1);
+            data.drawingBBox.splice(idx, 1);
           }
         }
         this.redrawDrawing();
@@ -1774,9 +1792,15 @@ export class Whiteboard {
     this.isPointerDown = false;
     if (this.selected !== null) {
       if (this.currentAction !== "none") {
+        const robot = this.selected[1];
         this.addUndoHistory({
           type: "transform",
           prev: this.previousRobotTransform,
+          new: {
+            x: robot.x,
+            y: robot.y,
+            r: robot.r,
+          },
           slot: this.selected[0],
         });
       }

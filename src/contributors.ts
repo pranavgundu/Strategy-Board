@@ -66,7 +66,7 @@ export class ContributorsService {
     }
   }
 
-  getTopContributors(count: number = 10): Contributor[] {
+  getTopContributors(count: number = 4): Contributor[] {
     return this.contributors.slice(0, count);
   }
 
