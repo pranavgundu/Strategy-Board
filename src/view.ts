@@ -823,7 +823,7 @@ export class View {
         E.LastCommitInfo.innerHTML = `
           <a href="${commit.url}" target="_blank" rel="noopener noreferrer" 
              class="hover:text-slate-300 transition-colors flex items-center gap-2"
-             title="${commit.message}">
+             title="Deployed version: ${commit.message}">
             <span class="font-mono">${commit.sha}</span>
             <span>•</span>
             <span>${timeAgo}</span>

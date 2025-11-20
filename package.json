@@ -2,12 +2,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build",
+    "build": "tsx scripts/get-commit-sha.ts && tsc && vite build",
     "preview": "vite preview --host"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
+    "tsx": "^4.20.6",
     "typescript": "^5.8.2",
     "vite": "^6.2.1",
     "vite-plugin-pwa": "^1.1.0"
