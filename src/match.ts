@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-// the Match class represents a robotics match with teams and phases
+// the match class represents a robotics match with teams and phases
 
 interface RobotPosition {
   x: number;
