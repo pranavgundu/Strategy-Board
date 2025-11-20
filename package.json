@@ -2,10 +2,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsx scripts/get-commit-sha.ts && tsc && vite build",
+    "build": "tsx scripts/commit.ts && tsc && vite build",
     "preview": "vite preview --host"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
     "tsx": "^4.20.6",
