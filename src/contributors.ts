@@ -90,8 +90,6 @@ export class ContributorsService {
   }
 
   async fetchLastCommit(): Promise<LastCommit | null> {
-    // Return the commit this build is on (embedded at build time)
-    // rather than fetching the latest commit from GitHub
     if (this.lastCommit) {
       return this.lastCommit;
     }

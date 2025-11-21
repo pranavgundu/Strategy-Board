@@ -95,8 +95,6 @@ export class QRExport {
       totalChunks.toString().padStart(TOTAL_CHUNKS_HEADER_SIZE, "0") +
       (chunks[index] || "");
 
-    // Make QR code very large to fill most of the screen
-    // Use smaller multiplier to account for padding and UI elements
     const qrCanvasPixelSize = Math.max(
       512,
       Math.floor(Math.min(window.innerWidth * 0.8, window.innerHeight * 0.65)),
@@ -128,7 +126,6 @@ export class QRExport {
         }
       } catch (_err) {}
 
-      // Show progress bar when animation starts
       const progressWrap = document.getElementById("qr-export-progress-wrap");
       if (progressWrap) progressWrap.style.display = "flex";
     };
@@ -149,32 +146,26 @@ export class QRExport {
           el.replaceChildren();
           el.appendChild(canvas);
 
-          // Show the first QR code immediately
           const dom = document.getElementById(el.id);
           if (dom) dom.classList.remove("hidden");
 
-          // Wait for start button click before starting animation
           const startExport = () => {
             markShown(0);
 
-            // Hide start button
             const startBtn = document.getElementById("qr-export-start-btn");
             if (startBtn) startBtn.style.display = "none";
 
-            // Hide PDF export button
             const pdfBtn = document.getElementById("qr-export-pdf-btn");
             if (pdfBtn) pdfBtn.style.display = "none";
           };
 
           if (onReadyToStart) {
             onReadyToStart();
-            // Set up the start callback
             const startBtn = document.getElementById("qr-export-start-btn");
             if (startBtn) {
               startBtn.onclick = startExport;
             }
           } else {
-            // Fallback: start immediately if no callback provided
             startExport();
           }
         } catch (err) {
@@ -192,7 +183,6 @@ export class QRExport {
 
     (async () => {
       try {
-        // Pre-render initial QR codes
         for (let i = 0; i < poolSize; i++) {
           const el = this.pool[i];
           if (!el) continue;
@@ -216,9 +206,7 @@ export class QRExport {
           }
         }
 
-        // Define the start function that begins the animation
         const startAnimation = () => {
-          // Show the first QR code and mark as shown
           const firstEl = this.pool.find((x) => x) || null;
           if (firstEl) {
             const dom = document.getElementById(firstEl.id);
@@ -226,10 +214,8 @@ export class QRExport {
           }
           markShown(0);
 
-          // Hide start button
           const startBtn = document.getElementById("qr-export-start-btn");
 
-          // Hide PDF export button
           const pdfBtn = document.getElementById("qr-export-pdf-btn");
           if (pdfBtn) pdfBtn.style.display = "none";
           if (startBtn) startBtn.style.display = "none";

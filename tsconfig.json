@@ -1,26 +1,21 @@
 {
   "compilerOptions": {
-    /* Language and Environment */
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
 
-    /* Modules */
     "module": "ES2022",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
 
-    /* Emit */
     "noEmit": true,
 
-    /* Interop Constraints */
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Type Checking */
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -28,13 +23,11 @@
     "noImplicitReturns": false,
     "skipLibCheck": true,
 
-    /* Path Mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
 
-    /* Type Definitions */
     "types": ["vite-plugin-pwa/client"]
   },
   "include": ["src"],

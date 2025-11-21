@@ -23,7 +23,6 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    /* Support for iPhone notch and safe areas */
     padding-top: env(safe-area-inset-top);
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
@@ -32,11 +31,9 @@ body {
 
 body {
     font-size: 16px;
-    /* Ensure scrolling works smoothly on mobile */
     -webkit-overflow-scrolling: touch;
 }
 
-/* App debug overlay styles */
 #app-debug-overlay {
     position: fixed;
     right: 12px;
@@ -86,8 +83,6 @@ body {
     border-radius: 6px;
 }
 
-/* Responsive toolbar + QR overlay visuals and animations */
-/* Keep the mode selector centered while allowing left/right controls to adapt */
 #whiteboard-toolbar {
     display: grid;
     grid-template-columns: 1fr auto 1fr;

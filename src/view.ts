@@ -614,7 +614,6 @@ export class View {
               const requiredWidth =
                 leftWidth + modeWidth + rightWidth + padding * 2;
 
-              // Remove any previous layout classes first
               toolbar.classList.remove(
                 "toolbar-collapsed",
                 "toolbar-condensed",
@@ -623,7 +622,6 @@ export class View {
 
               const slack = toolbarWidth - requiredWidth; // positive = space remaining
               if (slack < 0) {
-                // Not enough space: apply progressive scaling classes but keep single row
                 if (slack < -120) {
                   toolbar.classList.add("toolbar-ultra");
                 } else {
@@ -725,8 +723,6 @@ export class View {
       } else {
         console.warn("Missing element: qr-export-container");
       }
-
-      // No longer need PDF button click handler here since export is now triggered from kebab menu
 
       const importEl = E?.Import;
       if (importEl) {

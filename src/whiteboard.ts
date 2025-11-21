@@ -273,16 +273,13 @@ export class Whiteboard {
     window.addEventListener("resize", this.redrawAll.bind(this));
     window.addEventListener("orientationchange", this.redrawAll.bind(this));
     window.addEventListener("keydown", (e) => {
-      // Support both Cmd (Mac) and Ctrl (Windows/Linux)
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const modifier = isMac ? e.metaKey : e.ctrlKey;
       
-      // Undo: Cmd+Z or Ctrl+Z
       if (modifier && e.code === "KeyZ" && !e.shiftKey) {
         e.preventDefault();
         this.undo();
       }
-      // Redo: Cmd+Shift+Z or Ctrl+Shift+Z or Cmd+Y or Ctrl+Y
       else if (modifier && (e.code === "KeyY" || (e.code === "KeyZ" && e.shiftKey))) {
         e.preventDefault();
         this.redo();
@@ -294,7 +291,6 @@ export class Whiteboard {
     drawing.addEventListener("pointerdown", this.onPointerDown.bind(this));
     drawing.addEventListener("pointerleave", this.onPointerLeave.bind(this));
 
-    // Add click handler for undo button
     document
       .getElementById("whiteboard-toolbar-undo")
       ?.addEventListener("click", (e) => {
