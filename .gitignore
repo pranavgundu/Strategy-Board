@@ -25,3 +25,6 @@ dist-ssr
 .env.*
 
 src/build.ts
+
+android/
+ios/

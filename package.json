@@ -3,9 +3,15 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsx scripts/commit.ts && tsc && vite build",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android",
+    "cap:run:ios": "npm run cap:sync && npx cap run ios",
+    "cap:run:android": "npm run cap:sync && npx cap run android"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.4",
     "@types/node": "^24.10.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
@@ -15,6 +21,9 @@
     "vite-plugin-pwa": "^1.1.0"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4",
     "@tailwindcss/vite": "^4.0.12",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
