@@ -95,7 +95,6 @@ export class ContributorsService {
     }
 
     try {
-      // Use the build-time commit info
       this.lastCommit = {
         sha: BUILD_COMMIT.sha,
         message: BUILD_COMMIT.message,
