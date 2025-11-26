@@ -1,6 +1,7 @@
 import { defineConfig, Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
 
 // Plugin to stub out core-js imports from canvg
 const stubCoreJs = (): Plugin => ({
@@ -30,6 +31,7 @@ const srcPath = (() => {
 
 export default defineConfig({
   plugins: [
+    react(),
     stubCoreJs(),
     tailwindcss(),
     VitePWA({

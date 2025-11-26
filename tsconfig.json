@@ -4,6 +4,8 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
 
+    "jsx": "react-jsx",
+
     "module": "ES2022",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

@@ -31,6 +31,16 @@ export interface TBAEvent {
   country?: string;
 }
 
+export interface TBATeam {
+  key: string;
+  team_number: number;
+  nickname: string;
+  name?: string;
+  city?: string;
+  state_prov?: string;
+  country?: string;
+}
+
 export interface TBASimpleEvent {
   key: string;
   name: string;
@@ -48,7 +58,11 @@ export interface TBASimpleMatch {
 export class TBAService {
   private apiKey: string | null = null;
 
-  constructor() {}
+  constructor(apiKey?: string) {
+    if (apiKey) {
+      this.apiKey = apiKey;
+    }
+  }
 
   public async loadApiKey(): Promise<string | null> {
     const key = await GET("tbaApiKey", (e) => {
@@ -310,5 +324,48 @@ export class TBAService {
   ): Promise<TBASimpleMatch[]> {
     const matches = await this.getMatchesAtEvent(eventKey);
     return this.parseMatchesToSimple(matches);
+  }
+
+  // New methods for React hooks
+  public async searchEvents(query: string): Promise<TBAEvent[]> {
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear, currentYear - 1];
+    const allEvents: TBAEvent[] = [];
+
+    for (const year of years) {
+      try {
+        const events = await this.getEvents(year);
+        allEvents.push(...events);
+      } catch (error) {
+        console.error(`Failed to fetch events for ${year}:`, error);
+      }
+    }
+
+    // Filter events by query
+    const lowerQuery = query.toLowerCase();
+    return allEvents.filter(
+      (event) =>
+        event.name.toLowerCase().includes(lowerQuery) ||
+        event.event_code.toLowerCase().includes(lowerQuery) ||
+        event.city?.toLowerCase().includes(lowerQuery) ||
+        event.state_prov?.toLowerCase().includes(lowerQuery),
+    );
+  }
+
+  public async getEventTeams(eventKey: string): Promise<TBATeam[]> {
+    const endpoint = `/event/${eventKey}/teams`;
+    return await this.makeRequest(endpoint);
+  }
+
+  public async getTeamMatches(
+    eventKey: string,
+    teamNumber: string,
+  ): Promise<TBAMatch[]> {
+    const teamKey = `frc${teamNumber}`;
+    return await this.getTeamMatchesAtEvent(teamKey, eventKey);
+  }
+
+  public async getAllMatches(eventKey: string): Promise<TBAMatch[]> {
+    return await this.getMatchesAtEvent(eventKey);
   }
 }

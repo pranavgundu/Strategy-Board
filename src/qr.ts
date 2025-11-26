@@ -1,6 +1,6 @@
 import QrScanner from "qr-scanner";
 import * as QRCode from "qrcode";
-import { Match } from "@/match.ts";
+import { Match } from "./match";
 
 const HEADER_SIZE = 4;
 const TOTAL_CHUNKS_HEADER_SIZE = 4;
@@ -8,6 +8,25 @@ const CHUNK_HEADER_SIZE = HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE;
 
 const MAX_CHUNK_PAYLOAD = 200;
 const FRAME_DURATION_MS = 600;
+
+const showElement = (
+  el: HTMLElement | null,
+  display: string = "flex",
+): void => {
+  if (!el) return;
+  el.style.display = display;
+  try {
+    el.classList.remove("hidden");
+  } catch (_err) {}
+};
+
+const hideElement = (el: HTMLElement | null): void => {
+  if (!el) return;
+  el.style.display = "none";
+  try {
+    el.classList.add("hidden");
+  } catch (_err) {}
+};
 
 function encodeToBase64(input: string): string {
   const encoder = new TextEncoder();
@@ -109,10 +128,12 @@ export class QRExport {
     }
 
     const updateOverlayStatus = (shownCount: number, total: number) => {
-      const status = document.getElementById("qr-export-status");
-      if (status) {
-        status.textContent = `Page ${shownCount} / ${total}`;
-        status.style.display = "block";
+      const statusWrapper = document.getElementById("qr-export-status");
+      const statusText = document.getElementById("qr-export-status-text");
+      if (statusWrapper && statusText) {
+        statusText.textContent = `Page ${shownCount} / ${total}`;
+        statusWrapper.style.display = "block";
+        statusWrapper.setAttribute("aria-hidden", "false");
       }
 
       try {
@@ -147,7 +168,7 @@ export class QRExport {
           el.appendChild(canvas);
 
           const dom = document.getElementById(el.id);
-          if (dom) dom.classList.remove("hidden");
+          showElement(dom);
 
           const startExport = () => {
             markShown(0);
@@ -200,7 +221,7 @@ export class QRExport {
             );
             el.appendChild(canvas);
             const slot = document.getElementById(`qr-export-code-worker-${i}`);
-            if (slot) slot.classList.add("hidden");
+            if (slot) hideElement(slot as HTMLElement);
           } catch (err) {
             console.warn("QRExport: failed to render initial QR canvas", err);
           }
@@ -210,7 +231,7 @@ export class QRExport {
           const firstEl = this.pool.find((x) => x) || null;
           if (firstEl) {
             const dom = document.getElementById(firstEl.id);
-            if (dom) dom.classList.remove("hidden");
+            showElement(dom);
           }
           markShown(0);
 
@@ -226,11 +247,11 @@ export class QRExport {
               const prevEl = this.pool[modulus(poolIndex - 1, poolSize)];
               if (currentEl) {
                 const domCur = document.getElementById(currentEl.id);
-                if (domCur) domCur.classList.remove("hidden");
+                showElement(domCur);
               }
               if (prevEl) {
                 const domPrev = document.getElementById(prevEl.id);
-                if (domPrev) domPrev.classList.add("hidden");
+                hideElement(domPrev);
               }
               markShown(payloadIndex);
 
@@ -286,7 +307,7 @@ export class QRExport {
         const firstEl = this.pool.find((x) => x) || null;
         if (firstEl) {
           const dom = document.getElementById(firstEl.id);
-          if (dom) dom.classList.remove("hidden");
+          showElement(dom);
         }
 
         // Wait for start button click or start immediately
@@ -330,7 +351,7 @@ export class QRExport {
         const slot = document.getElementById(`qr-export-code-worker-${i}`);
         if (slot) {
           try {
-            slot.classList.add("hidden");
+            hideElement(slot as HTMLElement);
             while (slot.firstChild) slot.removeChild(slot.firstChild);
           } catch (_err) {}
         }
@@ -342,7 +363,7 @@ export class QRExport {
       domWorkers.forEach((w) => {
         try {
           const h = w as HTMLElement;
-          h.classList.add("hidden");
+          hideElement(h);
           h.replaceChildren();
         } catch (_err) {}
       });
@@ -352,11 +373,13 @@ export class QRExport {
 
     try {
       const overlay = document.getElementById("qr-export-container");
-      if (overlay) overlay.classList.add("hidden");
+      if (overlay) hideElement(overlay as HTMLElement);
       const status = document.getElementById("qr-export-status");
-      if (status) {
-        status.textContent = "";
+      const statusText = document.getElementById("qr-export-status-text");
+      if (status && statusText) {
+        statusText.textContent = "";
         status.style.display = "none";
+        status.setAttribute("aria-hidden", "true");
       }
       const dots = document.getElementById("qr-export-dots");
       if (dots) {
@@ -366,6 +389,9 @@ export class QRExport {
       }
       const progressWrap = document.getElementById("qr-export-progress-wrap");
       if (progressWrap) progressWrap.style.display = "none";
+
+      const prepared = document.getElementById("qr-export-prepared");
+      if (prepared) hideElement(prepared as HTMLElement);
 
       // Reset start button
       const startBtn = document.getElementById("qr-export-start-btn");

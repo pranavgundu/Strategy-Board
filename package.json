@@ -13,6 +13,9 @@
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
     "@types/node": "^24.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
     "tsx": "^4.20.6",
@@ -32,7 +35,11 @@
     "jspdf": "^3.0.3",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
     "tailwindcss": "^4.0.12",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zustand": "^5.0.2"
   }
 }

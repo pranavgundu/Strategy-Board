@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // the match class represents a robotics match with teams and phases
 
-interface RobotPosition {
+export interface RobotPosition {
   x: number;
   y: number;
   w: number;
@@ -10,7 +10,7 @@ interface RobotPosition {
   r: number;
 }
 
-interface PhaseData {
+export interface PhaseData {
   redOneRobot: RobotPosition;
   redTwoRobot: RobotPosition;
   redThreeRobot: RobotPosition;
@@ -22,9 +22,9 @@ interface PhaseData {
   textAnnotations: TextAnnotation[];
 }
 
-type DrawingStroke = [number, ...Array<[number, number]>];
-type BoundingBox = [number, number, number, number];
-type TextAnnotation = [number, number, number, string];
+export type DrawingStroke = [number, ...Array<[number, number]>];
+export type BoundingBox = [number, number, number, number];
+export type TextAnnotation = [number, number, number, string];
 
 interface MatchOptions {
   dim: {
