@@ -13,6 +13,7 @@
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
     "@types/node": "^24.10.1",
+    "@vercel/node": "^5.5.12",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
     "tsx": "^4.20.6",
@@ -26,6 +27,7 @@
     "@capacitor/ios": "^7.4.4",
     "@tailwindcss/vite": "^4.0.12",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/kv": "^3.0.0",
     "@vercel/speed-insights": "^1.2.0",
     "es-abstract": "^1.24.0",
     "idb-keyval": "^6.2.1",

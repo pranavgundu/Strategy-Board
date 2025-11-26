@@ -941,7 +941,8 @@ export class View {
     const exportQROption = options.children[1] as HTMLElement;
     const exportPNGOption = options.children[2] as HTMLElement;
     const exportPDFOption = options.children[3] as HTMLElement;
-    const deleteOption = options.children[4] as HTMLElement;
+    const shareOnlineOption = options.children[4] as HTMLElement;
+    const deleteOption = options.children[5] as HTMLElement;
 
     options.addEventListener("click", (e) => e.stopPropagation());
 
@@ -1026,6 +1027,57 @@ export class View {
         } catch (err) {
           console.error("View: failed to export PDF:", err);
           alert("Failed to export PDF. See console for details.");
+        }
+      }
+
+      this.hide(options);
+      this.show(kebab);
+    });
+
+    // Share Online - share match via Vercel KV
+    shareOnlineOption.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const match = this.model.getMatch(id);
+      if (match) {
+        try {
+          // Show loading state
+          shareOnlineOption.textContent = "Sharing...";
+          shareOnlineOption.classList.add("opacity-50");
+
+          const result = await this.model.shareMatchOnline(id);
+
+          if (result.success && result.shareUrl) {
+            // Copy to clipboard
+            try {
+              await navigator.clipboard.writeText(result.shareUrl);
+              shareOnlineOption.textContent = "Link Copied!";
+              shareOnlineOption.classList.remove("opacity-50");
+              shareOnlineOption.classList.add("bg-green-500");
+
+              // Show URL in alert as backup
+              alert(`Match shared successfully!\n\nLink copied to clipboard:\n${result.shareUrl}`);
+
+              // Reset button after 2 seconds
+              setTimeout(() => {
+                shareOnlineOption.textContent = "Share Online";
+                shareOnlineOption.classList.remove("bg-green-500");
+              }, 2000);
+            } catch (clipboardErr) {
+              // Fallback if clipboard API fails
+              shareOnlineOption.textContent = "Share Online";
+              shareOnlineOption.classList.remove("opacity-50");
+              alert(`Match shared successfully!\n\nShare this link:\n${result.shareUrl}\n\n(Could not copy to clipboard automatically)`);
+            }
+          } else {
+            shareOnlineOption.textContent = "Share Online";
+            shareOnlineOption.classList.remove("opacity-50");
+            alert(`Failed to share match: ${result.error || "Unknown error"}`);
+          }
+        } catch (err) {
+          console.error("View: failed to share match online:", err);
+          shareOnlineOption.textContent = "Share Online";
+          shareOnlineOption.classList.remove("opacity-50");
+          alert("Failed to share match online. See console for details.");
         }
       }
 

@@ -66,6 +66,35 @@ async function initializeApp(): Promise<void> {
 
     const app = new viewModule.View(model, whiteboard, qrimport, qrexport);
     console.log("Application initialized successfully");
+
+    // Check for shared match URL (e.g., /m/{id})
+    const url = window.location.pathname;
+    const shareMatchRegex = /^\/m\/([a-zA-Z0-9]+)$/;
+    const match = url.match(shareMatchRegex);
+
+    if (match && match[1]) {
+      const shareId = match[1];
+      console.log(`Detected shared match URL with ID: ${shareId}`);
+
+      try {
+        const result = await model.loadSharedMatch(shareId);
+
+        if (result.success) {
+          alert("Match loaded successfully from shared link!");
+          // Clear the URL to prevent reloading on refresh
+          window.history.replaceState({}, document.title, "/");
+        } else {
+          alert(`Failed to load shared match: ${result.error || "Unknown error"}`);
+          // Clear the URL even on failure
+          window.history.replaceState({}, document.title, "/");
+        }
+      } catch (err) {
+        console.error("Error loading shared match:", err);
+        alert("Failed to load shared match. Please try again.");
+        window.history.replaceState({}, document.title, "/");
+      }
+    }
+
     try {
       document.documentElement.setAttribute("data-app-ready", "true");
     } catch (err) {

@@ -104,4 +104,65 @@ export class Model {
     this.matchIds = [];
     await CLEAR();
   }
+
+  public async shareMatchOnline(id: string): Promise<{ success: boolean; shareUrl?: string; error?: string }> {
+    const match = this.getMatch(id);
+    if (!match) {
+      return { success: false, error: 'Match not found' };
+    }
+
+    try {
+      const matchData = match.getAsPacket();
+
+      const response = await fetch('/api/share', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(matchData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to share match' }));
+        return { success: false, error: errorData.error || 'Failed to share match' };
+      }
+
+      const result = await response.json();
+      return { success: true, shareUrl: result.shareUrl };
+    } catch (error) {
+      console.error('Error sharing match:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to share match online'
+      };
+    }
+  }
+
+  public async loadSharedMatch(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(`/api/match/${id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return { success: false, error: 'Shared match not found or expired' };
+        }
+        const errorData = await response.json().catch(() => ({ error: 'Failed to load match' }));
+        return { success: false, error: errorData.error || 'Failed to load shared match' };
+      }
+
+      const result = await response.json();
+      const match = Match.fromPacket(result.data);
+
+      // Add the match to local storage
+      await this.addMatch(match);
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error loading shared match:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to load shared match'
+      };
+    }
+  }
 }
