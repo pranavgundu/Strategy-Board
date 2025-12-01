@@ -46,7 +46,7 @@ export const BUILD_COMMIT = ${JSON.stringify(commitInfo, null, 2)};
     url: 'https://github.com/pranavgundu/Strategy-Board'
   };
   
-  const content = `// Auto-generated file; do not edit manually :) - pranav
+  const content = `do not edit manually :) - pranav
 export const BUILD_COMMIT = ${JSON.stringify(fallback, null, 2)};
 `;
 

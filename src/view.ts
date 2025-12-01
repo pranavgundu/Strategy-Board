@@ -1595,6 +1595,23 @@ export class View {
   }
 
   private setupTBADropdownListeners(): void {
+    // Save API key when user enters it (on blur or change)
+    if (I?.TBAApiKey) {
+      const saveApiKey = async () => {
+        const apiKey = I.TBAApiKey!.value.trim();
+        if (apiKey) {
+          this.tbaService.setApiKey(apiKey);
+          await SET("tbaApiKey", apiKey, (e) => {
+            console.error("Failed to save TBA API key:", e);
+          });
+          I.TBAApiKey!.placeholder = "API Key (saved)";
+        }
+      };
+      
+      I.TBAApiKey.addEventListener("blur", saveApiKey);
+      I.TBAApiKey.addEventListener("change", saveApiKey);
+    }
+
     if (I?.TBAEventSearch) {
       I.TBAEventSearch.addEventListener("input", (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
