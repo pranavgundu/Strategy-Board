@@ -2,7 +2,6 @@ import { defineConfig, Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tailwindcss from "@tailwindcss/vite";
 
-// Plugin to stub out core-js imports from canvg
 const stubCoreJs = (): Plugin => ({
   name: "stub-core-js",
   resolveId(id) {
@@ -18,11 +17,9 @@ const stubCoreJs = (): Plugin => ({
     return null;
   },
 });
-// Compute a filesystem path for the ./src directory without importing the 'url' module.
-// This avoids TypeScript diagnostics in environments without node type declarations.
+
 const srcPath = (() => {
   const p = new URL("./src", import.meta.url).pathname;
-  // On Windows the pathname may begin with /C:/... - strip the leading slash in that case.
   return /^\/[A-Za-z]:\//.test(p)
     ? decodeURIComponent(p.slice(1))
     : decodeURIComponent(p);

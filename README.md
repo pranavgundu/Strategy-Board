@@ -72,7 +72,7 @@ To use TBA integration features, you'll need an API key:
 2. Generate an API key
 3. Add it to your `.env` file:
    ```
-   VITE_TBA_API_KEY=your_api_key_here
+   API_KEY=your_api_key_here
    ```
 
 Alternatively, users can enter their own API key in the application settings.

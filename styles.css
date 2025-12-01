@@ -1111,9 +1111,7 @@ button, a, [role="button"] {
     }
 }
 
-/* Foldable phone support */
 @media (max-width: 653px) and (max-height: 280px) {
-    /* Samsung Galaxy Z Fold and similar in landscape */
     #home-toolbar {
         height: 2.5rem !important;
     }
@@ -1128,7 +1126,6 @@ button, a, [role="button"] {
     }
 }
 
-/* Ultra-wide displays */
 @media (min-width: 1920px) {
     #home-container,
     #whiteboard-container {
@@ -1149,15 +1146,12 @@ button, a, [role="button"] {
     }
 }
 
-/* Dark mode improvements (for devices that support it) */
 @media (prefers-color-scheme: dark) {
-    /* Already using dark theme, but ensure proper contrast */
     input, select, textarea {
         color-scheme: dark;
     }
 }
 
-/* Fix contributors close button - make it crisp and consistent */
 #contributors-close-btn,
 #qr-export-close-btn {
     backdrop-filter: none !important;
@@ -1169,10 +1163,9 @@ button, a, [role="button"] {
 
 #contributors-close-btn:hover,
 #qr-export-close-btn:hover {
-    background-color: rgb(220 38 38) !important; /* red-600 */
+    background-color: rgb(220 38 38) !important;
 }
 
-/* Make all buttons crisp and clear */
 .glass-button {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

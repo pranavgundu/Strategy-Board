@@ -33,7 +33,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_TBA_API_KEY: ${{ secrets.API_KEY }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: npm run build
 
       - name: Setup Pages

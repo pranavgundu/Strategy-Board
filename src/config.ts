@@ -1,4 +1,3 @@
-// configuration for field dimensions and station positions
 export const Config = {
   fieldPNGPixelWidth: 3510,
   fieldPNGPixelHeight: 1610,
@@ -24,5 +23,5 @@ export const Config = {
   blueThreeStationX: -65,
   blueThreeStationY: 1155,
 
-  sharedTBAApiKey: import.meta.env.VITE_TBA_API_KEY || "",
+  sharedTBAApiKey: import.meta.env.API_KEY || "",
 };
