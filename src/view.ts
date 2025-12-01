@@ -1975,16 +1975,12 @@ export class View {
         // Add the same hover style as match items
         contributorCard.style.transition = "all 0.2s ease";
 
-        const rank = index + 1;
-        const medalEmoji = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "";
-
         contributorCard.innerHTML = `
           <div class="flex-shrink-0 relative">
-            ${medalEmoji ? `<div class="absolute -top-3 left-1/2 -translate-x-1/2 text-3xl z-10" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${medalEmoji}</div>` : ""}
             <img
               src="${contributor.avatar_url}?s=128"
               alt="${contributor.login}"
-              class="w-16 h-16 rounded-full border-2 ${rank === 1 ? "border-yellow-400" : rank === 2 ? "border-gray-400" : rank === 3 ? "border-orange-400" : "border-slate-500"}"
+              class="w-16 h-16 rounded-full border-2 border-slate-500"
               style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; backface-visibility: hidden; transform: translateZ(0); will-change: transform;"
             />
           </div>
@@ -2001,10 +1997,6 @@ export class View {
             </div>
             <p class="text-sm text-slate-400 truncate">@${contributor.login}</p>
             ${contributor.bio ? `<p class="text-sm text-slate-300 mt-1 line-clamp-2">${contributor.bio}</p>` : ""}
-          </div>
-          <div class="flex-shrink-0 text-right">
-            <div class="text-2xl font-bold text-white">${contributor.contributions}</div>
-            <div class="text-xs text-slate-400">commits</div>
           </div>
         `;
 
