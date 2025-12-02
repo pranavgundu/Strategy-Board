@@ -280,6 +280,13 @@
                         <span class="sm:hidden">Import</span>
                     </button>
                     <button
+                        id="home-toolbar-import-link-btn"
+                        class="flex items-center justify-center w-24 sm:w-32 md:w-36 lg:w-44 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-purple-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
+                    >
+                        <span class="hidden sm:inline">Import Link</span>
+                        <span class="sm:hidden">Link</span>
+                    </button>
+                    <button
                         id="home-toolbar-clear-btn"
                         class="flex items-center justify-center w-16 sm:w-20 md:w-24 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-red-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
                     >
@@ -343,14 +350,14 @@
                                 Export QR
                             </button>
                             <button
-                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-cyan-500 rounded-xl glass-button glossy-shine whitespace-nowrap"
+                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-orange-500 rounded-xl glass-button glossy-shine whitespace-nowrap"
                             >
                                 Export PNG
                             </button>
                             <button
                                 class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-purple-500 rounded-xl glass-button glossy-shine whitespace-nowrap"
                             >
-                                Export PDF
+                                Share
                             </button>
                             <button
                                 class="w-20 sm:w-24 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-red-500 rounded-xl glass-button glossy-shine"
@@ -664,6 +671,51 @@
             </div>
         </div>
         <div
+            id="link-import-container"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
+        >
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+            >
+                <div
+                    class="w-full pt-6 pb-4 text-xl sm:text-2xl md:text-3xl text-center text-slate-200 font-bold"
+                >
+                    Import from Link
+                </div>
+                <div
+                    class="w-full px-6 sm:px-8 md:px-10 pb-6 text-base sm:text-lg text-center text-slate-300"
+                >
+                    <input
+                        id="link-import-code"
+                        placeholder="Enter 6-character share code"
+                        maxlength="6"
+                        class="w-full p-3 sm:p-4 text-lg sm:text-xl md:text-2xl text-center text-slate-200 rounded-xl bg-slate-700 outline-0 uppercase tracking-wider font-mono"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <div
+                        id="link-import-status"
+                        class="hidden mt-4 text-sm sm:text-base text-slate-300"
+                    ></div>
+                </div>
+                <div class="flex w-full">
+                    <button
+                        id="link-import-import-btn"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine hover:bg-green-600 transition-colors"
+                    >
+                        Import
+                    </button>
+                    <button
+                        id="link-import-cancel-btn"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine hover:bg-red-600 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div
             id="qr-export-container"
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
             style="touch-action: auto;"
@@ -707,7 +759,6 @@
                         <button
                             id="qr-export-pdf-btn"
                             class="px-8 py-3 text-xl font-bold text-white bg-blue-500 rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors"
-                            style="display: none;"
                         >
                             Export as PDF
                         </button>

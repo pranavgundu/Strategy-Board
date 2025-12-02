@@ -6,12 +6,14 @@ import { CLEAR, SET, GET } from "./db.ts";
 import { TBAService } from "./tba.ts";
 import { PDFExport } from "./pdf.ts";
 import { ContributorsService } from "./contributors.ts";
+import { uploadMatch, downloadMatch } from "./cloud.ts";
 
 const get = (id: string): HTMLElement | null => document.getElementById(id);
 
 let B: {
   NewMatch?: HTMLElement | null;
   ImportMatch?: HTMLElement | null;
+  ImportLink?: HTMLElement | null;
   TBAImport?: HTMLElement | null;
   Clear?: HTMLElement | null;
   CreateMatch?: HTMLElement | null;
@@ -26,6 +28,9 @@ let B: {
   ContributorsLink?: HTMLElement | null;
   ContributorsClose?: HTMLElement | null;
   ContributorsRetry?: HTMLElement | null;
+  LinkImportImport?: HTMLElement | null;
+  LinkImportCancel?: HTMLElement | null;
+  ExportPDFBtn?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -41,6 +46,7 @@ let I: {
   TBATeamNumber?: HTMLInputElement | null;
   TBAEventSearch?: HTMLInputElement | null;
   TBATeamSearch?: HTMLInputElement | null;
+  LinkImportCode?: HTMLInputElement | null;
 } | null = null;
 
 let E: {
@@ -65,6 +71,8 @@ let E: {
   ContributorsError?: HTMLElement | null;
   ContributorsList?: HTMLElement | null;
   LastCommitInfo?: HTMLElement | null;
+  LinkImportPanel?: HTMLElement | null;
+  LinkImportStatus?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -96,6 +104,7 @@ export class View {
       B = {
         NewMatch: get("home-toolbar-new-btn") as HTMLElement | null,
         ImportMatch: get("home-toolbar-import-btn") as HTMLElement | null,
+        ImportLink: get("home-toolbar-import-link-btn") as HTMLElement | null,
         TBAImport: get("home-toolbar-tba-btn") as HTMLElement | null,
         Clear: get("home-toolbar-clear-btn") as HTMLElement | null,
         CreateMatch: get("create-match-create-btn") as HTMLElement | null,
@@ -110,6 +119,9 @@ export class View {
         ContributorsLink: get("contributors-link-btn") as HTMLElement | null,
         ContributorsClose: get("contributors-close-btn") as HTMLElement | null,
         ContributorsRetry: get("contributors-retry-btn") as HTMLElement | null,
+        LinkImportImport: get("link-import-import-btn") as HTMLElement | null,
+        LinkImportCancel: get("link-import-cancel-btn") as HTMLElement | null,
+        ExportPDFBtn: get("qr-export-pdf-btn") as HTMLElement | null,
       };
 
       I = {
@@ -125,6 +137,7 @@ export class View {
         TBATeamNumber: get("tba-team-number") as HTMLInputElement | null,
         TBAEventSearch: get("tba-event-search") as HTMLInputElement | null,
         TBATeamSearch: get("tba-team-search") as HTMLInputElement | null,
+        LinkImportCode: get("link-import-code") as HTMLInputElement | null,
       };
 
       E = {
@@ -153,6 +166,8 @@ export class View {
         ContributorsError: get("contributors-error") as HTMLElement | null,
         ContributorsList: get("contributors-list") as HTMLElement | null,
         LastCommitInfo: get("last-commit-info") as HTMLElement | null,
+        LinkImportPanel: get("link-import-container") as HTMLElement | null,
+        LinkImportStatus: get("link-import-status") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -206,6 +221,12 @@ export class View {
           fn: (e: Event) => this.onClickImportMatch(e),
         },
         {
+          el: B?.ImportLink,
+          id: "home-toolbar-import-link-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickImportLink(e),
+        },
+        {
           el: B?.TBAImport,
           id: "home-toolbar-tba-btn",
           evt: "click",
@@ -228,6 +249,24 @@ export class View {
           id: "tba-all-matches-btn",
           evt: "click",
           fn: (e: Event) => this.onClickTBAAllMatches(e),
+        },
+        {
+          el: B?.LinkImportImport,
+          id: "link-import-import-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickLinkImportSubmit(e),
+        },
+        {
+          el: B?.LinkImportCancel,
+          id: "link-import-cancel-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickLinkImportCancel(e),
+        },
+        {
+          el: B?.ExportPDFBtn,
+          id: "qr-export-pdf-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickExportPDFFromModal(e),
         },
       ];
 
@@ -413,6 +452,33 @@ export class View {
         } catch (err) {
           console.error(
             "View: failed to attach 'click' handler to #contributors-container:",
+            err,
+          );
+        }
+      }
+
+      // Link import panel backdrop click
+      const linkImportPanel = E?.LinkImportPanel;
+      if (linkImportPanel) {
+        console.debug(
+          "View: attaching 'click' handler to #link-import-container",
+        );
+        try {
+          linkImportPanel.addEventListener("click", (e) => {
+            if (e.target === linkImportPanel) {
+              this.hide(E.LinkImportPanel);
+              this.hide(E.LinkImportStatus);
+              if (I?.LinkImportCode) {
+                I.LinkImportCode.value = "";
+              }
+            }
+          });
+          console.debug(
+            "View: attached 'click' handler to #link-import-container",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #link-import-container:",
             err,
           );
         }
@@ -1014,18 +1080,16 @@ export class View {
       this.show(kebab);
     });
 
-    // Export PDF - directly export to PDF
+    // Share - generate Firebase link and copy to clipboard
     exportPDFOption.addEventListener("click", async (e) => {
       e.stopPropagation();
       const match = this.model.getMatch(id);
       if (match) {
         try {
-          this.currentExportMatch = match;
-          await this.onClickExportPDF();
-          this.currentExportMatch = null;
+          await this.onClickShare(match);
         } catch (err) {
-          console.error("View: failed to export PDF:", err);
-          alert("Failed to export PDF. See console for details.");
+          console.error("View: failed to share match:", err);
+          alert("Failed to share match. See console for details.");
         }
       }
 
@@ -1977,7 +2041,7 @@ export class View {
 
     try {
       const contributors = await this.contributorsService.fetchContributors();
-      
+
       // Clear existing contributors
       E.ContributorsList.innerHTML = "";
 
@@ -1988,7 +2052,7 @@ export class View {
           flex items-center gap-4 p-4 bg-slate-700 rounded-xl
           glass-card transition-all cursor-pointer
         `;
-        
+
         // Add the same hover style as match items
         contributorCard.style.transition = "all 0.2s ease";
 
@@ -2025,10 +2089,123 @@ export class View {
       E.ContributorsList.classList.remove("hidden");
     } catch (error) {
       console.error("Error loading contributors:", error);
-      
+
       // Show error state
       E.ContributorsLoading.classList.add("hidden");
       E.ContributorsError.classList.remove("hidden");
+    }
+  }
+
+  private onClickImportLink(e: Event): void {
+    this.show(E.LinkImportPanel);
+    if (I?.LinkImportCode) {
+      I.LinkImportCode.value = "";
+    }
+    this.hide(E.LinkImportStatus);
+  }
+
+  private async onClickLinkImportSubmit(e: Event): Promise<void> {
+    if (!I?.LinkImportCode) {
+      console.error("Link import code input not found");
+      return;
+    }
+
+    const shareCode = I.LinkImportCode.value.trim().toUpperCase();
+
+    if (!shareCode || shareCode.length !== 6) {
+      this.showLinkImportStatus("Please enter a valid 6-character code", true);
+      return;
+    }
+
+    this.showLinkImportStatus("Loading match...", false);
+
+    try {
+      const match = await downloadMatch(shareCode);
+
+      if (!match) {
+        this.showLinkImportStatus("Share code not found or expired", true);
+        return;
+      }
+
+      const id = await this.model.addMatch(match);
+      this.createNewMatch(
+        id,
+        match.matchName,
+        match.redOne,
+        match.redTwo,
+        match.redThree,
+        match.blueOne,
+        match.blueTwo,
+        match.blueThree,
+      );
+
+      this.showLinkImportStatus("Match imported successfully!", false);
+
+      setTimeout(() => {
+        this.hide(E.LinkImportPanel);
+        this.hide(E.LinkImportStatus);
+        if (I?.LinkImportCode) {
+          I.LinkImportCode.value = "";
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Link import error:", error);
+      this.showLinkImportStatus(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        true,
+      );
+    }
+  }
+
+  private onClickLinkImportCancel(e: Event): void {
+    this.hide(E.LinkImportPanel);
+    this.hide(E.LinkImportStatus);
+    if (I?.LinkImportCode) {
+      I.LinkImportCode.value = "";
+    }
+  }
+
+  private showLinkImportStatus(message: string, isError: boolean): void {
+    if (!E?.LinkImportStatus) return;
+
+    E.LinkImportStatus.textContent = message;
+    E.LinkImportStatus.className = isError
+      ? "mt-4 text-sm sm:text-base text-red-400"
+      : "mt-4 text-sm sm:text-base text-slate-300";
+    this.show(E.LinkImportStatus);
+  }
+
+  private async onClickShare(match: Match): Promise<void> {
+    try {
+      const shareCode = await uploadMatch(match);
+      const shareUrl = `https://strategyboard.app/?share=${shareCode}`;
+
+      // Copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert(`Share link copied to clipboard!\n\nShare code: ${shareCode}\nLink: ${shareUrl}\n\nThe link expires in 30 days.`);
+      } catch (clipboardErr) {
+        // Fallback if clipboard API is not available
+        alert(`Share code: ${shareCode}\nLink: ${shareUrl}\n\nCopy this link to share the match.\n\nThe link expires in 30 days.`);
+      }
+    } catch (error) {
+      console.error("Failed to generate share link:", error);
+      throw error;
+    }
+  }
+
+  private async onClickExportPDFFromModal(e: Event): Promise<void> {
+    if (!this.currentExportMatch) {
+      console.error("No match available for PDF export");
+      alert("No match data available for export");
+      return;
+    }
+
+    try {
+      await this.onClickExportPDF();
+    } catch (err) {
+      console.error("View: failed to export PDF:", err);
+      alert("Failed to export PDF. See console for details.");
     }
   }
 }
