@@ -11,7 +11,11 @@ let _BGctx: CanvasRenderingContext2D | null = null;
 let _ITctx: CanvasRenderingContext2D | null = null;
 let _DRctx: CanvasRenderingContext2D | null = null;
 
+// Performance: Track initialization to avoid repeated ensureCanvases calls
+let _canvasesInitialized = false;
+
 function ensureCanvases(): void {
+  if (_canvasesInitialized) return; // Early exit if already initialized
   if (!_backgroundEl) {
     _backgroundEl = document.getElementById(
       "whiteboard-canvas-background",
@@ -62,6 +66,9 @@ function ensureCanvases(): void {
     const ctx = c.getContext("2d");
     if (ctx) _DRctx = ctx;
   }
+
+  // Mark as initialized to avoid repeated calls
+  _canvasesInitialized = true;
 }
 
 const _canvasStub = (() => {
@@ -236,6 +243,9 @@ export class Whiteboard {
   private rotControl: { x: number; y: number } | null = null;
   private isPointerDown = false;
 
+  // Performance: Cache bounding rect to avoid repeated getBoundingClientRect calls
+  private cachedDrawingRect: DOMRect | null = null;
+
   private currentStrokePoints: Array<any> = [];
   private currentErasePoint: { x: number; y: number } | null = null;
   private lastErasePoint: { x: number; y: number } | null = null;
@@ -259,11 +269,43 @@ export class Whiteboard {
 
   private updateInterval: number | null = null;
 
+  // Cache DOM elements for performance
+  private cachedElements: {
+    drawConfigMarker: HTMLElement | null;
+    drawConfigEraser: HTMLElement | null;
+    drawConfigText: HTMLElement | null;
+    numberPad: HTMLElement | null;
+    colorWhite: HTMLElement | null;
+    colorRed: HTMLElement | null;
+    colorBlue: HTMLElement | null;
+    colorGreen: HTMLElement | null;
+    colorYellow: HTMLElement | null;
+    colorClose: HTMLElement | null;
+    undoBtn: HTMLElement | null;
+    redoBtn: HTMLElement | null;
+  } = {
+    drawConfigMarker: null,
+    drawConfigEraser: null,
+    drawConfigText: null,
+    numberPad: null,
+    colorWhite: null,
+    colorRed: null,
+    colorBlue: null,
+    colorGreen: null,
+    colorYellow: null,
+    colorClose: null,
+    undoBtn: null,
+    redoBtn: null,
+  };
+
   static camera_presets: { [key: string]: { x: number; y: number } } = {
     full: { x: width / 2, y: height / 2 },
     red: { x: (3 * width) / 4, y: height / 2 },
     blue: { x: width / 4, y: height / 2 },
   };
+
+  // Maximum history size to prevent unbounded memory growth
+  private static readonly MAX_HISTORY_SIZE = 100;
 
   constructor(model: Model) {
     this.model = model;
@@ -799,6 +841,20 @@ export class Whiteboard {
     DR.lineJoin = "round";
     DR.strokeStyle = "white";
 
+    // Cache DOM elements once for performance
+    this.cachedElements.drawConfigMarker = document.getElementById("whiteboard-draw-config-marker");
+    this.cachedElements.drawConfigEraser = document.getElementById("whiteboard-draw-config-eraser");
+    this.cachedElements.drawConfigText = document.getElementById("whiteboard-draw-config-text");
+    this.cachedElements.numberPad = document.getElementById("whiteboard-number-pad");
+    this.cachedElements.colorWhite = document.getElementById("whiteboard-color-white");
+    this.cachedElements.colorRed = document.getElementById("whiteboard-color-red");
+    this.cachedElements.colorBlue = document.getElementById("whiteboard-color-blue");
+    this.cachedElements.colorGreen = document.getElementById("whiteboard-color-green");
+    this.cachedElements.colorYellow = document.getElementById("whiteboard-color-yellow");
+    this.cachedElements.colorClose = document.getElementById("whiteboard-color-close");
+    this.cachedElements.undoBtn = document.getElementById("whiteboard-toolbar-undo");
+    this.cachedElements.redoBtn = document.getElementById("whiteboard-toolbar-redo");
+
     requestAnimationFrame(this.main.bind(this));
 
     this.updateInterval = window.setInterval(() => {
@@ -810,65 +866,52 @@ export class Whiteboard {
 
   public setActive(active: boolean) {
     this.active = active;
-    if (active == true) {
-      if (this.getCurrentUndoHistory().length < 1) {
-        document
-          .getElementById("whiteboard-toolbar-undo")
-          ?.style.setProperty("opacity", "0.5");
-        document
-          .getElementById("whiteboard-toolbar-undo")
-          ?.style.setProperty("cursor", "not-allowed");
-      } else {
-        document
-          .getElementById("whiteboard-toolbar-undo")
-          ?.style.setProperty("opacity", "1");
-        document
-          .getElementById("whiteboard-toolbar-undo")
-          ?.style.setProperty("cursor", "pointer");
-      }
-      this.currentTool = "marker";
-      this.currentColor = 0;
-      document
-        .getElementById("whiteboard-draw-config-marker")
-        ?.style.setProperty("display", "inline");
-      document
-        .getElementById("whiteboard-draw-config-eraser")
-        ?.style.setProperty("display", "none");
 
-      document
-        .getElementById("whiteboard-color-white")
-        ?.classList.remove("hidden");
-      document
-        .getElementById("whiteboard-color-white")
-        ?.classList.remove("border-4");
-      document.getElementById("whiteboard-color-red")?.classList.add("hidden");
-      document
-        .getElementById("whiteboard-color-red")
-        ?.classList.remove("border-4");
-      document.getElementById("whiteboard-color-blue")?.classList.add("hidden");
-      document
-        .getElementById("whiteboard-color-blue")
-        ?.classList.remove("border-4");
-      document
-        .getElementById("whiteboard-color-green")
-        ?.classList.add("hidden");
-      document
-        .getElementById("whiteboard-color-green")
-        ?.classList.remove("border-4");
-      document
-        .getElementById("whiteboard-color-yellow")
-        ?.classList.add("hidden");
-      document
-        .getElementById("whiteboard-color-yellow")
-        ?.classList.remove("border-4");
-      document
-        .getElementById("whiteboard-color-close")
-        ?.classList.add("hidden");
-    } else if (active == false) {
+    if (active) {
+      // Batch read operations first (avoid layout thrashing)
+      const hasHistory = this.getCurrentUndoHistory().length > 0;
+
+      // Batch all DOM writes together using requestAnimationFrame
+      requestAnimationFrame(() => {
+        const els = this.cachedElements;
+
+        // Update undo button state using cached reference
+        if (els.undoBtn) {
+          els.undoBtn.style.opacity = hasHistory ? "1" : "0.5";
+          els.undoBtn.style.cursor = hasHistory ? "pointer" : "not-allowed";
+        }
+
+        // Reset tool state
+        this.currentTool = "marker";
+        this.currentColor = 0;
+
+        // Batch display updates using cached references
+        if (els.drawConfigMarker) els.drawConfigMarker.style.display = "inline";
+        if (els.drawConfigEraser) els.drawConfigEraser.style.display = "none";
+        if (els.drawConfigText) els.drawConfigText.style.display = "none";
+
+        // Batch color picker updates using classList (faster than individual operations)
+        const hideColors = [els.colorRed, els.colorBlue, els.colorGreen, els.colorYellow, els.colorClose];
+        hideColors.forEach(el => {
+          if (el) {
+            el.classList.add("hidden");
+            el.classList.remove("border-4");
+          }
+        });
+
+        if (els.colorWhite) {
+          els.colorWhite.classList.remove("hidden", "border-4");
+        }
+      });
+    } else {
+      // Cleanup when deactivating
       if (this.match !== null) this.model.updateMatch(this.match.id);
+
       this.match = null;
       this.lastSelected = null;
       this.selected = null;
+
+      // Clear history arrays
       this.autoActionHistory = [];
       this.teleopActionHistory = [];
       this.endgameActionHistory = [];
@@ -877,10 +920,11 @@ export class Whiteboard {
       this.teleopRedoHistory = [];
       this.endgameRedoHistory = [];
       this.notesRedoHistory = [];
+
       document
         .getElementById("whiteboard-robot-config")
         ?.classList.add("hidden");
-      
+
       // Clean up interval to prevent memory leak
       if (this.updateInterval !== null) {
         clearInterval(this.updateInterval);
@@ -911,18 +955,26 @@ export class Whiteboard {
   private addUndoHistory(action: any) {
     // Clear redo history when a new action is performed
     this.clearCurrentRedoHistory();
-    
+
+    // Get the appropriate history array and add action
+    let history: Array<any> | null = null;
     if (this.mode === "auto") {
-      this.autoActionHistory.push(action);
+      history = this.autoActionHistory;
+    } else if (this.mode === "teleop") {
+      history = this.teleopActionHistory;
+    } else if (this.mode === "endgame") {
+      history = this.endgameActionHistory;
+    } else if (this.mode === "notes") {
+      history = this.notesActionHistory;
     }
-    if (this.mode === "teleop") {
-      this.teleopActionHistory.push(action);
-    }
-    if (this.mode === "endgame") {
-      this.endgameActionHistory.push(action);
-    }
-    if (this.mode === "notes") {
-      this.notesActionHistory.push(action);
+
+    if (history) {
+      history.push(action);
+
+      // Enforce size limit to prevent memory leaks (remove oldest if over limit)
+      if (history.length > Whiteboard.MAX_HISTORY_SIZE) {
+        history.shift(); // Remove oldest action
+      }
     }
 
     this.updateUndoRedoButtons();
@@ -1341,36 +1393,68 @@ export class Whiteboard {
 
     if (data === null || this.match === null) return;
 
+    // Performance: Calculate camera offset once
+    const offsetX = this.camera.x - width / 2;
+    const offsetY = this.camera.y - height / 2;
+
+    // Performance: Use clearRect with specific dimensions
     DR.clearRect(0, 0, width, height);
+
+    // Performance: Set context properties once before loop
     DR.lineWidth = 10;
     DR.lineCap = "round";
     DR.lineJoin = "round";
+
+    // Performance: Track current color to avoid redundant strokeStyle sets
+    let currentStrokeColor = "";
+
+    // Performance: Batch stroke drawing
     for (let stroke of data.drawing) {
-      DR.beginPath();
-      DR.strokeStyle = this.getStrokeColor(stroke[0]);
-      DR.moveTo(
-        stroke[1][0] - (this.camera.x - width / 2),
-        stroke[1][1] - (this.camera.y - height / 2),
-      );
-      for (let i = 2; i < stroke.length; i++) {
-        DR.lineTo(
-          stroke[i][0] - (this.camera.x - width / 2),
-          stroke[i][1] - (this.camera.y - height / 2),
-        );
+      // Skip if no points (defensive)
+      if (stroke.length < 2) continue;
+
+      const color = this.getStrokeColor(stroke[0]);
+
+      // Performance: Set style only if changed
+      if (currentStrokeColor !== color) {
+        DR.strokeStyle = color;
+        currentStrokeColor = color;
       }
+
+      DR.beginPath();
+
+      // Performance: Use pre-calculated offset
+      DR.moveTo(stroke[1][0] - offsetX, stroke[1][1] - offsetY);
+
+      // Performance: Batch lineTo operations
+      for (let i = 2; i < stroke.length; i++) {
+        DR.lineTo(stroke[i][0] - offsetX, stroke[i][1] - offsetY);
+      }
+
       DR.stroke();
     }
 
-    if (data.textAnnotations) {
+    // Text rendering with same optimization
+    if (data.textAnnotations && data.textAnnotations.length > 0) {
       DR.font = "bold 80px Arial";
       DR.textAlign = "center";
       DR.textBaseline = "top";
+
+      let currentFillColor = "";
+
       for (let text of data.textAnnotations) {
-        DR.fillStyle = this.getStrokeColor(text[2]);
+        const color = this.getStrokeColor(text[2]);
+
+        // Performance: Set style only if changed
+        if (currentFillColor !== color) {
+          DR.fillStyle = color;
+          currentFillColor = color;
+        }
+
         DR.fillText(
           text[3],
-          text[0] - (this.camera.x - width / 2),
-          text[1] - (this.camera.y - height / 2) - 40,
+          text[0] - offsetX,
+          text[1] - offsetY - 40,
         );
       }
     }
@@ -1547,7 +1631,8 @@ export class Whiteboard {
   }
 
   private onPointerMove(e: PointerEvent) {
-    const rect = drawing.getBoundingClientRect();
+    // Performance: Use cached rect if available, otherwise get fresh one
+    const rect = this.cachedDrawingRect || drawing.getBoundingClientRect();
     const x =
       Math.round(e.clientX / scaling - rect.left / scaling) -
       (width / 2 - this.camera.x);
@@ -1557,13 +1642,15 @@ export class Whiteboard {
     clickMovement += Math.abs(x) + Math.abs(y);
     if (this.selected == null && this.isPointerDown) {
       if (this.currentTool == "marker") {
+        // Performance: Reduce distance threshold from 10px to 2px for better tracking
+        // This captures more points during fast movements
         if (
           Math.hypot(
             x -
               this.currentStrokePoints[this.currentStrokePoints.length - 1][0],
             y -
               this.currentStrokePoints[this.currentStrokePoints.length - 1][1],
-          ) < 10
+          ) < 2
         )
           return;
         this.currentStrokePoints.push([x, y]);
@@ -1577,11 +1664,12 @@ export class Whiteboard {
         );
         DR.stroke();
       } else if (this.currentTool == "eraser") {
+        // Performance: Reduce eraser distance threshold for better tracking
         if (
           Math.hypot(
             x - this.currentErasePoint.x,
             y - this.currentErasePoint.y,
-          ) < 20
+          ) < 5
         )
           return;
         this.lastErasePoint = this.currentErasePoint;
@@ -1681,7 +1769,12 @@ export class Whiteboard {
 
   private onPointerDown(e: PointerEvent) {
     this.isPointerDown = true;
-    const rect = drawing.getBoundingClientRect();
+
+    // Performance: Cache bounding rect and enable pointer capture for better tracking
+    this.cachedDrawingRect = drawing.getBoundingClientRect();
+    drawing.setPointerCapture(e.pointerId);
+
+    const rect = this.cachedDrawingRect;
     const x =
       Math.round(e.clientX / scaling - rect.left / scaling) -
       (width / 2 - this.camera.x);
@@ -1786,6 +1879,15 @@ export class Whiteboard {
 
   private onPointerUp(e: PointerEvent) {
     this.isPointerDown = false;
+
+    // Performance: Clear cached rect and release pointer capture
+    this.cachedDrawingRect = null;
+    try {
+      drawing.releasePointerCapture(e.pointerId);
+    } catch (_err) {
+      // Ignore errors if pointer was already released
+    }
+
     if (this.selected !== null) {
       if (this.currentAction !== "none") {
         const robot = this.selected[1];
@@ -1825,6 +1927,10 @@ export class Whiteboard {
 
   private onPointerLeave(e: Event) {
     this.isPointerDown = false;
+
+    // Performance: Clear cached rect
+    this.cachedDrawingRect = null;
+
     if (this.currentStrokePoints.length > 2) {
       DR.closePath();
       this.addUndoHistory({
