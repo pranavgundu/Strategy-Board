@@ -28,7 +28,8 @@
       "@/*": ["src/*"]
     },
 
-    "types": ["vite-plugin-pwa/client"]
+    "types": ["vite-plugin-pwa/client"],
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "build", "android", "ios"]

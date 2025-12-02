@@ -27,7 +27,7 @@ try {
     url: `https://github.com/pranavgundu/Strategy-Board/commit/${sha}`
   };
 
-  const content = `// Auto-generated file - do not edit manually
+  const content = `// do not edit manually - pranav :)
 export const BUILD_COMMIT = ${JSON.stringify(commitInfo, null, 2)};
 `;
 
