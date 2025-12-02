@@ -45,8 +45,11 @@ export async function uploadMatch(match: Match): Promise<string> {
   const packetWithoutId = [...packet];
   packetWithoutId[7] = null;
 
+  // Convert to JSON string to avoid nested array issues with Firestore
+  const dataString = JSON.stringify(packetWithoutId);
+
   await setDoc(doc(firestore, "matches", shareCode), {
-    data: packetWithoutId,
+    data: dataString,
     createdAt: Date.now(),
     expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
     version: 1,
@@ -76,7 +79,8 @@ export async function downloadMatch(shareCode: string): Promise<Match | null> {
     throw new Error("This share code has expired");
   }
 
-  const packet = docData.data;
+  // Parse JSON string back to array
+  const packet = JSON.parse(docData.data);
   return Match.fromPacket(packet);
 }
 
