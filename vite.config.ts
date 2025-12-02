@@ -72,6 +72,23 @@ export default defineConfig({
       include: [/node_modules/],
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          firebase: [
+            "firebase/app",
+            "firebase/firestore",
+          ],
+          jspdf: ["jspdf"],
+          qr: ["qrcode", "qr-scanner"],
+          analytics: ["@vercel/analytics", "@vercel/speed-insights"],
+          vendor: [
+            "idb-keyval",
+            "uuid",
+          ],
+        },
+      },
+    },
   },
   optimizeDeps: {
     include: ["qrcode", "rgbcolor"],
