@@ -1,6 +1,6 @@
 import QrScanner from "qr-scanner";
 import * as QRCode from "qrcode";
-import { Match } from "@/match.ts";
+import { Match } from "./match.ts";
 
 const HEADER_SIZE = 4;
 const TOTAL_CHUNKS_HEADER_SIZE = 4;

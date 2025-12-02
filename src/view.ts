@@ -1,8 +1,8 @@
-import { Model } from "@/model.ts";
-import { Whiteboard, updateCanvasSize } from "@/whiteboard.ts";
-import { Match } from "@/match.ts";
-import { QRImport, QRExport } from "@/qr.ts";
-import { CLEAR, SET, GET } from "@/db.ts";
+import { Model } from "./model.ts";
+import { Whiteboard, updateCanvasSize } from "./whiteboard.ts";
+import { Match } from "./match.ts";
+import { QRImport, QRExport } from "./qr.ts";
+import { CLEAR, SET, GET } from "./db.ts";
 import { TBAService } from "./tba.ts";
 import { PDFExport } from "./pdf.ts";
 import { ContributorsService } from "./contributors.ts";

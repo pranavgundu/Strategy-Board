@@ -1,5 +1,5 @@
-import { GET, GETMANY, SET, DEL, CLEAR } from "@/db.ts";
-import { Match } from "@/match.ts";
+import { GET, GETMANY, SET, DEL, CLEAR } from "./db.ts";
+import { Match } from "./match.ts";
 
 // this class manages matches and their persistent storage
 export class Model {

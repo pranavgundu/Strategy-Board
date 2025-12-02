@@ -1,4 +1,4 @@
-import { Model } from "@/model.ts";
+import { Model } from "./model.ts";
 
 // the model class handles application data and its persistence
 import { registerSW } from "virtual:pwa-register";
@@ -53,9 +53,9 @@ async function initializeApp(): Promise<void> {
 
     console.log("Dynamically importing UI and QR modules...");
     const [whiteboardModule, qrModule, viewModule] = await Promise.all([
-      import("@/whiteboard.ts"),
-      import("@/qr.ts"),
-      import("@/view.ts"),
+      import("./whiteboard.ts"),
+      import("./qr.ts"),
+      import("./view.ts"),
     ]);
     console.log("UI and QR modules imported");
 
