@@ -672,6 +672,70 @@
             </div>
         </div>
         <div
+            id="share-success-container"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
+        >
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+                onclick="event.stopPropagation()"
+            >
+                <div
+                    class="w-full pt-6 pb-4 text-xl sm:text-2xl md:text-3xl text-center text-slate-200 font-bold"
+                >
+                    Share Link Generated!
+                </div>
+                <div
+                    class="w-full px-6 sm:px-8 md:px-10 pb-6 flex flex-col gap-4"
+                >
+                    <div class="text-center text-slate-300">
+                        <p class="text-sm sm:text-base mb-2">Share Code:</p>
+                        <div class="flex items-center justify-center gap-2">
+                            <p id="share-code-display" class="text-2xl sm:text-3xl md:text-4xl font-mono font-bold tracking-wider text-white bg-slate-700 px-4 py-2 rounded-xl">
+                                ABC123
+                            </p>
+                            <button
+                                id="share-code-copy-btn"
+                                class="px-4 py-2 bg-blue-500 text-white rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors"
+                                title="Copy code"
+                            >
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center text-slate-300">
+                        <p class="text-sm sm:text-base mb-2">Share Link:</p>
+                        <div class="flex items-center justify-center gap-2">
+                            <input
+                                id="share-link-display"
+                                type="text"
+                                readonly
+                                value="https://strategyboard.app/?share=ABC123"
+                                class="flex-1 text-sm sm:text-base text-slate-200 bg-slate-700 px-4 py-2 rounded-xl outline-0 font-mono"
+                            />
+                            <button
+                                id="share-link-copy-btn"
+                                class="px-4 py-2 bg-blue-500 text-white rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors"
+                                title="Copy link"
+                            >
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center text-slate-400 text-xs sm:text-sm">
+                        <i class="fas fa-info-circle"></i> Link expires in 30 days
+                    </div>
+                </div>
+                <div class="flex w-full">
+                    <button
+                        id="share-success-close-btn"
+                        class="w-full text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-b-2xl md:rounded-b-3xl glossy-shine hover:bg-green-600 transition-colors"
+                    >
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div
             id="link-import-container"
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
         >

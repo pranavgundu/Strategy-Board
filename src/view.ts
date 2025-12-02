@@ -31,6 +31,9 @@ let B: {
   LinkImportImport?: HTMLElement | null;
   LinkImportCancel?: HTMLElement | null;
   ExportPDFBtn?: HTMLElement | null;
+  ShareSuccessClose?: HTMLElement | null;
+  ShareCodeCopy?: HTMLElement | null;
+  ShareLinkCopy?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -73,6 +76,9 @@ let E: {
   LastCommitInfo?: HTMLElement | null;
   LinkImportPanel?: HTMLElement | null;
   LinkImportStatus?: HTMLElement | null;
+  ShareSuccessPanel?: HTMLElement | null;
+  ShareCodeDisplay?: HTMLElement | null;
+  ShareLinkDisplay?: HTMLInputElement | null;
 } | null = null;
 
 export class View {
@@ -122,6 +128,9 @@ export class View {
         LinkImportImport: get("link-import-import-btn") as HTMLElement | null,
         LinkImportCancel: get("link-import-cancel-btn") as HTMLElement | null,
         ExportPDFBtn: get("qr-export-pdf-btn") as HTMLElement | null,
+        ShareSuccessClose: get("share-success-close-btn") as HTMLElement | null,
+        ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
+        ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
       };
 
       I = {
@@ -168,6 +177,9 @@ export class View {
         LastCommitInfo: get("last-commit-info") as HTMLElement | null,
         LinkImportPanel: get("link-import-container") as HTMLElement | null,
         LinkImportStatus: get("link-import-status") as HTMLElement | null,
+        ShareSuccessPanel: get("share-success-container") as HTMLElement | null,
+        ShareCodeDisplay: get("share-code-display") as HTMLElement | null,
+        ShareLinkDisplay: get("share-link-display") as HTMLInputElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -482,6 +494,63 @@ export class View {
             err,
           );
         }
+      }
+
+      // Share success panel event listeners
+      const shareSuccessClose = B?.ShareSuccessClose;
+      if (shareSuccessClose) {
+        shareSuccessClose.addEventListener("click", () => {
+          this.hide(E.ShareSuccessPanel);
+        });
+      }
+
+      const shareSuccessPanel = E?.ShareSuccessPanel;
+      if (shareSuccessPanel) {
+        shareSuccessPanel.addEventListener("click", (e) => {
+          if (e.target === shareSuccessPanel) {
+            this.hide(E.ShareSuccessPanel);
+          }
+        });
+      }
+
+      const shareCodeCopy = B?.ShareCodeCopy;
+      if (shareCodeCopy) {
+        shareCodeCopy.addEventListener("click", async () => {
+          const code = E.ShareCodeDisplay?.textContent;
+          if (code) {
+            try {
+              await navigator.clipboard.writeText(code);
+              const btn = shareCodeCopy as HTMLElement;
+              const originalHTML = btn.innerHTML;
+              btn.innerHTML = '<i class="fas fa-check"></i>';
+              setTimeout(() => {
+                btn.innerHTML = originalHTML;
+              }, 1500);
+            } catch (err) {
+              console.error("Failed to copy code:", err);
+            }
+          }
+        });
+      }
+
+      const shareLinkCopy = B?.ShareLinkCopy;
+      if (shareLinkCopy) {
+        shareLinkCopy.addEventListener("click", async () => {
+          const link = E.ShareLinkDisplay?.value;
+          if (link) {
+            try {
+              await navigator.clipboard.writeText(link);
+              const btn = shareLinkCopy as HTMLElement;
+              const originalHTML = btn.innerHTML;
+              btn.innerHTML = '<i class="fas fa-check"></i>';
+              setTimeout(() => {
+                btn.innerHTML = originalHTML;
+              }, 1500);
+            } catch (err) {
+              console.error("Failed to copy link:", err);
+            }
+          }
+        });
       }
 
       const exportEl = E?.Export;
@@ -2180,13 +2249,22 @@ export class View {
       const shareCode = await uploadMatch(match);
       const shareUrl = `https://strategyboard.app/?share=${shareCode}`;
 
-      // Copy to clipboard
+      // Update the modal with the share code and link
+      if (E.ShareCodeDisplay) {
+        E.ShareCodeDisplay.textContent = shareCode;
+      }
+      if (E.ShareLinkDisplay) {
+        E.ShareLinkDisplay.value = shareUrl;
+      }
+
+      // Show the custom modal
+      this.show(E.ShareSuccessPanel);
+
+      // Also copy to clipboard silently
       try {
         await navigator.clipboard.writeText(shareUrl);
-        alert(`Share link copied to clipboard!\n\nShare code: ${shareCode}\nLink: ${shareUrl}\n\nThe link expires in 30 days.`);
       } catch (clipboardErr) {
-        // Fallback if clipboard API is not available
-        alert(`Share code: ${shareCode}\nLink: ${shareUrl}\n\nCopy this link to share the match.\n\nThe link expires in 30 days.`);
+        console.warn("Could not copy to clipboard:", clipboardErr);
       }
     } catch (error) {
       console.error("Failed to generate share link:", error);
