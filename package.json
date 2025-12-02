@@ -28,6 +28,7 @@
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "es-abstract": "^1.24.0",
+    "firebase": "^12.6.0",
     "idb-keyval": "^6.2.1",
     "jspdf": "^3.0.3",
     "qr-scanner": "^1.4.2",
