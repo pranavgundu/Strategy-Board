@@ -2116,8 +2116,6 @@ export class View {
 
     const status = get("qr-export-status");
     if (status) status.textContent = "";
-
-    this.currentExportMatch = null;
   }
 
   private onCancelImport(e: Event): void {
