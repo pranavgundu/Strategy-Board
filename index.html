@@ -1195,31 +1195,60 @@
             // into a single image and either download as PNG or open a print dialog (PDF).
             (function () {
                 function compositeCanvases() {
-                    var bg = document.getElementById(
-                        "whiteboard-canvas-background",
-                    );
-                    var items = document.getElementById(
-                        "whiteboard-canvas-items",
-                    );
-                    var drawing = document.getElementById(
-                        "whiteboard-canvas-drawing",
-                    );
-                    if (!bg || !items || !drawing) return null;
+                    try {
+                        var bg = document.getElementById(
+                            "whiteboard-canvas-background",
+                        );
+                        var items = document.getElementById(
+                            "whiteboard-canvas-items",
+                        );
+                        var drawing = document.getElementById(
+                            "whiteboard-canvas-drawing",
+                        );
 
-                    var w = bg.width || bg.clientWidth || 3510;
-                    var h = bg.height || bg.clientHeight || 1610;
-                    var out = document.createElement("canvas");
-                    out.width = w;
-                    out.height = h;
-                    var ctx = out.getContext("2d");
-                    if (!ctx) return null;
+                        // Better type checking
+                        if (!bg || !items || !drawing) {
+                            console.error("PNG Export: One or more canvases not found", {
+                                bg: !!bg,
+                                items: !!items,
+                                drawing: !!drawing
+                            });
+                            return null;
+                        }
 
-                    // Draw in the same order we render: background, items (robots), drawing (annotations)
-                    ctx.drawImage(bg, 0, 0);
-                    ctx.drawImage(items, 0, 0);
-                    ctx.drawImage(drawing, 0, 0);
+                        // Verify they are canvas elements
+                        if (!(bg instanceof HTMLCanvasElement) ||
+                            !(items instanceof HTMLCanvasElement) ||
+                            !(drawing instanceof HTMLCanvasElement)) {
+                            console.error("PNG Export: Elements are not canvas elements");
+                            return null;
+                        }
 
-                    return out;
+                        var w = bg.width || 3510;
+                        var h = bg.height || 1610;
+
+                        console.log("PNG Export: Creating composite canvas", w, "x", h);
+
+                        var out = document.createElement("canvas");
+                        out.width = w;
+                        out.height = h;
+                        var ctx = out.getContext("2d");
+                        if (!ctx) {
+                            console.error("PNG Export: Failed to get 2d context");
+                            return null;
+                        }
+
+                        // Draw in the same order we render: background, items (robots), drawing (annotations)
+                        ctx.drawImage(bg, 0, 0);
+                        ctx.drawImage(items, 0, 0);
+                        ctx.drawImage(drawing, 0, 0);
+
+                        console.log("PNG Export: Composite canvas created successfully");
+                        return out;
+                    } catch (err) {
+                        console.error("PNG Export: Error in compositeCanvases", err);
+                        return null;
+                    }
                 }
 
                 function downloadDataUrl(dataUrl, filename) {

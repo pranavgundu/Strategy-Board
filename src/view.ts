@@ -1190,10 +1190,11 @@ export class View {
         try {
           this.currentExportMatch = match;
           this.onClickExportPNG();
-          this.currentExportMatch = null;
+          // Note: currentExportMatch is cleared after the async export completes in onClickExportPNG
         } catch (err) {
           console.error("View: failed to export PNG:", err);
           alert("Failed to export PNG. See console for details.");
+          this.currentExportMatch = null;
         }
       }
 
@@ -1338,20 +1339,35 @@ export class View {
     }
 
     try {
-      // Call the global exportPNG function defined in index.html
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const filename = `strategy-board-${this.currentExportMatch.matchName}-${timestamp}.png`;
-      
-      // Access the global exportPNG function
-      const win = window as any;
-      if (typeof win.exportPNG === "function") {
-        win.exportPNG(filename);
-      } else {
-        throw new Error("exportPNG function not available");
-      }
+      // Force a complete redraw of all canvases before export to ensure they're rendered
+      console.log("PNG Export: Forcing whiteboard redraw before export");
+      this.whiteboard.forceRedraw();
+
+      // Small delay to ensure rendering completes
+      setTimeout(() => {
+        try {
+          // Call the global exportPNG function defined in index.html
+          const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+          const filename = `strategy-board-${this.currentExportMatch?.matchName ?? "unknown"}-${timestamp}.png`;
+
+          // Access the global exportPNG function
+          const win = window as any;
+          if (typeof win.exportPNG === "function") {
+            win.exportPNG(filename);
+          } else {
+            throw new Error("exportPNG function not available");
+          }
+        } catch (err) {
+          console.error("View: PNG export failed:", err);
+          alert("Failed to export PNG. See console for details.");
+        } finally {
+          this.currentExportMatch = null;
+        }
+      }, 100);
     } catch (err) {
       console.error("View: PNG export failed:", err);
       alert("Failed to export PNG. See console for details.");
+      this.currentExportMatch = null;
     }
   }
 

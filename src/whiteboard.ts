@@ -1466,6 +1466,11 @@ export class Whiteboard {
     this.redrawDrawing();
   }
 
+  // Public method to force a complete redraw (used for PNG export)
+  public forceRedraw() {
+    this.redrawAll();
+  }
+
   private getStrokeColor(id) {
     switch (id) {
       case 0: {
