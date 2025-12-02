@@ -1171,3 +1171,27 @@ button, a, [role="button"] {
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
 }
+
+/* Special team digit animation */
+.special-team-digit {
+    display: inline-block;
+    animation: gold-glow 2s ease-in-out infinite;
+}
+
+@keyframes gold-glow {
+    0% {
+        color: inherit;
+    }
+    15% {
+        color: #fbbf24;
+    }
+    30% {
+        color: #fbbf24;
+    }
+    45% {
+        color: inherit;
+    }
+    100% {
+        color: inherit;
+    }
+}

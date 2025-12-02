@@ -1065,8 +1065,36 @@ export class View {
     blueThree = blueThree || "---";
 
     item.children[0].textContent = matchName;
-    item.children[1].children[0].textContent = `${redThree} ${redTwo} ${redOne}`;
-    item.children[1].children[2].textContent = `${blueOne} ${blueTwo} ${blueThree}`;
+
+    // Helper function to create colored team number spans with glow effect for special teams
+    const createTeamSpan = (teamNumber: string, isSpecial: boolean, baseColor: string): string => {
+      if (isSpecial) {
+        // Create sequential gold glow animation for each digit
+        const digits = teamNumber.split('');
+        const animatedDigits = digits.map((digit, index) => {
+          const delay = index * 0.3; // 0.3s delay between each digit
+          return `<span class="special-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
+        }).join('');
+        return `<span class="${baseColor} font-bold">${animatedDigits}</span>`;
+      }
+      return `<span class="${baseColor}">${teamNumber}</span>`;
+    };
+
+    const specialTeams = ['467', '834'];
+
+    // Build HTML for red alliance with individual team colors
+    const redAllianceElement = item.children[1].children[0] as HTMLElement;
+    const redTeamsHTML = [redThree, redTwo, redOne]
+      .map(team => createTeamSpan(team, specialTeams.includes(team), 'text-red-400'))
+      .join(' ');
+    redAllianceElement.innerHTML = redTeamsHTML;
+
+    // Build HTML for blue alliance with individual team colors
+    const blueAllianceElement = item.children[1].children[2] as HTMLElement;
+    const blueTeamsHTML = [blueOne, blueTwo, blueThree]
+      .map(team => createTeamSpan(team, specialTeams.includes(team), 'text-blue-400'))
+      .join(' ');
+    blueAllianceElement.innerHTML = blueTeamsHTML;
 
     item.setAttribute("tabindex", "0");
 
