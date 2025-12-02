@@ -32,18 +32,41 @@ export class ContributorsService {
     this.hasError = false;
 
     try {
-      const response = await fetch(
-        "https://api.github.com/repos/pranavgundu/Strategy-Board/contributors"
+      // Fetch recent commits to get contributors sorted by recent activity
+      const commitsResponse = await fetch(
+        "https://api.github.com/repos/pranavgundu/Strategy-Board/commits?per_page=100"
       );
 
-      if (!response.ok) {
-        throw new Error(`GitHub API error: ${response.status}`);
+      if (!commitsResponse.ok) {
+        throw new Error(`GitHub API error: ${commitsResponse.status}`);
       }
 
-      this.contributors = await response.json();
+      const commits = await commitsResponse.json();
 
+      // Extract unique contributors from recent commits, maintaining order of most recent activity
+      const contributorMap = new Map<string, { login: string; avatar_url: string; html_url: string; lastCommitDate: string }>();
+
+      for (const commit of commits) {
+        if (commit.author && commit.author.login) {
+          const login = commit.author.login;
+          // Only add if not already in map (to keep the most recent commit date)
+          if (!contributorMap.has(login)) {
+            contributorMap.set(login, {
+              login: commit.author.login,
+              avatar_url: commit.author.avatar_url,
+              html_url: commit.author.html_url,
+              lastCommitDate: commit.commit.author.date,
+            });
+          }
+        }
+      }
+
+      // Convert map to array (already sorted by recent activity due to commit order)
+      const recentContributors = Array.from(contributorMap.values());
+
+      // Fetch detailed information for contributors
       const detailedContributors = await Promise.all(
-        this.contributors.slice(0, 10).map(async (contributor) => {
+        recentContributors.slice(0, 10).map(async (contributor) => {
           try {
             const userResponse = await fetch(
               `https://api.github.com/users/${contributor.login}`
@@ -51,7 +74,10 @@ export class ContributorsService {
             if (userResponse.ok) {
               const userData = await userResponse.json();
               return {
-                ...contributor,
+                login: contributor.login,
+                avatar_url: contributor.avatar_url,
+                html_url: contributor.html_url,
+                contributions: 0, // Not relevant for recent contributors
                 name: userData.name,
                 bio: userData.bio,
               };
@@ -59,14 +85,16 @@ export class ContributorsService {
           } catch (error) {
             console.error(`Error fetching user details for ${contributor.login}:`, error);
           }
-          return contributor;
+          return {
+            login: contributor.login,
+            avatar_url: contributor.avatar_url,
+            html_url: contributor.html_url,
+            contributions: 0,
+          };
         })
       );
 
-      detailedContributors.forEach((detailed, index) => {
-        this.contributors[index] = detailed;
-      });
-
+      this.contributors = detailedContributors;
       return this.contributors;
     } catch (error) {
       console.error("Error fetching contributors:", error);
@@ -77,7 +105,7 @@ export class ContributorsService {
     }
   }
 
-  getTopContributors(count: number = 4): Contributor[] {
+  getRecentContributors(count: number = 4): Contributor[] {
     return this.contributors.slice(0, count);
   }
 
