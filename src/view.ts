@@ -2196,7 +2196,7 @@ export class View {
       E.ContributorsList.innerHTML = "";
 
       // Render contributors
-      contributors.slice(0, 10).forEach((contributor, index) => {
+      contributors.forEach((contributor, index) => {
         const contributorCard = document.createElement("div");
         contributorCard.className = `
           flex items-center gap-4 p-4 bg-slate-700 rounded-xl

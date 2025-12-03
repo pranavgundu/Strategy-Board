@@ -66,7 +66,7 @@ export class ContributorsService {
 
       // Fetch detailed information for contributors
       const detailedContributors = await Promise.all(
-        recentContributors.slice(0, 10).map(async (contributor) => {
+        recentContributors.map(async (contributor) => {
           try {
             const userResponse = await fetch(
               `https://api.github.com/users/${contributor.login}`
