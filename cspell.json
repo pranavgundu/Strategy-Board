@@ -1,0 +1,14 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "qrimport",
+    "qrexport",
+    "handlerattached",
+    "closeexport",
+    "noopener",
+    "noreferrer",
+    "teleop",
+    "qrcode"
+  ]
+}

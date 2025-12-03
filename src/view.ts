@@ -2192,10 +2192,8 @@ export class View {
     try {
       const contributors = await this.contributorsService.fetchContributors();
 
-      // Clear existing contributors
       E.ContributorsList.innerHTML = "";
 
-      // Render contributors
       contributors.forEach((contributor, index) => {
         const contributorCard = document.createElement("div");
         contributorCard.className = `
@@ -2203,11 +2201,10 @@ export class View {
           glass-card transition-all cursor-pointer
         `;
 
-        // Add the same hover style as match items
         contributorCard.style.transition = "all 0.2s ease";
 
         contributorCard.innerHTML = `
-          <div class="flex-shrink-0 relative">
+          <div class="shrink-0 relative">
             <img
               src="${contributor.avatar_url}?s=128"
               alt="${contributor.login}"
@@ -2215,7 +2212,7 @@ export class View {
               style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; backface-visibility: hidden; transform: translateZ(0); will-change: transform;"
             />
           </div>
-          <div class="flex-grow min-w-0">
+          <div class="grow min-w-0">
             <div class="flex items-center gap-2 mb-1">
               <a
                 href="${contributor.html_url}"
@@ -2234,13 +2231,11 @@ export class View {
         E.ContributorsList?.appendChild(contributorCard);
       });
 
-      // Hide loading, show list
       E.ContributorsLoading.classList.add("hidden");
       E.ContributorsList.classList.remove("hidden");
     } catch (error) {
       console.error("Error loading contributors:", error);
 
-      // Show error state
       E.ContributorsLoading.classList.add("hidden");
       E.ContributorsError.classList.remove("hidden");
     }
@@ -2330,7 +2325,6 @@ export class View {
       const shareCode = await uploadMatch(match);
       const shareUrl = `https://strategyboard.app/?share=${shareCode}`;
 
-      // Update the modal with the share code and link
       if (E.ShareCodeDisplay) {
         E.ShareCodeDisplay.textContent = shareCode;
       }
@@ -2338,10 +2332,8 @@ export class View {
         E.ShareLinkDisplay.value = shareUrl;
       }
 
-      // Show the custom modal
       this.show(E.ShareSuccessPanel);
 
-      // Also copy to clipboard silently
       try {
         await navigator.clipboard.writeText(shareUrl);
       } catch (clipboardErr) {
