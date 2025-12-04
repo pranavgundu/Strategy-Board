@@ -275,6 +275,7 @@ export class Whiteboard {
     drawConfigEraser: HTMLElement | null;
     drawConfigText: HTMLElement | null;
     numberPad: HTMLElement | null;
+    colorConfig: HTMLElement | null;
     colorWhite: HTMLElement | null;
     colorRed: HTMLElement | null;
     colorBlue: HTMLElement | null;
@@ -288,6 +289,7 @@ export class Whiteboard {
     drawConfigEraser: null,
     drawConfigText: null,
     numberPad: null,
+    colorConfig: null,
     colorWhite: null,
     colorRed: null,
     colorBlue: null,
@@ -377,6 +379,9 @@ export class Whiteboard {
           document
             .getElementById("whiteboard-number-pad")
             ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-config")
+            ?.classList.add("hidden");
         } else if (this.currentTool == "eraser") {
           this.currentTool = "text";
           document
@@ -391,6 +396,9 @@ export class Whiteboard {
           document
             .getElementById("whiteboard-number-pad")
             ?.classList.remove("hidden");
+          document
+            .getElementById("whiteboard-color-config")
+            ?.classList.add("hidden");
         } else if (this.currentTool == "text") {
           this.currentTool = "marker";
           document
@@ -405,6 +413,9 @@ export class Whiteboard {
           document
             .getElementById("whiteboard-number-pad")
             ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-config")
+            ?.classList.remove("hidden");
         }
       });
 
@@ -846,6 +857,7 @@ export class Whiteboard {
     this.cachedElements.drawConfigEraser = document.getElementById("whiteboard-draw-config-eraser");
     this.cachedElements.drawConfigText = document.getElementById("whiteboard-draw-config-text");
     this.cachedElements.numberPad = document.getElementById("whiteboard-number-pad");
+    this.cachedElements.colorConfig = document.getElementById("whiteboard-color-config");
     this.cachedElements.colorWhite = document.getElementById("whiteboard-color-white");
     this.cachedElements.colorRed = document.getElementById("whiteboard-color-red");
     this.cachedElements.colorBlue = document.getElementById("whiteboard-color-blue");
@@ -889,6 +901,9 @@ export class Whiteboard {
         if (els.drawConfigMarker) els.drawConfigMarker.style.display = "inline";
         if (els.drawConfigEraser) els.drawConfigEraser.style.display = "none";
         if (els.drawConfigText) els.drawConfigText.style.display = "none";
+
+        // Show color picker when in marker mode
+        if (els.colorConfig) els.colorConfig.classList.remove("hidden");
 
         // Batch color picker updates using classList (faster than individual operations)
         const hideColors = [els.colorRed, els.colorBlue, els.colorGreen, els.colorYellow, els.colorClose];
