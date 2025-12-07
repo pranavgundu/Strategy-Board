@@ -247,34 +247,57 @@ body {
 @media (max-width: 640px) {
     #whiteboard-toolbar {
         grid-template-columns: 1fr auto 1fr;
-        gap: 0.35rem;
-        padding: 0 6px;
+        gap: 0.25rem;
+        padding: 0 4px;
+        height: 3rem !important; /* Reduce height on mobile */
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
-        gap: 0.4rem;
-        font-size: 0.85rem;
+        gap: 0.3rem;
+        font-size: 0.75rem;
         white-space: nowrap;
         overflow: hidden;
     }
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+        padding: 4px 8px !important; /* Reduce padding on mode labels */
+        font-size: 0.7rem !important;
+    }
+    #whiteboard-toolbar .toolbar-left,
+    #whiteboard-toolbar .toolbar-right {
+        gap: 0.25rem;
+        margin: 0 0.25rem;
+    }
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
-        padding: 4px 5px;
-        font-size: 0.8rem;
-        min-width: 44px;
+        padding: 4px 6px;
+        font-size: 0.7rem;
+        min-width: 50px;
+        white-space: nowrap;
     }
 }
 
 /* Extra small phones - improve touch targets and readability */
 @media (max-width: 480px) {
+    #whiteboard-toolbar {
+        height: 2.5rem !important; /* Even smaller on very small screens */
+        padding: 0 2px;
+    }
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
-        min-width: 40px;
-        font-size: 0.7rem;
-        padding: 3px 4px;
+        min-width: 45px;
+        font-size: 0.65rem;
+        padding: 3px 5px;
+    }
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+        gap: 0.2rem;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
-        font-size: 0.75rem;
-        padding: 6px 12px;
+        font-size: 0.65rem !important;
+        padding: 3px 6px !important;
+    }
+    #whiteboard-toolbar .toolbar-left,
+    #whiteboard-toolbar .toolbar-right {
+        gap: 0.2rem;
+        margin: 0 0.15rem;
     }
 }
 
@@ -285,6 +308,30 @@ body {
     }
     #home-toolbar-logo {
         font-size: 1rem !important;
+    }
+
+    /* Ultra compact whiteboard toolbar for very small screens */
+    #whiteboard-toolbar {
+        height: 2.25rem !important;
+        padding: 0 1px;
+    }
+    #whiteboard-toolbar .toolbar-right button,
+    #whiteboard-toolbar .toolbar-left button {
+        min-width: 40px;
+        font-size: 0.6rem;
+        padding: 2px 4px;
+    }
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select {
+        gap: 0.15rem;
+    }
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+        font-size: 0.6rem !important;
+        padding: 2px 4px !important;
+    }
+    #whiteboard-toolbar .toolbar-left,
+    #whiteboard-toolbar .toolbar-right {
+        gap: 0.15rem;
+        margin: 0 0.1rem;
     }
 }
 
@@ -770,6 +817,42 @@ body {
     }
 }
 
+/* Mobile-friendly home screen buttons */
+@media (max-width: 640px) {
+    #home-toolbar {
+        gap: 0.5rem;
+    }
+    #home-toolbar > div:last-child {
+        gap: 0.3rem !important;
+    }
+    #home-toolbar-new-btn,
+    #home-toolbar-tba-btn,
+    #home-toolbar-import-btn,
+    #home-toolbar-import-link-btn,
+    #home-toolbar-clear-btn {
+        min-height: 2.5rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #home-toolbar-logo {
+        font-size: 1.1rem !important;
+    }
+    #home-toolbar > div:last-child {
+        gap: 0.25rem !important;
+    }
+    #home-toolbar-new-btn,
+    #home-toolbar-tba-btn,
+    #home-toolbar-import-btn,
+    #home-toolbar-import-link-btn,
+    #home-toolbar-clear-btn {
+        min-height: 2.25rem !important;
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.75rem !important;
+    }
+}
+
 /* Landscape optimizations for mobile */
 @media (max-width: 1024px) and (orientation: landscape) {
     #home-toolbar {
@@ -993,6 +1076,39 @@ body {
 @supports (-webkit-touch-callout: none) {
     html, body {
         height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+    }
+
+    /* Ensure containers respect safe areas on iOS */
+    #home-container,
+    #whiteboard-container {
+        height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+    }
+}
+
+/* iOS PWA safe area improvements */
+@media (max-width: 640px) {
+    /* Ensure modals don't go under notches */
+    .glass-modal {
+        margin-top: env(safe-area-inset-top);
+        margin-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Ensure whiteboard controls respect safe areas */
+    #whiteboard-draw-config {
+        right: max(0.75rem, env(safe-area-inset-right)) !important;
+        bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
+    }
+
+    #whiteboard-color-config {
+        left: max(0.75rem, env(safe-area-inset-left)) !important;
+        bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
+    }
+
+    #whiteboard-number-pad {
+        right: max(0.75rem, env(safe-area-inset-right)) !important;
+        bottom: max(4.5rem, calc(4.5rem + env(safe-area-inset-bottom))) !important;
     }
 }
 
@@ -1000,6 +1116,161 @@ body {
 @media (max-height: 600px) {
     .glass-modal {
         max-height: 95vh !important;
+    }
+}
+
+/* Better modal sizing and spacing on mobile */
+@media (max-width: 640px) {
+    .glass-modal {
+        max-height: 92vh !important;
+        width: 95vw !important;
+    }
+
+    /* Create match panel mobile optimization */
+    #create-match-container .glass-modal {
+        padding: 0.5rem !important;
+    }
+
+    #create-match-name {
+        padding: 0.75rem !important;
+        font-size: 1.25rem !important;
+    }
+
+    #create-match-red-1,
+    #create-match-red-2,
+    #create-match-red-3,
+    #create-match-blue-1,
+    #create-match-blue-2,
+    #create-match-blue-3 {
+        padding: 0.6rem !important;
+        font-size: 1rem !important;
+    }
+
+    #create-match-create-btn,
+    #create-match-cancel-btn {
+        padding: 0.75rem !important;
+        font-size: 1rem !important;
+    }
+
+    /* TBA import panel mobile optimization */
+    #tba-import-container .glass-modal {
+        width: 96vw !important;
+    }
+
+    #tba-import-container input {
+        padding: 0.6rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    #tba-import-btn,
+    #tba-cancel-btn {
+        padding: 0.75rem !important;
+        font-size: 1rem !important;
+    }
+
+    /* Clear confirm dialog mobile optimization */
+    #clear-confirm-container .glass-modal {
+        width: 90vw !important;
+    }
+
+    #clear-confirm-container .glass-modal > div:first-child {
+        padding: 1rem 0.75rem 0.75rem !important;
+        font-size: 1.25rem !important;
+    }
+
+    #clear-confirm-container .glass-modal > div:nth-child(2) {
+        padding: 0 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    #clear-confirm-cancel-btn,
+    #clear-confirm-clear-btn {
+        padding: 0.75rem !important;
+        font-size: 1rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #create-match-name {
+        padding: 0.6rem !important;
+        font-size: 1.1rem !important;
+    }
+
+    #create-match-red-1,
+    #create-match-red-2,
+    #create-match-red-3,
+    #create-match-blue-1,
+    #create-match-blue-2,
+    #create-match-blue-3 {
+        padding: 0.5rem !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Match list items mobile optimization */
+@media (max-width: 640px) {
+    #home-match-list {
+        padding: 0.75rem !important;
+        gap: 0.75rem !important;
+    }
+
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) {
+        min-height: 5rem !important;
+        padding: 0.75rem 0.5rem !important;
+    }
+
+    /* Make team numbers more readable on mobile */
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:first-child {
+        font-size: 1rem !important;
+    }
+
+    /* Better spacing for VS display */
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:nth-child(2) {
+        gap: 0.5rem !important;
+    }
+
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:nth-child(2) > div {
+        font-size: 0.9rem !important;
+    }
+
+    /* Larger touch target for kebab menu */
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:last-child > button:first-child {
+        min-width: 2.5rem !important;
+        min-height: 2.5rem !important;
+    }
+
+    /* Better action button sizing */
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:last-child > div > button {
+        min-height: 2rem !important;
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #home-match-list {
+        padding: 0.5rem !important;
+        gap: 0.5rem !important;
+    }
+
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) {
+        min-height: 4.5rem !important;
+        padding: 0.6rem 0.4rem !important;
+    }
+
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:first-child {
+        font-size: 0.9rem !important;
+    }
+
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:nth-child(2) > div {
+        font-size: 0.8rem !important;
+    }
+
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:last-child > div > button {
+        min-height: 1.75rem !important;
+        padding: 0.3rem 0.5rem !important;
+        font-size: 0.7rem !important;
+        min-width: 4.5rem !important;
     }
 }
 
@@ -1019,6 +1290,65 @@ body {
 button, a, [role="button"] {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
     touch-action: manipulation;
+    /* Ensure minimum touch target size */
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Improve touch scrolling on mobile */
+#home-match-list,
+#tba-event-list,
+#tba-team-list,
+#contributors-list {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+}
+
+/* Prevent text selection during touch interactions */
+.touch-none,
+.select-none {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* Better active state for touch */
+button:active,
+a:active,
+[role="button"]:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+/* Ensure clickable areas are large enough on mobile */
+@media (max-width: 640px) {
+    button, a, [role="button"] {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Even larger for primary actions */
+    #create-match-create-btn,
+    #create-match-cancel-btn,
+    #tba-import-btn,
+    #tba-cancel-btn,
+    #clear-confirm-clear-btn,
+    #clear-confirm-cancel-btn,
+    #home-toolbar-new-btn,
+    #home-toolbar-import-btn,
+    #home-toolbar-import-link-btn,
+    #home-toolbar-tba-btn,
+    #home-toolbar-clear-btn {
+        min-height: 48px !important;
+    }
+
+    /* Better tap feedback for cards */
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template):active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
 }
 
 /* Prevent zoom on input focus for iOS */
@@ -1052,13 +1382,98 @@ button, a, [role="button"] {
     #whiteboard-draw-config,
     #whiteboard-color-config {
         /* Make controls slightly larger on touch devices */
-        transform: scale(1.1);
+        transform: scale(1.15);
     }
 
     #whiteboard-number-pad {
         /* Better positioning on small screens */
         bottom: 4rem;
         right: 0.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Larger, more touch-friendly whiteboard controls */
+    #whiteboard-draw-config {
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+        bottom: 0.75rem !important;
+        right: 0.75rem !important;
+        transform: scale(1.2);
+    }
+
+    #whiteboard-draw-config i {
+        font-size: 1.25rem !important;
+    }
+
+    #whiteboard-color-config {
+        bottom: 0.75rem !important;
+        left: 0.75rem !important;
+        padding: 0.5rem !important;
+        transform: scale(1.2);
+    }
+
+    #whiteboard-color-yellow,
+    #whiteboard-color-green,
+    #whiteboard-color-blue,
+    #whiteboard-color-red,
+    #whiteboard-color-white,
+    #whiteboard-color-close {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        margin: 0.3rem !important;
+    }
+
+    #whiteboard-color-close i {
+        font-size: 1.25rem !important;
+    }
+
+    /* Number pad mobile optimization */
+    #whiteboard-number-pad {
+        bottom: 4.5rem !important;
+        right: 0.75rem !important;
+        padding: 0.75rem !important;
+        gap: 0.5rem !important;
+    }
+
+    #whiteboard-number-pad button {
+        min-width: 3rem !important;
+        min-height: 3rem !important;
+        padding: 0.75rem !important;
+        font-size: 1.1rem !important;
+    }
+
+    #whiteboard-number-0 {
+        min-width: 6.5rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #whiteboard-draw-config {
+        width: 3rem !important;
+        height: 3rem !important;
+    }
+
+    #whiteboard-color-yellow,
+    #whiteboard-color-green,
+    #whiteboard-color-blue,
+    #whiteboard-color-red,
+    #whiteboard-color-white,
+    #whiteboard-color-close {
+        width: 2.25rem !important;
+        height: 2.25rem !important;
+        margin: 0.25rem !important;
+    }
+
+    #whiteboard-number-pad button {
+        min-width: 2.75rem !important;
+        min-height: 2.75rem !important;
+        padding: 0.6rem !important;
+        font-size: 1rem !important;
+    }
+
+    #whiteboard-number-0 {
+        min-width: 6rem !important;
     }
 }
 
@@ -1111,6 +1526,26 @@ button, a, [role="button"] {
     }
 }
 
+/* Robot config panel mobile optimization */
+@media (max-width: 640px) {
+    #whiteboard-robot-config {
+        width: 90vw !important;
+        max-width: 18rem !important;
+        height: auto !important;
+        padding: 1rem !important;
+    }
+
+    #whiteboard-robot-config .text-2xl {
+        font-size: 1.25rem !important;
+    }
+
+    #whiteboard-robot-config input {
+        font-size: 1.5rem !important;
+        padding: 0.5rem !important;
+    }
+}
+
+/* Ultra-small landscape screens (small phones in landscape) */
 @media (max-width: 653px) and (max-height: 280px) {
     #home-toolbar {
         height: 2.5rem !important;
@@ -1123,6 +1558,10 @@ button, a, [role="button"] {
     .glass-modal {
         max-height: 90vh !important;
         max-width: 90vw !important;
+    }
+
+    #whiteboard-toolbar {
+        height: 2rem !important;
     }
 }
 

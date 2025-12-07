@@ -1430,23 +1430,43 @@ export class Whiteboard {
 
       const color = this.getStrokeColor(stroke[0]);
 
-      // Performance: Set style only if changed
-      if (currentStrokeColor !== color) {
-        DR.strokeStyle = color;
-        currentStrokeColor = color;
+      // Handle single-click dots (length === 2 means [color, point])
+      if (stroke.length === 2) {
+        // Performance: Set fill style only if changed
+        if (currentStrokeColor !== color) {
+          DR.fillStyle = color;
+          currentStrokeColor = color;
+        }
+
+        DR.beginPath();
+        DR.arc(
+          stroke[1][0] - offsetX,
+          stroke[1][1] - offsetY,
+          5, // radius of the dot (half of line width which is 10)
+          0,
+          2 * Math.PI
+        );
+        DR.fill();
+      } else {
+        // Regular stroke with multiple points
+        // Performance: Set style only if changed
+        if (currentStrokeColor !== color) {
+          DR.strokeStyle = color;
+          currentStrokeColor = color;
+        }
+
+        DR.beginPath();
+
+        // Performance: Use pre-calculated offset
+        DR.moveTo(stroke[1][0] - offsetX, stroke[1][1] - offsetY);
+
+        // Performance: Batch lineTo operations
+        for (let i = 2; i < stroke.length; i++) {
+          DR.lineTo(stroke[i][0] - offsetX, stroke[i][1] - offsetY);
+        }
+
+        DR.stroke();
       }
-
-      DR.beginPath();
-
-      // Performance: Use pre-calculated offset
-      DR.moveTo(stroke[1][0] - offsetX, stroke[1][1] - offsetY);
-
-      // Performance: Batch lineTo operations
-      for (let i = 2; i < stroke.length; i++) {
-        DR.lineTo(stroke[i][0] - offsetX, stroke[i][1] - offsetY);
-      }
-
-      DR.stroke();
     }
 
     // Text rendering with same optimization
@@ -1923,8 +1943,27 @@ export class Whiteboard {
         });
       }
       this.currentAction = "none";
-    } else if (this.currentStrokePoints.length > 2) {
-      DR.closePath();
+    } else if (this.currentStrokePoints.length >= 2) {
+      // Handle both single-click dots and regular strokes
+      if (this.currentStrokePoints.length === 2) {
+        // Single click - draw a dot
+        const point = this.currentStrokePoints[1];
+        const color = this.currentStrokePoints[0];
+        DR.fillStyle = this.getStrokeColor(color);
+        DR.beginPath();
+        DR.arc(
+          point[0] - (this.camera.x - width / 2),
+          point[1] - (this.camera.y - height / 2),
+          5, // radius of the dot (half of line width which is 10)
+          0,
+          2 * Math.PI
+        );
+        DR.fill();
+      } else {
+        // Regular stroke with movement
+        DR.closePath();
+      }
+
       this.addUndoHistory({
         type: "stroke",
         ref: this.currentStrokePoints,
@@ -1951,8 +1990,27 @@ export class Whiteboard {
     // Performance: Clear cached rect
     this.cachedDrawingRect = null;
 
-    if (this.currentStrokePoints.length > 2) {
-      DR.closePath();
+    if (this.currentStrokePoints.length >= 2) {
+      // Handle both single-click dots and regular strokes
+      if (this.currentStrokePoints.length === 2) {
+        // Single click - draw a dot
+        const point = this.currentStrokePoints[1];
+        const color = this.currentStrokePoints[0];
+        DR.fillStyle = this.getStrokeColor(color);
+        DR.beginPath();
+        DR.arc(
+          point[0] - (this.camera.x - width / 2),
+          point[1] - (this.camera.y - height / 2),
+          5, // radius of the dot (half of line width which is 10)
+          0,
+          2 * Math.PI
+        );
+        DR.fill();
+      } else {
+        // Regular stroke with movement
+        DR.closePath();
+      }
+
       this.addUndoHistory({
         type: "stroke",
         ref: this.currentStrokePoints,
@@ -2055,6 +2113,16 @@ function getBBox(stroke: any): [number, number, number, number] {
       maxy = point[1];
     }
   }
+
+  // For single-point strokes (dots), add margin for the dot radius
+  if (stroke.length === 2) {
+    const dotRadius = 5;
+    minx -= dotRadius;
+    miny -= dotRadius;
+    maxx += dotRadius;
+    maxy += dotRadius;
+  }
+
   return [minx, miny, maxx, maxy];
 }
 
