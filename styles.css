@@ -623,7 +623,7 @@ body {
 }
 
 #whiteboard-toolbar-back:hover {
-    background-color: rgb(168 85 247) !important; /* purple-600 */
+    background-color: rgb(220 38 38) !important; /* red-600 */
     transform: translateY(-2px);
     box-shadow:
         0 6px 16px rgba(0, 0, 0, 0.4),
