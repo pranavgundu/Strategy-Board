@@ -1704,6 +1704,9 @@ export class Whiteboard {
         );
         DR.stroke();
       } else if (this.currentTool == "eraser") {
+        // Eraser brush size (slightly larger than smallest dot radius of 5)
+        const eraserRadius = 6;
+
         // Performance: Reduce eraser distance threshold for better tracking
         if (
           Math.hypot(
@@ -1724,33 +1727,60 @@ export class Whiteboard {
               y,
               this.lastErasePoint.x,
               this.lastErasePoint.y,
-              bboxes[i][0],
-              bboxes[i][1],
-              bboxes[i][2],
-              bboxes[i][3],
+              bboxes[i][0] - eraserRadius,
+              bboxes[i][1] - eraserRadius,
+              bboxes[i][2] + eraserRadius,
+              bboxes[i][3] + eraserRadius,
             )
           ) {
             const stroke = data.drawing[i];
-            for (let j = 0; j < stroke.length - 2; j++) {
-              if (
-                isSegmentsIntersecting(
-                  x,
-                  y,
-                  this.lastErasePoint.x,
-                  this.lastErasePoint.y,
-                  stroke[j][0],
-                  stroke[j][1],
-                  stroke[j + 1][0],
-                  stroke[j + 1][1],
-                )
-              ) {
-                data.drawing.splice(i, 1);
-                data.drawingBBox.splice(i, 1);
-                this.redrawDrawing();
-                this.currentErasedStrokes.push(stroke);
-                this.currentErasedStrokeIndexes.push(i);
-                break;
+            let shouldErase = false;
+
+            // Handle single-point strokes (dots) - length is 2: [color, point]
+            if (stroke.length === 2) {
+              const dotX = stroke[1][0];
+              const dotY = stroke[1][1];
+              const dotRadius = 5; // Match the dot radius from drawing code
+
+              // Check if eraser path comes within range of the dot
+              const distToEraser = distanceFromPointToSegment(
+                dotX,
+                dotY,
+                this.lastErasePoint.x,
+                this.lastErasePoint.y,
+                x,
+                y
+              );
+
+              shouldErase = distToEraser <= (eraserRadius + dotRadius);
+            } else {
+              // Handle regular multi-point strokes
+              for (let j = 0; j < stroke.length - 2; j++) {
+                if (
+                  isSegmentsIntersecting(
+                    x,
+                    y,
+                    this.lastErasePoint.x,
+                    this.lastErasePoint.y,
+                    stroke[j][0],
+                    stroke[j][1],
+                    stroke[j + 1][0],
+                    stroke[j + 1][1],
+                    eraserRadius,
+                  )
+                ) {
+                  shouldErase = true;
+                  break;
+                }
               }
+            }
+
+            if (shouldErase) {
+              data.drawing.splice(i, 1);
+              data.drawingBBox.splice(i, 1);
+              this.redrawDrawing();
+              this.currentErasedStrokes.push(stroke);
+              this.currentErasedStrokeIndexes.push(i);
             }
           }
         }
@@ -2080,19 +2110,62 @@ function isSegmentInBound(x1, y1, x2, y2, minx, miny, maxx, maxy) {
   return false;
 }
 
-function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
+function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2, tolerance = 0) {
   const sx = ax2 - ax1;
   const sy = ay2 - ay1;
   const tx = bx2 - bx1;
   const ty = by2 - by1;
   const d = -tx * sy + sx * ty;
 
-  if (Math.abs(d) < 1e-10) return false;
+  if (Math.abs(d) < 1e-10) {
+    // Lines are parallel or coincident - check distance between them
+    if (tolerance > 0) {
+      return distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
+             distanceFromPointToSegment(ax2, ay2, bx1, by1, bx2, by2) <= tolerance ||
+             distanceFromPointToSegment(bx1, by1, ax1, ay1, ax2, ay2) <= tolerance ||
+             distanceFromPointToSegment(bx2, by2, ax1, ay1, ax2, ay2) <= tolerance;
+    }
+    return false;
+  }
 
   const s = (-sy * (ax1 - bx1) + sx * (ay1 - by1)) / d;
   const t = (tx * (ay1 - by1) - ty * (ax1 - bx1)) / d;
 
-  return s >= 0 && s <= 1 && t >= 0 && t <= 1;
+  if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+    return true;
+  }
+
+  // If tolerance is specified, check distance to line segments even if they don't intersect
+  if (tolerance > 0) {
+    return distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
+           distanceFromPointToSegment(ax2, ay2, bx1, by1, bx2, by2) <= tolerance ||
+           distanceFromPointToSegment(bx1, by1, ax1, ay1, ax2, ay2) <= tolerance ||
+           distanceFromPointToSegment(bx2, by2, ax1, ay1, ax2, ay2) <= tolerance;
+  }
+
+  return false;
+}
+
+function distanceFromPointToSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number): number {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const lengthSquared = dx * dx + dy * dy;
+
+  if (lengthSquared === 0) {
+    // Segment is just a point
+    return Math.hypot(px - x1, py - y1);
+  }
+
+  // Calculate projection parameter t
+  let t = ((px - x1) * dx + (py - y1) * dy) / lengthSquared;
+  t = Math.max(0, Math.min(1, t));
+
+  // Calculate closest point on segment
+  const closestX = x1 + t * dx;
+  const closestY = y1 + t * dy;
+
+  // Return distance to closest point
+  return Math.hypot(px - closestX, py - closestY);
 }
 
 function getBBox(stroke: any): [number, number, number, number] {
