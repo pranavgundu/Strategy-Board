@@ -515,12 +515,6 @@ export class Whiteboard {
     });
 
     document
-      .getElementById("whiteboard-toolbar-undo")
-      ?.addEventListener("click", (e) => {
-        this.undo();
-      });
-
-    document
       .getElementById("whiteboard-color-close")
       ?.addEventListener("click", (e) => {
         document
