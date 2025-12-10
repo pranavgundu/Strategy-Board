@@ -21,8 +21,8 @@ A powerful strategy planning tool for FIRST Robotics Competition teams
 - The Blue Alliance Integration 
 - QR Code Export/Import
 - Multi-Phase Planning
-- Auto-Save
 - Match Management
+- Cloud Export
 
 ---
 
