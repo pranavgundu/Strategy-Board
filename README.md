@@ -17,14 +17,14 @@ A powerful strategy planning tool for FIRST Robotics Competition teams
 ## Features
 
 - Interactive Field Drawing
-![Field Drawing Demo](https://github.com/user-attachments/assets/a339677d-1c5a-453c-991b-fc2f6bac20e6)
+   ![Field Drawing Demo](https://github.com/user-attachments/assets/a339677d-1c5a-453c-991b-fc2f6bac20e6)
 - Robot Positioning
-![Robot Positioning Demo](https://github.com/user-attachments/assets/7252e4ae-c225-4190-a13a-2ad6de24f0f4)
+   ![Robot Positioning Demo](https://github.com/user-attachments/assets/7252e4ae-c225-4190-a13a-2ad6de24f0f4)
 - The Blue Alliance Integration
-![TBA Demo](https://github.com/user-attachments/assets/e69212be-f9ca-45ca-89d3-3395a69db6cc)
+   ![TBA Demo](https://github.com/user-attachments/assets/e69212be-f9ca-45ca-89d3-3395a69db6cc)
 - QR Code Export/Import
 - Multi-Phase Planning
-![Multi-Phase Planning](https://github.com/user-attachments/assets/d8990922-3613-45a3-bb0a-c8f3b86b3247)
+   ![Multi-Phase Planning](https://github.com/user-attachments/assets/d8990922-3613-45a3-bb0a-c8f3b86b3247)
 - Match Management
 - Cloud Export 
 
