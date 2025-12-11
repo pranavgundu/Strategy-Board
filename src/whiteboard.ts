@@ -11,11 +11,10 @@ let _BGctx: CanvasRenderingContext2D | null = null;
 let _ITctx: CanvasRenderingContext2D | null = null;
 let _DRctx: CanvasRenderingContext2D | null = null;
 
-// Performance: Track initialization to avoid repeated ensureCanvases calls
 let _canvasesInitialized = false;
 
 function ensureCanvases(): void {
-  if (_canvasesInitialized) return; // Early exit if already initialized
+  if (_canvasesInitialized) return;
   if (!_backgroundEl) {
     _backgroundEl = document.getElementById(
       "whiteboard-canvas-background",
@@ -67,7 +66,6 @@ function ensureCanvases(): void {
     if (ctx) _DRctx = ctx;
   }
 
-  // Mark as initialized to avoid repeated calls
   _canvasesInitialized = true;
 }
 
@@ -243,7 +241,6 @@ export class Whiteboard {
   private rotControl: { x: number; y: number } | null = null;
   private isPointerDown = false;
 
-  // Performance: Cache bounding rect to avoid repeated getBoundingClientRect calls
   private cachedDrawingRect: DOMRect | null = null;
 
   private currentStrokePoints: Array<any> = [];
@@ -269,11 +266,11 @@ export class Whiteboard {
 
   private updateInterval: number | null = null;
 
-  // Cache DOM elements for performance
   private cachedElements: {
     drawConfigMarker: HTMLElement | null;
     drawConfigEraser: HTMLElement | null;
     drawConfigText: HTMLElement | null;
+    drawConfigCheckbox: HTMLElement | null;
     numberPad: HTMLElement | null;
     colorConfig: HTMLElement | null;
     colorWhite: HTMLElement | null;
@@ -288,6 +285,7 @@ export class Whiteboard {
     drawConfigMarker: null,
     drawConfigEraser: null,
     drawConfigText: null,
+    drawConfigCheckbox: null,
     numberPad: null,
     colorConfig: null,
     colorWhite: null,
@@ -306,7 +304,6 @@ export class Whiteboard {
     blue: { x: width / 4, y: height / 2 },
   };
 
-  // Maximum history size to prevent unbounded memory growth
   private static readonly MAX_HISTORY_SIZE = 100;
 
   constructor(model: Model) {
@@ -342,7 +339,6 @@ export class Whiteboard {
         this.undo();
       });
 
-    // Add click handler for redo button
     document
       .getElementById("whiteboard-toolbar-redo")
       ?.addEventListener("click", (e) => {
@@ -377,6 +373,9 @@ export class Whiteboard {
             .getElementById("whiteboard-draw-config-text")
             ?.style.setProperty("display", "none");
           document
+            .getElementById("whiteboard-draw-config-checkbox")
+            ?.style.setProperty("display", "none");
+          document
             .getElementById("whiteboard-number-pad")
             ?.classList.add("hidden");
           document
@@ -394,12 +393,58 @@ export class Whiteboard {
             .getElementById("whiteboard-draw-config-text")
             ?.style.setProperty("display", "inline");
           document
+            .getElementById("whiteboard-draw-config-checkbox")
+            ?.style.setProperty("display", "none");
+          document
             .getElementById("whiteboard-number-pad")
             ?.classList.remove("hidden");
           document
             .getElementById("whiteboard-color-config")
             ?.classList.add("hidden");
         } else if (this.currentTool == "text") {
+          // Only show checkbox tool in notes mode, otherwise cycle back to marker
+          if (this.mode === "notes") {
+            this.currentTool = "checkbox";
+            document
+              .getElementById("whiteboard-draw-config-marker")
+              ?.style.setProperty("display", "none");
+            document
+              .getElementById("whiteboard-draw-config-eraser")
+              ?.style.setProperty("display", "none");
+            document
+              .getElementById("whiteboard-draw-config-text")
+              ?.style.setProperty("display", "none");
+            document
+              .getElementById("whiteboard-draw-config-checkbox")
+              ?.style.setProperty("display", "inline");
+            document
+              .getElementById("whiteboard-number-pad")
+              ?.classList.add("hidden");
+            document
+              .getElementById("whiteboard-color-config")
+              ?.classList.remove("hidden");
+          } else {
+            this.currentTool = "marker";
+            document
+              .getElementById("whiteboard-draw-config-marker")
+              ?.style.setProperty("display", "inline");
+            document
+              .getElementById("whiteboard-draw-config-eraser")
+              ?.style.setProperty("display", "none");
+            document
+              .getElementById("whiteboard-draw-config-text")
+              ?.style.setProperty("display", "none");
+            document
+              .getElementById("whiteboard-draw-config-checkbox")
+              ?.style.setProperty("display", "none");
+            document
+              .getElementById("whiteboard-number-pad")
+              ?.classList.add("hidden");
+            document
+              .getElementById("whiteboard-color-config")
+              ?.classList.remove("hidden");
+          }
+        } else if (this.currentTool == "checkbox") {
           this.currentTool = "marker";
           document
             .getElementById("whiteboard-draw-config-marker")
@@ -409,6 +454,9 @@ export class Whiteboard {
             ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-draw-config-text")
+            ?.style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-draw-config-checkbox")
             ?.style.setProperty("display", "none");
           document
             .getElementById("whiteboard-number-pad")
@@ -846,10 +894,10 @@ export class Whiteboard {
     DR.lineJoin = "round";
     DR.strokeStyle = "white";
 
-    // Cache DOM elements once for performance
     this.cachedElements.drawConfigMarker = document.getElementById("whiteboard-draw-config-marker");
     this.cachedElements.drawConfigEraser = document.getElementById("whiteboard-draw-config-eraser");
     this.cachedElements.drawConfigText = document.getElementById("whiteboard-draw-config-text");
+     this.cachedElements.drawConfigCheckbox = document.getElementById("whiteboard-draw-config-checkbox");
     this.cachedElements.numberPad = document.getElementById("whiteboard-number-pad");
     this.cachedElements.colorConfig = document.getElementById("whiteboard-color-config");
     this.cachedElements.colorWhite = document.getElementById("whiteboard-color-white");
@@ -874,32 +922,26 @@ export class Whiteboard {
     this.active = active;
 
     if (active) {
-      // Batch read operations first (avoid layout thrashing)
       const hasHistory = this.getCurrentUndoHistory().length > 0;
 
-      // Batch all DOM writes together using requestAnimationFrame
       requestAnimationFrame(() => {
         const els = this.cachedElements;
 
-        // Update undo button state using cached reference
         if (els.undoBtn) {
           els.undoBtn.style.opacity = hasHistory ? "1" : "0.5";
           els.undoBtn.style.cursor = hasHistory ? "pointer" : "not-allowed";
         }
 
-        // Reset tool state
         this.currentTool = "marker";
         this.currentColor = 0;
 
-        // Batch display updates using cached references
         if (els.drawConfigMarker) els.drawConfigMarker.style.display = "inline";
         if (els.drawConfigEraser) els.drawConfigEraser.style.display = "none";
         if (els.drawConfigText) els.drawConfigText.style.display = "none";
+        if (els.drawConfigCheckbox) els.drawConfigCheckbox.style.display = "none";
 
-        // Show color picker when in marker mode
         if (els.colorConfig) els.colorConfig.classList.remove("hidden");
 
-        // Batch color picker updates using classList (faster than individual operations)
         const hideColors = [els.colorRed, els.colorBlue, els.colorGreen, els.colorYellow, els.colorClose];
         hideColors.forEach(el => {
           if (el) {
@@ -913,7 +955,6 @@ export class Whiteboard {
         }
       });
     } else {
-      // Cleanup when deactivating
       if (this.match !== null) this.model.updateMatch(this.match.id);
 
       this.match = null;
@@ -934,7 +975,6 @@ export class Whiteboard {
         .getElementById("whiteboard-robot-config")
         ?.classList.add("hidden");
 
-      // Clean up interval to prevent memory leak
       if (this.updateInterval !== null) {
         clearInterval(this.updateInterval);
         this.updateInterval = null;
@@ -945,7 +985,6 @@ export class Whiteboard {
   public setMatch(match: Match) {
     this.match = match;
     this.redrawAll();
-    // Update undo/redo button states when a new match is loaded
     this.updateUndoRedoButtons();
   }
 
@@ -962,10 +1001,8 @@ export class Whiteboard {
   }
 
   private addUndoHistory(action: any) {
-    // Clear redo history when a new action is performed
     this.clearCurrentRedoHistory();
 
-    // Get the appropriate history array and add action
     let history: Array<any> | null = null;
     if (this.mode === "auto") {
       history = this.autoActionHistory;
@@ -980,7 +1017,6 @@ export class Whiteboard {
     if (history) {
       history.push(action);
 
-      // Enforce size limit to prevent memory leaks (remove oldest if over limit)
       if (history.length > Whiteboard.MAX_HISTORY_SIZE) {
         history.shift(); // Remove oldest action
       }
@@ -1135,6 +1171,33 @@ export class Whiteboard {
         }
         this.redrawDrawing();
       }
+    } else if (action.type === "checkbox") {
+      const data = this.getData();
+      if (data !== null) {
+        if (action.ref) {
+          const ref = action.ref as any[];
+          const idx = data.checkboxes.findIndex(
+            (cb: any) =>
+              cb[0] === ref[0] &&
+              cb[1] === ref[1] &&
+              cb[2] === ref[2],
+          );
+          if (idx !== -1) {
+            data.checkboxes.splice(idx, 1);
+          } else {
+            data.checkboxes.pop();
+          }
+        } else {
+          data.checkboxes.pop();
+        }
+        this.redrawDrawing();
+      }
+    } else if (action.type === "checkbox-toggle") {
+      const data = this.getData();
+      if (data !== null && action.index !== undefined && data.checkboxes[action.index]) {
+        data.checkboxes[action.index][3] = action.prevChecked;
+        this.redrawDrawing();
+      }
     }
 
     this.updateUndoRedoButtons();
@@ -1186,6 +1249,20 @@ export class Whiteboard {
         if (action.ref) {
           data.textAnnotations.push(action.ref);
         }
+        this.redrawDrawing();
+      }
+    } else if (action.type === "checkbox") {
+      const data = this.getData();
+      if (data !== null) {
+        if (action.ref) {
+          data.checkboxes.push(action.ref);
+        }
+        this.redrawDrawing();
+      }
+    } else if (action.type === "checkbox-toggle") {
+      const data = this.getData();
+      if (data !== null && action.index !== undefined && data.checkboxes[action.index]) {
+        data.checkboxes[action.index][3] = action.newChecked;
         this.redrawDrawing();
       }
     }
@@ -1402,31 +1479,23 @@ export class Whiteboard {
 
     if (data === null || this.match === null) return;
 
-    // Performance: Calculate camera offset once
     const offsetX = this.camera.x - width / 2;
     const offsetY = this.camera.y - height / 2;
 
-    // Performance: Use clearRect with specific dimensions
     DR.clearRect(0, 0, width, height);
 
-    // Performance: Set context properties once before loop
     DR.lineWidth = 10;
     DR.lineCap = "round";
     DR.lineJoin = "round";
 
-    // Performance: Track current color to avoid redundant strokeStyle sets
     let currentStrokeColor = "";
 
-    // Performance: Batch stroke drawing
     for (let stroke of data.drawing) {
-      // Skip if no points (defensive)
       if (stroke.length < 2) continue;
 
       const color = this.getStrokeColor(stroke[0]);
 
-      // Handle single-click dots (length === 2 means [color, point])
       if (stroke.length === 2) {
-        // Performance: Set fill style only if changed
         if (currentStrokeColor !== color) {
           DR.fillStyle = color;
           currentStrokeColor = color;
@@ -1436,14 +1505,12 @@ export class Whiteboard {
         DR.arc(
           stroke[1][0] - offsetX,
           stroke[1][1] - offsetY,
-          5, // radius of the dot (half of line width which is 10)
+          5,
           0,
           2 * Math.PI
         );
         DR.fill();
       } else {
-        // Regular stroke with multiple points
-        // Performance: Set style only if changed
         if (currentStrokeColor !== color) {
           DR.strokeStyle = color;
           currentStrokeColor = color;
@@ -1451,10 +1518,8 @@ export class Whiteboard {
 
         DR.beginPath();
 
-        // Performance: Use pre-calculated offset
         DR.moveTo(stroke[1][0] - offsetX, stroke[1][1] - offsetY);
 
-        // Performance: Batch lineTo operations
         for (let i = 2; i < stroke.length; i++) {
           DR.lineTo(stroke[i][0] - offsetX, stroke[i][1] - offsetY);
         }
@@ -1463,7 +1528,6 @@ export class Whiteboard {
       }
     }
 
-    // Text rendering with same optimization
     if (data.textAnnotations && data.textAnnotations.length > 0) {
       DR.font = "bold 80px Arial";
       DR.textAlign = "center";
@@ -1474,7 +1538,6 @@ export class Whiteboard {
       for (let text of data.textAnnotations) {
         const color = this.getStrokeColor(text[2]);
 
-        // Performance: Set style only if changed
         if (currentFillColor !== color) {
           DR.fillStyle = color;
           currentFillColor = color;
@@ -1487,6 +1550,38 @@ export class Whiteboard {
         );
       }
     }
+
+    if (data.checkboxes && data.checkboxes.length > 0) {
+      const boxSize = 200;
+      const checkPadding = 20;
+
+      for (let checkbox of data.checkboxes) {
+        const x = checkbox[0] - offsetX;
+        const y = checkbox[1] - offsetY;
+        const color = this.getStrokeColor(checkbox[2]);
+        const checked = checkbox[3];
+
+        DR.strokeStyle = color;
+        DR.lineWidth = 8;
+        DR.strokeRect(x - boxSize / 2, y - boxSize / 2, boxSize, boxSize);
+
+        if (checked) {
+          DR.strokeStyle = "#22c55e"; 
+          DR.lineWidth = 12;
+          DR.lineCap = "round";
+          DR.lineJoin = "round";
+          DR.beginPath();
+          DR.moveTo(x - boxSize / 2 + checkPadding, y);
+          DR.lineTo(x - boxSize / 6, y + boxSize / 2 - checkPadding);
+          DR.lineTo(x + boxSize / 2 - checkPadding, y - boxSize / 2 + checkPadding);
+          DR.stroke();
+        }
+      }
+
+      DR.lineWidth = 10;
+      DR.lineCap = "round";
+      DR.lineJoin = "round";
+    }
   }
 
   private redrawAll() {
@@ -1495,7 +1590,6 @@ export class Whiteboard {
     this.redrawDrawing();
   }
 
-  // Public method to force a complete redraw (used for PNG export)
   public forceRedraw() {
     this.redrawAll();
   }
@@ -1547,12 +1641,32 @@ export class Whiteboard {
       ?.classList.remove("text-zinc-300");
     this.mode = mode;
     
-    // Hide toggle view button when in notes mode, show it otherwise
     const toggleViewButton = document.getElementById("whiteboard-toolbar-view-toggle");
     if (mode === "notes") {
       toggleViewButton?.classList.add("hidden");
     } else {
       toggleViewButton?.classList.remove("hidden");
+      if (this.currentTool === "checkbox") {
+        this.currentTool = "marker";
+        document
+          .getElementById("whiteboard-draw-config-marker")
+          ?.style.setProperty("display", "inline");
+        document
+          .getElementById("whiteboard-draw-config-eraser")
+          ?.style.setProperty("display", "none");
+        document
+          .getElementById("whiteboard-draw-config-text")
+          ?.style.setProperty("display", "none");
+        document
+          .getElementById("whiteboard-draw-config-checkbox")
+          ?.style.setProperty("display", "none");
+        document
+          .getElementById("whiteboard-number-pad")
+          ?.classList.add("hidden");
+        document
+          .getElementById("whiteboard-color-config")
+          ?.classList.remove("hidden");
+      }
     }
     
     this.redrawAll();
@@ -1698,10 +1812,8 @@ export class Whiteboard {
         );
         DR.stroke();
       } else if (this.currentTool == "eraser") {
-        // Eraser brush size (slightly larger than smallest dot radius of 5)
         const eraserRadius = 6;
 
-        // Performance: Reduce eraser distance threshold for better tracking
         if (
           Math.hypot(
             x - this.currentErasePoint.x,
@@ -1736,7 +1848,6 @@ export class Whiteboard {
               const dotY = stroke[1][1];
               const dotRadius = 5; // Match the dot radius from drawing code
 
-              // Check if eraser path comes within range of the dot
               const distToEraser = distanceFromPointToSegment(
                 dotX,
                 dotY,
@@ -1748,7 +1859,6 @@ export class Whiteboard {
 
               shouldErase = distToEraser <= (eraserRadius + dotRadius);
             } else {
-              // Handle regular multi-point strokes
               for (let j = 0; j < stroke.length - 2; j++) {
                 if (
                   isSegmentsIntersecting(
@@ -1936,6 +2046,42 @@ export class Whiteboard {
             .getElementById("whiteboard-number-pad")
             ?.classList.remove("hidden");
         }
+      } else if (this.currentTool == "checkbox") {
+        const data = this.getData();
+        if (data !== null) {
+          // Check if clicking on an existing checkbox to toggle it
+          const boxSize = 120;
+          const clickedCheckboxIndex = data.checkboxes.findIndex((cb: any) => {
+            const cbX = cb[0];
+            const cbY = cb[1];
+            return Math.abs(x - cbX) <= boxSize / 2 && Math.abs(y - cbY) <= boxSize / 2;
+          });
+
+          if (clickedCheckboxIndex !== -1) {
+            // Toggle existing checkbox
+            const prevChecked = data.checkboxes[clickedCheckboxIndex][3];
+            data.checkboxes[clickedCheckboxIndex][3] = !prevChecked;
+            this.addUndoHistory({
+              type: "checkbox-toggle",
+              index: clickedCheckboxIndex,
+              prevChecked: prevChecked,
+              newChecked: !prevChecked,
+            });
+          } else {
+            // Create new checkbox (unchecked by default)
+            data.checkboxes.push([
+              x,
+              y,
+              this.currentColor,
+              false,
+            ]);
+            this.addUndoHistory({
+              type: "checkbox",
+              ref: [x, y, this.currentColor, false],
+            });
+          }
+          this.redrawDrawing();
+        }
       }
     }
     clickMovement = 0;
@@ -1944,12 +2090,10 @@ export class Whiteboard {
   private onPointerUp(e: PointerEvent) {
     this.isPointerDown = false;
 
-    // Performance: Clear cached rect and release pointer capture
     this.cachedDrawingRect = null;
     try {
       drawing.releasePointerCapture(e.pointerId);
     } catch (_err) {
-      // Ignore errors if pointer was already released
     }
 
     if (this.selected !== null) {
@@ -1968,9 +2112,7 @@ export class Whiteboard {
       }
       this.currentAction = "none";
     } else if (this.currentStrokePoints.length >= 2) {
-      // Handle both single-click dots and regular strokes
       if (this.currentStrokePoints.length === 2) {
-        // Single click - draw a dot
         const point = this.currentStrokePoints[1];
         const color = this.currentStrokePoints[0];
         DR.fillStyle = this.getStrokeColor(color);
@@ -1978,13 +2120,12 @@ export class Whiteboard {
         DR.arc(
           point[0] - (this.camera.x - width / 2),
           point[1] - (this.camera.y - height / 2),
-          5, // radius of the dot (half of line width which is 10)
+          5,
           0,
           2 * Math.PI
         );
         DR.fill();
       } else {
-        // Regular stroke with movement
         DR.closePath();
       }
 
@@ -2011,13 +2152,10 @@ export class Whiteboard {
   private onPointerLeave(e: Event) {
     this.isPointerDown = false;
 
-    // Performance: Clear cached rect
     this.cachedDrawingRect = null;
 
     if (this.currentStrokePoints.length >= 2) {
-      // Handle both single-click dots and regular strokes
       if (this.currentStrokePoints.length === 2) {
-        // Single click - draw a dot
         const point = this.currentStrokePoints[1];
         const color = this.currentStrokePoints[0];
         DR.fillStyle = this.getStrokeColor(color);
@@ -2031,7 +2169,6 @@ export class Whiteboard {
         );
         DR.fill();
       } else {
-        // Regular stroke with movement
         DR.closePath();
       }
 
@@ -2112,7 +2249,6 @@ function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2, toleranc
   const d = -tx * sy + sx * ty;
 
   if (Math.abs(d) < 1e-10) {
-    // Lines are parallel or coincident - check distance between them
     if (tolerance > 0) {
       return distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
              distanceFromPointToSegment(ax2, ay2, bx1, by1, bx2, by2) <= tolerance ||
@@ -2146,19 +2282,15 @@ function distanceFromPointToSegment(px: number, py: number, x1: number, y1: numb
   const lengthSquared = dx * dx + dy * dy;
 
   if (lengthSquared === 0) {
-    // Segment is just a point
     return Math.hypot(px - x1, py - y1);
   }
 
-  // Calculate projection parameter t
   let t = ((px - x1) * dx + (py - y1) * dy) / lengthSquared;
   t = Math.max(0, Math.min(1, t));
 
-  // Calculate closest point on segment
   const closestX = x1 + t * dx;
   const closestY = y1 + t * dy;
 
-  // Return distance to closest point
   return Math.hypot(px - closestX, py - closestY);
 }
 

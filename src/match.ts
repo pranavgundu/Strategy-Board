@@ -20,11 +20,13 @@ interface PhaseData {
   drawing: DrawingStroke[];
   drawingBBox: BoundingBox[];
   textAnnotations: TextAnnotation[];
+  checkboxes: CheckboxAnnotation[];
 }
 
 type DrawingStroke = [number, ...Array<[number, number]>];
 type BoundingBox = [number, number, number, number];
 type TextAnnotation = [number, number, number, string];
+type CheckboxAnnotation = [number, number, number, boolean]; // x, y, color, checked
 
 interface MatchOptions {
   dim: {
@@ -51,6 +53,7 @@ interface PhaseOptions {
   d: DrawingStroke[];
   dx: BoundingBox[];
   txt?: TextAnnotation[];
+  cb?: CheckboxAnnotation[];
 }
 
 const DEFAULT_ROBOT_WIDTH = 152.4;
@@ -143,6 +146,7 @@ export class Match {
       drawing: [],
       drawingBBox: [],
       textAnnotations: [],
+      checkboxes: [],
     };
   }
 
@@ -173,6 +177,7 @@ export class Match {
     phase.drawing = phaseOptions.d;
     phase.drawingBBox = phaseOptions.dx;
     phase.textAnnotations = phaseOptions.txt || [];
+    phase.checkboxes = phaseOptions.cb || [];
 
     phase.redOneRobot = {
       x: phaseOptions.r1.x,
