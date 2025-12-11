@@ -1198,6 +1198,13 @@ export class Whiteboard {
         data.checkboxes[action.index][3] = action.prevChecked;
         this.redrawDrawing();
       }
+    } else if (action.type === "checkbox-erase") {
+      // Undo erasing a checkbox - restore it at the original index
+      const data = this.getData();
+      if (data !== null && action.ref) {
+        data.checkboxes.splice(action.index, 0, action.ref);
+        this.redrawDrawing();
+      }
     }
 
     this.updateUndoRedoButtons();
@@ -1263,6 +1270,13 @@ export class Whiteboard {
       const data = this.getData();
       if (data !== null && action.index !== undefined && data.checkboxes[action.index]) {
         data.checkboxes[action.index][3] = action.newChecked;
+        this.redrawDrawing();
+      }
+    } else if (action.type === "checkbox-erase") {
+      // Redo erasing a checkbox - remove it again
+      const data = this.getData();
+      if (data !== null && action.index !== undefined) {
+        data.checkboxes.splice(action.index, 1);
         this.redrawDrawing();
       }
     }
@@ -1885,6 +1899,34 @@ export class Whiteboard {
               this.redrawDrawing();
               this.currentErasedStrokes.push(stroke);
               this.currentErasedStrokeIndexes.push(i);
+            }
+          }
+        }
+
+        // Erase checkboxes
+        if (data.checkboxes && data.checkboxes.length > 0) {
+          const boxSize = 200;
+          for (let i = data.checkboxes.length - 1; i >= 0; i--) {
+            const cb = data.checkboxes[i];
+            const cbX = cb[0];
+            const cbY = cb[1];
+            // Check if eraser line passes through or near the checkbox
+            const distToCheckbox = distanceFromPointToSegment(
+              cbX,
+              cbY,
+              this.lastErasePoint.x,
+              this.lastErasePoint.y,
+              x,
+              y
+            );
+            if (distToCheckbox <= boxSize / 2 + eraserRadius) {
+              const erasedCheckbox = data.checkboxes.splice(i, 1)[0];
+              this.addUndoHistory({
+                type: "checkbox-erase",
+                ref: erasedCheckbox,
+                index: i,
+              });
+              this.redrawDrawing();
             }
           }
         }
