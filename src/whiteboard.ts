@@ -1552,8 +1552,8 @@ export class Whiteboard {
     }
 
     if (data.checkboxes && data.checkboxes.length > 0) {
-      const boxSize = 200;
-      const checkPadding = 20;
+      const boxSize = 150;
+      const checkPadding = 15;
 
       for (let checkbox of data.checkboxes) {
         const x = checkbox[0] - offsetX;
