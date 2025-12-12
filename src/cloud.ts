@@ -50,7 +50,7 @@ export async function uploadMatch(match: Match): Promise<string> {
   await setDoc(doc(firestore, "matches", shareCode), {
     data: dataString,
     createdAt: Date.now(),
-    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     version: 1,
   });
 
