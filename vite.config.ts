@@ -101,5 +101,5 @@ export default defineConfig({
       "@": srcPath,
     },
   },
-  base: "/Strategy-Board/",
+  base: "./",
 });
