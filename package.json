@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsx scripts/commit.ts && tsc && vite build",
+    "build": "node scripts/commit.js && tsc && vite build",
     "preview": "vite preview --host",
     "cap:sync": "npm run build && npx cap sync",
     "cap:open:ios": "npx cap open ios",
