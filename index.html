@@ -1,6 +1,8 @@
 <!doctype html>
 <html style="background-color: #192334">
     <head>
+        <!-- Load critical CSS first to avoid FOUC -->
+        <link rel="stylesheet" href="./styles.css" fetchpriority="high" />
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-4VJQGNMYYH"></script>
         <script>
@@ -26,7 +28,7 @@
         <meta name="theme-color" content="#000000" />
         <meta name="screen-orientation" content="landscape" />
         <meta name="orientation" content="landscape" />
-        <link rel="stylesheet" href="./styles.css" />
+        
         <script>
             (function () {
                 function qs(id) {
