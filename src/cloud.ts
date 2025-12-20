@@ -20,6 +20,11 @@ const firebaseConfig = {
 
 let db: Firestore | null = null;
 
+/**
+ * Retrieves a Firestore database instance.
+ * 
+ * @returns {Firestore} The Firestore database instance for the initialized Firebase app.
+ */
 function getDb(): Firestore {
   if (!db) {
     const app = initializeApp(firebaseConfig);
@@ -28,6 +33,11 @@ function getDb(): Firestore {
   return db;
 }
 
+/**
+ * Generates a random share code for collaborative access.
+ * 
+ * @returns {string} A randomly generated 6-character share code containing uppercase letters and digits.
+ */
 function generateShareCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
@@ -37,6 +47,13 @@ function generateShareCode(): string {
   return code;
 }
 
+/**
+ * Uploads a match to Firestore and generates a shareable code.
+ * 
+ * @param match - The Match object to upload
+ * @returns A promise that resolves to a share code string for accessing the uploaded match
+ * @throws Will throw an error if the Firestore operation fails
+ */
 export async function uploadMatch(match: Match): Promise<string> {
   const firestore = getDb();
   const shareCode = generateShareCode();
@@ -57,6 +74,14 @@ export async function uploadMatch(match: Match): Promise<string> {
   return shareCode;
 }
 
+/**
+ * Downloads a match from Firestore using a share code.
+ * 
+ * @param shareCode - The 6-character share code to retrieve the match. Will be trimmed and converted to uppercase.
+ * @returns A Promise that resolves to the Match object if found and valid, or null if the document doesn't exist.
+ * @throws {Error} If the share code format is invalid (not exactly 6 characters after trimming).
+ * @throws {Error} If the share code has expired based on the expiresAt timestamp.
+ */
 export async function downloadMatch(shareCode: string): Promise<Match | null> {
   const firestore = getDb();
 
@@ -82,6 +107,13 @@ export async function downloadMatch(shareCode: string): Promise<Match | null> {
   return Match.fromPacket(packet);
 }
 
+/**
+ * Checks if a given share code exists in the Firestore database.
+ *
+ * @param shareCode - The share code to be checked. It should be a string of exactly 6 characters.
+ * @returns A promise that resolves to a boolean indicating whether the share code exists in the database.
+ *          Returns false if the share code is not 6 characters long.
+ */
 export async function checkShareCode(shareCode: string): Promise<boolean> {
   const firestore = getDb();
   const normalizedCode = shareCode.trim().toUpperCase();

@@ -1,6 +1,4 @@
 import { Model } from "./model.ts";
-
-// the model class handles application data and its persistence
 import { registerSW } from "virtual:pwa-register";
 import { inject } from "@vercel/analytics";
 import { injectSpeedInsights } from "@vercel/speed-insights";
