@@ -1,6 +1,4 @@
 import { Model } from "./model.ts";
-
-// the model class handles application data and its persistence
 import { registerSW } from "virtual:pwa-register";
 import { inject } from "@vercel/analytics";
 import { injectSpeedInsights } from "@vercel/speed-insights";
@@ -22,6 +20,11 @@ registerSW({
   },
 });
 
+/**
+ * Initializes the application by loading data and setting up UI components.
+ *
+ * @throws Error if application initialization fails.
+ */
 async function initializeApp(): Promise<void> {
   console.log(
     "Application startup: initializing model and deferring UI until DOM is ready...",

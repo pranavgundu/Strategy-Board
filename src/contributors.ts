@@ -23,6 +23,12 @@ export class ContributorsService {
   private hasError = false;
   private lastCommit: LastCommit | null = null;
 
+  /**
+   * Fetches contributors from GitHub repository and caches the results.
+   *
+   * @returns Array of contributor information with details.
+   * @throws Error if the GitHub API request fails.
+   */
   async fetchContributors(): Promise<Contributor[]> {
     if (this.contributors.length > 0) {
       return this.contributors;
@@ -32,7 +38,6 @@ export class ContributorsService {
     this.hasError = false;
 
     try {
-      // Fetch recent commits to get contributors sorted by recent activity
       const commitsResponse = await fetch(
         "https://api.github.com/repos/pranavgundu/Strategy-Board/commits?per_page=100"
       );
@@ -43,13 +48,11 @@ export class ContributorsService {
 
       const commits = await commitsResponse.json();
 
-      // Extract unique contributors from recent commits, maintaining order of most recent activity
       const contributorMap = new Map<string, { login: string; avatar_url: string; html_url: string; lastCommitDate: string }>();
 
       for (const commit of commits) {
         if (commit.author && commit.author.login) {
           const login = commit.author.login;
-          // Only add if not already in map (to keep the most recent commit date)
           if (!contributorMap.has(login)) {
             contributorMap.set(login, {
               login: commit.author.login,
@@ -61,10 +64,8 @@ export class ContributorsService {
         }
       }
 
-      // Convert map to array (already sorted by recent activity due to commit order)
       const recentContributors = Array.from(contributorMap.values());
 
-      // Fetch detailed information for contributors
       const detailedContributors = await Promise.all(
         recentContributors.map(async (contributor) => {
           try {
@@ -77,7 +78,7 @@ export class ContributorsService {
                 login: contributor.login,
                 avatar_url: contributor.avatar_url,
                 html_url: contributor.html_url,
-                contributions: 0, // Not relevant for recent contributors
+                contributions: 0, 
                 name: userData.name,
                 bio: userData.bio,
               };
@@ -105,18 +106,39 @@ export class ContributorsService {
     }
   }
 
+  /**
+   * Gets the most recent contributors from the cached list.
+   *
+   * @param count - Number of contributors to return. Defaults to 4.
+   * @returns Array of the most recent contributors.
+   */
   getRecentContributors(count: number = 4): Contributor[] {
     return this.contributors.slice(0, count);
   }
 
+  /**
+   * Checks if contributors are currently being loaded.
+   *
+   * @returns True if loading, false otherwise.
+   */
   isLoadingContributors(): boolean {
     return this.isLoading;
   }
 
+  /**
+   * Checks if an error occurred during the last load attempt.
+   *
+   * @returns True if there was an error, false otherwise.
+   */
   hasLoadError(): boolean {
     return this.hasError;
   }
 
+  /**
+   * Fetches the last commit information from build metadata.
+   *
+   * @returns The last commit information, or null if unavailable.
+   */
   async fetchLastCommit(): Promise<LastCommit | null> {
     if (this.lastCommit) {
       return this.lastCommit;

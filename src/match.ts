@@ -223,6 +223,12 @@ export class Match {
     };
   }
 
+  /**
+   * Creates a Match instance from a serialized packet.
+   *
+   * @param packet - The serialized match data array.
+   * @returns A new Match instance.
+   */
   static fromPacket(packet: any): Match {
     return new Match(
       packet[0],
@@ -276,6 +282,12 @@ export class Match {
     );
   }
 
+  /**
+   * Converts an array packet to robot position data.
+   *
+   * @param array - Array containing x, y, and rotation values.
+   * @returns Object with x, y, and r properties.
+   */
   static robotFromArrayPacket(array: any[]): {
     x: number;
     y: number;
@@ -288,6 +300,11 @@ export class Match {
     };
   }
 
+  /**
+   * Serializes the match to a packet format for storage or transmission.
+   *
+   * @returns Serialized match data as an array.
+   */
   getAsPacket(): any {
     return [
       this.matchName,
