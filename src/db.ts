@@ -1,5 +1,12 @@
 import { get, getMany, set, clear, entries, del } from "idb-keyval";
 
+/**
+ * Retrieves a value from IndexedDB by key.
+ *
+ * @param key - The key to retrieve the value for.
+ * @param handler - Optional error handler function.
+ * @returns The value associated with the key, or undefined if not found or an error occurs.
+ */
 export async function GET<T = unknown>(
   key: string,
   handler?: (err: Error) => void,
@@ -17,6 +24,13 @@ export async function GET<T = unknown>(
   }
 }
 
+/**
+ * Retrieves multiple values from IndexedDB by their keys.
+ *
+ * @param keys - Array of keys to retrieve values for.
+ * @param handler - Optional error handler function.
+ * @returns Array of values associated with the keys, or undefined if an error occurs.
+ */
 export async function GETMANY<T = unknown>(
   keys: Array<string>,
   handler?: (err: Error) => void,
@@ -34,6 +48,13 @@ export async function GETMANY<T = unknown>(
   }
 }
 
+/**
+ * Stores a value in IndexedDB with the specified key.
+ *
+ * @param key - The key to store the value under.
+ * @param value - The value to store.
+ * @param handler - Optional error handler function.
+ */
 export async function SET<T = unknown>(
   key: string,
   value: T,
@@ -50,6 +71,11 @@ export async function SET<T = unknown>(
   }
 }
 
+/**
+ * Deletes a value from IndexedDB by key.
+ *
+ * @param key - The key of the value to delete.
+ */
 export async function DEL(key: string): Promise<void> {
   try {
     await del(key);
@@ -58,6 +84,9 @@ export async function DEL(key: string): Promise<void> {
   }
 }
 
+/**
+ * Clears all data from IndexedDB.
+ */
 export async function CLEAR(): Promise<void> {
   try {
     await clear();
@@ -66,6 +95,12 @@ export async function CLEAR(): Promise<void> {
   }
 }
 
+/**
+ * Retrieves all key-value pairs from IndexedDB.
+ *
+ * @param handler - Optional error handler function.
+ * @returns Array of key-value pairs, or undefined if an error occurs.
+ */
 export async function ENTRIES(
   handler?: (err: Error) => void,
 ): Promise<Array<[IDBValidKey, unknown]> | undefined> {

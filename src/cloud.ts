@@ -22,8 +22,8 @@ let db: Firestore | null = null;
 
 /**
  * Retrieves a Firestore database instance.
- * 
- * @returns {Firestore} The Firestore database instance for the initialized Firebase app.
+ *
+ * @returns The Firestore database instance for the initialized Firebase app.
  */
 function getDb(): Firestore {
   if (!db) {
@@ -35,8 +35,8 @@ function getDb(): Firestore {
 
 /**
  * Generates a random share code for collaborative access.
- * 
- * @returns {string} A randomly generated 6-character share code containing uppercase letters and digits.
+ *
+ * @returns A randomly generated 6-character share code containing uppercase letters and digits.
  */
 function generateShareCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

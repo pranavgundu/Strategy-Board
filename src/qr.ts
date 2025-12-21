@@ -9,6 +9,12 @@ const CHUNK_HEADER_SIZE = HEADER_SIZE + TOTAL_CHUNKS_HEADER_SIZE;
 const MAX_CHUNK_PAYLOAD = 200;
 const FRAME_DURATION_MS = 600;
 
+/**
+ * Encodes a string to base64 format.
+ *
+ * @param input - The string to encode.
+ * @returns Base64 encoded string.
+ */
 function encodeToBase64(input: string): string {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(input);
@@ -19,6 +25,12 @@ function encodeToBase64(input: string): string {
   return btoa(binary);
 }
 
+/**
+ * Decodes a base64 string back to its original format.
+ *
+ * @param b64 - The base64 string to decode.
+ * @returns Decoded string.
+ */
 function decodeBase64ToString(b64: string): string {
   const binary = atob(b64);
   const bytes = new Uint8Array(binary.length);
@@ -29,6 +41,13 @@ function decodeBase64ToString(b64: string): string {
   return decoder.decode(bytes);
 }
 
+/**
+ * Generates a QR code as a canvas element.
+ *
+ * @param payload - The text to encode in the QR code.
+ * @param options - QR code generation options.
+ * @returns Promise that resolves to a canvas element containing the QR code.
+ */
 function toCanvasAsync(
   payload: string,
   options: Record<string, unknown>,
@@ -62,6 +81,12 @@ export class QRExport {
     this.pool = [];
   }
 
+  /**
+   * Exports a match as a series of QR codes for scanning.
+   *
+   * @param match - The match to export.
+   * @param onReadyToStart - Optional callback when export is ready to start.
+   */
   export(match: Match, onReadyToStart?: () => void): void {
     this.pool = [
       document.getElementById("qr-export-code-worker-0"),
@@ -313,6 +338,9 @@ export class QRExport {
     })();
   }
 
+  /**
+   * Closes the QR export and stops the animation.
+   */
   close(): void {
     if (this.intervalId !== null) {
       clearInterval(this.intervalId);
@@ -430,6 +458,11 @@ export class QRImport {
     }
   }
 
+  /**
+   * Starts the QR code scanner using the device camera.
+   *
+   * @param callback - Function called when a complete match is scanned.
+   */
   public async start(callback: QRExportCallback): Promise<void> {
     this.callback = callback;
     this.received = {};
@@ -469,6 +502,9 @@ export class QRImport {
     }
   }
 
+  /**
+   * Stops the QR code scanner and releases the camera.
+   */
   public stop(): void {
     try {
       this.scanner.stop();
@@ -651,6 +687,13 @@ export class QRImport {
   }
 }
 
+/**
+ * Inserts a number into a sorted array while maintaining sort order.
+ *
+ * @param arr - The sorted array to insert into.
+ * @param num - The number to insert.
+ * @returns The modified array with the number inserted.
+ */
 function insertSorted(arr: number[], num: number): number[] {
   let left = 0;
   let right = arr.length;

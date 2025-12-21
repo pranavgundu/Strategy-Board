@@ -20,6 +20,11 @@ registerSW({
   },
 });
 
+/**
+ * Initializes the application by loading data and setting up UI components.
+ *
+ * @throws Error if application initialization fails.
+ */
 async function initializeApp(): Promise<void> {
   console.log(
     "Application startup: initializing model and deferring UI until DOM is ready...",

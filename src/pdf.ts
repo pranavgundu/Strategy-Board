@@ -2,6 +2,13 @@ import { jsPDF } from "jspdf";
 import * as QRCode from "qrcode";
 
 export class PDFExport {
+  /**
+   * Exports QR codes to a PDF with multiple codes per page.
+   *
+   * @param data - Array of data strings to encode as QR codes.
+   * @param matchName - Name of the match to include in the PDF header.
+   * @throws Error if PDF generation fails.
+   */
   public async exportToPDF(data: string[], matchName: string): Promise<void> {
     try {
       const pdf = new jsPDF({
@@ -83,6 +90,13 @@ export class PDFExport {
     }
   }
 
+  /**
+   * Exports QR codes to a PDF with one large code per page.
+   *
+   * @param data - Array of data strings to encode as QR codes.
+   * @param matchName - Name of the match to include in the PDF header.
+   * @throws Error if PDF generation fails.
+   */
   public async exportToPDFLarge(
     data: string[],
     matchName: string

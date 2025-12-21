@@ -8,6 +8,9 @@ export class Model {
 
   constructor() {}
 
+  /**
+   * Loads match data from IndexedDB storage.
+   */
   public async loadPersistentData(): Promise<void> {
     const matchIds: Array<string> | undefined = await GET("matchIds", (e) => {
       console.error("Failed to load match IDs from IndexedDB:", e);
@@ -37,6 +40,18 @@ export class Model {
     }
   }
 
+  /**
+   * Creates a new match and adds it to the model.
+   *
+   * @param matchName - Name of the match.
+   * @param redOne - Red alliance robot 1 team number.
+   * @param redTwo - Red alliance robot 2 team number.
+   * @param redThree - Red alliance robot 3 team number.
+   * @param blueOne - Blue alliance robot 1 team number.
+   * @param blueTwo - Blue alliance robot 2 team number.
+   * @param blueThree - Blue alliance robot 3 team number.
+   * @returns The unique ID of the created match.
+   */
   public async createNewMatch(
     matchName: string,
     redOne: string,
@@ -58,6 +73,12 @@ export class Model {
     return this.addMatch(match);
   }
 
+  /**
+   * Adds an existing match to the model and persists it.
+   *
+   * @param match - The match to add.
+   * @returns The unique ID of the added match.
+   */
   public async addMatch(match: Match): Promise<string> {
     this.matches.push(match);
     this.matchIds.push(match.id);
@@ -70,6 +91,11 @@ export class Model {
     return match.id;
   }
 
+  /**
+   * Deletes a match by ID from the model and storage.
+   *
+   * @param id - The unique ID of the match to delete.
+   */
   public async deleteMatch(id: string): Promise<void> {
     const index = this.matches.findIndex((e) => e.id === id);
     if (index === -1) return;
@@ -83,12 +109,23 @@ export class Model {
     await DEL(id);
   }
 
+  /**
+   * Retrieves a match by ID.
+   *
+   * @param id - The unique ID of the match.
+   * @returns The match if found, or null if not found.
+   */
   public getMatch(id: string): Match | null {
     const index = this.matches.findIndex((e) => e.id === id);
     if (index === -1) return null;
     return this.matches[index];
   }
 
+  /**
+   * Updates a match in storage with its current state.
+   *
+   * @param id - The unique ID of the match to update.
+   */
   public async updateMatch(id: string): Promise<void> {
     const index = this.matches.findIndex((e) => e.id === id);
     if (index === -1) return;
@@ -99,6 +136,9 @@ export class Model {
     });
   }
 
+  /**
+   * Clears all matches from the model and storage.
+   */
   public async clear(): Promise<void> {
     this.matches = [];
     this.matchIds = [];
