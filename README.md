@@ -45,7 +45,7 @@ To contribute to Strategy Board, follow these steps:
     ```
 6. Open a Pull Request from your fork to the original repository
 
-### Feel free to reach out if you have any questions!
+**Feel free to reach out if you have any questions!**
 
 ## Credits
 The original version of Strategy Board was created by [Team 834](https://github.com/frcteam834) and [realTronsi](https://github.com/realTronsi). This project is being pursued **with explicit permission**.
@@ -54,3 +54,11 @@ The field images come from [Pathplanner](https://github.com/mjansen4857/pathplan
 
 ## Liscense
 Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) liscensed.
+
+<a href="https://www.star-history.com/#pranavgundu/Strategy-Board&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&legend=top-left" />
+ </picture>
+</a>
