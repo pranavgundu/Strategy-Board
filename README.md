@@ -50,7 +50,7 @@ To contribute to Strategy Board, follow these steps:
 ## Credits
 The original version of Strategy Board was created by [Team 834](https://github.com/frcteam834) and [realTronsi](https://github.com/realTronsi). This project is being pursued **with explicit permission**.
 
-The field images come from [Pathplanner](https://github.com/mjansen4857/pathplanner).
+Field images come from [Pathplanner](https://github.com/mjansen4857/pathplanner).
 
 ## Liscense
 Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) liscensed.
