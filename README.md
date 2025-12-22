@@ -6,3 +6,8 @@
 
 ![Strategy Board](https://github.com/user-attachments/assets/792e4f8c-c889-47ce-920c-99120942ad70)
 
+<div align="center">
+
+## Digital Strategy Whiteboard for FIRST Robotics Competitions
+
+</div>
