@@ -1611,6 +1611,18 @@ a:active,
     text-rendering: optimizeLegibility;
 }
 
+/* Strategy Board logo hover glow effect */
+#home-toolbar-logo {
+    transition: all 0.3s ease-in-out;
+}
+
+#home-toolbar-logo:hover {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.6),
+                0 0 30px rgba(255, 255, 255, 0.4),
+                0 0 40px rgba(255, 255, 255, 0.2);
+}
+
 /* Special team digit animation */
 .special-team-digit {
     display: inline-block;
