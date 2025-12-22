@@ -55,6 +55,12 @@ The field images come from [Pathplanner](https://github.com/mjansen4857/pathplan
 ## Liscense
 Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) liscensed.
 
+## Access
+You can access the website through any of these following domains; they are automatically updated from the latest version available on GitHub.
+- https://strategyboard.app/
+- https://strategyboard.vercel.app/
+- https://pranavgundu.github.io/Strategy-Board/
+
 <a href="https://www.star-history.com/#pranavgundu/Strategy-Board&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=pranavgundu/Strategy-Board&type=date&theme=dark&legend=top-left" />
