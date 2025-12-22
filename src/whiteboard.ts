@@ -400,7 +400,7 @@ export class Whiteboard {
             ?.classList.remove("hidden");
           document
             .getElementById("whiteboard-color-config")
-            ?.classList.add("hidden");
+            ?.classList.remove("hidden");
         } else if (this.currentTool == "text") {
           // Only show checkbox tool in notes mode, otherwise cycle back to marker
           if (this.mode === "notes") {
