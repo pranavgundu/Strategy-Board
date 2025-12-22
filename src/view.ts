@@ -1339,6 +1339,9 @@ export class View {
     }
 
     try {
+      // Set the match on the whiteboard so it knows what to draw
+      this.whiteboard.setMatch(this.currentExportMatch);
+      
       // Force a complete redraw of all canvases before export to ensure they're rendered
       console.log("PNG Export: Forcing whiteboard redraw before export");
       this.whiteboard.forceRedraw();
