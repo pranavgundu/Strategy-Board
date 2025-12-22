@@ -52,3 +52,5 @@ The original version of Strategy Board was created by [Team 834](https://github.
 
 The field images come from [Pathplanner](https://github.com/mjansen4857/pathplanner).
 
+## Liscense
+Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) liscensed.
