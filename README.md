@@ -56,7 +56,10 @@ Field images come from [Pathplanner](https://github.com/mjansen4857/pathplanner)
 Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) liscensed.
 
 ## Access
-You can access the website through any of these following domains; they are automatically updated from the latest version available on GitHub.
+You can access the website through any of these following domains; they are automatically updated from the latest version available on GitHub. 
+
+*If there is ever a time where TBA limits the usage of the API key for the [main website](https://strategyboard.app/), try using the other ones temporarily.*
+
 - https://strategyboard.app/
 - https://strategyboard.vercel.app/
 - https://pranavgundu.github.io/Strategy-Board/
