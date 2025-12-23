@@ -103,6 +103,19 @@
                     if (s) s.textContent = text;
                     log("Status: " + text);
                 }
+                function setLoadingMessage(text) {
+                    var el = qs("app-loading-message");
+                    if (el) el.textContent = text;
+                }
+                function hideLoadingScreen() {
+                    var l = qs("app-loading");
+                    if (l) l.classList.add("is-hidden");
+                }
+                function showLoadingScreen(text) {
+                    var l = qs("app-loading");
+                    if (l) l.classList.remove("is-hidden");
+                    if (text) setLoadingMessage(text);
+                }
                 function showOverlay() {
                     var o = qs("app-debug-overlay");
                     if (o) o.classList.remove("hidden");
@@ -183,9 +196,13 @@
                 }
 
                 window.addEventListener("app:initialized", function () {
+                    hideLoadingScreen();
                     onAppInitialized();
                 });
                 window.addEventListener("app:moduleerror", function (e) {
+                    showLoadingScreen(
+                        "Something went wrong loading the app. Try refreshing.",
+                    );
                     onModuleError(e && e.detail);
                 });
                 window.addEventListener("error", function (e) {
@@ -199,6 +216,7 @@
                     "DOMContentLoaded",
                     function () {
                         setStatus("DOMContentLoaded — awaiting module load...");
+                        setLoadingMessage("Preparing Strategy Board...");
                         var selfBtn = qs("app-debug-selftest-btn");
                         if (selfBtn)
                             selfBtn.addEventListener("click", runSelfTest);
@@ -221,6 +239,15 @@
         />
     </head>
     <body class="overflow-hidden">
+        <div id="app-loading" role="status" aria-live="polite">
+            <div class="loading-card">
+                <div class="loading-spinner" aria-hidden="true"></div>
+                <div class="loading-title">Strategy Board</div>
+                <div id="app-loading-message" class="loading-subtitle">
+                    Loading the playbook...
+                </div>
+            </div>
+        </div>
         <div id="orientation-warning">
             <div class="rotate-icon"><i class="fas fa-mobile-alt"></i></div>
             <div class="message">Please rotate your device</div>

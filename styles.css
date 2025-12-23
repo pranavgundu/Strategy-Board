@@ -34,6 +34,66 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Early loading screen that shows before the app bundles finish loading */
+#app-loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.22), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(16, 185, 129, 0.2), transparent 40%),
+        #0f172a;
+    color: #e2e8f0;
+    z-index: 99990;
+    transition: opacity 220ms ease, visibility 220ms ease;
+}
+
+#app-loading.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#app-loading .loading-card {
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    border-radius: 18px;
+    padding: 24px 28px;
+    min-width: min(92vw, 420px);
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+    text-align: center;
+}
+
+#app-loading .loading-title {
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+#app-loading .loading-subtitle {
+    font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+    color: #cbd5e1;
+}
+
+#app-loading .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    border: 4px solid rgba(148, 163, 184, 0.25);
+    border-top-color: #38bdf8;
+    animation: app-loading-spin 1s linear infinite;
+}
+
+@keyframes app-loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 #app-debug-overlay {
     position: fixed;
     right: 12px;
