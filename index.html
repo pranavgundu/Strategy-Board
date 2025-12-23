@@ -93,7 +93,6 @@
                                 }
                             }
                         } catch (err) {
-                            // Non-fatal; don't break app initialization if instrumentation fails.
                             console.warn("Instrumentation failed:", err);
                         }
                         return originalAdd.call(this, type, listener, options);
@@ -133,7 +132,6 @@
                                 setStatus(
                                     "Self-test passed: create panel opened; handlers attached.",
                                 );
-                                // close the panel to restore state
                                 var cancel = qs("create-match-cancel-btn");
                                 if (cancel) cancel.click();
                                 setTimeout(function () {
@@ -155,7 +153,6 @@
                 }
                 function onAppInitialized() {
                     setStatus("App initialized");
-                    // Self-test disabled to prevent flash on load
                 }
                 function onModuleError(detail) {
                     setStatus(
@@ -202,8 +199,6 @@
                     "DOMContentLoaded",
                     function () {
                         setStatus("DOMContentLoaded — awaiting module load...");
-                        // Self-test disabled to prevent flash of create match panel on page load
-                        // Users can manually run self-test from debug overlay if needed
                         var selfBtn = qs("app-debug-selftest-btn");
                         if (selfBtn)
                             selfBtn.addEventListener("click", runSelfTest);
@@ -226,7 +221,6 @@
         />
     </head>
     <body class="overflow-hidden">
-        <!-- Landscape orientation warning for mobile devices -->
         <div id="orientation-warning">
             <div class="rotate-icon"><i class="fas fa-mobile-alt"></i></div>
             <div class="message">Please rotate your device</div>
