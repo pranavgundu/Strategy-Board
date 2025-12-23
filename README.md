@@ -45,20 +45,20 @@ To contribute to Strategy Board, follow these steps:
     ```
 6. Open a Pull Request from your fork to the original repository
 
-**Feel free to reach out if you have any questions!**
+**Feel free to reach out to [pranav@strategyboard.app](mailto:pranav@strategyboard.app) if you have any questions!**
 
 ## Credits
 The original version of Strategy Board was created by [Team 834](https://github.com/frcteam834) and [realTronsi](https://github.com/realTronsi). This project is being pursued **with explicit permission**.
 
 Field images come from [Pathplanner](https://github.com/mjansen4857/pathplanner).
 
-## Liscense
-Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) liscensed.
+## License
+Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) licensed.
 
 ## Access
 You can access the website through any of these following domains; they are automatically updated from the latest version available on GitHub. 
 
-*If there is ever a time where TBA limits the usage of the API key for the [main website](https://strategyboard.app/), try using the other ones temporarily.*
+*If there is ever a time where TBA limits the usage of the API key for the [main website](https://strategyboard.app/) (which I highly doubt), try using the other domains temporarily.*
 
 - https://strategyboard.app/
 - https://strategyboard.vercel.app/
