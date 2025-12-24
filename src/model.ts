@@ -1,5 +1,6 @@
 import { GET, GETMANY, SET, DEL, CLEAR } from "./db.ts";
 import { Match } from "./match.ts";
+import { captureEvent } from "./analytics.ts";
 
 // this class manages matches and their persistent storage
 export class Model {
@@ -50,6 +51,7 @@ export class Model {
    * @param blueOne - Blue alliance robot 1 team number.
    * @param blueTwo - Blue alliance robot 2 team number.
    * @param blueThree - Blue alliance robot 3 team number.
+   * @param source - Optional source of the match creation ('manual' or 'tba')
    * @returns The unique ID of the created match.
    */
   public async createNewMatch(
@@ -60,6 +62,7 @@ export class Model {
     blueOne: string,
     blueTwo: string,
     blueThree: string,
+    source: string = "manual",
   ): Promise<string> {
     const match = new Match(
       matchName,
@@ -70,16 +73,17 @@ export class Model {
       blueTwo,
       blueThree,
     );
-    return this.addMatch(match);
+    return this.addMatch(match, source);
   }
 
   /**
    * Adds an existing match to the model and persists it.
    *
    * @param match - The match to add.
+   * @param source - Optional source of the match creation ('manual' or 'tba')
    * @returns The unique ID of the added match.
    */
-  public async addMatch(match: Match): Promise<string> {
+  public async addMatch(match: Match, source: string = "manual"): Promise<string> {
     this.matches.push(match);
     this.matchIds.push(match.id);
     await SET(match.id, match.getAsPacket(), (e) => {
@@ -88,6 +92,17 @@ export class Model {
     await SET("matchIds", this.matchIds, (e) => {
       console.error("Failed to save match IDs to IndexedDB:", e);
     });
+    
+    // Capture analytics event
+    captureEvent("match_created", {
+      source,
+      match_name: match.matchName,
+      match_id: match.id,
+      red_teams: [match.redOne, match.redTwo, match.redThree].filter(t => t),
+      blue_teams: [match.blueOne, match.blueTwo, match.blueThree].filter(t => t),
+      total_matches: this.matches.length,
+    });
+    
     return match.id;
   }
 
