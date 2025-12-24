@@ -2,19 +2,13 @@ import { Model } from "./model.ts";
 import { registerSW } from "virtual:pwa-register";
 import { inject } from "@vercel/analytics";
 import { injectSpeedInsights } from "@vercel/speed-insights";
-import posthog from "posthog-js";
+// PostHog client is used in Node build script (scripts/commit.ts)
 
 inject();
 
 injectSpeedInsights();
 
-const postHogApiKey = import.meta.env.VITE_POSTHOG_API_KEY;
-
-if (typeof window !== "undefined" && postHogApiKey) {
-  posthog.init(postHogApiKey, {
-    api_host: "https://us.i.posthog.com",
-  });
-}
+// Analytics are handled server-side; no client initialization here.
 
 registerSW({
   immediate: true,
