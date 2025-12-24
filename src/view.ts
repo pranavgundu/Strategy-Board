@@ -1546,7 +1546,6 @@ export class View {
           match.blueTeams[0] || "",
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
-          "tba",
         );
 
         this.createNewMatch(
@@ -1627,7 +1626,6 @@ export class View {
           match.blueTeams[0] || "",
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
-          "tba",
         );
 
         this.createNewMatch(

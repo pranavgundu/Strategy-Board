@@ -2,14 +2,10 @@ import { Model } from "./model.ts";
 import { registerSW } from "virtual:pwa-register";
 import { inject } from "@vercel/analytics";
 import { injectSpeedInsights } from "@vercel/speed-insights";
-import { initAnalytics } from "./analytics.ts";
-// PostHog client is used in Node build script (scripts/commit.ts)
 
 inject();
 
 injectSpeedInsights();
-
-initAnalytics();
 
 registerSW({
   immediate: true,

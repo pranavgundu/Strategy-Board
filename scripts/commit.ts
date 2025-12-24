@@ -2,8 +2,6 @@
 
 import { execSync } from 'child_process';
 import fs from 'fs';
-import { config as dotenvConfig } from 'dotenv';
-import { PostHog } from 'posthog-node';
 
 interface CommitInfo {
   sha: string;
@@ -14,10 +12,7 @@ interface CommitInfo {
   url: string;
 }
 
-dotenvConfig();
-
-async function main() {
-  try {
+try {
   const sha = execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim();
   const shortSha = sha.substring(0, 7);
   const date = execSync('git log -1 --format=%cI', { encoding: 'utf-8' }).trim();
@@ -39,28 +34,7 @@ export const BUILD_COMMIT = ${JSON.stringify(commitInfo, null, 2)};
 
   fs.writeFileSync('src/build.ts', content);
   console.log('Build info generated:', shortSha);
-
-  const posthogKey = process.env.VITE_POSTHOG_API_KEY || '';
-  if (posthogKey) {
-    const client = new PostHog(posthogKey, { host: 'https://us.i.posthog.com' });
-    try {
-      client.capture({
-        distinctId: author || 'unknown',
-        event: 'build_generated',
-        properties: {
-          sha,
-          shortSha,
-          message,
-          author,
-          date,
-          url: commitInfo.url,
-        },
-      });
-    } finally {
-      await client.shutdown();
-    }
-  }
-  } catch (error) {
+} catch (error) {
   const errorMessage = error instanceof Error ? error.message : String(error);
   console.warn('Warning: Could not get git commit info:', errorMessage);
   
@@ -79,7 +53,4 @@ export const BUILD_COMMIT = ${JSON.stringify(fallback, null, 2)};
 
   fs.writeFileSync('src/build.ts', content);
   console.log('Build info generated (fallback)');
-  }
 }
-
-main();
