@@ -33,7 +33,8 @@ jobs:
 
       - name: Build
         env:
-          API_KEY: ${{ secrets.API_KEY }}
+          TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
         run: npm run build
 
       - name: Setup Pages

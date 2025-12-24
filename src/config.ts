@@ -23,5 +23,6 @@ export const Config = {
   blueThreeStationX: -65,
   blueThreeStationY: 1155,
 
-  sharedTBAApiKey: import.meta.env.VITE_API_KEY || "",
+  sharedTBAApiKey: import.meta.env.VITE_TBA_API_KEY || "",
+  postHogApiKey: import.meta.env.VITE_POSTHOG_API_KEY || "",
 };
