@@ -88,12 +88,11 @@ export class Model {
   public async addMatch(match: Match): Promise<string> {
     this.matches.push(match);
     this.matchIds.push(match.id);
-    // Tell Google shit
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       'event': 'match_creation',
     });
-    console.log("told google better shit")
+    console.log("sent data to google")
     await SET(match.id, match.getAsPacket(), (e) => {
       console.error("Failed to save match to IndexedDB:", e);
     });
