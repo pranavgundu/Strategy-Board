@@ -1,6 +1,12 @@
 import { GET, GETMANY, SET, DEL, CLEAR } from "./db.ts";
 import { Match } from "./match.ts";
 
+declare global {
+  interface Window {
+    dataLayer: Array<Record<string, unknown>>;
+  }
+}
+
 // this class manages matches and their persistent storage
 export class Model {
   public matches: Array<Match> = [];
@@ -82,6 +88,12 @@ export class Model {
   public async addMatch(match: Match): Promise<string> {
     this.matches.push(match);
     this.matchIds.push(match.id);
+    // Tell Google shit
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'match_creation',
+    });
+    console.log("told google better shit")
     await SET(match.id, match.getAsPacket(), (e) => {
       console.error("Failed to save match to IndexedDB:", e);
     });
