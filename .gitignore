@@ -28,3 +28,5 @@ src/build.ts
 
 android/
 ios/
+
+analytics/
