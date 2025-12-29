@@ -1691,3 +1691,42 @@ a:active,
         color: inherit;
     }
 }
+
+/* Rainbow team digit animation (for teams 467 and 834) */
+.rainbow-team-digit {
+    display: inline-block;
+    animation: rainbow-glow 3s ease-in-out infinite;
+}
+
+@keyframes rainbow-glow {
+    0% {
+        color: inherit;
+    }
+    10% {
+        color: #ef4444; /* red */
+    }
+    20% {
+        color: #f97316; /* orange */
+    }
+    30% {
+        color: #eab308; /* yellow */
+    }
+    40% {
+        color: #22c55e; /* green */
+    }
+    50% {
+        color: #3b82f6; /* blue */
+    }
+    60% {
+        color: #8b5cf6; /* purple */
+    }
+    70% {
+        color: #ec4899; /* pink */
+    }
+    80% {
+        color: inherit;
+    }
+    100% {
+        color: inherit;
+    }
+}

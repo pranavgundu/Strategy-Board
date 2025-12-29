@@ -101,6 +101,7 @@ export class View {
   private pdfExport: any = null; // Lazy-loaded
   private contributorsService: ContributorsService;
   private currentExportMatch: Match | null = null;
+  private contributorTeams: string[] = [];
 
   constructor(
     model: Model,
@@ -954,6 +955,41 @@ export class View {
 
     this.initializeTBAService();
     this.initializeLastCommit();
+    this.initializeContributorTeams();
+  }
+
+  private async initializeContributorTeams(): Promise<void> {
+    try {
+      this.contributorTeams = await this.contributorsService.fetchTeams();
+      // Re-render match list to apply team animations now that teams are loaded
+      this.refreshMatchList();
+    } catch (error) {
+      console.error('Failed to load contributor teams:', error);
+    }
+  }
+
+  private refreshMatchList(): void {
+    if (!E.MatchList) return;
+    // Clear and re-render all matches with updated team animations
+    E.MatchList.innerHTML = '';
+    for (const match of this.model.matches) {
+      this.createNewMatch(
+        match.id,
+        match.matchName,
+        match.redOne,
+        match.redTwo,
+        match.redThree,
+        match.blueOne,
+        match.blueTwo,
+        match.blueThree,
+      );
+    }
+    // Show empty placeholder if no matches
+    if (this.model.matches.length === 0) {
+      this.show(E.EmptyMatchListPlaceholder);
+    } else {
+      this.hide(E.EmptyMatchListPlaceholder);
+    }
   }
 
   private async initializeTBAService(): Promise<void> {
@@ -1094,9 +1130,18 @@ export class View {
     item.children[0].textContent = matchName;
 
     // Helper function to create colored team number spans with glow effect for special teams
-    const createTeamSpan = (teamNumber: string, isSpecial: boolean, baseColor: string): string => {
-      if (isSpecial) {
-        // Create sequential gold glow animation for each digit
+    const createTeamSpan = (teamNumber: string, animationType: 'rainbow' | 'gold' | 'none', baseColor: string): string => {
+      if (animationType === 'rainbow') {
+        // Create sequential rainbow glow animation for each digit (for 467 and 834)
+        const digits = teamNumber.split('');
+        const animatedDigits = digits.map((digit, index) => {
+          const delay = index * 0.3; // 0.3s delay between each digit
+          return `<span class="rainbow-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
+        }).join('');
+        return `<span class="${baseColor}">${animatedDigits}</span>`;
+      }
+      if (animationType === 'gold') {
+        // Create sequential gold glow animation for each digit (for contributor teams)
         const digits = teamNumber.split('');
         const animatedDigits = digits.map((digit, index) => {
           const delay = index * 0.3; // 0.3s delay between each digit
@@ -1107,19 +1152,26 @@ export class View {
       return `<span class="${baseColor}">${teamNumber}</span>`;
     };
 
-    const specialTeams = ['467', '834'];
+    const rainbowTeams = ['467', '834'];
+    const contributorTeams = this.contributorTeams || [];
+    
+    const getAnimationType = (team: string): 'rainbow' | 'gold' | 'none' => {
+      if (rainbowTeams.includes(team)) return 'rainbow';
+      if (contributorTeams.includes(team)) return 'gold';
+      return 'none';
+    };
 
     // Build HTML for red alliance with individual team colors
     const redAllianceElement = item.children[1].children[0] as HTMLElement;
     const redTeamsHTML = [redThree, redTwo, redOne]
-      .map(team => createTeamSpan(team, specialTeams.includes(team), 'text-red-400'))
+      .map(team => createTeamSpan(team, getAnimationType(team), 'text-red-400'))
       .join(' ');
     redAllianceElement.innerHTML = redTeamsHTML;
 
     // Build HTML for blue alliance with individual team colors
     const blueAllianceElement = item.children[1].children[2] as HTMLElement;
     const blueTeamsHTML = [blueOne, blueTwo, blueThree]
-      .map(team => createTeamSpan(team, specialTeams.includes(team), 'text-blue-400'))
+      .map(team => createTeamSpan(team, getAnimationType(team), 'text-blue-400'))
       .join(' ');
     blueAllianceElement.innerHTML = blueTeamsHTML;
 
