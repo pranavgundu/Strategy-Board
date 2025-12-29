@@ -1,31 +1,29 @@
 # How to Use Strategy Board
 
 ## Table of Contents
-- [How to Use Strategy Board](#how-to-use-strategy-board)
-  - [Table of Contents](#table-of-contents)
-  - [Accessing Strategy Board](#accessing-strategy-board)
-  - [Creating a New Match](#creating-a-new-match)
-  - [Using the Whiteboard](#using-the-whiteboard)
-    - [Accessing the Whiteboard](#accessing-the-whiteboard)
-    - [Switching Sections on the Whiteboard](#switching-sections-on-the-whiteboard)
-    - [Toggling Views on the Whiteboard](#toggling-views-on-the-whiteboard)
-    - [Drawing on the Whiteboard](#drawing-on-the-whiteboard)
-    - [Erasing on the Whiteboard](#erasing-on-the-whiteboard)
-    - [Writing Numbers on the Whiteboard](#writing-numbers-on-the-whiteboard)
-    - [Switching Colors on the Whiteboard](#switching-colors-on-the-whiteboard)
-    - [Adding Checkboxes on the Whiteboard](#adding-checkboxes-on-the-whiteboard)
-  - [Managing Matches](#managing-matches)
-    - [Duplicating Matches](#duplicating-matches)
-    - [Deleting Matches](#deleting-matches)
-  - [Importing Matches from TBA (The Blue Alliance)](#importing-matches-from-tba-the-blue-alliance)
-  - [Exporting Matches](#exporting-matches)
-    - [Exporting as a PNG](#exporting-as-a-png)
-    - [Exporting as a PDF](#exporting-as-a-pdf)
-    - [Exporting as a QR Code](#exporting-as-a-qr-code)
-    - [Exporting as a Shareable Code](#exporting-as-a-shareable-code)
-  - [Importing Matches](#importing-matches)
-    - [Importing from a QR Code](#importing-from-a-qr-code)
-    - [Importing from a Shareable Code](#importing-from-a-shareable-code)
+- <a href="#accessing-strategy-board" style="text-decoration: none; color: #3b82f6;">Accessing Strategy Board</a>
+- <a href="#creating-a-new-match" style="text-decoration: none; color: #3b82f6;">Creating a New Match</a>
+- <a href="#using-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Using the Whiteboard</a>
+  - <a href="#accessing-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Accessing the Whiteboard</a>
+  - <a href="#switching-sections-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Switching Sections on the Whiteboard</a>
+  - <a href="#toggling-views-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Toggling Views on the Whiteboard</a>
+  - <a href="#drawing-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Drawing on the Whiteboard</a>
+  - <a href="#erasing-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Erasing on the Whiteboard</a>
+  - <a href="#writing-numbers-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Writing Numbers on the Whiteboard</a>
+  - <a href="#switching-colors-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Switching Colors on the Whiteboard</a>
+  - <a href="#adding-checkboxes-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Adding Checkboxes on the Whiteboard</a>
+- <a href="#managing-matches" style="text-decoration: none; color: #3b82f6;">Managing Matches</a>
+  - <a href="#duplicating-matches" style="text-decoration: none; color: #3b82f6;">Duplicating Matches</a>
+  - <a href="#deleting-matches" style="text-decoration: none; color: #3b82f6;">Deleting Matches</a>
+- <a href="#importing-matches-from-tba-the-blue-alliance" style="text-decoration: none; color: #3b82f6;">Importing Matches from TBA (The Blue Alliance)</a>
+- <a href="#exporting-matches" style="text-decoration: none; color: #3b82f6;">Exporting Matches</a>
+  - <a href="#exporting-as-a-png" style="text-decoration: none; color: #3b82f6;">Exporting as a PNG</a>
+  - <a href="#exporting-as-a-pdf" style="text-decoration: none; color: #3b82f6;">Exporting as a PDF</a>
+  - <a href="#exporting-as-a-qr-code" style="text-decoration: none; color: #3b82f6;">Exporting as a QR Code</a>
+  - <a href="#exporting-as-a-shareable-code" style="text-decoration: none; color: #3b82f6;">Exporting as a Shareable Code</a>
+- <a href="#importing-matches" style="text-decoration: none; color: #3b82f6;">Importing Matches</a>
+  - <a href="#importing-from-a-qr-code" style="text-decoration: none; color: #3b82f6;">Importing from a QR Code</a>
+  - <a href="#importing-from-a-shareable-code" style="text-decoration: none; color: #3b82f6;">Importing from a Shareable Code</a>
 
 
 ## Accessing Strategy Board
