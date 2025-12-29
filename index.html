@@ -952,7 +952,7 @@
             >
                 <div class="w-full pt-6 pb-4 px-6 flex justify-between items-center border-b border-slate-500">
                     <h2 class="text-2xl sm:text-3xl md:text-4xl text-slate-200 font-bold">
-                        Recent Contributors
+                        Contributors
                     </h2>
                     <button
                         id="contributors-close-btn"
@@ -978,8 +978,13 @@
                         </button>
                     </div>
                     
-                    <div id="contributors-list" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Contributors will be dynamically inserted here -->
+                    <div id="contributors-list" class="hidden space-y-6">
+                        <div id="contributors-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Contributors will be dynamically inserted here -->
+                        </div>
+                        <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Teams will be dynamically inserted here -->
+                        </div>
                     </div>
                 </div>
             </div>

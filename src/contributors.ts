@@ -22,6 +22,31 @@ export class ContributorsService {
   private isLoading = false;
   private hasError = false;
   private lastCommit: LastCommit | null = null;
+  private teams: string[] = [];
+
+  /**
+   * Fetches team numbers from teams.txt file.
+   *
+   * @returns Array of team numbers.
+   */
+  async fetchTeams(): Promise<string[]> {
+    if (this.teams.length > 0) {
+      return this.teams;
+    }
+
+    try {
+      const response = await fetch('/teams.txt');
+      if (!response.ok) {
+        throw new Error(`Failed to load teams.txt: ${response.status}`);
+      }
+      const text = await response.text();
+      this.teams = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      return this.teams;
+    } catch (error) {
+      console.error("Error fetching teams:", error);
+      return [];
+    }
+  }
 
   /**
    * Fetches contributors from GitHub repository and caches the results.
@@ -38,36 +63,19 @@ export class ContributorsService {
     this.hasError = false;
 
     try {
-      const commitsResponse = await fetch(
-        "https://api.github.com/repos/pranavgundu/Strategy-Board/commits?per_page=100"
+      // Fetch all contributors using the contributors API
+      const contributorsResponse = await fetch(
+        "https://api.github.com/repos/pranavgundu/Strategy-Board/contributors?per_page=100"
       );
 
-      if (!commitsResponse.ok) {
-        throw new Error(`GitHub API error: ${commitsResponse.status}`);
+      if (!contributorsResponse.ok) {
+        throw new Error(`GitHub API error: ${contributorsResponse.status}`);
       }
 
-      const commits = await commitsResponse.json();
-
-      const contributorMap = new Map<string, { login: string; avatar_url: string; html_url: string; lastCommitDate: string }>();
-
-      for (const commit of commits) {
-        if (commit.author && commit.author.login) {
-          const login = commit.author.login;
-          if (!contributorMap.has(login)) {
-            contributorMap.set(login, {
-              login: commit.author.login,
-              avatar_url: commit.author.avatar_url,
-              html_url: commit.author.html_url,
-              lastCommitDate: commit.commit.author.date,
-            });
-          }
-        }
-      }
-
-      const recentContributors = Array.from(contributorMap.values());
+      const contributorsData = await contributorsResponse.json();
 
       const detailedContributors = await Promise.all(
-        recentContributors.map(async (contributor) => {
+        contributorsData.map(async (contributor: any) => {
           try {
             const userResponse = await fetch(
               `https://api.github.com/users/${contributor.login}`
@@ -78,7 +86,7 @@ export class ContributorsService {
                 login: contributor.login,
                 avatar_url: contributor.avatar_url,
                 html_url: contributor.html_url,
-                contributions: 0, 
+                contributions: contributor.contributions, 
                 name: userData.name,
                 bio: userData.bio,
               };
@@ -90,7 +98,7 @@ export class ContributorsService {
             login: contributor.login,
             avatar_url: contributor.avatar_url,
             html_url: contributor.html_url,
-            contributions: 0,
+            contributions: contributor.contributions,
           };
         })
       );

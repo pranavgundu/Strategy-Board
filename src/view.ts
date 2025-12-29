@@ -83,6 +83,8 @@ let E: {
   ContributorsLoading?: HTMLElement | null;
   ContributorsError?: HTMLElement | null;
   ContributorsList?: HTMLElement | null;
+  ContributorsGrid?: HTMLElement | null;
+  TeamsGrid?: HTMLElement | null;
   LastCommitInfo?: HTMLElement | null;
   LinkImportPanel?: HTMLElement | null;
   LinkImportStatus?: HTMLElement | null;
@@ -183,6 +185,8 @@ export class View {
         ContributorsLoading: get("contributors-loading") as HTMLElement | null,
         ContributorsError: get("contributors-error") as HTMLElement | null,
         ContributorsList: get("contributors-list") as HTMLElement | null,
+        ContributorsGrid: get("contributors-grid") as HTMLElement | null,
+        TeamsGrid: get("teams-grid") as HTMLElement | null,
         LastCommitInfo: get("last-commit-info") as HTMLElement | null,
         LinkImportPanel: get("link-import-container") as HTMLElement | null,
         LinkImportStatus: get("link-import-status") as HTMLElement | null,
@@ -1099,7 +1103,7 @@ export class View {
           const delay = index * 0.3; // 0.3s delay between each digit
           return `<span class="special-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
         }).join('');
-        return `<span class="${baseColor} font-bold">${animatedDigits}</span>`;
+        return `<span class="${baseColor}">${animatedDigits}</span>`;
       }
       return `<span class="${baseColor}">${teamNumber}</span>`;
     };
@@ -2183,7 +2187,7 @@ export class View {
   }
 
   private async loadContributors() {
-    if (!E.ContributorsLoading || !E.ContributorsError || !E.ContributorsList) {
+    if (!E.ContributorsLoading || !E.ContributorsError || !E.ContributorsList || !E.ContributorsGrid || !E.TeamsGrid) {
       return;
     }
 
@@ -2193,18 +2197,27 @@ export class View {
     E.ContributorsList.classList.add("hidden");
 
     try {
-      const contributors = await this.contributorsService.fetchContributors();
+      // Fetch both contributors and teams
+      const [contributors, teams] = await Promise.all([
+        this.contributorsService.fetchContributors(),
+        this.contributorsService.fetchTeams()
+      ]);
 
-      E.ContributorsList.innerHTML = "";
+      // Clear existing content
+      E.ContributorsGrid.innerHTML = "";
+      E.TeamsGrid.innerHTML = "";
 
-      contributors.forEach((contributor, index) => {
-        const contributorCard = document.createElement("div");
+      // Populate contributors
+      contributors.forEach((contributor) => {
+        const contributorCard = document.createElement("a");
+        contributorCard.href = contributor.html_url;
+        contributorCard.target = "_blank";
+        contributorCard.rel = "noopener noreferrer";
         contributorCard.className = `
           flex items-center gap-4 p-4 bg-slate-700 rounded-xl
-          glass-card transition-all cursor-pointer
+          glass-card hover:bg-slate-600 hover:scale-105 transition-all duration-200
+          cursor-pointer no-underline
         `;
-
-        contributorCard.style.transition = "all 0.2s ease";
 
         contributorCard.innerHTML = `
           <div class="shrink-0 relative">
@@ -2216,22 +2229,45 @@ export class View {
             />
           </div>
           <div class="grow min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <a
-                href="${contributor.html_url}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-lg font-bold text-white hover:text-blue-400 transition-colors truncate"
-              >
-                ${contributor.name || contributor.login}
-              </a>
+            <div class="contributor-name text-lg font-bold text-white truncate">
+              ${contributor.name || contributor.login}
             </div>
             <p class="text-sm text-slate-400 truncate">@${contributor.login}</p>
             ${contributor.bio ? `<p class="text-sm text-slate-300 mt-1 line-clamp-2">${contributor.bio}</p>` : ""}
           </div>
         `;
 
-        E.ContributorsList?.appendChild(contributorCard);
+        // Add hover effect for name color
+        contributorCard.addEventListener('mouseenter', () => {
+          const nameEl = contributorCard.querySelector('.contributor-name');
+          if (nameEl) nameEl.classList.replace('text-white', 'text-blue-400');
+        });
+        contributorCard.addEventListener('mouseleave', () => {
+          const nameEl = contributorCard.querySelector('.contributor-name');
+          if (nameEl) nameEl.classList.replace('text-blue-400', 'text-white');
+        });
+
+        E.ContributorsGrid?.appendChild(contributorCard);
+      });
+
+      // Populate teams with same styling as contributors
+      teams.forEach((teamNumber) => {
+        const teamCard = document.createElement("div");
+        teamCard.className = `
+          flex items-center justify-center p-4 bg-slate-700 rounded-xl
+          glass-card hover:bg-slate-600 hover:scale-105 transition-all duration-200
+          cursor-default
+        `;
+        
+        teamCard.innerHTML = `
+          <div class="text-center">
+            <div class="text-lg font-bold text-white">
+              Team ${teamNumber}
+            </div>
+          </div>
+        `;
+        
+        E.TeamsGrid?.appendChild(teamCard);
       });
 
       E.ContributorsLoading.classList.add("hidden");
