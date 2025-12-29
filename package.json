@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
+    "@types/marked": "^5.0.2",
     "@types/node": "^24.10.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
