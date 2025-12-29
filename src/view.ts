@@ -1384,6 +1384,15 @@ export class View {
       I.BlueThree.value,
     );
     this.hide(E.CreateMatchPanel);
+    
+    // Clear all input fields
+    I.MatchName.value = "";
+    I.RedOne.value = "";
+    I.RedTwo.value = "";
+    I.RedThree.value = "";
+    I.BlueOne.value = "";
+    I.BlueTwo.value = "";
+    I.BlueThree.value = "";
   }
 
   private onClickExportPNG(): void {
