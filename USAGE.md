@@ -1,36 +1,38 @@
 # How to Use Strategy Board
 
 ## Table of Contents
-- [Accessing Strategy Board](#accessing-strategy-board)
-- [Creating a New Match](#creating-a-new-match)
-- [Importing Matches from TBA (The Blue Alliance)](#importing-matches-from-tba-the-blue-alliance)
-- [Using the Whiteboard](#using-the-whiteboard)
-  - [Accessing the Whiteboard](#accessing-the-whiteboard)
-  - [Switching Sections on the Whiteboard](#switching-sections-on-the-whiteboard)
-  - [Toggling Views on the Whiteboard](#toggling-views-on-the-whiteboard)
-  - [Drawing on the Whiteboard](#drawing-on-the-whiteboard)
-  - [Erasing on the Whiteboard](#erasing-on-the-whiteboard)
-  - [Writing Numbers on the Whiteboard](#writing-numbers-on-the-whiteboard)
-  - [Switching Colors on the Whiteboard](#switching-colors-on-the-whiteboard)
-  - [Adding Checkboxes on the Whiteboard](#adding-checkboxes-on-the-whiteboard)
-- [Managing Matches](#managing-matches)
-  - [Duplicating Matches](#duplicating-matches)
-  - [Deleting Matches](#deleting-matches)
-- [Exporting Matches](#exporting-matches)
-  - [Exporting as a PNG](#exporting-as-a-png)
-  - [Exporting as a PDF](#exporting-as-a-pdf)
-  - [Exporting as a QR Code](#exporting-as-a-qr-code)
-  - [Exporting as a Shareable Code](#exporting-as-a-shareable-code)
-- [Importing Matches](#importing-matches)
-  - [Importing from a QR Code](#importing-from-a-qr-code)
-  - [Importing from a Shareable Code](#importing-from-a-shareable-code)
+- [How to Use Strategy Board](#how-to-use-strategy-board)
+  - [Table of Contents](#table-of-contents)
+  - [Accessing Strategy Board](#accessing-strategy-board)
+  - [Creating a New Match](#creating-a-new-match)
+  - [Using the Whiteboard](#using-the-whiteboard)
+    - [Accessing the Whiteboard](#accessing-the-whiteboard)
+    - [Switching Sections on the Whiteboard](#switching-sections-on-the-whiteboard)
+    - [Toggling Views on the Whiteboard](#toggling-views-on-the-whiteboard)
+    - [Drawing on the Whiteboard](#drawing-on-the-whiteboard)
+    - [Erasing on the Whiteboard](#erasing-on-the-whiteboard)
+    - [Writing Numbers on the Whiteboard](#writing-numbers-on-the-whiteboard)
+    - [Switching Colors on the Whiteboard](#switching-colors-on-the-whiteboard)
+    - [Adding Checkboxes on the Whiteboard](#adding-checkboxes-on-the-whiteboard)
+  - [Managing Matches](#managing-matches)
+    - [Duplicating Matches](#duplicating-matches)
+    - [Deleting Matches](#deleting-matches)
+  - [Importing Matches from TBA (The Blue Alliance)](#importing-matches-from-tba-the-blue-alliance)
+  - [Exporting Matches](#exporting-matches)
+    - [Exporting as a PNG](#exporting-as-a-png)
+    - [Exporting as a PDF](#exporting-as-a-pdf)
+    - [Exporting as a QR Code](#exporting-as-a-qr-code)
+    - [Exporting as a Shareable Code](#exporting-as-a-shareable-code)
+  - [Importing Matches](#importing-matches)
+    - [Importing from a QR Code](#importing-from-a-qr-code)
+    - [Importing from a Shareable Code](#importing-from-a-shareable-code)
 
 
 ## Accessing Strategy Board
 First access Strategy Board from any of the following domains: 
-- [`strategyboard.app`](https://strategyboard.app)
-- [`strategyboard.vercel.app`](https://strategyboard.vercel.app)
-- [`pranavgundu.github.io/Strategy-Board`](https://pranavgundu.github.io/Strategy-Board)
+- <a href="https://strategyboard.app" style="text-decoration: none; color: #3b82f6;">strategyboard.app</a>
+- <a href="https://strategyboard.vercel.app" style="text-decoration: none; color: #3b82f6;">strategyboard.vercel.app</a>
+- <a href="https://pranavgundu.github.io/Strategy-Board" style="text-decoration: none; color: #3b82f6;">pranavgundu.github.io/Strategy-Board</a>
 ## Creating a New Match
 1. Click on the green "New" button on the homepage. 
 
