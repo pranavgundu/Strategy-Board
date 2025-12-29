@@ -282,6 +282,43 @@
             </div>
             <pre id="app-debug-log"></pre>
         </div>
+        <!-- Team Number Welcome Popup -->
+        <div
+            id="team-number-popup"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-[99999]"
+        >
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-md bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+            >
+                <div class="w-full pt-6 pb-4 px-6 bg-slate-500 rounded-t-2xl md:rounded-t-3xl">
+                    <h2 class="text-2xl sm:text-3xl text-center text-slate-100 font-bold">
+                        Welcome to Strategy Board!
+                    </h2>
+                    <p class="text-center text-slate-300 mt-2">
+                        What's your team number?
+                    </p>
+                </div>
+                <div class="w-full p-6">
+                    <input
+                        type="number"
+                        id="team-number-input"
+                        placeholder="Enter team number"
+                        class="w-full text-xl sm:text-2xl text-center text-slate-200 p-4 bg-slate-700 rounded-xl outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                </div>
+                <div class="flex w-full">
+                    <button
+                        id="team-number-save-btn"
+                        class="w-full text-center text-lg sm:text-xl font-bold text-white bg-green-600 p-4 sm:p-5 rounded-b-2xl md:rounded-b-3xl glossy-shine hover:bg-green-500"
+                    >
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
         <div id="home-container" class="flex flex-col w-dvw h-dvh touch-none">
             <div
                 id="home-toolbar"

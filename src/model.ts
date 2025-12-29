@@ -92,7 +92,6 @@ export class Model {
     window.dataLayer.push({
       'event': 'match_creation',
     });
-    console.log("sent data to google")
     await SET(match.id, match.getAsPacket(), (e) => {
       console.error("Failed to save match to IndexedDB:", e);
     });

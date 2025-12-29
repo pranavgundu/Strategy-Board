@@ -43,6 +43,7 @@ let B: {
   ShareSuccessClose?: HTMLElement | null;
   ShareCodeCopy?: HTMLElement | null;
   ShareLinkCopy?: HTMLElement | null;
+  TeamNumberSave?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -59,6 +60,7 @@ let I: {
   TBAEventSearch?: HTMLInputElement | null;
   TBATeamSearch?: HTMLInputElement | null;
   LinkImportCode?: HTMLInputElement | null;
+  TeamNumber?: HTMLInputElement | null;
 } | null = null;
 
 let E: {
@@ -142,6 +144,7 @@ export class View {
         ShareSuccessClose: get("share-success-close-btn") as HTMLElement | null,
         ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
         ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
+        TeamNumberSave: get("team-number-save-btn") as HTMLElement | null,
       };
 
       I = {
@@ -158,6 +161,7 @@ export class View {
         TBAEventSearch: get("tba-event-search") as HTMLInputElement | null,
         TBATeamSearch: get("tba-team-search") as HTMLInputElement | null,
         LinkImportCode: get("link-import-code") as HTMLInputElement | null,
+        TeamNumber: get("team-number-input") as HTMLInputElement | null,
       };
 
       E = {
@@ -956,6 +960,7 @@ export class View {
     this.initializeTBAService();
     this.initializeLastCommit();
     this.initializeContributorTeams();
+    this.initializeTeamNumberPopup();
   }
 
   private async initializeContributorTeams(): Promise<void> {
@@ -2457,6 +2462,44 @@ export class View {
       console.error("View: failed to export PDF:", err);
       alert("Failed to export PDF. See console for details.");
     }
+  }
+
+  private initializeTeamNumberPopup(): void {
+    const TEAM_NUMBER_KEY = "user-team-number";
+    const popup = get("team-number-popup");
+    
+    // Check if user has already set their team number
+    const savedTeamNumber = localStorage.getItem(TEAM_NUMBER_KEY);
+    
+    if (!savedTeamNumber && popup) {
+      // Show popup on first visit
+      popup.classList.remove("hidden");
+    }
+
+    // Save button handler - requires team number
+    B?.TeamNumberSave?.addEventListener("click", () => {
+      const teamNumber = I?.TeamNumber?.value?.trim();
+      if (teamNumber) {
+        localStorage.setItem(TEAM_NUMBER_KEY, teamNumber);
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          'event': 'team_number',
+          'number': teamNumber
+        });
+        console.log(`Team number saved and sent to GA: ${teamNumber}`);
+        popup?.classList.add("hidden");
+      } else {
+        // Show validation error
+        alert("Please enter your team number to continue.");
+      }
+    });
+
+    // Allow Enter key to save
+    I?.TeamNumber?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        B?.TeamNumberSave?.click();
+      }
+    });
   }
 }
 
