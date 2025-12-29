@@ -22,7 +22,7 @@
 
 <div align="center">
 
-## See [USAGE.md](https://github.com/pranavgundu/Strategy-Board/blob/main/USAGE.md) to learn how to use Strategy Board.
+## See [USAGE.md](https://github.com/pranavgundu/Strategy-Board/blob/main/USAGE.md) to learn how to use Strategy Board!
 
 </div>
 
