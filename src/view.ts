@@ -1366,9 +1366,9 @@ export class View {
   private async onClickCreateMatch(e: Event): Promise<void> {
     const id = await this.model.createNewMatch(
       I.MatchName.value,
-      I.RedOne.value,
-      I.RedTwo.value,
       I.RedThree.value,
+      I.RedTwo.value,
+      I.RedOne.value,
       I.BlueOne.value,
       I.BlueTwo.value,
       I.BlueThree.value,
@@ -1376,9 +1376,9 @@ export class View {
     this.createNewMatch(
       id,
       I.MatchName.value,
-      I.RedOne.value,
-      I.RedTwo.value,
       I.RedThree.value,
+      I.RedTwo.value,
+      I.RedOne.value,
       I.BlueOne.value,
       I.BlueTwo.value,
       I.BlueThree.value,
