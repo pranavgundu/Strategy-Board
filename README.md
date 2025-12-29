@@ -20,7 +20,11 @@
 - Pull data from TBA ([The Blue Alliance](https://www.thebluealliance.com)) to get all matches for a single team
 - Saves data so you can use everything offline
 
-### See [USAGE.md](https://github.com/pranavgundu/Strategy-Board/blob/main/USAGE.md) to learn how to use Strategy Board.
+<div align="center">
+
+## See [USAGE.md](https://github.com/pranavgundu/Strategy-Board/blob/main/USAGE.md) to learn how to use Strategy Board.
+
+</div>
 
 ## Issues 
 Report any bugs or errors in [GitHub](https://github.com/pranavgundu/Strategy-Board/issues/new/choose) or feel free to email me at [pranav@strategyboard.app](mailto:pranav@strategyboard.app).
