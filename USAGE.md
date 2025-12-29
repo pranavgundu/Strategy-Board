@@ -31,3 +31,8 @@ From there a popup will appear asking for match details.
 <img src="https://github.com/user-attachments/assets/e7f8ebe9-50c8-4591-b9a5-f4ea2622af41" alt="Match Created Confirmation" width="50%">
 </p>
 
+This will create a match that you can access on the homepage.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/9f7729b9-b56c-4b70-928c-a74eca8e72f7" alt="Match Created Confirmation" width="50%">
+</p>
