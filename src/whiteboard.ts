@@ -252,7 +252,6 @@ export class Whiteboard {
   private currentAction = "none";
   private currentTool = "marker";
   private currentColor = 0;
-  private currentTextValue = "";
 
   private autoActionHistory: Array<any> = [];
   private teleopActionHistory: Array<any> = [];
@@ -269,9 +268,7 @@ export class Whiteboard {
   private cachedElements: {
     drawConfigMarker: HTMLElement | null;
     drawConfigEraser: HTMLElement | null;
-    drawConfigText: HTMLElement | null;
     drawConfigCheckbox: HTMLElement | null;
-    numberPad: HTMLElement | null;
     colorConfig: HTMLElement | null;
     colorWhite: HTMLElement | null;
     colorRed: HTMLElement | null;
@@ -284,9 +281,7 @@ export class Whiteboard {
   } = {
     drawConfigMarker: null,
     drawConfigEraser: null,
-    drawConfigText: null,
     drawConfigCheckbox: null,
-    numberPad: null,
     colorConfig: null,
     colorWhite: null,
     colorRed: null,
@@ -370,38 +365,12 @@ export class Whiteboard {
             .getElementById("whiteboard-draw-config-eraser")
             ?.style.setProperty("display", "inline");
           document
-            .getElementById("whiteboard-draw-config-text")
-            ?.style.setProperty("display", "none");
-          document
             .getElementById("whiteboard-draw-config-checkbox")
             ?.style.setProperty("display", "none");
-          document
-            .getElementById("whiteboard-number-pad")
-            ?.classList.add("hidden");
           document
             .getElementById("whiteboard-color-config")
             ?.classList.add("hidden");
         } else if (this.currentTool == "eraser") {
-          this.currentTool = "text";
-          document
-            .getElementById("whiteboard-draw-config-marker")
-            ?.style.setProperty("display", "none");
-          document
-            .getElementById("whiteboard-draw-config-eraser")
-            ?.style.setProperty("display", "none");
-          document
-            .getElementById("whiteboard-draw-config-text")
-            ?.style.setProperty("display", "inline");
-          document
-            .getElementById("whiteboard-draw-config-checkbox")
-            ?.style.setProperty("display", "none");
-          document
-            .getElementById("whiteboard-number-pad")
-            ?.classList.remove("hidden");
-          document
-            .getElementById("whiteboard-color-config")
-            ?.classList.remove("hidden");
-        } else if (this.currentTool == "text") {
           // Only show checkbox tool in notes mode, otherwise cycle back to marker
           if (this.mode === "notes") {
             this.currentTool = "checkbox";
@@ -412,14 +381,8 @@ export class Whiteboard {
               .getElementById("whiteboard-draw-config-eraser")
               ?.style.setProperty("display", "none");
             document
-              .getElementById("whiteboard-draw-config-text")
-              ?.style.setProperty("display", "none");
-            document
               .getElementById("whiteboard-draw-config-checkbox")
               ?.style.setProperty("display", "inline");
-            document
-              .getElementById("whiteboard-number-pad")
-              ?.classList.add("hidden");
             document
               .getElementById("whiteboard-color-config")
               ?.classList.remove("hidden");
@@ -432,14 +395,8 @@ export class Whiteboard {
               .getElementById("whiteboard-draw-config-eraser")
               ?.style.setProperty("display", "none");
             document
-              .getElementById("whiteboard-draw-config-text")
-              ?.style.setProperty("display", "none");
-            document
               .getElementById("whiteboard-draw-config-checkbox")
               ?.style.setProperty("display", "none");
-            document
-              .getElementById("whiteboard-number-pad")
-              ?.classList.add("hidden");
             document
               .getElementById("whiteboard-color-config")
               ?.classList.remove("hidden");
@@ -453,72 +410,11 @@ export class Whiteboard {
             .getElementById("whiteboard-draw-config-eraser")
             ?.style.setProperty("display", "none");
           document
-            .getElementById("whiteboard-draw-config-text")
-            ?.style.setProperty("display", "none");
-          document
             .getElementById("whiteboard-draw-config-checkbox")
             ?.style.setProperty("display", "none");
           document
-            .getElementById("whiteboard-number-pad")
-            ?.classList.add("hidden");
-          document
             .getElementById("whiteboard-color-config")
             ?.classList.remove("hidden");
-        }
-      });
-
-    for (let i = 0; i <= 9; i++) {
-      const btn = document.getElementById(`whiteboard-number-${i}`);
-      btn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        this.currentTool = "text";
-        this.currentTextValue = String(i);
-
-        document
-          .getElementById("whiteboard-number-pad")
-          ?.classList.remove("hidden");
-
-        for (let k = 0; k <= 9; k++) {
-          document
-            .getElementById(`whiteboard-number-${k}`)
-            ?.classList.remove("ring-2", "ring-amber-400");
-        }
-        try {
-          (e.currentTarget as HTMLElement).classList.add(
-            "ring-2",
-            "ring-amber-400",
-          );
-        } catch (err) {}
-      });
-    }
-
-    document
-      .getElementById("whiteboard-number-close")
-      ?.addEventListener("click", (e) => {
-        e.stopPropagation();
-
-        this.currentTextValue = "";
-
-        this.currentTool = "marker";
-
-        document
-          .getElementById("whiteboard-draw-config-marker")
-          ?.style.setProperty("display", "inline");
-        document
-          .getElementById("whiteboard-draw-config-eraser")
-          ?.style.setProperty("display", "none");
-        document
-          .getElementById("whiteboard-draw-config-text")
-          ?.style.setProperty("display", "none");
-
-        document
-          .getElementById("whiteboard-number-pad")
-          ?.classList.add("hidden");
-
-        for (let k = 0; k <= 9; k++) {
-          document
-            .getElementById(`whiteboard-number-${k}`)
-            ?.classList.remove("ring-2", "ring-amber-400");
         }
       });
 
@@ -896,9 +792,7 @@ export class Whiteboard {
 
     this.cachedElements.drawConfigMarker = document.getElementById("whiteboard-draw-config-marker");
     this.cachedElements.drawConfigEraser = document.getElementById("whiteboard-draw-config-eraser");
-    this.cachedElements.drawConfigText = document.getElementById("whiteboard-draw-config-text");
      this.cachedElements.drawConfigCheckbox = document.getElementById("whiteboard-draw-config-checkbox");
-    this.cachedElements.numberPad = document.getElementById("whiteboard-number-pad");
     this.cachedElements.colorConfig = document.getElementById("whiteboard-color-config");
     this.cachedElements.colorWhite = document.getElementById("whiteboard-color-white");
     this.cachedElements.colorRed = document.getElementById("whiteboard-color-red");
@@ -937,7 +831,6 @@ export class Whiteboard {
 
         if (els.drawConfigMarker) els.drawConfigMarker.style.display = "inline";
         if (els.drawConfigEraser) els.drawConfigEraser.style.display = "none";
-        if (els.drawConfigText) els.drawConfigText.style.display = "none";
         if (els.drawConfigCheckbox) els.drawConfigCheckbox.style.display = "none";
 
         if (els.colorConfig) els.colorConfig.classList.remove("hidden");
@@ -1149,28 +1042,6 @@ export class Whiteboard {
         }
         this.redrawDrawing();
       }
-    } else if (action.type === "text") {
-      const data = this.getData();
-      if (data !== null) {
-        if (action.ref) {
-          const ref = action.ref as any[];
-          const idx = data.textAnnotations.findIndex(
-            (t: any) =>
-              t[0] === ref[0] &&
-              t[1] === ref[1] &&
-              t[2] === ref[2] &&
-              String(t[3]) === String(ref[3]),
-          );
-          if (idx !== -1) {
-            data.textAnnotations.splice(idx, 1);
-          } else {
-            data.textAnnotations.pop();
-          }
-        } else {
-          data.textAnnotations.pop();
-        }
-        this.redrawDrawing();
-      }
     } else if (action.type === "checkbox") {
       const data = this.getData();
       if (data !== null) {
@@ -1247,14 +1118,6 @@ export class Whiteboard {
             data.drawing.splice(idx, 1);
             data.drawingBBox.splice(idx, 1);
           }
-        }
-        this.redrawDrawing();
-      }
-    } else if (action.type === "text") {
-      const data = this.getData();
-      if (data !== null) {
-        if (action.ref) {
-          data.textAnnotations.push(action.ref);
         }
         this.redrawDrawing();
       }
@@ -1539,29 +1402,6 @@ export class Whiteboard {
         }
 
         DR.stroke();
-      }
-    }
-
-    if (data.textAnnotations && data.textAnnotations.length > 0) {
-      DR.font = "bold 80px Arial";
-      DR.textAlign = "center";
-      DR.textBaseline = "top";
-
-      let currentFillColor = "";
-
-      for (let text of data.textAnnotations) {
-        const color = this.getStrokeColor(text[2]);
-
-        if (currentFillColor !== color) {
-          DR.fillStyle = color;
-          currentFillColor = color;
-        }
-
-        DR.fillText(
-          text[3],
-          text[0] - offsetX,
-          text[1] - offsetY - 40,
-        );
       }
     }
 
@@ -2069,25 +1909,6 @@ export class Whiteboard {
         this.currentStrokePoints.push([x, y]);
       } else if (this.currentTool == "eraser") {
         this.currentErasePoint = { x: x, y: y };
-      } else if (this.currentTool == "text" && this.currentTextValue !== "") {
-        const data = this.getData();
-        if (data !== null) {
-          data.textAnnotations.push([
-            x,
-            y,
-            this.currentColor,
-            this.currentTextValue,
-          ]);
-          this.addUndoHistory({
-            type: "text",
-            ref: [x, y, this.currentColor, this.currentTextValue],
-          });
-          this.redrawDrawing();
-          this.currentTextValue = "";
-          document
-            .getElementById("whiteboard-number-pad")
-            ?.classList.remove("hidden");
-        }
       } else if (this.currentTool == "checkbox") {
         const data = this.getData();
         if (data !== null) {

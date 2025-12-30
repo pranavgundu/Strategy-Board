@@ -25,7 +25,7 @@ export class ContributorsService {
   private teams: string[] = [];
 
   /**
-   * Fetches team numbers from teams.txt file.
+   * Fetches team numbers from contributors.txt file.
    *
    * @returns Array of team numbers.
    */
@@ -35,9 +35,9 @@ export class ContributorsService {
     }
 
     try {
-      const response = await fetch('/teams.txt');
+      const response = await fetch('/contributors.txt');
       if (!response.ok) {
-        throw new Error(`Failed to load teams.txt: ${response.status}`);
+        throw new Error(`Failed to load contributors.txt: ${response.status}`);
       }
       const text = await response.text();
       this.teams = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);

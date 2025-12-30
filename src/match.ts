@@ -19,13 +19,11 @@ interface PhaseData {
   blueThreeRobot: RobotPosition;
   drawing: DrawingStroke[];
   drawingBBox: BoundingBox[];
-  textAnnotations: TextAnnotation[];
   checkboxes: CheckboxAnnotation[];
 }
 
 type DrawingStroke = [number, ...Array<[number, number]>];
 type BoundingBox = [number, number, number, number];
-type TextAnnotation = [number, number, number, string];
 type CheckboxAnnotation = [number, number, number, boolean]; // x, y, color, checked
 
 interface MatchOptions {
@@ -52,7 +50,6 @@ interface PhaseOptions {
   b3: { x: number; y: number; r: number };
   d: DrawingStroke[];
   dx: BoundingBox[];
-  txt?: TextAnnotation[];
   cb?: CheckboxAnnotation[];
 }
 
@@ -145,7 +142,6 @@ export class Match {
       ),
       drawing: [],
       drawingBBox: [],
-      textAnnotations: [],
       checkboxes: [],
     };
   }
@@ -176,7 +172,6 @@ export class Match {
   ): void {
     phase.drawing = phaseOptions.d;
     phase.drawingBBox = phaseOptions.dx;
-    phase.textAnnotations = phaseOptions.txt || [];
     phase.checkboxes = phaseOptions.cb || [];
 
     phase.redOneRobot = {
@@ -375,7 +370,6 @@ export class Match {
           ],
           this.auto.drawing,
           this.auto.drawingBBox,
-          this.auto.textAnnotations,
         ],
         [
           [
@@ -410,7 +404,6 @@ export class Match {
           ],
           this.teleop.drawing,
           this.teleop.drawingBBox,
-          this.teleop.textAnnotations,
         ],
         [
           [
@@ -445,7 +438,6 @@ export class Match {
           ],
           this.endgame.drawing,
           this.endgame.drawingBBox,
-          this.endgame.textAnnotations,
         ],
         [
           [
@@ -480,7 +472,6 @@ export class Match {
           ],
           this.notes.drawing,
           this.notes.drawingBBox,
-          this.notes.textAnnotations,
         ],
       ],
     ];

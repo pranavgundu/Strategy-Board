@@ -9,7 +9,6 @@
   - <a href="#toggling-views-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Toggling Views on the Whiteboard</a>
   - <a href="#drawing-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Drawing on the Whiteboard</a>
   - <a href="#erasing-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Erasing on the Whiteboard</a>
-  - <a href="#writing-numbers-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Writing Numbers on the Whiteboard</a>
   - <a href="#switching-colors-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Switching Colors on the Whiteboard</a>
   - <a href="#adding-checkboxes-on-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Adding Checkboxes on the Whiteboard</a>
 - <a href="#managing-matches" style="text-decoration: none; color: #3b82f6;">Managing Matches</a>
@@ -101,13 +100,6 @@ This will bring you into the whiteboard view.
 </p>
 
 ### Erasing on the Whiteboard
-
-
-<p align="center">
-<img src="" alt="Image" width="50%">
-</p>
-
-### Writing Numbers on the Whiteboard
 
 
 <p align="center">
