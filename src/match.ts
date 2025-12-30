@@ -273,6 +273,16 @@ export class Match {
           d: packet[8][3][6],
           dx: packet[8][3][7],
         },
+        n: packet[8][4] ? {
+          r1: Match.robotFromArrayPacket(packet[8][4][0]),
+          r2: Match.robotFromArrayPacket(packet[8][4][1]),
+          r3: Match.robotFromArrayPacket(packet[8][4][2]),
+          b1: Match.robotFromArrayPacket(packet[8][4][3]),
+          b2: Match.robotFromArrayPacket(packet[8][4][4]),
+          b3: Match.robotFromArrayPacket(packet[8][4][5]),
+          d: packet[8][4][6],
+          dx: packet[8][4][7],
+        } : undefined,
       },
     );
   }

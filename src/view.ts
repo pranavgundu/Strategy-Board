@@ -961,6 +961,7 @@ export class View {
     this.initializeLastCommit();
     this.initializeContributorTeams();
     this.initializeTeamNumberPopup();
+    this.checkShareCodeFromUrl();
   }
 
   private async initializeContributorTeams(): Promise<void> {
@@ -1185,8 +1186,8 @@ export class View {
     const kebab = item.children[2].children[0] as HTMLElement;
     const options = item.children[2].children[1] as HTMLElement;
     const duplicateOption = options.children[0] as HTMLElement;
-    const exportQROption = options.children[1] as HTMLElement;
-    const exportPNGOption = options.children[2] as HTMLElement;
+    const exportPNGOption = options.children[1] as HTMLElement;
+    const exportQROption = options.children[2] as HTMLElement;
     const exportPDFOption = options.children[3] as HTMLElement;
     const deleteOption = options.children[4] as HTMLElement;
 
@@ -2422,6 +2423,72 @@ export class View {
       ? "mt-4 text-sm sm:text-base text-red-400"
       : "mt-4 text-sm sm:text-base text-slate-300";
     this.show(E.LinkImportStatus);
+  }
+
+  private async checkShareCodeFromUrl(): Promise<void> {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const shareCode = urlParams.get("share");
+
+      if (!shareCode) return;
+
+      // Clean up URL without reloading
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      console.log("Found share code in URL:", shareCode);
+
+      // Wait for DOM to be ready
+      const waitForDOM = () => {
+        return new Promise<void>((resolve) => {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => resolve(), { once: true });
+          } else {
+            resolve();
+          }
+        });
+      };
+
+      await waitForDOM();
+
+      // Show loading status
+      this.show(E.LinkImportPanel);
+      this.showLinkImportStatus("Loading shared match...", false);
+
+      const match = await downloadMatch(shareCode.trim().toUpperCase());
+
+      if (!match) {
+        this.showLinkImportStatus("Share code not found or expired", true);
+        return;
+      }
+
+      const id = await this.model.addMatch(match);
+      this.createNewMatch(
+        id,
+        match.matchName,
+        match.redOne,
+        match.redTwo,
+        match.redThree,
+        match.blueOne,
+        match.blueTwo,
+        match.blueThree,
+      );
+
+      this.showLinkImportStatus("Match imported successfully!", false);
+
+      setTimeout(() => {
+        this.hide(E.LinkImportPanel);
+        this.hide(E.LinkImportStatus);
+        // Open the imported match
+        this.loadWhiteboard(match);
+      }, 1000);
+    } catch (error) {
+      console.error("Error loading share code from URL:", error);
+      this.showLinkImportStatus(
+        `Error: ${error instanceof Error ? error.message : "Failed to load shared match"}`,
+        true,
+      );
+    }
   }
 
   private async onClickShare(match: Match): Promise<void> {
