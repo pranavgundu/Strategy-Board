@@ -1138,7 +1138,7 @@ export class View {
     // Helper function to create colored team number spans with glow effect for special teams
     const createTeamSpan = (teamNumber: string, animationType: 'rainbow' | 'gold' | 'none', baseColor: string): string => {
       if (animationType === 'rainbow') {
-        // Create sequential rainbow glow animation for each digit (for 467 and 834)
+        // Create sequential rainbow glow animation for each digit (for contributor teams)
         const digits = teamNumber.split('');
         const animatedDigits = digits.map((digit, index) => {
           const delay = index * 0.3; // 0.3s delay between each digit
@@ -1147,7 +1147,7 @@ export class View {
         return `<span class="${baseColor}">${animatedDigits}</span>`;
       }
       if (animationType === 'gold') {
-        // Create sequential gold glow animation for each digit (for contributor teams)
+        // Create sequential gold glow animation for each digit (for 834)
         const digits = teamNumber.split('');
         const animatedDigits = digits.map((digit, index) => {
           const delay = index * 0.3; // 0.3s delay between each digit
@@ -1158,12 +1158,12 @@ export class View {
       return `<span class="${baseColor}">${teamNumber}</span>`;
     };
 
-    const rainbowTeams = ['467', '834'];
+    const goldTeam = '834';
     const contributorTeams = this.contributorTeams || [];
     
     const getAnimationType = (team: string): 'rainbow' | 'gold' | 'none' => {
-      if (rainbowTeams.includes(team)) return 'rainbow';
-      if (contributorTeams.includes(team)) return 'gold';
+      if (team === goldTeam) return 'gold';
+      if (contributorTeams.includes(team)) return 'rainbow';
       return 'none';
     };
 
