@@ -127,9 +127,10 @@ It is ***strongly recommended*** to use a stylus for better precision, but you c
 
 ### Erasing on the Whiteboard
 
+To erase any mistakes or unwanted drawings on the whiteboard, you can use the eraser tool. By clicking the pencil icon in the bottom right of the whiteboard.
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/0c64a6e0-5055-4cac-a14c-a40a3e456591" alt="Image" width="50%">
 </p>
 
 ### Switching Colors on the Whiteboard
