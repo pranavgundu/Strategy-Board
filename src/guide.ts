@@ -80,19 +80,24 @@ export class Guide {
             // Fix paragraph alignment
             html = html.replace(/<p align="center">/g, '<p style="text-align: center;">');
 
-            // Fix image tags to ensure proper loading and styling
+            // Fix image tags - use proxy for GitHub images to bypass CORS
             html = html.replace(/<img ([^>]+)>/g, (match, attrs) => {
                 // Extract src attribute
                 const srcMatch = attrs.match(/src="([^"]+)"/);
                 if (!srcMatch) return match;
 
-                const src = srcMatch[1];
+                let src = srcMatch[1];
                 const altMatch = attrs.match(/alt="([^"]*)"/);
                 const alt = altMatch ? altMatch[1] : '';
                 const widthMatch = attrs.match(/width="([^"]*)"/);
                 const width = widthMatch ? widthMatch[1] : '100%';
 
-                return `<img src="${src}" alt="${alt}" loading="lazy" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1.5rem auto; display: block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onerror="this.style.display='none';console.warn('Image blocked by CORS (normal on localhost):', this.src)" />`;
+                // Use cors-anywhere proxy for GitHub images
+                if (src.includes('github.com')) {
+                    src = `https://corsproxy.io/?${encodeURIComponent(src)}`;
+                }
+
+                return `<img src="${src}" alt="${alt}" loading="lazy" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1.5rem auto; display: block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onerror="this.style.border='2px dashed #e5e7eb';this.style.padding='2rem';this.style.boxShadow='none';this.alt='Image failed to load: ${alt}';console.warn('Image failed to load:', this.src)" />`;
             });
 
             // Add comprehensive styling
