@@ -45,7 +45,6 @@ let B: {
   ShareCodeCopy?: HTMLElement | null;
   ShareLinkCopy?: HTMLElement | null;
   TeamNumberSave?: HTMLElement | null;
-  GuideBack?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -150,7 +149,6 @@ export class View {
         ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
         ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
         TeamNumberSave: get("team-number-save-btn") as HTMLElement | null,
-        GuideBack: get("guide-toolbar-back-btn") as HTMLElement | null,
       };
 
       I = {
@@ -307,12 +305,6 @@ export class View {
           id: "qr-export-pdf-btn",
           evt: "click",
           fn: (e: Event) => this.onClickExportPDFFromModal(e),
-        },
-        {
-          el: B?.GuideBack,
-          id: "guide-toolbar-back-btn",
-          evt: "click",
-          fn: (e: Event) => this.onClickGuideBack(e),
         },
       ];
 
@@ -1538,12 +1530,6 @@ export class View {
     this.whiteboard.setActive(false);
     this.show(E.Home);
     this.hide(E.Whiteboard);
-  }
-
-  private onClickGuideBack(_e: Event): void {
-    this.hide(E.Guide);
-    this.show(E.Home);
-    window.location.hash = "";
   }
 
   private handleRouting(): void {
