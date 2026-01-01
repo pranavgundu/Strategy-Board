@@ -1,6 +1,5 @@
 # How to Use Strategy Board
 
-## Table of Contents
 - <a href="#accessing-strategy-board" style="text-decoration: none; color: #3b82f6;">Accessing Strategy Board</a>
 - <a href="#creating-a-new-match" style="text-decoration: none; color: #3b82f6;">Creating a New Match</a>
 - <a href="#using-the-whiteboard" style="text-decoration: none; color: #3b82f6;">Using the Whiteboard</a>
@@ -26,7 +25,7 @@
 
 
 ## Accessing Strategy Board
-First access Strategy Board from any of the following domains: 
+You can access Strategy Board from any of the following domains: 
 - <a href="https://strategyboard.app" style="text-decoration: none; color: #3b82f6;">strategyboard.app</a>
 - <a href="https://strategyboard.vercel.app" style="text-decoration: none; color: #3b82f6;">strategyboard.vercel.app</a>
 - <a href="https://pranavgundu.github.io/Strategy-Board" style="text-decoration: none; color: #3b82f6;">pranavgundu.github.io/Strategy-Board</a>
