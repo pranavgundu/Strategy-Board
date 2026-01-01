@@ -96,11 +96,13 @@ You can see what section you are by looking at what section is bolded (Auto).
 
 ### Toggling Views on the Whiteboard
 
-To focus on a specific alliance, you can toggle between the Red Alliance, Blue Alliance, and Full View by repeatedly clicking the purple toggle view button in the top right of the whiteboard.
+To focus on a specific alliance, you can toggle by repeatedly clicking the purple toggle view button in the top right of the whiteboard.
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/949160a1-4aba-427f-aa5e-cdd22db4e69e" alt="Image" width="50%">
 </p>
+
+Here are the different views you can toggle through.
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/97a60289-086e-4787-b008-754a5f885e83" alt="Image" width="45%" style="display: inline-block; margin-right: 10px;">
