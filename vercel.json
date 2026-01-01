@@ -1,0 +1,20 @@
+{
+  "redirects": [
+    {
+      "source": "/guide",
+      "destination": "/#/guide",
+      "permanent": false
+    },
+    {
+      "source": "/guide/",
+      "destination": "/#/guide",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
