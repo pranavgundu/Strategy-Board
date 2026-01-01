@@ -219,6 +219,10 @@ export class View {
         );
       }
 
+      // Handle hash-based routing for guide page
+      this.handleRouting();
+      window.addEventListener("hashchange", () => this.handleRouting());
+
       const trackedHandlers = [
         {
           el: B?.NewMatch,
@@ -1539,6 +1543,24 @@ export class View {
   private onClickGuideBack(_e: Event): void {
     this.hide(E.Guide);
     this.show(E.Home);
+    window.location.hash = "";
+  }
+
+  private handleRouting(): void {
+    const hash = window.location.hash;
+
+    if (hash === "#/guide" || hash === "#guide") {
+      // Show guide page
+      this.hide(E.Home);
+      this.hide(E.Whiteboard);
+      this.show(E.Guide);
+    } else {
+      // Default to home page if guide is showing
+      if (!E.Guide?.classList.contains("hidden")) {
+        this.hide(E.Guide);
+        this.show(E.Home);
+      }
+    }
   }
 
   private onClickToggleView(e: Event): void {
