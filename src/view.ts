@@ -5,7 +5,6 @@ import { QRImport, QRExport } from "./qr.ts";
 import { CLEAR, SET, GET } from "./db.ts";
 import { ContributorsService } from "./contributors.ts";
 import { uploadMatch, downloadMatch } from "./cloud.ts";
-import { Guide } from "./guide.ts";
 
 function debounce<T extends (...args: any[]) => any>(
   func: T,
@@ -93,7 +92,6 @@ let E: {
   ShareSuccessPanel?: HTMLElement | null;
   ShareCodeDisplay?: HTMLElement | null;
   ShareLinkDisplay?: HTMLInputElement | null;
-  Guide?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -104,7 +102,6 @@ export class View {
   private tbaService: any = null; // Lazy-loaded
   private pdfExport: any = null; // Lazy-loaded
   private contributorsService: ContributorsService;
-  private guide: Guide;
   private currentExportMatch: Match | null = null;
   private contributorTeams: string[] = [];
 
@@ -121,7 +118,6 @@ export class View {
 
     // tbaService and pdfExport are lazy-loaded when needed
     this.contributorsService = new ContributorsService();
-    this.guide = new Guide();
 
     const initDOM = () => {
       B = {
@@ -201,7 +197,6 @@ export class View {
         ShareSuccessPanel: get("share-success-container") as HTMLElement | null,
         ShareCodeDisplay: get("share-code-display") as HTMLElement | null,
         ShareLinkDisplay: get("share-link-display") as HTMLInputElement | null,
-        Guide: get("guide-container") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -216,10 +211,6 @@ export class View {
           match.blueThree,
         );
       }
-
-      // Handle hash-based routing for guide page
-      this.handleRouting();
-      window.addEventListener("hashchange", () => this.handleRouting());
 
       const trackedHandlers = [
         {
@@ -1073,17 +1064,11 @@ export class View {
       document.documentElement.style.backgroundColor = "#192334";
     } else if (e === E.Whiteboard) {
       document.documentElement.style.backgroundColor = "#18181b";
-    } else if (e === E.Guide) {
-      document.documentElement.style.backgroundColor = "#ffffff";
-      this.guide.show();
     }
     e?.classList.remove("hidden");
   }
 
   private hide(e: HTMLElement | null): void {
-    if (e === E.Guide) {
-      this.guide.hide();
-    }
     e?.classList.add("hidden");
   }
 
@@ -1530,23 +1515,6 @@ export class View {
     this.whiteboard.setActive(false);
     this.show(E.Home);
     this.hide(E.Whiteboard);
-  }
-
-  private handleRouting(): void {
-    const hash = window.location.hash;
-
-    if (hash === "#/guide" || hash === "#guide") {
-      // Show guide page
-      this.hide(E.Home);
-      this.hide(E.Whiteboard);
-      this.show(E.Guide);
-    } else {
-      // Default to home page if guide is showing
-      if (!E.Guide?.classList.contains("hidden")) {
-        this.hide(E.Guide);
-        this.show(E.Home);
-      }
-    }
   }
 
   private onClickToggleView(e: Event): void {

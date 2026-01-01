@@ -30,16 +30,6 @@
         <meta name="orientation" content="landscape" />
 
         <script>
-            // Handle /guide path redirects
-            (function() {
-                var path = window.location.pathname;
-                if (path === '/guide' || path === '/guide/' || path.endsWith('/guide') || path.endsWith('/guide/')) {
-                    window.location.replace(window.location.origin + window.location.pathname.replace(/\/guide\/?$/, '') + '/#/guide');
-                }
-            })();
-        </script>
-
-        <script>
             (function () {
                 function qs(id) {
                     return document.getElementById(id);
@@ -1175,22 +1165,6 @@
                         class="fa fa-close text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-red-500"
                     ></i>
                 </div>
-            </div>
-        </div>
-        <div
-            id="guide-container"
-            class="hidden w-dvw h-dvh bg-white overflow-auto"
-        >
-            <div
-                id="guide-content"
-                class="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16"
-                style="
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                    color: #1f2937;
-                    line-height: 1.7;
-                "
-            >
-                <div class="text-gray-600 text-center py-8">Loading guide...</div>
             </div>
         </div>
         <script>
