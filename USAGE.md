@@ -84,9 +84,7 @@ The whiteboard is divided into different sections for different parts of the mat
 - **Endgame**
 - **Notes**
 
-Auto, Teleop, and Endgame, <u>have the same view as they are the same fields</u>, just for different parts of the match. 
-
-*Notes* is a freeform section where you can jot down any additional information, as well as ranking points.
+Auto, Teleop, and Endgame, <u>have the same view as they are the same fields</u>, just for different parts of the match. *Notes* is a freeform section where you can jot down any additional information, as well as ranking points.
 
 To switch between sections, click on the respective button on the top of the whiteboard.
 
@@ -98,9 +96,15 @@ You can see what section you are by looking at what section is bolded (Auto).
 
 ### Toggling Views on the Whiteboard
 
+To focus on a specific alliance, you can toggle between the Red Alliance, Blue Alliance, and Full View by repeatedly clicking the purple toggle view button in the top right of the whiteboard.
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/949160a1-4aba-427f-aa5e-cdd22db4e69e" alt="Image" width="50%">
+</p>
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/97a60289-086e-4787-b008-754a5f885e83" alt="Image" width="45%" style="display: inline-block; margin-right: 10px;">
+<img src="https://github.com/user-attachments/assets/31028f1b-f1d3-4953-8972-6afdcd347f46" alt="Image" width="45%" style="display: inline-block;">
 </p>
 
 
