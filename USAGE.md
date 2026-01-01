@@ -78,10 +78,23 @@ This will bring you into the whiteboard view.
 
 ### Switching Sections on the Whiteboard
 
+The whiteboard is divided into different sections for different parts of the match.
+- Autonomous (**Auto**)
+- Teleoperated (**Teleop**)
+- **Endgame**
+- **Notes**
+
+Auto, Teleop, and Endgame, <u>have the same view as they are the same fields</u>, just for different parts of the match. 
+
+*Notes* is a freeform section where you can jot down any additional information, as well as ranking points.
+
+To switch between sections, click on the respective button on the top of the whiteboard.
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/86ea6070-b95e-438e-82a3-f480592798ee" alt="Image" width="50%">
 </p>
+
+You can see what section you are by looking at what section is bolded (Auto).
 
 ### Toggling Views on the Whiteboard
 
