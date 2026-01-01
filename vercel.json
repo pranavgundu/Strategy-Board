@@ -1,19 +1,11 @@
 {
-  "redirects": [
+  "rewrites": [
     {
       "source": "/guide",
-      "destination": "/#/guide",
-      "permanent": false
+      "destination": "/index.html"
     },
     {
       "source": "/guide/",
-      "destination": "/#/guide",
-      "permanent": false
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]

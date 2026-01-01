@@ -1082,7 +1082,7 @@ export class View {
     } else if (e === E.Whiteboard) {
       document.documentElement.style.backgroundColor = "#18181b";
     } else if (e === E.Guide) {
-      document.documentElement.style.backgroundColor = "#0f172a";
+      document.documentElement.style.backgroundColor = "#ffffff";
       this.guide.show();
     }
     e?.classList.remove("hidden");
