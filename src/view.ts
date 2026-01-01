@@ -5,6 +5,7 @@ import { QRImport, QRExport } from "./qr.ts";
 import { CLEAR, SET, GET } from "./db.ts";
 import { ContributorsService } from "./contributors.ts";
 import { uploadMatch, downloadMatch } from "./cloud.ts";
+import { Guide } from "./guide.ts";
 
 function debounce<T extends (...args: any[]) => any>(
   func: T,
@@ -44,6 +45,7 @@ let B: {
   ShareCodeCopy?: HTMLElement | null;
   ShareLinkCopy?: HTMLElement | null;
   TeamNumberSave?: HTMLElement | null;
+  GuideBack?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -92,6 +94,7 @@ let E: {
   ShareSuccessPanel?: HTMLElement | null;
   ShareCodeDisplay?: HTMLElement | null;
   ShareLinkDisplay?: HTMLInputElement | null;
+  Guide?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -102,6 +105,7 @@ export class View {
   private tbaService: any = null; // Lazy-loaded
   private pdfExport: any = null; // Lazy-loaded
   private contributorsService: ContributorsService;
+  private guide: Guide;
   private currentExportMatch: Match | null = null;
   private contributorTeams: string[] = [];
 
@@ -118,6 +122,7 @@ export class View {
 
     // tbaService and pdfExport are lazy-loaded when needed
     this.contributorsService = new ContributorsService();
+    this.guide = new Guide();
 
     const initDOM = () => {
       B = {
@@ -145,6 +150,7 @@ export class View {
         ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
         ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
         TeamNumberSave: get("team-number-save-btn") as HTMLElement | null,
+        GuideBack: get("guide-toolbar-back-btn") as HTMLElement | null,
       };
 
       I = {
@@ -197,6 +203,7 @@ export class View {
         ShareSuccessPanel: get("share-success-container") as HTMLElement | null,
         ShareCodeDisplay: get("share-code-display") as HTMLElement | null,
         ShareLinkDisplay: get("share-link-display") as HTMLInputElement | null,
+        Guide: get("guide-container") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -296,6 +303,12 @@ export class View {
           id: "qr-export-pdf-btn",
           evt: "click",
           fn: (e: Event) => this.onClickExportPDFFromModal(e),
+        },
+        {
+          el: B?.GuideBack,
+          id: "guide-toolbar-back-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickGuideBack(e),
         },
       ];
 
@@ -1064,11 +1077,17 @@ export class View {
       document.documentElement.style.backgroundColor = "#192334";
     } else if (e === E.Whiteboard) {
       document.documentElement.style.backgroundColor = "#18181b";
+    } else if (e === E.Guide) {
+      document.documentElement.style.backgroundColor = "#0f172a";
+      this.guide.show();
     }
     e?.classList.remove("hidden");
   }
 
   private hide(e: HTMLElement | null): void {
+    if (e === E.Guide) {
+      this.guide.hide();
+    }
     e?.classList.add("hidden");
   }
 
@@ -1515,6 +1534,11 @@ export class View {
     this.whiteboard.setActive(false);
     this.show(E.Home);
     this.hide(E.Whiteboard);
+  }
+
+  private onClickGuideBack(_e: Event): void {
+    this.hide(E.Guide);
+    this.show(E.Home);
   }
 
   private onClickToggleView(e: Event): void {

@@ -32,6 +32,7 @@
     "firebase": "^12.6.0",
     "idb-keyval": "^6.2.1",
     "jspdf": "^3.0.3",
+    "marked": "^17.0.1",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
     "tailwindcss": "^4.0.12",
