@@ -135,9 +135,25 @@ To erase any mistakes or unwanted drawings on the whiteboard, you can use the er
 
 ### Switching Colors on the Whiteboard
 
+To switch colors while drawing on the whiteboard, you can click the color palette icon in the bottom left of the whiteboard. 
+
+You will only be able to use the color chooser when you have the drawing tool selected or checkbox feature in the Notes section.
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/4aa78c94-b858-447a-8c8b-115b9832bc6e" alt="Image" width="50%">
+</p>
+
+From there you can choose from a variety of colors to draw with.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/45b3dad2-848b-4182-952e-ac4bcd9da02c" alt="Image" width="50%">
+</p>
+
+You will know what color you are using by looking at the color indicator at the bottom left of the whiteboard.
+
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/09fed1fb-54ad-4ccd-ac58-778a9904081f" alt="Image" width="50%">
 </p>
 
 ### Adding Checkboxes on the Whiteboard
