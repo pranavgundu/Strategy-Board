@@ -1571,25 +1571,6 @@ a:active,
     }
 }
 
-/* Robot config panel mobile optimization */
-@media (max-width: 640px) {
-    #whiteboard-robot-config {
-        width: 90vw !important;
-        max-width: 18rem !important;
-        height: auto !important;
-        padding: 1rem !important;
-    }
-
-    #whiteboard-robot-config .text-2xl {
-        font-size: 1.25rem !important;
-    }
-
-    #whiteboard-robot-config input {
-        font-size: 1.5rem !important;
-        padding: 0.5rem !important;
-    }
-}
-
 /* Ultra-small landscape screens (small phones in landscape) */
 @media (max-width: 653px) and (max-height: 280px) {
     #home-toolbar {

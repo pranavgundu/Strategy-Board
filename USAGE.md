@@ -149,7 +149,7 @@ From there you can choose from a variety of colors to draw with.
 <img src="https://github.com/user-attachments/assets/45b3dad2-848b-4182-952e-ac4bcd9da02c" alt="Image" width="50%">
 </p>
 
-You will know what color you are using by looking at the color indicator at the bottom left of the whiteboard.
+You will know what color you are using by looking at the color indicated at the bottom left of the whiteboard.
 
 
 <p align="center">
@@ -158,9 +158,16 @@ You will know what color you are using by looking at the color indicator at the 
 
 ### Adding Checkboxes on the Whiteboard
 
+To add checkboxes on the Notes section of the whiteboard, you have to cycle through the tools in the bottom right of the whiteboard until you reach the checkbox tool.
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/0737d77f-f352-40cf-9001-fc9d6e6ba459" alt="Image" width="50%">
+</p>
+
+You can place them anywhere and click them again to add a green checkmark to indicate that it was completed.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/1369c5f6-df47-4299-a1c6-f7a1f1d3426c" alt="Image" width="50%">
 </p>
 
 ## Managing Matches

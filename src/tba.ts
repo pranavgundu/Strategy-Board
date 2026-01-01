@@ -37,7 +37,6 @@ export interface TBASimpleEvent {
   location: string;
   dateRange: string;
   year: number;
-  startDate: Date;
 }
 
 export interface TBASimpleMatch {
@@ -218,7 +217,6 @@ export class TBAService {
         location,
         dateRange,
         year: event.year,
-        startDate,
       };
     });
   }
@@ -372,25 +370,6 @@ export class TBAService {
   public async fetchAndParseEvents(year: number): Promise<TBASimpleEvent[]> {
     const events = await this.getEvents(year);
     return this.parseEventsToSimple(events);
-  }
-
-  /**
-   * Filters events to only include those starting within a week from today.
-   *
-   * @param events - Array of simplified event information.
-   * @returns Filtered array of events starting within one week.
-   */
-  public filterEventsWithinOneWeek(events: TBASimpleEvent[]): TBASimpleEvent[] {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const oneWeekFromNow = new Date(today);
-    oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
-
-    return events.filter((event) => {
-      const eventStartDate = new Date(event.startDate);
-      eventStartDate.setHours(0, 0, 0, 0);
-      return eventStartDate <= oneWeekFromNow;
-    });
   }
 
   /**

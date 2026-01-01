@@ -418,46 +418,6 @@ export class Whiteboard {
         }
       });
 
-    const widthConfig = <HTMLInputElement>(
-      document.getElementById("whiteboard-robot-config-width")
-    );
-    widthConfig.addEventListener("input", (e) => {
-      if (this.selected !== null) {
-        let robotWidth = Number(widthConfig.value);
-        if (Number.isNaN(robotWidth) || robotWidth > 100 || robotWidth < 5) {
-          robotWidth = 30;
-        }
-        if (this.match === null) return;
-        this.match.auto[`${this.selected[0]}Robot`].w =
-          (robotWidth * width) / realWidth;
-        this.match.teleop[`${this.selected[0]}Robot`].w =
-          (robotWidth * width) / realWidth;
-        this.match.endgame[`${this.selected[0]}Robot`].w =
-          (robotWidth * width) / realWidth;
-        this.drawRobots();
-      }
-    });
-
-    const heightConfig = <HTMLInputElement>(
-      document.getElementById("whiteboard-robot-config-height")
-    );
-    heightConfig.addEventListener("input", (e) => {
-      if (this.selected !== null) {
-        let robotHeight = Number(heightConfig.value);
-        if (Number.isNaN(robotHeight) || robotHeight > 100 || robotHeight < 5) {
-          robotHeight = 30;
-        }
-        if (this.match === null) return;
-        this.match.auto[`${this.selected[0]}Robot`].h =
-          (robotHeight * height) / realHeight;
-        this.match.teleop[`${this.selected[0]}Robot`].h =
-          (robotHeight * height) / realHeight;
-        this.match.endgame[`${this.selected[0]}Robot`].h =
-          (robotHeight * height) / realHeight;
-        this.drawRobots();
-      }
-    });
-
     document
       .getElementById("whiteboard-color-close")
       ?.addEventListener("click", (e) => {
@@ -863,10 +823,6 @@ export class Whiteboard {
       this.teleopRedoHistory = [];
       this.endgameRedoHistory = [];
       this.notesRedoHistory = [];
-
-      document
-        .getElementById("whiteboard-robot-config")
-        ?.classList.add("hidden");
 
       if (this.updateInterval !== null) {
         clearInterval(this.updateInterval);
@@ -1474,7 +1430,6 @@ export class Whiteboard {
     if (this.mode === mode) return;
     this.lastSelected = null;
     this.selected = null;
-    document.getElementById("whiteboard-robot-config")?.classList.add("hidden");
     document
       .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
       ?.classList.remove("font-extrabold");
@@ -1601,35 +1556,6 @@ export class Whiteboard {
       Math.round(e.clientY / scaling - rect.top / scaling) -
       (height / 2 - this.camera.y);
     if (clickMovement > 30) return;
-
-    if (this.selected == null) {
-      document
-        .getElementById("whiteboard-robot-config")
-        ?.classList.add("hidden");
-    } else {
-      if (
-        this.lastSelected !== null &&
-        this.lastSelected[0] == this.selected[0]
-      ) {
-        if (
-          document
-            .getElementById("whiteboard-robot-config")
-            ?.classList.contains("hidden")
-        ) {
-          document
-            .getElementById("whiteboard-robot-config")
-            ?.classList.remove("hidden");
-        } else {
-          document
-            .getElementById("whiteboard-robot-config")
-            ?.classList.add("hidden");
-        }
-      } else {
-        document
-          .getElementById("whiteboard-robot-config")
-          ?.classList.add("hidden");
-      }
-    }
   }
 
   private onPointerMove(e: PointerEvent) {
@@ -1848,18 +1774,6 @@ export class Whiteboard {
       }
     }
     if (selected !== null) {
-      const widthConfig = <HTMLInputElement>(
-        document.getElementById("whiteboard-robot-config-width")
-      );
-      const heightConfig = <HTMLInputElement>(
-        document.getElementById("whiteboard-robot-config-height")
-      );
-      widthConfig.value = String(
-        Math.round(((selected[1].w * realWidth) / width) * 10) / 10,
-      );
-      heightConfig.value = String(
-        Math.round(((selected[1].h * realHeight) / height) * 10) / 10,
-      );
       this.lastSelected = this.selected;
       this.selected = selected;
       this.selectedType = "robot";
@@ -1892,9 +1806,6 @@ export class Whiteboard {
     this.selected = selected;
     if (this.selected == null) {
       this.drawRobots();
-      document
-        .getElementById("whiteboard-robot-config")
-        ?.classList.add("hidden");
       if (this.currentTool == "marker") {
         DR.lineWidth = 10;
         DR.lineCap = "round";
