@@ -171,10 +171,29 @@ You can place them anywhere and click them again to add a green checkmark to ind
 </p>
 
 ## Managing Matches
-### Duplicating Matches
+
+To manage any of your matches click on the three dots at the right of any match on the homepage. Following this multiple buttons will pop up giving you options to manage your match. 
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/9cc04fca-e290-41f6-80b0-462a4d900d84" alt="Image" width="50%">
+</p>
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/74550be2-85b9-4130-b6e6-5031bd1499e6" alt="Image" width="50%">
+</p>
+
+### Duplicating Matches
+
+To duplicate a match, click on the "Duplicate" button in the match options popup.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/10f17716-5098-4fba-a7a3-e66d1734a194" alt="Image" width="50%">
+</p>
+
+This will create a match with the exact same description and whiteboard as the original match, but with "Copy of " added to the front of the match name.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/546703cc-6cf2-44ed-afc8-6f3c08b90587" alt="Image" width="50%">
 </p>
 
 ### Deleting Matches
