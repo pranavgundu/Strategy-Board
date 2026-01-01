@@ -112,10 +112,18 @@ Here are the different views you can toggle through.
 
 ### Drawing on the Whiteboard
 
+To plan any strategy on the whiteboard you can use the drawing tool. 
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/d9f4cba7-e8e2-4aaf-98e7-b11af8d3385b" alt="Image" width="50%">
 </p>
+
+It is ***strongly recommended*** to use a stylus for better precision, but you can also use your mouse or finger (on touchscreens).
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/40051872-11e0-41ee-9f5b-a7f481d22cd4" alt="Image" width="50%">
+</p>
+
 
 ### Erasing on the Whiteboard
 
