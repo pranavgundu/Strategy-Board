@@ -252,7 +252,9 @@ From there the matches will populate and the popup will automatically close.
 </p>
 
 Here's a video demonstrating the process. 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Pkn3RHr7Ieg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<p align="center" width="100%">
+<video src="https://www.youtube.com/watch?v=Pkn3RHr7Ieg" width="75%" controls></video>
+</p>
 
 
 ## Exporting Matches
