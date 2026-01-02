@@ -211,7 +211,15 @@ This will delete the match permanently, so be careful when using this option.
 </p>
 
 ## Importing Matches from TBA (The Blue Alliance)
+1. Click on the blue "TBA" button on the homepage.
 
+<p align="center">
+<img src="https://github.com/user-attachments/assets/fb9a35c4-d37f-4e12-a95b-9d3bc5eba9d9" alt="Image" width="50%">
+</p>
+
+<p align="center">
+<img src="" alt="Image" width="50%">
+</p>
 
 <p align="center">
 <img src="" alt="Image" width="50%">

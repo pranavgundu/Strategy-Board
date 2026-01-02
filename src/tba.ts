@@ -395,4 +395,38 @@ export class TBAService {
     const matches = await this.getMatchesAtEvent(eventKey);
     return this.parseMatchesToSimple(matches);
   }
+
+  /**
+   * Filters events to only include those within one week of today.
+   *
+   * @param events - Array of TBA simple events.
+   * @returns Array of events within one week.
+   */
+  public filterEventsWithinOneWeek(events: TBASimpleEvent[]): TBASimpleEvent[] {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    return events.filter((event) => {
+      // Parse the date range to get the start date
+      // Format is either "Mon DD-DD" or "Mon DD - Mon DD"
+      const parts = event.dateRange.split(" ");
+      const month = parts[0];
+      const dayStr = parts[1].split("-")[0];
+      const day = parseInt(dayStr, 10);
+
+      const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+      ];
+      const monthIndex = monthNames.indexOf(month);
+
+      if (monthIndex === -1) {
+        return false;
+      }
+
+      const eventDate = new Date(event.year, monthIndex, day);
+      return eventDate >= oneWeekAgo && eventDate <= oneWeekFromNow;
+    });
+  }
 }
