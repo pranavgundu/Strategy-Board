@@ -397,14 +397,13 @@ export class TBAService {
   }
 
   /**
-   * Filters events to only include those within one week of today.
+   * Filters events to show all past events and future events up to 1 week from now.
    *
    * @param events - Array of TBA simple events.
-   * @returns Array of events within one week.
+   * @returns Array of filtered events.
    */
   public filterEventsWithinOneWeek(events: TBASimpleEvent[]): TBASimpleEvent[] {
     const now = new Date();
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     return events.filter((event) => {
@@ -426,7 +425,8 @@ export class TBAService {
       }
 
       const eventDate = new Date(event.year, monthIndex, day);
-      return eventDate >= oneWeekAgo && eventDate <= oneWeekFromNow;
+      // Show all past events and future events up to 1 week from now
+      return eventDate <= oneWeekFromNow;
     });
   }
 }
