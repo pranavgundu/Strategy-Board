@@ -217,13 +217,43 @@ This will delete the match permanently, so be careful when using this option.
 <img src="https://github.com/user-attachments/assets/fb9a35c4-d37f-4e12-a95b-9d3bc5eba9d9" alt="Image" width="50%">
 </p>
 
-<p align="center">
-<img src="" alt="Image" width="50%">
-</p>
+A popup will appear asking for details for the matches you want from TBA.
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/fa4c6351-bce6-4d57-a7ff-785bd7a1c3ee" alt="Image" width="50%">
 </p>
+
+
+2. Choose whether or not you want to use a shared API key or your own API key. During peak competitions, there may be a lot of traffic on the shared API key, so it is recommended to use your own API key if you don't want to face any issues. **By default you use the shared API key.**
+
+3. Choose from what even you want to get matches from by entering the name of the event. You can only see past events or events that are happening in the next week. As soon as you start to type in the name a list of potential events will appear for you to choose from.
+
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/076b42cd-d403-4135-9110-ff4cb1be4d41" alt="Image" width="50%">
+</p>
+
+4. Choose the team that you want to get matches for or all matches from that event. You need to scroll all the way down to see the "All Matches" option.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/284e5888-2b50-4e2f-b423-67ec8e69a77f" alt="Image" width="50%">
+</p>
+
+5. Click the "Import" button to import the matches. Unless you clicked "All Matches", which would directly import all the matches. 
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/b2cdcbba-8582-4570-9cce-59654006a033" alt="Image" width="50%">
+</p>
+
+From there the matches will populate and the popup will automatically close.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/7633b502-e0ae-48d3-bc12-2ad839960bb2" alt="Image" width="50%">
+</p>
+
+Here's a video demonstrating the process. 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Pkn3RHr7Ieg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 
 ## Exporting Matches
 ### Exporting as a PNG
