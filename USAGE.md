@@ -252,8 +252,8 @@ From there the matches will populate and the popup will automatically close.
 </p>
 
 Here's a video demonstrating the process. 
-<p align="center" width="100%">
-<video src="https://github.com/user-attachments/assets/456de6a8-2ca7-438f-8980-43621407b2db" width="75%" controls></video>
+<p align="center" width="50%">
+<video src="https://github.com/user-attachments/assets/48e85b32-34f5-46d6-bbce-baf54ca13330" width="50%" controls></video>
 </p>
 
 
