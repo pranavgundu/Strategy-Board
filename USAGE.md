@@ -198,9 +198,16 @@ This will create a match with the exact same description and whiteboard as the o
 
 ### Deleting Matches
 
+To delete a match, click on the "Delete" button in the match options popup.
 
 <p align="center">
-<img src="" alt="Image" width="50%">
+<img src="https://github.com/user-attachments/assets/29518844-dcda-4a33-89b7-cb8f5651539d" alt="Image" width="50%">
+</p>
+
+This will delete the match permanently, so be careful when using this option.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/6403cee3-c502-482f-be4c-d37d06ed5f77" alt="Image" width="50%">
 </p>
 
 ## Importing Matches from TBA (The Blue Alliance)
