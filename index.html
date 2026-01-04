@@ -1,16 +1,23 @@
 <!doctype html>
 <html style="background-color: #192334">
     <head>
-        <!-- Google Tag Manager -->
-        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-WJ4D4FGS');</script>
-        <!-- End Google Tag Manager -->
-        <!-- Load critical CSS first to avoid FOUC -->
-        <link rel="stylesheet" href="./styles.css" fetchpriority="high" />                
+        <script>
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    "gtm.start": new Date().getTime(),
+                    event: "gtm.js",
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l != "dataLayer" ? "&l=" + l : "";
+                j.async = true;
+                j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, "script", "dataLayer", "GTM-WJ4D4FGS");
+        </script>
 
+        <link rel="stylesheet" href="./styles.css" fetchpriority="high" />
 
         <title>Strategy Board</title>
         <meta name="description" content="FRC Strategy Board" />
@@ -238,8 +245,14 @@
     </head>
     <body class="overflow-hidden">
         <!-- Google Tag Manager (noscript) -->
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WJ4D4FGS"
-        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <noscript
+            ><iframe
+                src="https://www.googletagmanager.com/ns.html?id=GTM-WJ4D4FGS"
+                height="0"
+                width="0"
+                style="display: none; visibility: hidden"
+            ></iframe
+        ></noscript>
         <!-- End Google Tag Manager (noscript) -->
         <div id="app-loading" role="status" aria-live="polite">
             <div class="loading-card">
@@ -254,7 +267,14 @@
             <div class="rotate-icon"><i class="fas fa-mobile-alt"></i></div>
             <div class="message">Please rotate your device</div>
             <div class="submessage">This app works best in landscape mode</div>
-            <button class="dismiss-button" onclick="document.getElementById('orientation-warning').classList.add('dismissed')">
+            <button
+                class="dismiss-button"
+                onclick="
+                    document
+                        .getElementById('orientation-warning')
+                        .classList.add('dismissed')
+                "
+            >
                 Continue in Portrait
             </button>
         </div>
@@ -290,8 +310,12 @@
             <div
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-md bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
             >
-                <div class="w-full pt-6 pb-4 px-6 bg-slate-500 rounded-t-2xl md:rounded-t-3xl">
-                    <h2 class="text-2xl sm:text-3xl text-center text-slate-100 font-bold">
+                <div
+                    class="w-full pt-6 pb-4 px-6 bg-slate-500 rounded-t-2xl md:rounded-t-3xl"
+                >
+                    <h2
+                        class="text-2xl sm:text-3xl text-center text-slate-100 font-bold"
+                    >
                         Welcome to Strategy Board!
                     </h2>
                     <p class="text-center text-slate-300 mt-2">
@@ -331,7 +355,9 @@
                 >
                     Strategy Board
                 </div>
-                <div class="flex gap-2 sm:gap-3 md:gap-4 text-base sm:text-xl md:text-2xl text-white">
+                <div
+                    class="flex gap-2 sm:gap-3 md:gap-4 text-base sm:text-xl md:text-2xl text-white"
+                >
                     <button
                         id="home-toolbar-new-btn"
                         class="flex items-center justify-center w-16 sm:w-20 md:w-24 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-green-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
@@ -343,7 +369,11 @@
                         class="flex items-center justify-center w-16 sm:w-20 md:w-24 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-blue-500 glass-button glossy-shine gap-1 sm:gap-2 text-sm sm:text-base md:text-lg lg:text-xl"
                     >
                         <span>TBA</span>
-                        <img src="/tba.svg" alt="TBA" class="h-5 sm:h-6 md:h-8 w-auto" />
+                        <img
+                            src="/tba.svg"
+                            alt="TBA"
+                            class="h-5 sm:h-6 md:h-8 w-auto"
+                        />
                     </button>
                     <button
                         id="home-toolbar-import-btn"
@@ -375,7 +405,12 @@
                     id="home-match-list-empty-placeholder"
                     class="absolute top-1/2 text-slate-300 text-base sm:text-lg md:text-xl italic pointer-events-none"
                 >
-                    Click <span class="not-italic text-white bg-green-500 px-2 py-1 rounded-lg">New</span> to add matches
+                    Click
+                    <span
+                        class="not-italic text-white bg-green-500 px-2 py-1 rounded-lg"
+                        >New</span
+                    >
+                    to add matches
                 </div>
                 <div
                     id="home-match-list-item-template"
@@ -386,7 +421,9 @@
                     >
                         Match Name
                     </div>
-                    <div class="w-1/2 flex justify-center items-center gap-2 sm:gap-4 md:gap-6">
+                    <div
+                        class="w-1/2 flex justify-center items-center gap-2 sm:gap-4 md:gap-6"
+                    >
                         <div
                             class="w-1/2 text-red-400 text-sm sm:text-base md:text-lg lg:text-2xl text-right select-none overflow-hidden text-ellipsis whitespace-nowrap"
                         >
@@ -403,15 +440,25 @@
                             000 000 000
                         </div>
                     </div>
-                    <div class="grow-1 basis-0 flex h-full justify-end items-center">
+                    <div
+                        class="grow-1 basis-0 flex h-full justify-end items-center"
+                    >
                         <button
                             class="flex flex-col w-8 sm:w-10 md:w-12 gap-1 items-center justify-center"
                         >
-                            <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></div>
-                            <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></div>
-                            <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></div>
+                            <div
+                                class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
+                            ></div>
+                            <div
+                                class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
+                            ></div>
+                            <div
+                                class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
+                            ></div>
                         </button>
-                        <div class="hidden flex items-center justify-center gap-2">
+                        <div
+                            class="hidden flex items-center justify-center gap-2"
+                        >
                             <button
                                 class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-green-500 rounded-xl glass-button glossy-shine"
                             >
@@ -431,7 +478,9 @@
                                 class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-purple-500 rounded-xl glass-button glossy-shine whitespace-nowrap flex items-center justify-center gap-1"
                             >
                                 <span>Share</span>
-                                <i class="fas fa-link text-xs sm:text-sm md:text-base"></i>
+                                <i
+                                    class="fas fa-link text-xs sm:text-sm md:text-base"
+                                ></i>
                             </button>
                             <button
                                 class="w-20 sm:w-24 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-red-500 rounded-xl glass-button glossy-shine"
@@ -455,7 +504,10 @@
                     <i class="fab fa-github text-2xl"></i>
                     <span class="text-lg font-semibold"></span>
                 </a>
-                <div id="last-commit-info" class="absolute left-6 text-slate-400 text-xs hidden">
+                <div
+                    id="last-commit-info"
+                    class="absolute left-6 text-slate-400 text-xs hidden"
+                >
                     <span class="opacity-0">Loading...</span>
                 </div>
                 <a
@@ -482,7 +534,8 @@
                 <div
                     class="w-full px-6 sm:px-8 md:px-10 pb-6 text-base sm:text-lg text-center text-slate-300"
                 >
-                    This will permanently delete all matches and data. This action cannot be undone.
+                    This will permanently delete all matches and data. This
+                    action cannot be undone.
                 </div>
                 <div class="flex w-full">
                     <button
@@ -611,7 +664,9 @@
                             autocapitalize="off"
                             spellcheck="false"
                         />
-                        <div class="text-xs sm:text-sm text-slate-400 text-center mt-2">
+                        <div
+                            class="text-xs sm:text-sm text-slate-400 text-center mt-2"
+                        >
                             Using shared API key. Add your own at
                             <a
                                 href="https://www.thebluealliance.com/account"
@@ -622,7 +677,9 @@
                             for higher rate limits
                         </div>
                     </div>
-                    <div class="w-full px-4 sm:px-6 md:px-8 pb-3 sm:pb-4 relative">
+                    <div
+                        class="w-full px-4 sm:px-6 md:px-8 pb-3 sm:pb-4 relative"
+                    >
                         <input
                             id="tba-event-search"
                             placeholder="Search events..."
@@ -642,7 +699,9 @@
                         </div>
                         <input id="tba-event-key" type="hidden" />
                     </div>
-                    <div class="w-full px-4 sm:px-6 md:px-8 pb-4 sm:pb-5 md:pb-6 relative">
+                    <div
+                        class="w-full px-4 sm:px-6 md:px-8 pb-4 sm:pb-5 md:pb-6 relative"
+                    >
                         <input
                             id="tba-team-search"
                             placeholder="Select event first..."
@@ -762,7 +821,10 @@
                     <div class="text-center text-slate-300">
                         <p class="text-sm sm:text-base mb-2">Share Code:</p>
                         <div class="flex items-center justify-center gap-2">
-                            <p id="share-code-display" class="text-2xl sm:text-3xl md:text-4xl font-mono font-bold tracking-wider text-white bg-slate-700 px-4 py-2 rounded-xl">
+                            <p
+                                id="share-code-display"
+                                class="text-2xl sm:text-3xl md:text-4xl font-mono font-bold tracking-wider text-white bg-slate-700 px-4 py-2 rounded-xl"
+                            >
                                 ABC123
                             </p>
                             <button
@@ -794,7 +856,8 @@
                         </div>
                     </div>
                     <div class="text-center text-slate-400 text-xs sm:text-sm">
-                        <i class="fas fa-info-circle"></i> Link expires in 1 week
+                        <i class="fas fa-info-circle"></i> Link expires in 1
+                        week
                     </div>
                 </div>
                 <div class="flex w-full">
@@ -855,7 +918,7 @@
         <div
             id="qr-export-container"
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
-            style="touch-action: auto;"
+            style="touch-action: auto"
         >
             <!-- Inner container: clicking inside should NOT close the overlay.
                  We use an inline stopPropagation handler so the View's click-on-overlay
@@ -876,7 +939,11 @@
                         id="qr-export-close-btn"
                         class="text-white bg-red-500 px-3 py-1 rounded-xl hover:bg-red-600 glass-button glossy-shine"
                         title="Close export"
-                        onclick="document.getElementById('qr-export-container').click()"
+                        onclick="
+                            document
+                                .getElementById('qr-export-container')
+                                .click()
+                        "
                     >
                         Close
                     </button>
@@ -986,8 +1053,12 @@
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-5/6 md:w-4/5 lg:w-3/4 max-w-6xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal max-h-[90vh] overflow-hidden"
                 onclick="event.stopPropagation()"
             >
-                <div class="w-full pt-6 pb-4 px-6 flex justify-between items-center border-b border-slate-500">
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl text-slate-200 font-bold">
+                <div
+                    class="w-full pt-6 pb-4 px-6 flex justify-between items-center border-b border-slate-500"
+                >
+                    <h2
+                        class="text-2xl sm:text-3xl md:text-4xl text-slate-200 font-bold"
+                    >
                         Contributors
                     </h2>
                     <button
@@ -997,15 +1068,30 @@
                         Close
                     </button>
                 </div>
-                
-                <div id="contributors-content" class="w-full flex-1 overflow-y-auto p-6">
-                    <div id="contributors-loading" class="flex flex-col items-center justify-center h-full">
-                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mb-4"></div>
-                        <p class="text-slate-300 text-lg">Loading contributors...</p>
+
+                <div
+                    id="contributors-content"
+                    class="w-full flex-1 overflow-y-auto p-6"
+                >
+                    <div
+                        id="contributors-loading"
+                        class="flex flex-col items-center justify-center h-full"
+                    >
+                        <div
+                            class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mb-4"
+                        ></div>
+                        <p class="text-slate-300 text-lg">
+                            Loading contributors...
+                        </p>
                     </div>
-                    
-                    <div id="contributors-error" class="hidden flex flex-col items-center justify-center h-full">
-                        <p class="text-red-400 text-lg mb-4">Failed to load contributors</p>
+
+                    <div
+                        id="contributors-error"
+                        class="hidden flex flex-col items-center justify-center h-full"
+                    >
+                        <p class="text-red-400 text-lg mb-4">
+                            Failed to load contributors
+                        </p>
                         <button
                             id="contributors-retry-btn"
                             class="px-6 py-3 bg-green-500 text-white rounded-xl glass-button glossy-shine hover:bg-green-600 transition-colors font-semibold"
@@ -1013,12 +1099,18 @@
                             Retry
                         </button>
                     </div>
-                    
+
                     <div id="contributors-list" class="hidden space-y-6">
-                        <div id="contributors-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div
+                            id="contributors-grid"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        >
                             <!-- Contributors will be dynamically inserted here -->
                         </div>
-                        <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div
+                            id="teams-grid"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        >
                             <!-- Teams will be dynamically inserted here -->
                         </div>
                     </div>
@@ -1184,33 +1276,47 @@
 
                         // Better type checking
                         if (!bg || !items || !drawing) {
-                            console.error("PNG Export: One or more canvases not found", {
-                                bg: !!bg,
-                                items: !!items,
-                                drawing: !!drawing
-                            });
+                            console.error(
+                                "PNG Export: One or more canvases not found",
+                                {
+                                    bg: !!bg,
+                                    items: !!items,
+                                    drawing: !!drawing,
+                                },
+                            );
                             return null;
                         }
 
                         // Verify they are canvas elements
-                        if (!(bg instanceof HTMLCanvasElement) ||
+                        if (
+                            !(bg instanceof HTMLCanvasElement) ||
                             !(items instanceof HTMLCanvasElement) ||
-                            !(drawing instanceof HTMLCanvasElement)) {
-                            console.error("PNG Export: Elements are not canvas elements");
+                            !(drawing instanceof HTMLCanvasElement)
+                        ) {
+                            console.error(
+                                "PNG Export: Elements are not canvas elements",
+                            );
                             return null;
                         }
 
                         var w = bg.width || 3510;
                         var h = bg.height || 1610;
 
-                        console.log("PNG Export: Creating composite canvas", w, "x", h);
+                        console.log(
+                            "PNG Export: Creating composite canvas",
+                            w,
+                            "x",
+                            h,
+                        );
 
                         var out = document.createElement("canvas");
                         out.width = w;
                         out.height = h;
                         var ctx = out.getContext("2d");
                         if (!ctx) {
-                            console.error("PNG Export: Failed to get 2d context");
+                            console.error(
+                                "PNG Export: Failed to get 2d context",
+                            );
                             return null;
                         }
 
@@ -1219,10 +1325,15 @@
                         ctx.drawImage(items, 0, 0);
                         ctx.drawImage(drawing, 0, 0);
 
-                        console.log("PNG Export: Composite canvas created successfully");
+                        console.log(
+                            "PNG Export: Composite canvas created successfully",
+                        );
                         return out;
                     } catch (err) {
-                        console.error("PNG Export: Error in compositeCanvases", err);
+                        console.error(
+                            "PNG Export: Error in compositeCanvases",
+                            err,
+                        );
                         return null;
                     }
                 }
@@ -1404,7 +1515,13 @@
             id="app-module-script"
             crossorigin
             onload="document.dispatchEvent(new Event('app:moduleloaded'))"
-            onerror="document.dispatchEvent(new CustomEvent('app:moduleerror',{detail:{message:'module load failed'}}))"
+            onerror="
+                document.dispatchEvent(
+                    new CustomEvent('app:moduleerror', {
+                        detail: { message: 'module load failed' },
+                    }),
+                )
+            "
         ></script>
     </body>
 </html>
