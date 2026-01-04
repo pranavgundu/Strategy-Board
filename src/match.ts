@@ -252,6 +252,7 @@ export class Match {
           b3: Match.robotFromArrayPacket(packet[8][1][5]),
           d: packet[8][1][6],
           dx: packet[8][1][7],
+          cb: packet[8][1][8] || [],
         },
         t: {
           r1: Match.robotFromArrayPacket(packet[8][2][0]),
@@ -262,6 +263,7 @@ export class Match {
           b3: Match.robotFromArrayPacket(packet[8][2][5]),
           d: packet[8][2][6],
           dx: packet[8][2][7],
+          cb: packet[8][2][8] || [],
         },
         e: {
           r1: Match.robotFromArrayPacket(packet[8][3][0]),
@@ -272,17 +274,21 @@ export class Match {
           b3: Match.robotFromArrayPacket(packet[8][3][5]),
           d: packet[8][3][6],
           dx: packet[8][3][7],
+          cb: packet[8][3][8] || [],
         },
-        n: packet[8][4] ? {
-          r1: Match.robotFromArrayPacket(packet[8][4][0]),
-          r2: Match.robotFromArrayPacket(packet[8][4][1]),
-          r3: Match.robotFromArrayPacket(packet[8][4][2]),
-          b1: Match.robotFromArrayPacket(packet[8][4][3]),
-          b2: Match.robotFromArrayPacket(packet[8][4][4]),
-          b3: Match.robotFromArrayPacket(packet[8][4][5]),
-          d: packet[8][4][6],
-          dx: packet[8][4][7],
-        } : undefined,
+        n: packet[8][4]
+          ? {
+              r1: Match.robotFromArrayPacket(packet[8][4][0]),
+              r2: Match.robotFromArrayPacket(packet[8][4][1]),
+              r3: Match.robotFromArrayPacket(packet[8][4][2]),
+              b1: Match.robotFromArrayPacket(packet[8][4][3]),
+              b2: Match.robotFromArrayPacket(packet[8][4][4]),
+              b3: Match.robotFromArrayPacket(packet[8][4][5]),
+              d: packet[8][4][6],
+              dx: packet[8][4][7],
+              cb: packet[8][4][8] || [],
+            }
+          : undefined,
       },
     );
   }
@@ -380,6 +386,7 @@ export class Match {
           ],
           this.auto.drawing,
           this.auto.drawingBBox,
+          this.auto.checkboxes,
         ],
         [
           [
@@ -414,6 +421,7 @@ export class Match {
           ],
           this.teleop.drawing,
           this.teleop.drawingBBox,
+          this.teleop.checkboxes,
         ],
         [
           [
@@ -448,6 +456,7 @@ export class Match {
           ],
           this.endgame.drawing,
           this.endgame.drawingBBox,
+          this.endgame.checkboxes,
         ],
         [
           [
@@ -482,6 +491,7 @@ export class Match {
           ],
           this.notes.drawing,
           this.notes.drawingBBox,
+          this.notes.checkboxes,
         ],
       ],
     ];
