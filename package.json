@@ -31,7 +31,7 @@
     "es-abstract": "^1.24.0",
     "firebase": "^12.6.0",
     "idb-keyval": "^6.2.1",
-    "jspdf": "^3.0.3",
+    "jspdf": "^4.0.0",
     "marked": "^17.0.1",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",

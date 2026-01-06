@@ -5,13 +5,19 @@ import { QRImport, QRExport } from "./qr.ts";
 import { CLEAR, SET, GET } from "./db.ts";
 import { ContributorsService } from "./contributors.ts";
 import { uploadMatch, downloadMatch } from "./cloud.ts";
+import {
+  fuzzySearchItems,
+  extractEventItems,
+  extractTeamItems,
+  type SearchableItem,
+} from "./fuzzySearch.ts";
 
 function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: number | undefined;
-  return function(...args: Parameters<T>) {
+  return function (...args: Parameters<T>) {
     clearTimeout(timeout);
     timeout = window.setTimeout(() => func(...args), wait);
   };
@@ -134,7 +140,9 @@ export class View {
         TBACancel: get("tba-cancel-btn") as HTMLElement | null,
         TBAAllMatchesBtn: get("tba-all-matches-btn") as HTMLElement | null,
         ClearConfirmClear: get("clear-confirm-clear-btn") as HTMLElement | null,
-        ClearConfirmCancel: get("clear-confirm-cancel-btn") as HTMLElement | null,
+        ClearConfirmCancel: get(
+          "clear-confirm-cancel-btn",
+        ) as HTMLElement | null,
         ContributorsLink: get("contributors-link-btn") as HTMLElement | null,
         ContributorsClose: get("contributors-close-btn") as HTMLElement | null,
         ContributorsRetry: get("contributors-retry-btn") as HTMLElement | null,
@@ -665,9 +673,10 @@ export class View {
 
             updateProgressBarFromStatus(statusId, barId);
 
-            const overlayId = statusId === "qr-export-status"
-              ? "qr-export-container"
-              : "qr-import-container";
+            const overlayId =
+              statusId === "qr-export-status"
+                ? "qr-export-container"
+                : "qr-import-container";
             const overlay = get(overlayId);
 
             try {
@@ -970,14 +979,14 @@ export class View {
       // Re-render match list to apply team animations now that teams are loaded
       this.refreshMatchList();
     } catch (error) {
-      console.error('Failed to load contributor teams:', error);
+      console.error("Failed to load contributor teams:", error);
     }
   }
 
   private refreshMatchList(): void {
     if (!E.MatchList) return;
     // Clear and re-render all matches with updated team animations
-    E.MatchList.innerHTML = '';
+    E.MatchList.innerHTML = "";
     for (const match of this.model.matches) {
       this.createNewMatch(
         match.id,
@@ -1019,9 +1028,9 @@ export class View {
       if (commit) {
         const date = new Date(commit.date);
         const timeAgo = this.getTimeAgo(date);
-        
+
         E.LastCommitInfo.innerHTML = `
-          <a href="${commit.url}" target="_blank" rel="noopener noreferrer" 
+          <a href="${commit.url}" target="_blank" rel="noopener noreferrer"
              class="hover:text-slate-300 transition-colors flex items-center gap-2"
              title="latest commit: ${commit.message}">
             <span class="font-mono">${commit.sha}</span>
@@ -1039,7 +1048,7 @@ export class View {
 
   private getTimeAgo(date: Date): string {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-    
+
     const intervals = {
       year: 31536000,
       month: 2592000,
@@ -1052,11 +1061,11 @@ export class View {
     for (const [unit, secondsInUnit] of Object.entries(intervals)) {
       const interval = Math.floor(seconds / secondsInUnit);
       if (interval >= 1) {
-        return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+        return `${interval} ${unit}${interval > 1 ? "s" : ""} ago`;
       }
     }
-    
-    return 'just now';
+
+    return "just now";
   }
 
   private show(e: HTMLElement | null): void {
@@ -1136,49 +1145,61 @@ export class View {
     item.children[0].textContent = matchName;
 
     // Helper function to create colored team number spans with glow effect for special teams
-    const createTeamSpan = (teamNumber: string, animationType: 'rainbow' | 'gold' | 'none', baseColor: string): string => {
-      if (animationType === 'rainbow') {
+    const createTeamSpan = (
+      teamNumber: string,
+      animationType: "rainbow" | "gold" | "none",
+      baseColor: string,
+    ): string => {
+      if (animationType === "rainbow") {
         // Create sequential rainbow glow animation for each digit (for contributor teams)
-        const digits = teamNumber.split('');
-        const animatedDigits = digits.map((digit, index) => {
-          const delay = index * 0.3; // 0.3s delay between each digit
-          return `<span class="rainbow-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
-        }).join('');
+        const digits = teamNumber.split("");
+        const animatedDigits = digits
+          .map((digit, index) => {
+            const delay = index * 0.3; // 0.3s delay between each digit
+            return `<span class="rainbow-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
+          })
+          .join("");
         return `<span class="${baseColor}">${animatedDigits}</span>`;
       }
-      if (animationType === 'gold') {
+      if (animationType === "gold") {
         // Create sequential gold glow animation for each digit (for 834)
-        const digits = teamNumber.split('');
-        const animatedDigits = digits.map((digit, index) => {
-          const delay = index * 0.3; // 0.3s delay between each digit
-          return `<span class="special-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
-        }).join('');
+        const digits = teamNumber.split("");
+        const animatedDigits = digits
+          .map((digit, index) => {
+            const delay = index * 0.3; // 0.3s delay between each digit
+            return `<span class="special-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
+          })
+          .join("");
         return `<span class="${baseColor}">${animatedDigits}</span>`;
       }
       return `<span class="${baseColor}">${teamNumber}</span>`;
     };
 
-    const goldTeam = '834';
+    const goldTeam = "834";
     const contributorTeams = this.contributorTeams || [];
-    
-    const getAnimationType = (team: string): 'rainbow' | 'gold' | 'none' => {
-      if (team === goldTeam) return 'gold';
-      if (contributorTeams.includes(team)) return 'rainbow';
-      return 'none';
+
+    const getAnimationType = (team: string): "rainbow" | "gold" | "none" => {
+      if (team === goldTeam) return "gold";
+      if (contributorTeams.includes(team)) return "rainbow";
+      return "none";
     };
 
     // Build HTML for red alliance with individual team colors
     const redAllianceElement = item.children[1].children[0] as HTMLElement;
     const redTeamsHTML = [redThree, redTwo, redOne]
-      .map(team => createTeamSpan(team, getAnimationType(team), 'text-red-400'))
-      .join(' ');
+      .map((team) =>
+        createTeamSpan(team, getAnimationType(team), "text-red-400"),
+      )
+      .join(" ");
     redAllianceElement.innerHTML = redTeamsHTML;
 
     // Build HTML for blue alliance with individual team colors
     const blueAllianceElement = item.children[1].children[2] as HTMLElement;
     const blueTeamsHTML = [blueOne, blueTwo, blueThree]
-      .map(team => createTeamSpan(team, getAnimationType(team), 'text-blue-400'))
-      .join(' ');
+      .map((team) =>
+        createTeamSpan(team, getAnimationType(team), "text-blue-400"),
+      )
+      .join(" ");
     blueAllianceElement.innerHTML = blueTeamsHTML;
 
     item.setAttribute("tabindex", "0");
@@ -1220,7 +1241,7 @@ export class View {
         // Hide the options menu first
         this.hide(options);
         this.show(kebab);
-        
+
         // Then show the export overlay
         this.show(E.Export);
         setTimeout(() => {
@@ -1390,7 +1411,7 @@ export class View {
       I.BlueThree.value,
     );
     this.hide(E.CreateMatchPanel);
-    
+
     // Clear all input fields
     I.MatchName.value = "";
     I.RedOne.value = "";
@@ -1411,7 +1432,7 @@ export class View {
     try {
       // Set the match on the whiteboard so it knows what to draw
       this.whiteboard.setMatch(this.currentExportMatch);
-      
+
       // Force a complete redraw of all canvases before export to ensure they're rendered
       console.log("PNG Export: Forcing whiteboard redraw before export");
       this.whiteboard.forceRedraw();
@@ -1762,7 +1783,13 @@ export class View {
       const allEvents = allEventsArrays.flat();
       const events = this.tbaService.filterEventsWithinOneWeek(allEvents);
 
-      console.log("Loaded events:", events.length, "(filtered from", allEvents.length, ")");
+      console.log(
+        "Loaded events:",
+        events.length,
+        "(filtered from",
+        allEvents.length,
+        ")",
+      );
 
       if (!E?.TBAEventList) return;
 
@@ -1888,7 +1915,7 @@ export class View {
           I.TBAApiKey!.placeholder = "API Key (saved)";
         }
       };
-      
+
       I.TBAApiKey.addEventListener("blur", saveApiKey);
       I.TBAApiKey.addEventListener("change", saveApiKey);
     }
@@ -1976,31 +2003,37 @@ export class View {
   private filterTBAEvents(searchTerm: string): void {
     if (!E?.TBAEventList) return;
 
-    const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
-    let visibleCount = 0;
-
-    items.forEach((item) => {
-      const name =
-        item.querySelector(".tba-event-name")?.textContent?.toLowerCase() || "";
-      const details =
-        item.querySelector(".tba-event-details")?.textContent?.toLowerCase() ||
-        "";
-      const eventKey =
-        (item as HTMLElement).dataset.eventKey?.toLowerCase() || "";
-
-      if (
-        name.includes(searchTerm) ||
-        details.includes(searchTerm) ||
-        eventKey.includes(searchTerm)
-      ) {
+    // If no search term, show all items in original order
+    if (!searchTerm) {
+      const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
+      items.forEach((item) => {
         (item as HTMLElement).style.display = "";
-        visibleCount++;
-      } else {
-        (item as HTMLElement).style.display = "none";
+      });
+      if (items.length > 0) {
+        this.show(E.TBAEventDropdown);
       }
+      return;
+    }
+
+    // Extract searchable items from the dropdown
+    const searchableItems = extractEventItems(E.TBAEventList);
+
+    // Perform fuzzy search with ranking
+    const matches = fuzzySearchItems(searchableItems, searchTerm, 5);
+
+    // Hide all items first
+    searchableItems.forEach((item) => {
+      item.element.style.display = "none";
     });
 
-    if (visibleCount > 0) {
+    // Show and reorder matched items by score
+    if (matches.length > 0) {
+      // Reorder DOM elements based on match score
+      matches.forEach((match) => {
+        match.item.style.display = "";
+        // Move to end of list (maintains score order since we process in order)
+        E.TBAEventList!.appendChild(match.item);
+      });
       this.show(E.TBAEventDropdown);
     } else {
       this.hide(E.TBAEventDropdown);
@@ -2010,24 +2043,37 @@ export class View {
   private filterTBATeams(searchTerm: string): void {
     if (!E?.TBATeamList) return;
 
-    const items = E.TBATeamList.querySelectorAll(".tba-team-item");
-    let visibleCount = 0;
-
-    items.forEach((item) => {
-      const teamNumber = (item as HTMLElement).dataset.teamNumber || "";
-
-      if (
-        teamNumber.includes(searchTerm) ||
-        item.textContent?.toLowerCase().includes(searchTerm)
-      ) {
+    // If no search term, show all items in original order
+    if (!searchTerm) {
+      const items = E.TBATeamList.querySelectorAll(".tba-team-item");
+      items.forEach((item) => {
         (item as HTMLElement).style.display = "";
-        visibleCount++;
-      } else {
-        (item as HTMLElement).style.display = "none";
+      });
+      if (items.length > 0) {
+        this.show(E.TBATeamDropdown);
       }
+      return;
+    }
+
+    // Extract searchable items from the dropdown
+    const searchableItems = extractTeamItems(E.TBATeamList);
+
+    // Perform fuzzy search with ranking
+    const matches = fuzzySearchItems(searchableItems, searchTerm, 5);
+
+    // Hide all items first
+    searchableItems.forEach((item) => {
+      item.element.style.display = "none";
     });
 
-    if (visibleCount > 0) {
+    // Show and reorder matched items by score
+    if (matches.length > 0) {
+      // Reorder DOM elements based on match score
+      matches.forEach((match) => {
+        match.item.style.display = "";
+        // Move to end of list (maintains score order since we process in order)
+        E.TBATeamList!.appendChild(match.item);
+      });
       this.show(E.TBATeamDropdown);
     } else {
       this.hide(E.TBATeamDropdown);
@@ -2254,7 +2300,13 @@ export class View {
   }
 
   private async loadContributors() {
-    if (!E.ContributorsLoading || !E.ContributorsError || !E.ContributorsList || !E.ContributorsGrid || !E.TeamsGrid) {
+    if (
+      !E.ContributorsLoading ||
+      !E.ContributorsError ||
+      !E.ContributorsList ||
+      !E.ContributorsGrid ||
+      !E.TeamsGrid
+    ) {
       return;
     }
 
@@ -2267,7 +2319,7 @@ export class View {
       // Fetch both contributors and teams
       const [contributors, teams] = await Promise.all([
         this.contributorsService.fetchContributors(),
-        this.contributorsService.fetchTeams()
+        this.contributorsService.fetchTeams(),
       ]);
 
       // Clear existing content
@@ -2305,13 +2357,13 @@ export class View {
         `;
 
         // Add hover effect for name color
-        contributorCard.addEventListener('mouseenter', () => {
-          const nameEl = contributorCard.querySelector('.contributor-name');
-          if (nameEl) nameEl.classList.replace('text-white', 'text-blue-400');
+        contributorCard.addEventListener("mouseenter", () => {
+          const nameEl = contributorCard.querySelector(".contributor-name");
+          if (nameEl) nameEl.classList.replace("text-white", "text-blue-400");
         });
-        contributorCard.addEventListener('mouseleave', () => {
-          const nameEl = contributorCard.querySelector('.contributor-name');
-          if (nameEl) nameEl.classList.replace('text-blue-400', 'text-white');
+        contributorCard.addEventListener("mouseleave", () => {
+          const nameEl = contributorCard.querySelector(".contributor-name");
+          if (nameEl) nameEl.classList.replace("text-blue-400", "text-white");
         });
 
         E.ContributorsGrid?.appendChild(contributorCard);
@@ -2325,7 +2377,7 @@ export class View {
           glass-card hover:bg-slate-600 hover:scale-105 transition-all duration-200
           cursor-default
         `;
-        
+
         teamCard.innerHTML = `
           <div class="text-center">
             <div class="text-lg font-bold text-white">
@@ -2333,7 +2385,7 @@ export class View {
             </div>
           </div>
         `;
-        
+
         E.TeamsGrid?.appendChild(teamCard);
       });
 
@@ -2443,7 +2495,9 @@ export class View {
       const waitForDOM = () => {
         return new Promise<void>((resolve) => {
           if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", () => resolve(), { once: true });
+            document.addEventListener("DOMContentLoaded", () => resolve(), {
+              once: true,
+            });
           } else {
             resolve();
           }
@@ -2535,10 +2589,10 @@ export class View {
   private initializeTeamNumberPopup(): void {
     const TEAM_NUMBER_KEY = "user-team-number";
     const popup = get("team-number-popup");
-    
+
     // Check if user has already set their team number
     const savedTeamNumber = localStorage.getItem(TEAM_NUMBER_KEY);
-    
+
     if (!savedTeamNumber && popup) {
       // Show popup on first visit
       popup.classList.remove("hidden");
@@ -2551,8 +2605,8 @@ export class View {
         localStorage.setItem(TEAM_NUMBER_KEY, teamNumber);
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
-          'event': 'team_number',
-          'number': teamNumber
+          event: "team_number",
+          number: teamNumber,
         });
         console.log(`Team number saved and sent to GA: ${teamNumber}`);
         popup?.classList.add("hidden");
@@ -2570,4 +2624,3 @@ export class View {
     });
   }
 }
-
