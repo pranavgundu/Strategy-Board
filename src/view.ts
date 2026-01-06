@@ -10,7 +10,7 @@ import {
   extractEventItems,
   extractTeamItems,
   type SearchableItem,
-} from "./fuzzySearch.ts";
+} from "./search.ts";
 
 function debounce<T extends (...args: any[]) => any>(
   func: T,
