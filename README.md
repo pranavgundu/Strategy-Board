@@ -37,19 +37,23 @@ To contribute to Strategy Board, follow these steps:
     ```bash
     git clone https://github.com/YOUR_USERNAME/Strategy-Board.git
     ```
-3. Create a new branch for your feature:
+3. Install dependencies using pnpm:
+    ```bash
+    pnpm install
+    ```
+4. Create a new branch for your feature:
     ```bash
     git checkout -b feature/your-feature-name
     ```
-4. Make your changes and commit them:
+5. Make your changes and commit them:
     ```bash
     git commit -m "Add your feature description"
     ```
-5. Push to your fork:
+6. Push to your fork:
     ```bash
     git push origin feature/your-feature-name
     ```
-6. Open a Pull Request from your fork to the original repository
+7. Open a Pull Request from your fork to the original repository
 
 **Feel free to reach out to [pranav@strategyboard.app](mailto:pranav@strategyboard.app) if you have any questions!**
 
