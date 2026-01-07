@@ -1,6 +1,7 @@
 import { Match } from "./match.ts";
 import { Model } from "./model.ts";
 import { Config } from "./config.ts";
+import { StatboticsService, StatboticsData } from "./statbotics.ts";
 import fieldUrl from "./images/field25.png";
 
 let _backgroundEl: HTMLCanvasElement | null = null;
@@ -195,6 +196,9 @@ fieldImage.src = fieldUrl;
 export function updateCanvasSize() {
   const wrapper = <HTMLElement>document.getElementById("whiteboard-wrapper");
   if (!wrapper) return;
+  
+  // Skip canvas size update if whiteboard wrapper is hidden via the "hidden" class (used in statbotics mode)
+  if (wrapper.classList.contains("hidden")) return;
 
   const fillWidth = wrapper.clientWidth;
   const fillHeight = wrapper.clientHeight;
@@ -226,6 +230,7 @@ let clickMovement = 0;
 
 export class Whiteboard {
   private model;
+  private statboticsService = new StatboticsService();
   private active = true;
   private match: Match | null = null;
   private mode = "auto";
@@ -353,6 +358,9 @@ export class Whiteboard {
     document
       .getElementById("whiteboard-toolbar-mode-notes")
       ?.addEventListener("click", (e) => this.toggleMode("notes"));
+    document
+      .getElementById("whiteboard-toolbar-mode-statbotics")
+      ?.addEventListener("click", (e) => this.toggleMode("statbotics"));
     document
       .getElementById("whiteboard-draw-config")
       ?.addEventListener("click", (e) => {
@@ -776,6 +784,42 @@ export class Whiteboard {
     this.active = active;
 
     if (active) {
+      // Reset mode to auto when opening whiteboard
+      if (this.mode !== "auto") {
+        document
+          .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
+          ?.classList.remove("font-extrabold");
+        document
+          .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
+          ?.classList.remove("text-zinc-100");
+        document
+          .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
+          ?.classList.add("text-zinc-300");
+        document
+          .getElementById("whiteboard-toolbar-mode-auto")
+          ?.classList.add("font-extrabold");
+        document
+          .getElementById("whiteboard-toolbar-mode-auto")
+          ?.classList.add("text-zinc-100");
+        document
+          .getElementById("whiteboard-toolbar-mode-auto")
+          ?.classList.remove("text-zinc-300");
+        this.mode = "auto";
+      }
+
+      // Ensure whiteboard wrapper is visible and statbotics container is hidden
+      const whiteboardWrapper = document.getElementById("whiteboard-wrapper");
+      const statboticsContainer = document.getElementById("whiteboard-statbotics-container");
+      const toggleViewButton = document.getElementById("whiteboard-toolbar-view-toggle");
+      const drawConfig = document.getElementById("whiteboard-draw-config");
+      const colorConfig = document.getElementById("whiteboard-color-config");
+
+      whiteboardWrapper?.classList.remove("hidden");
+      statboticsContainer?.classList.add("hidden");
+      toggleViewButton?.classList.remove("hidden");
+      drawConfig?.classList.remove("hidden");
+      colorConfig?.classList.remove("hidden");
+
       const hasHistory = this.getCurrentUndoHistory().length > 0;
 
       requestAnimationFrame(() => {
@@ -833,8 +877,181 @@ export class Whiteboard {
 
   public setMatch(match: Match) {
     this.match = match;
+    // Always reset to auto mode when entering a match to avoid UI glitches
+    this.resetToAutoMode();
     this.redrawAll();
     this.updateUndoRedoButtons();
+    this.updateStatboticsDisplay();
+  }
+
+  private resetToAutoMode(): void {
+    // Reset the current mode's tab styling
+    document
+      .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
+      ?.classList.remove("font-extrabold", "text-zinc-100");
+    document
+      .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
+      ?.classList.add("text-zinc-300");
+    
+    // Set auto mode styling
+    document
+      .getElementById("whiteboard-toolbar-mode-auto")
+      ?.classList.add("font-extrabold", "text-zinc-100");
+    document
+      .getElementById("whiteboard-toolbar-mode-auto")
+      ?.classList.remove("text-zinc-300");
+    
+    this.mode = "auto";
+    this.lastSelected = null;
+    this.selected = null;
+    
+    // Ensure correct UI state: show whiteboard, hide statbotics
+    const whiteboardWrapper = document.getElementById("whiteboard-wrapper");
+    const statboticsContainer = document.getElementById("whiteboard-statbotics-container");
+    const toggleViewButton = document.getElementById("whiteboard-toolbar-view-toggle");
+    const drawConfig = document.getElementById("whiteboard-draw-config");
+    const colorConfig = document.getElementById("whiteboard-color-config");
+    
+    whiteboardWrapper?.classList.remove("hidden");
+    statboticsContainer?.classList.add("hidden");
+    toggleViewButton?.classList.remove("hidden");
+    drawConfig?.classList.remove("hidden");
+    colorConfig?.classList.remove("hidden");
+  }
+
+  private updateStatboticsDisplay(): void {
+    const emptyState = document.getElementById("statbotics-empty-state");
+    const dataContainer = document.getElementById("statbotics-data-container");
+
+    if (!this.match || !this.match.matchKey) {
+      // Show empty state
+      emptyState?.classList.remove("hidden");
+      dataContainer?.classList.add("hidden");
+      return;
+    }
+
+    // Show data container with team numbers
+    emptyState?.classList.add("hidden");
+    dataContainer?.classList.remove("hidden");
+
+    // Update team numbers
+    const red1Team = document.getElementById("statbotics-red-1-team");
+    const red2Team = document.getElementById("statbotics-red-2-team");
+    const red3Team = document.getElementById("statbotics-red-3-team");
+    const blue1Team = document.getElementById("statbotics-blue-1-team");
+    const blue2Team = document.getElementById("statbotics-blue-2-team");
+    const blue3Team = document.getElementById("statbotics-blue-3-team");
+
+    if (red1Team) red1Team.textContent = this.match.redOne || "----";
+    if (red2Team) red2Team.textContent = this.match.redTwo || "----";
+    if (red3Team) red3Team.textContent = this.match.redThree || "----";
+    if (blue1Team) blue1Team.textContent = this.match.blueOne || "----";
+    if (blue2Team) blue2Team.textContent = this.match.blueTwo || "----";
+    if (blue3Team) blue3Team.textContent = this.match.blueThree || "----";
+
+    // Reset EPA and win prob values to loading state
+    this.resetStatboticsValues();
+  }
+
+  private resetStatboticsValues(): void {
+    const elements = [
+      "statbotics-red-1-epa",
+      "statbotics-red-2-epa",
+      "statbotics-red-3-epa",
+      "statbotics-blue-1-epa",
+      "statbotics-blue-2-epa",
+      "statbotics-blue-3-epa",
+    ];
+
+    elements.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = "--";
+    });
+
+    const redWinProb = document.getElementById("statbotics-red-win-prob");
+    const blueWinProb = document.getElementById("statbotics-blue-win-prob");
+    const redBar = document.getElementById("statbotics-prob-bar-red");
+    const blueBar = document.getElementById("statbotics-prob-bar-blue");
+    const matchResult = document.getElementById("statbotics-match-result");
+
+    if (redWinProb) redWinProb.textContent = "--%";
+    if (blueWinProb) blueWinProb.textContent = "--%";
+    if (redBar) redBar.style.width = "50%";
+    if (blueBar) blueBar.style.width = "50%";
+    if (matchResult) {
+      matchResult.textContent = "Unknown";
+      matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
+    }
+  }
+
+  public async refreshStatboticsData(): Promise<void> {
+    if (!this.match || !this.match.matchKey) {
+      return;
+    }
+
+    try {
+      const data = await this.statboticsService.getMatchData(
+        this.match.matchKey,
+        [this.match.redOne, this.match.redTwo, this.match.redThree],
+        [this.match.blueOne, this.match.blueTwo, this.match.blueThree],
+      );
+
+      this.updateStatboticsUI(data);
+    } catch (error) {
+      console.error("Failed to fetch Statbotics data:", error);
+      // Show error in result field
+      const matchResult = document.getElementById("statbotics-match-result");
+      if (matchResult) matchResult.textContent = "Error loading data";
+    }
+  }
+
+  private updateStatboticsUI(data: StatboticsData): void {
+    // Update win probabilities
+    const redWinProb = document.getElementById("statbotics-red-win-prob");
+    const blueWinProb = document.getElementById("statbotics-blue-win-prob");
+    const redBar = document.getElementById("statbotics-prob-bar-red");
+    const blueBar = document.getElementById("statbotics-prob-bar-blue");
+
+    if (redWinProb) redWinProb.textContent = `${data.redWinProb.toFixed(0)}%`;
+    if (blueWinProb) blueWinProb.textContent = `${data.blueWinProb.toFixed(0)}%`;
+    if (redBar) redBar.style.width = `${data.redWinProb}%`;
+    if (blueBar) blueBar.style.width = `${data.blueWinProb}%`;
+
+    // Update match result
+    const matchResult = document.getElementById("statbotics-match-result");
+    if (matchResult) {
+      if (data.matchResult) {
+        let resultText = data.matchResult;
+        if (data.redScore !== null && data.blueScore !== null) {
+          resultText += ` (${data.redScore} - ${data.blueScore})`;
+        }
+        matchResult.textContent = resultText;
+        
+        // Color the result
+        if (data.matchResult === "Red Wins") {
+          matchResult.className = "text-xl md:text-2xl font-bold text-red-400";
+        } else if (data.matchResult === "Blue Wins") {
+          matchResult.className = "text-xl md:text-2xl font-bold text-blue-400";
+        } else {
+          matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
+        }
+      } else {
+        matchResult.textContent = "Not Played";
+        matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
+      }
+    }
+
+    // Update EPA values for red teams
+    data.redTeams.forEach((teamData, index) => {
+      const epaEl = document.getElementById(`statbotics-red-${index + 1}-epa`);
+      if (epaEl) epaEl.textContent = teamData.epa.toFixed(1);
+    });
+
+    // Update EPA values for blue teams
+    data.blueTeams.forEach((teamData, index) => {
+      const epaEl = document.getElementById(`statbotics-blue-${index + 1}-epa`);
+      if (epaEl) epaEl.textContent = teamData.epa.toFixed(1);
+    });
   }
 
   public toggleView() {
@@ -1451,30 +1668,55 @@ export class Whiteboard {
     this.mode = mode;
     
     const toggleViewButton = document.getElementById("whiteboard-toolbar-view-toggle");
-    if (mode === "notes") {
+    const whiteboardWrapper = document.getElementById("whiteboard-wrapper");
+    const statboticsContainer = document.getElementById("whiteboard-statbotics-container");
+    const drawConfig = document.getElementById("whiteboard-draw-config");
+    const colorConfig = document.getElementById("whiteboard-color-config");
+    
+    if (mode === "statbotics") {
+      // Hide whiteboard, show statbotics container
+      whiteboardWrapper?.classList.add("hidden");
+      statboticsContainer?.classList.remove("hidden");
       toggleViewButton?.classList.add("hidden");
+      drawConfig?.classList.add("hidden");
+      colorConfig?.classList.add("hidden");
+      // Refresh statbotics data when switching to this mode
+      this.refreshStatboticsData();
     } else {
-      toggleViewButton?.classList.remove("hidden");
-      if (this.currentTool === "checkbox") {
-        this.currentTool = "marker";
-        document
-          .getElementById("whiteboard-draw-config-marker")
-          ?.style.setProperty("display", "inline");
-        document
-          .getElementById("whiteboard-draw-config-eraser")
-          ?.style.setProperty("display", "none");
-        document
-          .getElementById("whiteboard-draw-config-text")
-          ?.style.setProperty("display", "none");
-        document
-          .getElementById("whiteboard-draw-config-checkbox")
-          ?.style.setProperty("display", "none");
-        document
-          .getElementById("whiteboard-number-pad")
-          ?.classList.add("hidden");
-        document
-          .getElementById("whiteboard-color-config")
-          ?.classList.remove("hidden");
+      // Show whiteboard, hide statbotics container
+      whiteboardWrapper?.classList.remove("hidden");
+      statboticsContainer?.classList.add("hidden");
+      drawConfig?.classList.remove("hidden");
+      colorConfig?.classList.remove("hidden");
+      
+      // Update canvas size in case window was resized while in statbotics mode
+      updateCanvasSize();
+      
+      if (mode === "notes") {
+        toggleViewButton?.classList.add("hidden");
+      } else {
+        toggleViewButton?.classList.remove("hidden");
+        if (this.currentTool === "checkbox") {
+          this.currentTool = "marker";
+          document
+            .getElementById("whiteboard-draw-config-marker")
+            ?.style.setProperty("display", "inline");
+          document
+            .getElementById("whiteboard-draw-config-eraser")
+            ?.style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-draw-config-text")
+            ?.style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-draw-config-checkbox")
+            ?.style.setProperty("display", "none");
+          document
+            .getElementById("whiteboard-number-pad")
+            ?.classList.add("hidden");
+          document
+            .getElementById("whiteboard-color-config")
+            ?.classList.remove("hidden");
+        }
       }
     }
     

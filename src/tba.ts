@@ -41,6 +41,7 @@ export interface TBASimpleEvent {
 
 export interface TBASimpleMatch {
   matchName: string;
+  matchKey: string;
   redTeams: string[];
   blueTeams: string[];
 }
@@ -318,6 +319,7 @@ export class TBAService {
 
       return {
         matchName,
+        matchKey: match.key,
         redTeams,
         blueTeams,
       };

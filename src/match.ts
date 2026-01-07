@@ -71,6 +71,7 @@ const DEFAULT_BLUE_POSITIONS = {
 
 export class Match {
   public readonly matchName: string;
+  public readonly matchKey: string | null;
   public readonly redOne: string;
   public readonly redTwo: string;
   public readonly redThree: string;
@@ -94,8 +95,10 @@ export class Match {
     blueThree: string,
     id?: string,
     options?: MatchOptions,
+    matchKey?: string | null,
   ) {
     this.matchName = matchName;
+    this.matchKey = matchKey ?? null;
     this.redOne = redOne;
     this.redTwo = redTwo;
     this.redThree = redThree;
@@ -290,6 +293,7 @@ export class Match {
             }
           : undefined,
       },
+      packet[9] || null,
     );
   }
 
@@ -494,6 +498,7 @@ export class Match {
           this.notes.checkboxes,
         ],
       ],
+      this.matchKey,
     ];
   }
 }

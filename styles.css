@@ -920,11 +920,21 @@ body {
     overflow: hidden;
 }
 
+/* Statbotics container - ensure no scrolling and content fits */
+body #whiteboard-statbotics-container {
+    overflow: hidden;
+}
+
+#statbotics-data-container {
+    overflow: hidden;
+}
+
 /* Mode selector buttons hover glow effect - exact copy of #home-bottom-bar a:hover */
 #whiteboard-toolbar-mode-auto,
 #whiteboard-toolbar-mode-teleop,
 #whiteboard-toolbar-mode-endgame,
-#whiteboard-toolbar-mode-notes {
+#whiteboard-toolbar-mode-notes,
+#whiteboard-toolbar-mode-statbotics {
     cursor: pointer;
     transition: all 0.3s ease-in-out;
     background: transparent !important;
@@ -935,7 +945,8 @@ body {
 #whiteboard-toolbar-mode-auto:hover,
 #whiteboard-toolbar-mode-teleop:hover,
 #whiteboard-toolbar-mode-endgame:hover,
-#whiteboard-toolbar-mode-notes:hover {
+#whiteboard-toolbar-mode-notes:hover,
+#whiteboard-toolbar-mode-statbotics:hover {
     color: white !important;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
                  0 0 20px rgba(255, 255, 255, 0.6),

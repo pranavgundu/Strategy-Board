@@ -1169,6 +1169,12 @@
                     >
                         NOTES
                     </div>
+                    <div
+                        id="whiteboard-toolbar-mode-statbotics"
+                        class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none"
+                    >
+                        STATBOTICS
+                    </div>
                 </div>
 
                 <div
@@ -1204,6 +1210,102 @@
                     height="1610"
                     class="absolute m-0 select-none touch-none"
                 ></canvas>
+            </div>
+            <div
+                id="whiteboard-statbotics-container"
+                class="hidden w-full flex-1 min-h-0 m-0 p-0 bg-zinc-900 overflow-hidden"
+            >
+                <!-- Empty state placeholder -->
+                <div
+                    id="statbotics-empty-state"
+                    class="flex flex-col items-center justify-center h-full p-8"
+                >
+                    <div class="text-4xl md:text-6xl text-zinc-400 font-bold mb-4">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl text-zinc-200 font-bold mb-2">
+                        Statbotics
+                    </h2>
+                    <p class="text-lg md:text-xl text-zinc-400 text-center max-w-md">
+                        Load matches through TBA to get Statbotics data.
+                    </p>
+                </div>
+
+                <!-- Data loaded state -->
+                <div
+                    id="statbotics-data-container"
+                    class="hidden flex flex-col h-full p-2 md:p-4 overflow-hidden"
+                >
+                    <!-- Win Probability Bar -->
+                    <div class="p-2 md:p-4 mb-2 flex-shrink-0">
+                        <div class="text-xs md:text-sm text-zinc-400 mb-1 md:mb-2">Win Probability</div>
+                        <div class="flex items-center gap-2 md:gap-3 mb-1">
+                            <span class="text-sm md:text-lg font-bold text-blue-400 w-12 md:w-16 text-right" id="statbotics-blue-win-prob">--%</span>
+                            <div class="flex-1 h-6 md:h-8 bg-zinc-700 rounded-full overflow-hidden flex">
+                                <div id="statbotics-prob-bar-blue" class="h-full bg-blue-500 transition-all duration-500" style="width: 50%"></div>
+                                <div id="statbotics-prob-bar-red" class="h-full bg-red-500 transition-all duration-500" style="width: 50%"></div>
+                            </div>
+                            <span class="text-sm md:text-lg font-bold text-red-400 w-12 md:w-16" id="statbotics-red-win-prob">--%</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-zinc-500 px-12 md:px-20">
+                            <span>Blue Alliance</span>
+                            <span>Red Alliance</span>
+                        </div>
+                    </div>
+
+                    <!-- Team EPA Sections -->
+                    <div class="flex flex-row gap-2 md:gap-4 flex-1 min-h-0">
+                        <!-- Blue Alliance -->
+                        <div class="flex-1 p-2 md:p-4 flex flex-col min-h-0">
+                            <div class="text-xs md:text-sm text-blue-400 font-bold mb-1 md:mb-2 flex items-center gap-1 md:gap-2 flex-shrink-0">
+                                <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full"></div>
+                                Blue Alliance EPA
+                            </div>
+                            <div class="flex flex-col gap-1 md:gap-2 flex-1 min-h-0">
+                                <div class="flex-1 flex items-center justify-between bg-transparent border-2 border-white rounded-lg px-2 md:px-3">
+                                    <span class="text-sm md:text-lg lg:text-xl font-bold text-blue-400" id="statbotics-blue-1-team">----</span>
+                                    <span class="text-base md:text-xl lg:text-2xl font-bold text-zinc-200" id="statbotics-blue-1-epa">--</span>
+                                </div>
+                                <div class="flex-1 flex items-center justify-between bg-transparent border-2 border-white rounded-lg px-2 md:px-3">
+                                    <span class="text-sm md:text-lg lg:text-xl font-bold text-blue-400" id="statbotics-blue-2-team">----</span>
+                                    <span class="text-base md:text-xl lg:text-2xl font-bold text-zinc-200" id="statbotics-blue-2-epa">--</span>
+                                </div>
+                                <div class="flex-1 flex items-center justify-between bg-transparent border-2 border-white rounded-lg px-2 md:px-3">
+                                    <span class="text-sm md:text-lg lg:text-xl font-bold text-blue-400" id="statbotics-blue-3-team">----</span>
+                                    <span class="text-base md:text-xl lg:text-2xl font-bold text-zinc-200" id="statbotics-blue-3-epa">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Red Alliance -->
+                        <div class="flex-1 p-2 md:p-4 flex flex-col min-h-0">
+                            <div class="text-xs md:text-sm text-red-400 font-bold mb-1 md:mb-2 flex items-center gap-1 md:gap-2 flex-shrink-0">
+                                <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full"></div>
+                                Red Alliance EPA
+                            </div>
+                            <div class="flex flex-col gap-1 md:gap-2 flex-1 min-h-0">
+                                <div class="flex-1 flex items-center justify-between bg-transparent border-2 border-white rounded-lg px-2 md:px-3">
+                                    <span class="text-sm md:text-lg lg:text-xl font-bold text-red-400" id="statbotics-red-1-team">----</span>
+                                    <span class="text-base md:text-xl lg:text-2xl font-bold text-zinc-200" id="statbotics-red-1-epa">--</span>
+                                </div>
+                                <div class="flex-1 flex items-center justify-between bg-transparent border-2 border-white rounded-lg px-2 md:px-3">
+                                    <span class="text-sm md:text-lg lg:text-xl font-bold text-red-400" id="statbotics-red-2-team">----</span>
+                                    <span class="text-base md:text-xl lg:text-2xl font-bold text-zinc-200" id="statbotics-red-2-epa">--</span>
+                                </div>
+                                <div class="flex-1 flex items-center justify-between bg-transparent border-2 border-white rounded-lg px-2 md:px-3">
+                                    <span class="text-sm md:text-lg lg:text-xl font-bold text-red-400" id="statbotics-red-3-team">----</span>
+                                    <span class="text-base md:text-xl lg:text-2xl font-bold text-zinc-200" id="statbotics-red-3-epa">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Result -->
+                    <div class="p-2 md:p-4 flex-shrink-0 mt-2">
+                        <div class="text-xs md:text-sm text-zinc-400 mb-1">Match Result</div>
+                        <div class="text-base md:text-xl font-bold text-zinc-300" id="statbotics-match-result">Unknown</div>
+                    </div>
+                </div>
             </div>
             <div
                 id="whiteboard-draw-config"

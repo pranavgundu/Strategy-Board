@@ -56,6 +56,7 @@ export class Model {
    * @param blueOne - Blue alliance robot 1 team number.
    * @param blueTwo - Blue alliance robot 2 team number.
    * @param blueThree - Blue alliance robot 3 team number.
+   * @param matchKey - Optional TBA match key for Statbotics integration.
    * @returns The unique ID of the created match.
    */
   public async createNewMatch(
@@ -66,6 +67,7 @@ export class Model {
     blueOne: string,
     blueTwo: string,
     blueThree: string,
+    matchKey?: string | null,
   ): Promise<string> {
     const match = new Match(
       matchName,
@@ -75,6 +77,9 @@ export class Model {
       blueOne,
       blueTwo,
       blueThree,
+      undefined,
+      undefined,
+      matchKey,
     );
     return this.addMatch(match);
   }

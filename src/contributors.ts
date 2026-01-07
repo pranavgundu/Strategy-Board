@@ -10,7 +10,7 @@ export interface Contributor {
 }
 
 export interface LastCommit {
-  sha: string;
+  sha: string;  
   message: string;
   author: string;
   date: string;
