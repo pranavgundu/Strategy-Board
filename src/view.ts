@@ -2590,15 +2590,12 @@ export class View {
     const TEAM_NUMBER_KEY = "user-team-number";
     const popup = get("team-number-popup");
 
-    // Check if user has already set their team number
     const savedTeamNumber = localStorage.getItem(TEAM_NUMBER_KEY);
 
     if (!savedTeamNumber && popup) {
-      // Show popup on first visit
       popup.classList.remove("hidden");
     }
 
-    // Save button handler - requires team number
     B?.TeamNumberSave?.addEventListener("click", () => {
       const teamNumber = I?.TeamNumber?.value?.trim();
       if (teamNumber) {
