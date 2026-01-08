@@ -1,7 +1,7 @@
 import { Match } from "./match.ts";
 import { Model } from "./model.ts";
 import { Config } from "./config.ts";
-import fieldUrl from "./images/field25.png";
+import fieldUrl from "./images/2025.png";
 
 let _backgroundEl: HTMLCanvasElement | null = null;
 let _itemsEl: HTMLCanvasElement | null = null;
