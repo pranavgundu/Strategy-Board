@@ -43,6 +43,7 @@ export interface TBASimpleMatch {
   matchName: string;
   redTeams: string[];
   blueTeams: string[];
+  matchKey: string;
 }
 
 export class TBAService {
@@ -320,6 +321,7 @@ export class TBAService {
         matchName,
         redTeams,
         blueTeams,
+        matchKey: match.key,
       };
     });
   }
@@ -415,8 +417,18 @@ export class TBAService {
       const day = parseInt(dayStr, 10);
 
       const monthNames = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
       ];
       const monthIndex = monthNames.indexOf(month);
 

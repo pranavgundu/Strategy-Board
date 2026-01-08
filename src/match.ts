@@ -79,6 +79,11 @@ export class Match {
   public readonly blueThree: string;
   public readonly id: string;
 
+  // TBA metadata for Statbotics integration
+  public readonly tbaEventKey?: string;
+  public readonly tbaMatchKey?: string;
+  public readonly tbaYear?: number;
+
   public auto: PhaseData;
   public teleop: PhaseData;
   public endgame: PhaseData;
@@ -94,6 +99,9 @@ export class Match {
     blueThree: string,
     id?: string,
     options?: MatchOptions,
+    tbaEventKey?: string,
+    tbaMatchKey?: string,
+    tbaYear?: number,
   ) {
     this.matchName = matchName;
     this.redOne = redOne;
@@ -103,6 +111,9 @@ export class Match {
     this.blueTwo = blueTwo;
     this.blueThree = blueThree;
     this.id = id ?? uuidv4();
+    this.tbaEventKey = tbaEventKey;
+    this.tbaMatchKey = tbaMatchKey;
+    this.tbaYear = tbaYear;
 
     this.auto = this.createDefaultPhaseData();
     this.teleop = this.createDefaultPhaseData();
@@ -290,6 +301,9 @@ export class Match {
             }
           : undefined,
       },
+      packet[9], // tbaEventKey
+      packet[10], // tbaMatchKey
+      packet[11], // tbaYear
     );
   }
 
@@ -494,6 +508,18 @@ export class Match {
           this.notes.checkboxes,
         ],
       ],
+      this.tbaEventKey,
+      this.tbaMatchKey,
+      this.tbaYear,
     ];
+  }
+
+  /**
+   * Checks if this match was imported from TBA.
+   *
+   * @returns True if the match has TBA metadata, false otherwise.
+   */
+  public isFromTBA(): boolean {
+    return !!(this.tbaEventKey && this.tbaMatchKey && this.tbaYear);
   }
 }

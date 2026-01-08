@@ -11,6 +11,7 @@ import {
   extractTeamItems,
   type SearchableItem,
 } from "./search.ts";
+import { StatboticsService, type StatboticsMatchData } from "./statbotics.ts";
 
 function debounce<T extends (...args: any[]) => any>(
   func: T,
@@ -108,8 +109,10 @@ export class View {
   private tbaService: any = null; // Lazy-loaded
   private pdfExport: any = null; // Lazy-loaded
   private contributorsService: ContributorsService;
+  private statboticsService: StatboticsService;
   private currentExportMatch: Match | null = null;
   private contributorTeams: string[] = [];
+  private currentStatboticsData: StatboticsMatchData | null = null;
 
   constructor(
     model: Model,
@@ -124,6 +127,7 @@ export class View {
 
     // tbaService and pdfExport are lazy-loaded when needed
     this.contributorsService = new ContributorsService();
+    this.statboticsService = new StatboticsService();
 
     const initDOM = () => {
       B = {
@@ -1092,12 +1096,317 @@ export class View {
     I.BlueThree.value = "";
   }
 
-  private loadWhiteboard(match: Match): void {
+  private async loadWhiteboard(match: Match): Promise<void> {
     this.whiteboard.setMatch(match);
     this.whiteboard.setActive(true);
     this.show(E.Whiteboard);
     this.hide(E.Home);
     updateCanvasSize();
+
+    // Show or hide Statbotics tab based on whether match is from TBA
+    const statboticsTab = document.getElementById(
+      "whiteboard-toolbar-mode-statbotics",
+    );
+    if (match.isFromTBA()) {
+      statboticsTab?.classList.remove("hidden");
+      // Load Statbotics data in the background
+      this.loadStatboticsData(match);
+    } else {
+      statboticsTab?.classList.add("hidden");
+    }
+  }
+
+  private async loadStatboticsData(match: Match): Promise<void> {
+    if (!match.tbaEventKey || !match.tbaMatchKey || !match.tbaYear) {
+      // Show empty state
+      const emptyState = document.getElementById("statbotics-empty-state");
+      const dataContainer = document.getElementById(
+        "statbotics-data-container",
+      );
+      const loadingState = document.getElementById("statbotics-loading-state");
+      emptyState?.classList.remove("hidden");
+      dataContainer?.classList.add("hidden");
+      loadingState?.classList.add("hidden");
+      return;
+    }
+
+    // Show loading state
+    const emptyState = document.getElementById("statbotics-empty-state");
+    const dataContainer = document.getElementById("statbotics-data-container");
+    const loadingState = document.getElementById("statbotics-loading-state");
+    emptyState?.classList.add("hidden");
+    dataContainer?.classList.add("hidden");
+    loadingState?.classList.remove("hidden");
+    loadingState?.classList.add("flex");
+
+    // Setup modal handlers
+    this.setupEPAModalHandlers();
+
+    try {
+      console.log("[View] Loading Statbotics data for match:", {
+        eventKey: match.tbaEventKey,
+        matchKey: match.tbaMatchKey,
+        year: match.tbaYear,
+        matchName: match.matchName,
+      });
+
+      // Prepare team data
+      const redTeams = [
+        parseInt(match.redThree),
+        parseInt(match.redTwo),
+        parseInt(match.redOne),
+      ].filter((t) => !isNaN(t));
+
+      const blueTeams = [
+        parseInt(match.blueOne),
+        parseInt(match.blueTwo),
+        parseInt(match.blueThree),
+      ].filter((t) => !isNaN(t));
+
+      console.log("[View] Team data:", {
+        redTeams,
+        blueTeams,
+      });
+
+      const matchData = await this.statboticsService.getMatchData(
+        match.tbaMatchKey,
+        redTeams,
+        blueTeams,
+        match.tbaYear,
+      );
+
+      this.currentStatboticsData = matchData;
+
+      // Hide loading, show data
+      loadingState?.classList.add("hidden");
+      loadingState?.classList.remove("flex");
+      dataContainer?.classList.remove("hidden");
+
+      // Update win probabilities and bars
+      const redWinProb = document.getElementById("statbotics-red-win-prob");
+      const blueWinProb = document.getElementById("statbotics-blue-win-prob");
+      const redBar = document.getElementById("statbotics-prob-bar-red");
+      const blueBar = document.getElementById("statbotics-prob-bar-blue");
+
+      if (redWinProb)
+        redWinProb.textContent = `${(matchData.redWinProbability * 100).toFixed(0)}%`;
+      if (blueWinProb)
+        blueWinProb.textContent = `${(matchData.blueWinProbability * 100).toFixed(0)}%`;
+      if (redBar)
+        redBar.style.width = `${(matchData.redWinProbability * 100).toFixed(1)}%`;
+      if (blueBar)
+        blueBar.style.width = `${(matchData.blueWinProbability * 100).toFixed(1)}%`;
+
+      // Update match result
+      const matchResult = document.getElementById("statbotics-match-result");
+      if (matchData.hasScores && matchResult) {
+        let resultText = "";
+        if (matchData.redScore && matchData.blueScore) {
+          if (matchData.redScore > matchData.blueScore) {
+            resultText = `Red Wins (${matchData.redScore} - ${matchData.blueScore})`;
+            matchResult.className =
+              "text-xl md:text-2xl font-bold text-red-400";
+          } else if (matchData.blueScore > matchData.redScore) {
+            resultText = `Blue Wins (${matchData.redScore} - ${matchData.blueScore})`;
+            matchResult.className =
+              "text-xl md:text-2xl font-bold text-blue-400";
+          } else {
+            resultText = `Tie (${matchData.redScore} - ${matchData.blueScore})`;
+            matchResult.className =
+              "text-xl md:text-2xl font-bold text-zinc-300";
+          }
+        } else {
+          resultText = "Match Complete";
+          matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
+        }
+        matchResult.textContent = resultText;
+      } else if (matchResult) {
+        matchResult.textContent = "Not Played";
+        matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
+      }
+
+      // Update Red Alliance EPAs
+      const redTeamsDisplay = [
+        parseInt(match.redOne),
+        parseInt(match.redTwo),
+        parseInt(match.redThree),
+      ];
+      redTeamsDisplay.forEach((team, index) => {
+        const teamEl = document.getElementById(
+          `statbotics-red-${index + 1}-team`,
+        );
+        const epaEl = document.getElementById(
+          `statbotics-red-${index + 1}-epa`,
+        );
+
+        if (teamEl) teamEl.textContent = team.toString();
+        if (epaEl) {
+          const epa = matchData.redTeamEPAs.get(team);
+          epaEl.textContent = epa !== undefined ? epa.toFixed(1) : "--";
+        }
+      });
+
+      // Update Blue Alliance EPAs
+      const blueTeamsDisplay = [
+        parseInt(match.blueOne),
+        parseInt(match.blueTwo),
+        parseInt(match.blueThree),
+      ];
+      blueTeamsDisplay.forEach((team, index) => {
+        const teamEl = document.getElementById(
+          `statbotics-blue-${index + 1}-team`,
+        );
+        const epaEl = document.getElementById(
+          `statbotics-blue-${index + 1}-epa`,
+        );
+
+        if (teamEl) teamEl.textContent = team.toString();
+        if (epaEl) {
+          const epa = matchData.blueTeamEPAs.get(team);
+          epaEl.textContent = epa !== undefined ? epa.toFixed(1) : "--";
+        }
+      });
+
+      // Setup click handlers for EPA cards
+      this.setupEPACardClickHandlers(matchData.teamDetails);
+    } catch (error) {
+      console.error("Failed to load Statbotics data:", error);
+      const matchResult = document.getElementById("statbotics-match-result");
+      if (matchResult) {
+        matchResult.textContent = "Error loading data";
+        matchResult.className = "text-xl md:text-2xl font-bold text-red-400";
+      }
+    }
+  }
+
+  private getPercentileColorClass(percentile: number | null): string {
+    if (percentile === null) return "text-zinc-300";
+
+    // Apply color based on percentile (higher percentile = better)
+    // Top 1% (99th percentile or higher) - Blue
+    if (percentile >= 0.99) {
+      return "text-blue-400";
+    }
+    // Top 10% (90th percentile or higher) - Dark Green
+    else if (percentile >= 0.9) {
+      return "text-green-500";
+    }
+    // Top 25% (75th percentile or higher) - Light Green
+    else if (percentile >= 0.75) {
+      return "text-green-300";
+    }
+    // Bottom 25% (25th percentile or lower) - Red
+    else if (percentile < 0.25) {
+      return "text-red-400";
+    }
+    // Middle 50% (25th-75th percentile) - No color/default
+    return "text-zinc-300";
+  }
+
+  private setupEPAModalHandlers(): void {
+    const modal = document.getElementById("epa-details-modal");
+    const closeBtn = document.getElementById("epa-modal-close");
+
+    // Close modal on button click
+    closeBtn?.addEventListener("click", () => {
+      modal?.classList.add("hidden");
+    });
+
+    // Close modal on backdrop click
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.add("hidden");
+      }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal?.classList.contains("hidden")) {
+        modal.classList.add("hidden");
+      }
+    });
+  }
+
+  private setupEPACardClickHandlers(teamDetails: Map<number, any>): void {
+    const allCards = document.querySelectorAll("[data-team-index]");
+
+    allCards.forEach((card) => {
+      const teamIndex = card.getAttribute("data-team-index");
+      if (!teamIndex) return;
+
+      // Remove existing listeners by cloning
+      const newCard = card.cloneNode(true);
+      card.parentNode?.replaceChild(newCard, card);
+
+      newCard.addEventListener("click", () => {
+        const [alliance, position] = teamIndex.split("-");
+        const teamEl = document.getElementById(
+          `statbotics-${alliance}-${position}-team`,
+        );
+        const teamNumber = parseInt(teamEl?.textContent || "0");
+
+        if (teamNumber && teamDetails.has(teamNumber)) {
+          this.showEPADetailsModal(teamDetails.get(teamNumber));
+        }
+      });
+    });
+  }
+
+  private showEPADetailsModal(teamData: any): void {
+    const modal = document.getElementById("epa-details-modal");
+    if (!modal) return;
+
+    // Update modal content
+    const teamEl = document.getElementById("epa-modal-team");
+    const totalEl = document.getElementById("epa-modal-total");
+    const autoEl = document.getElementById("epa-modal-auto");
+    const teleopEl = document.getElementById("epa-modal-teleop");
+    const endgameEl = document.getElementById("epa-modal-endgame");
+    const rankEl = document.getElementById("epa-modal-rank");
+    const percentileEl = document.getElementById("epa-modal-percentile");
+
+    if (teamEl) teamEl.textContent = teamData.team.toString();
+
+    // Apply color to each stat based on its own percentile
+    if (totalEl) {
+      totalEl.textContent = teamData.totalEPA.toFixed(1);
+      const totalColorClass = this.getPercentileColorClass(teamData.percentile);
+      totalEl.className = `font-bold ${totalColorClass}`;
+    }
+    if (autoEl) {
+      autoEl.textContent = teamData.autoEPA.toFixed(1);
+      const autoColorClass = this.getPercentileColorClass(
+        teamData.autoPercentile,
+      );
+      autoEl.className = `font-bold ${autoColorClass}`;
+    }
+    if (teleopEl) {
+      teleopEl.textContent = teamData.teleopEPA.toFixed(1);
+      const teleopColorClass = this.getPercentileColorClass(
+        teamData.teleopPercentile,
+      );
+      teleopEl.className = `font-bold ${teleopColorClass}`;
+    }
+    if (endgameEl) {
+      endgameEl.textContent = teamData.endgameEPA.toFixed(1);
+      const endgameColorClass = this.getPercentileColorClass(
+        teamData.endgamePercentile,
+      );
+      endgameEl.className = `font-bold ${endgameColorClass}`;
+    }
+    if (rankEl) {
+      rankEl.textContent = teamData.rank ? `#${teamData.rank}` : "N/A";
+      rankEl.className = "text-zinc-300 font-bold";
+    }
+    if (percentileEl) {
+      percentileEl.textContent = teamData.percentile
+        ? `${(teamData.percentile * 100).toFixed(1)}%`
+        : "N/A";
+      percentileEl.className = "text-zinc-300 font-bold";
+    }
+
+    // Show modal
+    modal.classList.remove("hidden");
   }
 
   public createNewMatch(
@@ -1629,6 +1938,7 @@ export class View {
           ? `${match.matchName} @ ${this.selectedEventName}`
           : match.matchName;
 
+        const year = parseInt(eventKey.substring(0, 4));
         const id = await this.model.createNewMatch(
           formattedMatchName,
           match.redTeams[2] || "",
@@ -1637,6 +1947,9 @@ export class View {
           match.blueTeams[0] || "",
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
+          eventKey,
+          match.matchKey,
+          year,
         );
 
         this.createNewMatch(
@@ -1709,6 +2022,7 @@ export class View {
           ? `${match.matchName} @ ${this.selectedEventName}`
           : match.matchName;
 
+        const year = parseInt(eventKey.substring(0, 4));
         const id = await this.model.createNewMatch(
           formattedMatchName,
           match.redTeams[2] || "",
@@ -1717,6 +2031,9 @@ export class View {
           match.blueTeams[0] || "",
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
+          eventKey,
+          match.matchKey,
+          year,
         );
 
         this.createNewMatch(
