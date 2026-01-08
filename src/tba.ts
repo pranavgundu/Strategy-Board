@@ -398,35 +398,68 @@ export class TBAService {
 
   /**
    * Filters events to show all past events and future events up to 1 week from now.
+   * Sorts events by date with most future dates first (descending order).
    *
    * @param events - Array of TBA simple events.
-   * @returns Array of filtered events.
+   * @returns Array of filtered and sorted events.
    */
   public filterEventsWithinOneWeek(events: TBASimpleEvent[]): TBASimpleEvent[] {
     const now = new Date();
     const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    return events.filter((event) => {
-      // Parse the date range to get the start date
-      // Format is either "Mon DD-DD" or "Mon DD - Mon DD"
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Helper function to parse event date
+    const parseEventDate = (event: TBASimpleEvent): Date | null => {
       const parts = event.dateRange.split(" ");
       const month = parts[0];
       const dayStr = parts[1].split("-")[0];
       const day = parseInt(dayStr, 10);
-
-      const monthNames = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-      ];
       const monthIndex = monthNames.indexOf(month);
 
       if (monthIndex === -1) {
-        return false;
+        return null;
       }
 
-      const eventDate = new Date(event.year, monthIndex, day);
+      return new Date(event.year, monthIndex, day);
+    };
+
+    // Filter events
+    const filteredEvents = events.filter((event) => {
+      const eventDate = parseEventDate(event);
+      if (!eventDate) {
+        return false;
+      }
       // Show all past events and future events up to 1 week from now
       return eventDate <= oneWeekFromNow;
     });
+
+    // Sort events by date (most future first, descending order)
+    filteredEvents.sort((a, b) => {
+      const dateA = parseEventDate(a);
+      const dateB = parseEventDate(b);
+
+      if (!dateA || !dateB) {
+        return 0;
+      }
+
+      // Descending order: most recent/future dates first
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    return filteredEvents;
   }
 }
