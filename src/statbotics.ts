@@ -90,6 +90,23 @@ export interface StatboticsTeamYear {
   district_rank?: number;
 }
 
+export interface EPAPercentiles {
+  p99: number;
+  p90: number;
+  p75: number;
+  p25: number;
+}
+
+export interface StatboticsYear {
+  year: number;
+  percentiles: {
+    total_points: EPAPercentiles;
+    auto_points: EPAPercentiles;
+    teleop_points: EPAPercentiles;
+    endgame_points: EPAPercentiles;
+  };
+}
+
 export interface StatboticsTeamEventData {
   team: number;
   teamName: string;
@@ -99,9 +116,6 @@ export interface StatboticsTeamEventData {
   endgameEPA: number;
   rank: number | null;
   percentile: number | null;
-  autoPercentile: number | null;
-  teleopPercentile: number | null;
-  endgamePercentile: number | null;
 }
 
 export interface StatboticsMatchData {
@@ -114,6 +128,7 @@ export interface StatboticsMatchData {
   blueScore?: number;
   hasScores: boolean;
   teamDetails: Map<number, StatboticsTeamEventData>;
+  yearData: StatboticsYear | null;
 }
 
 const STATBOTICS_API_BASE = "https://api.statbotics.io/v3";
@@ -184,6 +199,17 @@ export class StatboticsService {
   }
 
   /**
+   * Fetches year data including global EPA percentiles.
+   *
+   * @param year - The year.
+   * @returns The year data with percentiles.
+   */
+  public async getYear(year: number): Promise<StatboticsYear> {
+    const endpoint = `/year/${year}`;
+    return await this.makeRequest(endpoint);
+  }
+
+  /**
    * Fetches comprehensive match data including EPAs for all teams.
    *
    * @param matchKey - The match key (e.g., "2024ncwak_qm1").
@@ -214,6 +240,18 @@ export class StatboticsService {
         );
       }
 
+      // Fetch year data to get global percentile thresholds
+      let yearData: StatboticsYear | null = null;
+      try {
+        yearData = await this.getYear(year);
+        console.log(
+          "[Statbotics] Year data percentiles:",
+          yearData.percentiles,
+        );
+      } catch (error) {
+        console.warn("Could not fetch year data from Statbotics", error);
+      }
+
       // Fetch EPA data for each team
       const redEPAPromises = redTeams.map((team) =>
         this.getTeamYear(team, year)
@@ -232,7 +270,7 @@ export class StatboticsService {
               0;
             console.log(`[Statbotics] Team ${team} EPA: ${epa}`);
 
-            // Store detailed data (percentiles will be calculated later)
+            // Store detailed data
             teamDetails.set(team, {
               team,
               teamName: data.name || `Team ${team}`,
@@ -242,9 +280,6 @@ export class StatboticsService {
               endgameEPA: breakdown.endgame_points || 0,
               rank: epaData.ranks?.total?.rank || null,
               percentile: epaData.ranks?.total?.percentile || null,
-              autoPercentile: null,
-              teleopPercentile: null,
-              endgamePercentile: null,
             });
 
             return { team, epa };
@@ -275,7 +310,7 @@ export class StatboticsService {
               0;
             console.log(`[Statbotics] Team ${team} EPA: ${epa}`);
 
-            // Store detailed data (percentiles will be calculated later)
+            // Store detailed data
             teamDetails.set(team, {
               team,
               teamName: data.name || `Team ${team}`,
@@ -285,9 +320,6 @@ export class StatboticsService {
               endgameEPA: breakdown.endgame_points || 0,
               rank: epaData.ranks?.total?.rank || null,
               percentile: epaData.ranks?.total?.percentile || null,
-              autoPercentile: null,
-              teleopPercentile: null,
-              endgamePercentile: null,
             });
 
             return { team, epa };
@@ -306,52 +338,6 @@ export class StatboticsService {
 
       redEPAResults.forEach(({ team, epa }) => redTeamEPAs.set(team, epa));
       blueEPAResults.forEach(({ team, epa }) => blueTeamEPAs.set(team, epa));
-
-      // Calculate per-stat percentiles by comparing all teams in this match
-      const allTeamsData = Array.from(teamDetails.values());
-      if (allTeamsData.length > 0) {
-        // Collect all stat values
-        const autoValues = allTeamsData
-          .map((t) => t.autoEPA)
-          .sort((a, b) => a - b);
-        const teleopValues = allTeamsData
-          .map((t) => t.teleopEPA)
-          .sort((a, b) => a - b);
-        const endgameValues = allTeamsData
-          .map((t) => t.endgameEPA)
-          .sort((a, b) => a - b);
-
-        // Calculate percentile for each team's stats
-        teamDetails.forEach((data, team) => {
-          const autoRank = autoValues.filter((v) => v < data.autoEPA).length;
-          const teleopRank = teleopValues.filter(
-            (v) => v < data.teleopEPA,
-          ).length;
-          const endgameRank = endgameValues.filter(
-            (v) => v < data.endgameEPA,
-          ).length;
-
-          data.autoPercentile =
-            allTeamsData.length > 1
-              ? autoRank / (allTeamsData.length - 1)
-              : 0.5;
-          data.teleopPercentile =
-            allTeamsData.length > 1
-              ? teleopRank / (allTeamsData.length - 1)
-              : 0.5;
-          data.endgamePercentile =
-            allTeamsData.length > 1
-              ? endgameRank / (allTeamsData.length - 1)
-              : 0.5;
-
-          console.log(
-            `[Statbotics] Team ${team} percentiles - Auto: ${(data.autoPercentile * 100).toFixed(1)}%, Teleop: ${(data.teleopPercentile * 100).toFixed(1)}%, Endgame: ${(data.endgamePercentile * 100).toFixed(1)}%`,
-          );
-          console.log(
-            `[Statbotics] Team ${team} values - Auto: ${data.autoEPA.toFixed(1)}, Teleop: ${data.teleopEPA.toFixed(1)}, Endgame: ${data.endgameEPA.toFixed(1)}`,
-          );
-        });
-      }
 
       // Calculate win probabilities
       let redWinProb = 0.5;
@@ -404,6 +390,7 @@ export class StatboticsService {
         blueScore: blueScore,
         hasScores: hasScores,
         teamDetails: teamDetails,
+        yearData: yearData,
       };
 
       console.log("[Statbotics] Final match data:", result);

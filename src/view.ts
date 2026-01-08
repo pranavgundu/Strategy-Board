@@ -1268,7 +1268,7 @@ export class View {
       });
 
       // Setup click handlers for EPA cards
-      this.setupEPACardClickHandlers(matchData.teamDetails);
+      this.setupEPACardClickHandlers(matchData.teamDetails, matchData.yearData);
     } catch (error) {
       console.error("Failed to load Statbotics data:", error);
       const matchResult = document.getElementById("statbotics-match-result");
@@ -1279,27 +1279,32 @@ export class View {
     }
   }
 
-  private getPercentileColorClass(percentile: number | null): string {
-    if (percentile === null) return "text-zinc-300";
+  private getEPAColorClass(
+    value: number,
+    percentiles:
+      | { p99: number; p90: number; p75: number; p25: number }
+      | undefined,
+  ): string {
+    if (!percentiles) return "text-zinc-300";
 
-    // Apply color based on percentile (higher percentile = better)
-    // Top 1% (99th percentile or higher) - Blue
-    if (percentile >= 0.99) {
+    // Compare value against global year percentiles (like Statbotics does)
+    // Top 1% - Blue
+    if (value >= percentiles.p99) {
       return "text-blue-400";
     }
-    // Top 10% (90th percentile or higher) - Dark Green
-    else if (percentile >= 0.9) {
+    // Top 10% - Dark Green
+    else if (value >= percentiles.p90) {
       return "text-green-500";
     }
-    // Top 25% (75th percentile or higher) - Light Green
-    else if (percentile >= 0.75) {
+    // Top 25% - Light Green
+    else if (value >= percentiles.p75) {
       return "text-green-300";
     }
-    // Bottom 25% (25th percentile or lower) - Red
-    else if (percentile < 0.25) {
+    // Bottom 25% - Red
+    else if (value < percentiles.p25) {
       return "text-red-400";
     }
-    // Middle 50% (25th-75th percentile) - No color/default
+    // Middle 50% - No color/default
     return "text-zinc-300";
   }
 
@@ -1327,7 +1332,10 @@ export class View {
     });
   }
 
-  private setupEPACardClickHandlers(teamDetails: Map<number, any>): void {
+  private setupEPACardClickHandlers(
+    teamDetails: Map<number, any>,
+    yearData: any,
+  ): void {
     const allCards = document.querySelectorAll("[data-team-index]");
 
     allCards.forEach((card) => {
@@ -1346,13 +1354,13 @@ export class View {
         const teamNumber = parseInt(teamEl?.textContent || "0");
 
         if (teamNumber && teamDetails.has(teamNumber)) {
-          this.showEPADetailsModal(teamDetails.get(teamNumber));
+          this.showEPADetailsModal(teamDetails.get(teamNumber), yearData);
         }
       });
     });
   }
 
-  private showEPADetailsModal(teamData: any): void {
+  private showEPADetailsModal(teamData: any, yearData: any): void {
     const modal = document.getElementById("epa-details-modal");
     if (!modal) return;
 
@@ -1367,30 +1375,36 @@ export class View {
 
     if (teamEl) teamEl.textContent = teamData.team.toString();
 
-    // Apply color to each stat based on its own percentile
+    // Apply color to each stat based on global year percentiles
     if (totalEl) {
       totalEl.textContent = teamData.totalEPA.toFixed(1);
-      const totalColorClass = this.getPercentileColorClass(teamData.percentile);
+      const totalColorClass = this.getEPAColorClass(
+        teamData.totalEPA,
+        yearData?.percentiles?.total_points,
+      );
       totalEl.className = `font-bold ${totalColorClass}`;
     }
     if (autoEl) {
       autoEl.textContent = teamData.autoEPA.toFixed(1);
-      const autoColorClass = this.getPercentileColorClass(
-        teamData.autoPercentile,
+      const autoColorClass = this.getEPAColorClass(
+        teamData.autoEPA,
+        yearData?.percentiles?.auto_points,
       );
       autoEl.className = `font-bold ${autoColorClass}`;
     }
     if (teleopEl) {
       teleopEl.textContent = teamData.teleopEPA.toFixed(1);
-      const teleopColorClass = this.getPercentileColorClass(
-        teamData.teleopPercentile,
+      const teleopColorClass = this.getEPAColorClass(
+        teamData.teleopEPA,
+        yearData?.percentiles?.teleop_points,
       );
       teleopEl.className = `font-bold ${teleopColorClass}`;
     }
     if (endgameEl) {
       endgameEl.textContent = teamData.endgameEPA.toFixed(1);
-      const endgameColorClass = this.getPercentileColorClass(
-        teamData.endgamePercentile,
+      const endgameColorClass = this.getEPAColorClass(
+        teamData.endgameEPA,
+        yearData?.percentiles?.endgame_points,
       );
       endgameEl.className = `font-bold ${endgameColorClass}`;
     }
