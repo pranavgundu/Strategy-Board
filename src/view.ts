@@ -2241,20 +2241,30 @@ export class View {
       // Debounce search to prevent lag on rapid typing
       const debouncedEventSearch = debounce((searchTerm: string) => {
         this.filterTBAEvents(searchTerm);
-
-        if (searchTerm.length > 0) {
-          this.show(E.TBAEventDropdown);
-        } else {
-          this.hide(E.TBAEventDropdown);
-        }
       }, 200); // 200ms debounce - feels instant but reduces calls by 80%
 
       I.TBAEventSearch.addEventListener("input", (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
         debouncedEventSearch(searchTerm);
+
+        // Show dropdown when user types, hide when empty
+        if (searchTerm.length > 0) {
+          this.show(E.TBAEventDropdown);
+        } else {
+          // Show all events in original sorted order when cleared
+          this.filterTBAEvents("");
+          if (E?.TBAEventList?.children.length) {
+            this.show(E.TBAEventDropdown);
+          }
+        }
       });
 
       I.TBAEventSearch.addEventListener("focus", () => {
+        // Show all events in sorted order when focused
+        const currentValue = I.TBAEventSearch?.value || "";
+        if (currentValue.length === 0) {
+          this.filterTBAEvents("");
+        }
         if (E?.TBAEventList?.children.length) {
           this.show(E.TBAEventDropdown);
         }
@@ -2274,6 +2284,11 @@ export class View {
           // Otherwise, filter teams normally
           this.filterTBATeams(searchTerm);
         }
+      }, 200); // 200ms debounce
+
+      I.TBATeamSearch.addEventListener("input", (e) => {
+        const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+        debouncedTeamSearch(searchTerm);
 
         if (searchTerm.length > 0) {
           // Show team dropdown if event is selected, otherwise show event dropdown
@@ -2283,17 +2298,26 @@ export class View {
             this.show(E.TBAEventDropdown);
           }
         } else {
-          this.hide(E.TBATeamDropdown);
-          this.hide(E.TBAEventDropdown);
+          // Show all teams in original sorted order when cleared
+          this.filterTBATeams("");
+          if (
+            I?.TBAEventKey &&
+            I.TBAEventKey.value &&
+            E?.TBATeamList?.children.length
+          ) {
+            this.show(E.TBATeamDropdown);
+          } else {
+            this.hide(E.TBATeamDropdown);
+          }
         }
-      }, 200); // 200ms debounce
-
-      I.TBATeamSearch.addEventListener("input", (e) => {
-        const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
-        debouncedTeamSearch(searchTerm);
       });
 
       I.TBATeamSearch.addEventListener("focus", () => {
+        // Show all teams in sorted order when focused
+        const currentValue = I.TBATeamSearch?.value || "";
+        if (currentValue.length === 0) {
+          this.filterTBATeams("");
+        }
         if (E?.TBATeamList?.children.length) {
           this.show(E.TBATeamDropdown);
         }
@@ -2320,15 +2344,13 @@ export class View {
   private filterTBAEvents(searchTerm: string): void {
     if (!E?.TBAEventList) return;
 
-    // If no search term, show all items in original order
-    if (!searchTerm) {
-      const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
+    const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
+
+    // If no search term, show all items in original sorted order (by date)
+    if (!searchTerm || searchTerm.trim() === "") {
       items.forEach((item) => {
         (item as HTMLElement).style.display = "";
       });
-      if (items.length > 0) {
-        this.show(E.TBAEventDropdown);
-      }
       return;
     }
 
@@ -2339,8 +2361,8 @@ export class View {
     const matches = fuzzySearchItems(searchableItems, searchTerm, 5);
 
     // Hide all items first
-    searchableItems.forEach((item) => {
-      item.element.style.display = "none";
+    items.forEach((item) => {
+      (item as HTMLElement).style.display = "none";
     });
 
     // Show and reorder matched items by score
@@ -2351,24 +2373,19 @@ export class View {
         // Move to end of list (maintains score order since we process in order)
         E.TBAEventList!.appendChild(match.item);
       });
-      this.show(E.TBAEventDropdown);
-    } else {
-      this.hide(E.TBAEventDropdown);
     }
   }
 
   private filterTBATeams(searchTerm: string): void {
     if (!E?.TBATeamList) return;
 
-    // If no search term, show all items in original order
-    if (!searchTerm) {
-      const items = E.TBATeamList.querySelectorAll(".tba-team-item");
+    const items = E.TBATeamList.querySelectorAll(".tba-team-item");
+
+    // If no search term, show all items in original sorted order (by team number)
+    if (!searchTerm || searchTerm.trim() === "") {
       items.forEach((item) => {
         (item as HTMLElement).style.display = "";
       });
-      if (items.length > 0) {
-        this.show(E.TBATeamDropdown);
-      }
       return;
     }
 
@@ -2379,8 +2396,8 @@ export class View {
     const matches = fuzzySearchItems(searchableItems, searchTerm, 5);
 
     // Hide all items first
-    searchableItems.forEach((item) => {
-      item.element.style.display = "none";
+    items.forEach((item) => {
+      (item as HTMLElement).style.display = "none";
     });
 
     // Show and reorder matched items by score
@@ -2391,9 +2408,6 @@ export class View {
         // Move to end of list (maintains score order since we process in order)
         E.TBATeamList!.appendChild(match.item);
       });
-      this.show(E.TBATeamDropdown);
-    } else {
-      this.hide(E.TBATeamDropdown);
     }
   }
 
