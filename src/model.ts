@@ -56,6 +56,9 @@ export class Model {
    * @param blueOne - Blue alliance robot 1 team number.
    * @param blueTwo - Blue alliance robot 2 team number.
    * @param blueThree - Blue alliance robot 3 team number.
+   * @param tbaEventKey - Optional TBA event key for Statbotics integration.
+   * @param tbaMatchKey - Optional TBA match key for Statbotics integration.
+   * @param tbaYear - Optional year for Statbotics integration.
    * @returns The unique ID of the created match.
    */
   public async createNewMatch(
@@ -66,6 +69,9 @@ export class Model {
     blueOne: string,
     blueTwo: string,
     blueThree: string,
+    tbaEventKey?: string,
+    tbaMatchKey?: string,
+    tbaYear?: number,
   ): Promise<string> {
     const match = new Match(
       matchName,
@@ -75,6 +81,11 @@ export class Model {
       blueOne,
       blueTwo,
       blueThree,
+      undefined,
+      undefined,
+      tbaEventKey,
+      tbaMatchKey,
+      tbaYear,
     );
     return this.addMatch(match);
   }
@@ -90,7 +101,7 @@ export class Model {
     this.matchIds.push(match.id);
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      'event': 'match_creation',
+      event: "match_creation",
     });
     await SET(match.id, match.getAsPacket(), (e) => {
       console.error("Failed to save match to IndexedDB:", e);

@@ -41,12 +41,23 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.22), transparent 45%),
-        radial-gradient(circle at 80% 0%, rgba(16, 185, 129, 0.2), transparent 40%),
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(59, 130, 246, 0.22),
+            transparent 45%
+        ),
+        radial-gradient(
+            circle at 80% 0%,
+            rgba(16, 185, 129, 0.2),
+            transparent 40%
+        ),
         #0f172a;
     color: #e2e8f0;
     z-index: 99990;
-    transition: opacity 220ms ease, visibility 220ms ease;
+    transition:
+        opacity 220ms ease,
+        visibility 220ms ease;
 }
 
 #app-loading.is-hidden {
@@ -58,7 +69,9 @@ body {
 #app-loading .loading-card {
     background: rgba(15, 23, 42, 0.88);
     border: 1px solid rgba(148, 163, 184, 0.25);
-    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    box-shadow:
+        0 20px 80px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
     border-radius: 18px;
     padding: 24px 28px;
     min-width: min(92vw, 420px);
@@ -537,7 +550,8 @@ body {
 }
 
 #whiteboard-color-config.color-picker-hidden {
-    animation: colorPickerSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: colorPickerSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)
+        forwards;
     pointer-events: none;
 }
 
@@ -574,7 +588,8 @@ body {
 }
 
 #whiteboard-color-config.color-picker-hidden > div[id*="color"] {
-    animation: colorItemSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: colorItemSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)
+        forwards;
 }
 
 /* Yellow appears first (at bottom of container) */
@@ -764,7 +779,6 @@ body {
     transition: all 0.2s ease;
 }
 
-
 .glass-modal {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -920,27 +934,79 @@ body {
     overflow: hidden;
 }
 
+/* Statbotics container - ensure no scrolling and content fits */
+body #whiteboard-statbotics-container {
+    overflow: hidden;
+}
+
+#statbotics-data-container {
+    overflow: hidden;
+}
+
+/* Statbotics container - allow scrolling for overflow content */
+body #whiteboard-statbotics-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#statbotics-data-container {
+    overflow: visible;
+}
+
+/* EPA card hover effect */
+[data-team-index] {
+    transition: all 0.2s ease;
+}
+
+[data-team-index]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* EPA Details Modal */
+#epa-details-modal {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#epa-details-modal > div {
+    animation: modalFadeIn 0.1s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 /* Mode selector buttons hover glow effect - exact copy of #home-bottom-bar a:hover */
 #whiteboard-toolbar-mode-auto,
 #whiteboard-toolbar-mode-teleop,
 #whiteboard-toolbar-mode-endgame,
-#whiteboard-toolbar-mode-notes {
+#whiteboard-toolbar-mode-notes,
+#whiteboard-toolbar-mode-statbotics {
     cursor: pointer;
     transition: all 0.3s ease-in-out;
     background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    padding: 0.5rem 1rem;
 }
 
 #whiteboard-toolbar-mode-auto:hover,
 #whiteboard-toolbar-mode-teleop:hover,
 #whiteboard-toolbar-mode-endgame:hover,
-#whiteboard-toolbar-mode-notes:hover {
+#whiteboard-toolbar-mode-notes:hover,
+#whiteboard-toolbar-mode-statbotics:hover {
     color: white !important;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-                 0 0 20px rgba(255, 255, 255, 0.6),
-                 0 0 30px rgba(255, 255, 255, 0.4),
-                 0 0 40px rgba(255, 255, 255, 0.2);
+    text-shadow:
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 0 20px rgba(255, 255, 255, 0.6),
+        0 0 30px rgba(255, 255, 255, 0.4),
+        0 0 40px rgba(255, 255, 255, 0.2);
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -1099,16 +1165,17 @@ body {
 }
 
 #home-bottom-bar a:hover {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-                0 0 20px rgba(255, 255, 255, 0.6),
-                0 0 30px rgba(255, 255, 255, 0.4),
-                0 0 40px rgba(255, 255, 255, 0.2);
+    text-shadow:
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 0 20px rgba(255, 255, 255, 0.6),
+        0 0 30px rgba(255, 255, 255, 0.4),
+        0 0 40px rgba(255, 255, 255, 0.2);
 }
 
 #home-bottom-bar a:hover i {
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5))
-            drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))
-            drop-shadow(0 0 18px rgba(255, 255, 255, 0.2));
+        drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))
+        drop-shadow(0 0 18px rgba(255, 255, 255, 0.2));
 }
 
 /* Ensure proper scrolling on all mobile devices */
@@ -1119,7 +1186,8 @@ body {
 
 /* Fix for iOS Safari address bar hiding */
 @supports (-webkit-touch-callout: none) {
-    html, body {
+    html,
+    body {
         height: -webkit-fill-available;
         min-height: -webkit-fill-available;
     }
@@ -1153,7 +1221,10 @@ body {
 
     #whiteboard-number-pad {
         right: max(0.75rem, env(safe-area-inset-right)) !important;
-        bottom: max(4.5rem, calc(4.5rem + env(safe-area-inset-bottom))) !important;
+        bottom: max(
+            4.5rem,
+            calc(4.5rem + env(safe-area-inset-bottom))
+        ) !important;
     }
 }
 
@@ -1259,33 +1330,60 @@ body {
         gap: 0.75rem !important;
     }
 
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        ) {
         min-height: 5rem !important;
         padding: 0.75rem 0.5rem !important;
     }
 
     /* Make team numbers more readable on mobile */
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:first-child {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:first-child {
         font-size: 1rem !important;
     }
 
     /* Better spacing for VS display */
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:nth-child(2) {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:nth-child(2) {
         gap: 0.5rem !important;
     }
 
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:nth-child(2) > div {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:nth-child(2)
+        > div {
         font-size: 0.9rem !important;
     }
 
     /* Larger touch target for kebab menu */
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:last-child > button:first-child {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:last-child
+        > button:first-child {
         min-width: 2.5rem !important;
         min-height: 2.5rem !important;
     }
 
     /* Better action button sizing */
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:last-child > div > button {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:last-child
+        > div
+        > button {
         min-height: 2rem !important;
         padding: 0.4rem 0.6rem !important;
         font-size: 0.75rem !important;
@@ -1298,20 +1396,38 @@ body {
         gap: 0.5rem !important;
     }
 
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        ) {
         min-height: 4.5rem !important;
         padding: 0.6rem 0.4rem !important;
     }
 
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:first-child {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:first-child {
         font-size: 0.9rem !important;
     }
 
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:nth-child(2) > div {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:nth-child(2)
+        > div {
         font-size: 0.8rem !important;
     }
 
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template) > div:last-child > div > button {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:last-child
+        > div
+        > button {
         min-height: 1.75rem !important;
         padding: 0.3rem 0.5rem !important;
         font-size: 0.7rem !important;
@@ -1326,13 +1442,17 @@ body {
     }
 
     /* Allow specific elements to have full width */
-    canvas, img, video {
+    canvas,
+    img,
+    video {
         max-width: none;
     }
 }
 
 /* Better touch interaction for buttons */
-button, a, [role="button"] {
+button,
+a,
+[role="button"] {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
     touch-action: manipulation;
     /* Ensure minimum touch target size */
@@ -1368,7 +1488,9 @@ a:active,
 
 /* Ensure clickable areas are large enough on mobile */
 @media (max-width: 640px) {
-    button, a, [role="button"] {
+    button,
+    a,
+    [role="button"] {
         min-height: 44px;
         min-width: 44px;
         padding: 0.5rem 0.75rem;
@@ -1390,7 +1512,10 @@ a:active,
     }
 
     /* Better tap feedback for cards */
-    #home-match-list > div:not(#home-match-list-empty-placeholder):not(#home-match-list-item-template):active {
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        ):active {
         transform: scale(0.98);
         opacity: 0.9;
     }
@@ -1398,7 +1523,9 @@ a:active,
 
 /* Prevent zoom on input focus for iOS */
 @media screen and (max-width: 768px) {
-    input, select, textarea {
+    input,
+    select,
+    textarea {
         font-size: 16px !important;
     }
 }
@@ -1612,7 +1739,9 @@ a:active,
 }
 
 @media (prefers-color-scheme: dark) {
-    input, select, textarea {
+    input,
+    select,
+    textarea {
         color-scheme: dark;
     }
 }
@@ -1643,10 +1772,11 @@ a:active,
 }
 
 #home-toolbar-logo:hover {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-                0 0 20px rgba(255, 255, 255, 0.6),
-                0 0 30px rgba(255, 255, 255, 0.4),
-                0 0 40px rgba(255, 255, 255, 0.2);
+    text-shadow:
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 0 20px rgba(255, 255, 255, 0.6),
+        0 0 30px rgba(255, 255, 255, 0.4),
+        0 0 40px rgba(255, 255, 255, 0.2);
 }
 
 /* Special team digit animation */

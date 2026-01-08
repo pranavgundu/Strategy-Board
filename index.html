@@ -1169,6 +1169,12 @@
                     >
                         NOTES
                     </div>
+                    <div
+                        id="whiteboard-toolbar-mode-statbotics"
+                        class="text-xl md:text-3xl text-zinc-300 select-none touch-none hidden"
+                    >
+                        STATS
+                    </div>
                 </div>
 
                 <div
@@ -1204,6 +1210,312 @@
                     height="1610"
                     class="absolute m-0 select-none touch-none"
                 ></canvas>
+            </div>
+            <div
+                id="whiteboard-statbotics-container"
+                class="w-full flex-1 min-h-0 m-0 p-0 bg-zinc-900 hidden flex-col overflow-y-auto"
+            >
+                <!-- Empty State (shown when no match key) -->
+                <div
+                    id="statbotics-empty-state"
+                    class="flex flex-col items-center justify-center h-full p-4 md:p-8"
+                >
+                    <i class="fa fa-chart-line text-6xl text-zinc-600 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-white mb-2">
+                        Stats Data Not Available
+                    </h2>
+                    <p class="text-zinc-400 text-center max-w-md">
+                        This match was not imported from The Blue Alliance.
+                        Stats analytics are only available for TBA-imported
+                        matches.
+                    </p>
+                </div>
+
+                <!-- Loading State -->
+                <div
+                    id="statbotics-loading-state"
+                    class="hidden flex-col items-center justify-center h-full p-4 md:p-8"
+                >
+                    <div class="flex flex-col items-center">
+                        <div class="relative w-16 h-16 mb-4">
+                            <div
+                                class="absolute inset-0 border-4 border-zinc-700 rounded-full"
+                            ></div>
+                            <div
+                                class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"
+                            ></div>
+                        </div>
+                        <h2 class="text-xl font-bold text-white mb-2">
+                            Loading Stats...
+                        </h2>
+                        <p class="text-zinc-400 text-center">
+                            Fetching data from Statbotics
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Data Container (shown when match key exists) -->
+                <div
+                    id="statbotics-data-container"
+                    class="hidden flex-col p-4 md:p-8"
+                >
+                    <!-- Win Probability Section -->
+                    <div
+                        class="bg-zinc-800 rounded-lg p-4 md:p-6 glass-card mb-4"
+                    >
+                        <h3
+                            class="text-xl md:text-2xl font-bold text-white mb-3 text-center"
+                        >
+                            Win Probability
+                        </h3>
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-red-400 font-bold text-lg w-14"
+                                >Red</span
+                            >
+                            <div
+                                class="flex-1 flex h-6 rounded-full overflow-hidden"
+                            >
+                                <div
+                                    id="statbotics-prob-bar-red"
+                                    class="bg-red-500 transition-all duration-500"
+                                    style="width: 50%"
+                                ></div>
+                                <div
+                                    id="statbotics-prob-bar-blue"
+                                    class="bg-blue-500 transition-all duration-500"
+                                    style="width: 50%"
+                                ></div>
+                            </div>
+                            <span
+                                class="text-blue-400 font-bold text-lg w-14 text-right"
+                                >Blue</span
+                            >
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span
+                                id="statbotics-red-win-prob"
+                                class="text-red-400 text-xl font-bold"
+                                >--%</span
+                            >
+                            <span
+                                id="statbotics-blue-win-prob"
+                                class="text-blue-400 text-xl font-bold"
+                                >--%</span
+                            >
+                        </div>
+                        <!-- Match Result (inline) -->
+                        <div
+                            class="text-center mt-3 pt-3 border-t border-zinc-700"
+                        >
+                            <span
+                                id="statbotics-match-result"
+                                class="text-sm md:text-base font-semibold text-zinc-300"
+                                >Unknown</span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Red Alliance Section -->
+                    <div
+                        class="bg-zinc-800 rounded-lg p-4 md:p-6 glass-card mb-4"
+                    >
+                        <h3
+                            class="text-xl md:text-2xl font-bold text-red-400 mb-3"
+                        >
+                            Red Alliance
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div
+                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                data-team-index="red-1"
+                            >
+                                <div
+                                    class="text-white text-base font-semibold mb-1"
+                                >
+                                    Team
+                                    <span id="statbotics-red-1-team">----</span>
+                                </div>
+                                <div class="text-red-400 text-2xl font-bold">
+                                    <span id="statbotics-red-1-epa">--</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                data-team-index="red-2"
+                            >
+                                <div
+                                    class="text-white text-base font-semibold mb-1"
+                                >
+                                    Team
+                                    <span id="statbotics-red-2-team">----</span>
+                                </div>
+                                <div class="text-red-400 text-2xl font-bold">
+                                    <span id="statbotics-red-2-epa">--</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                data-team-index="red-3"
+                            >
+                                <div
+                                    class="text-white text-base font-semibold mb-1"
+                                >
+                                    Team
+                                    <span id="statbotics-red-3-team">----</span>
+                                </div>
+                                <div class="text-red-400 text-2xl font-bold">
+                                    <span id="statbotics-red-3-epa">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blue Alliance Section -->
+                    <div
+                        class="bg-zinc-800 rounded-lg p-4 md:p-6 glass-card mb-4"
+                    >
+                        <h3
+                            class="text-xl md:text-2xl font-bold text-blue-400 mb-3"
+                        >
+                            Blue Alliance
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div
+                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                data-team-index="blue-1"
+                            >
+                                <div
+                                    class="text-white text-base font-semibold mb-1"
+                                >
+                                    Team
+                                    <span id="statbotics-blue-1-team"
+                                        >----</span
+                                    >
+                                </div>
+                                <div class="text-blue-400 text-2xl font-bold">
+                                    <span id="statbotics-blue-1-epa">--</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                data-team-index="blue-2"
+                            >
+                                <div
+                                    class="text-white text-base font-semibold mb-1"
+                                >
+                                    Team
+                                    <span id="statbotics-blue-2-team"
+                                        >----</span
+                                    >
+                                </div>
+                                <div class="text-blue-400 text-2xl font-bold">
+                                    <span id="statbotics-blue-2-epa">--</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                data-team-index="blue-3"
+                            >
+                                <div
+                                    class="text-white text-base font-semibold mb-1"
+                                >
+                                    Team
+                                    <span id="statbotics-blue-3-team"
+                                        >----</span
+                                    >
+                                </div>
+                                <div class="text-blue-400 text-2xl font-bold">
+                                    <span id="statbotics-blue-3-epa">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EPA Details Modal -->
+                    <div
+                        id="epa-details-modal"
+                        class="hidden fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    >
+                        <div
+                            class="bg-zinc-800 rounded-lg p-6 glass-card max-w-md w-full border border-zinc-700 shadow-2xl"
+                        >
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-white">
+                                    Team
+                                    <span id="epa-modal-team">----</span> Stats
+                                </h3>
+                                <button
+                                    id="epa-modal-close"
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-all duration-200"
+                                >
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-300"
+                                        >Total EPA:</span
+                                    >
+                                    <span
+                                        id="epa-modal-total"
+                                        class="text-white font-bold"
+                                        >--</span
+                                    >
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-300"
+                                        >Auto Points:</span
+                                    >
+                                    <span
+                                        id="epa-modal-auto"
+                                        class="text-white font-bold"
+                                        >--</span
+                                    >
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-300"
+                                        >Teleop Points:</span
+                                    >
+                                    <span
+                                        id="epa-modal-teleop"
+                                        class="text-white font-bold"
+                                        >--</span
+                                    >
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-300"
+                                        >Endgame Points:</span
+                                    >
+                                    <span
+                                        id="epa-modal-endgame"
+                                        class="text-white font-bold"
+                                        >--</span
+                                    >
+                                </div>
+                                <div
+                                    class="flex justify-between pt-2 border-t border-zinc-700"
+                                >
+                                    <span class="text-zinc-300">Rank:</span>
+                                    <span
+                                        id="epa-modal-rank"
+                                        class="text-white font-bold"
+                                        >--</span
+                                    >
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-300"
+                                        >Percentile:</span
+                                    >
+                                    <span
+                                        id="epa-modal-percentile"
+                                        class="text-white font-bold"
+                                        >--</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div
                 id="whiteboard-draw-config"

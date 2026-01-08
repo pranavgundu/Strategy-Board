@@ -204,18 +204,18 @@ export function updateCanvasSize() {
 
   // Apply zoom factor to add padding (0.95 = 5% padding on each side)
   scaling = Math.min(ratioWidth, ratioHeight) * 0.95;
-  
+
   const scaledWidth = background.width * scaling;
   const scaledHeight = background.height * scaling;
-  
+
   const leftOffset = (fillWidth - scaledWidth) / 2;
   const topOffset = (fillHeight - scaledHeight) / 2;
-  
+
   [background, items, drawing].forEach((e) => {
     e.style.scale = `${scaling}`;
     e.style.left = `${leftOffset}px`;
     e.style.top = `${topOffset}px`;
-    e.style.transformOrigin = 'top left';
+    e.style.transformOrigin = "top left";
   });
 }
 
@@ -309,14 +309,16 @@ export class Whiteboard {
     window.addEventListener("resize", this.redrawAll.bind(this));
     window.addEventListener("orientationchange", this.redrawAll.bind(this));
     window.addEventListener("keydown", (e) => {
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const modifier = isMac ? e.metaKey : e.ctrlKey;
-      
+
       if (modifier && e.code === "KeyZ" && !e.shiftKey) {
         e.preventDefault();
         this.undo();
-      }
-      else if (modifier && (e.code === "KeyY" || (e.code === "KeyZ" && e.shiftKey))) {
+      } else if (
+        modifier &&
+        (e.code === "KeyY" || (e.code === "KeyZ" && e.shiftKey))
+      ) {
         e.preventDefault();
         this.redo();
       }
@@ -353,6 +355,9 @@ export class Whiteboard {
     document
       .getElementById("whiteboard-toolbar-mode-notes")
       ?.addEventListener("click", (e) => this.toggleMode("notes"));
+    document
+      .getElementById("whiteboard-toolbar-mode-statbotics")
+      ?.addEventListener("click", (e) => this.toggleMode("statbotics"));
     document
       .getElementById("whiteboard-draw-config")
       ?.addEventListener("click", (e) => {
@@ -750,18 +755,42 @@ export class Whiteboard {
     DR.lineJoin = "round";
     DR.strokeStyle = "white";
 
-    this.cachedElements.drawConfigMarker = document.getElementById("whiteboard-draw-config-marker");
-    this.cachedElements.drawConfigEraser = document.getElementById("whiteboard-draw-config-eraser");
-     this.cachedElements.drawConfigCheckbox = document.getElementById("whiteboard-draw-config-checkbox");
-    this.cachedElements.colorConfig = document.getElementById("whiteboard-color-config");
-    this.cachedElements.colorWhite = document.getElementById("whiteboard-color-white");
-    this.cachedElements.colorRed = document.getElementById("whiteboard-color-red");
-    this.cachedElements.colorBlue = document.getElementById("whiteboard-color-blue");
-    this.cachedElements.colorGreen = document.getElementById("whiteboard-color-green");
-    this.cachedElements.colorYellow = document.getElementById("whiteboard-color-yellow");
-    this.cachedElements.colorClose = document.getElementById("whiteboard-color-close");
-    this.cachedElements.undoBtn = document.getElementById("whiteboard-toolbar-undo");
-    this.cachedElements.redoBtn = document.getElementById("whiteboard-toolbar-redo");
+    this.cachedElements.drawConfigMarker = document.getElementById(
+      "whiteboard-draw-config-marker",
+    );
+    this.cachedElements.drawConfigEraser = document.getElementById(
+      "whiteboard-draw-config-eraser",
+    );
+    this.cachedElements.drawConfigCheckbox = document.getElementById(
+      "whiteboard-draw-config-checkbox",
+    );
+    this.cachedElements.colorConfig = document.getElementById(
+      "whiteboard-color-config",
+    );
+    this.cachedElements.colorWhite = document.getElementById(
+      "whiteboard-color-white",
+    );
+    this.cachedElements.colorRed = document.getElementById(
+      "whiteboard-color-red",
+    );
+    this.cachedElements.colorBlue = document.getElementById(
+      "whiteboard-color-blue",
+    );
+    this.cachedElements.colorGreen = document.getElementById(
+      "whiteboard-color-green",
+    );
+    this.cachedElements.colorYellow = document.getElementById(
+      "whiteboard-color-yellow",
+    );
+    this.cachedElements.colorClose = document.getElementById(
+      "whiteboard-color-close",
+    );
+    this.cachedElements.undoBtn = document.getElementById(
+      "whiteboard-toolbar-undo",
+    );
+    this.cachedElements.redoBtn = document.getElementById(
+      "whiteboard-toolbar-redo",
+    );
 
     requestAnimationFrame(this.main.bind(this));
 
@@ -791,12 +820,19 @@ export class Whiteboard {
 
         if (els.drawConfigMarker) els.drawConfigMarker.style.display = "inline";
         if (els.drawConfigEraser) els.drawConfigEraser.style.display = "none";
-        if (els.drawConfigCheckbox) els.drawConfigCheckbox.style.display = "none";
+        if (els.drawConfigCheckbox)
+          els.drawConfigCheckbox.style.display = "none";
 
         if (els.colorConfig) els.colorConfig.classList.remove("hidden");
 
-        const hideColors = [els.colorRed, els.colorBlue, els.colorGreen, els.colorYellow, els.colorClose];
-        hideColors.forEach(el => {
+        const hideColors = [
+          els.colorRed,
+          els.colorBlue,
+          els.colorGreen,
+          els.colorYellow,
+          els.colorClose,
+        ];
+        hideColors.forEach((el) => {
           if (el) {
             el.classList.add("hidden");
             el.classList.remove("border-4");
@@ -909,7 +945,7 @@ export class Whiteboard {
   private updateUndoRedoButtons() {
     const undoHistory = this.getCurrentUndoHistory();
     const redoHistory = this.getCurrentRedoHistory();
-    
+
     // Update undo button
     const undoBtn = document.getElementById("whiteboard-toolbar-undo");
     if (undoBtn) {
@@ -921,7 +957,7 @@ export class Whiteboard {
         undoBtn.style.cursor = "not-allowed";
       }
     }
-    
+
     // Update redo button
     const redoBtn = document.getElementById("whiteboard-toolbar-redo");
     if (redoBtn) {
@@ -957,11 +993,11 @@ export class Whiteboard {
     if (history.length < 1) return;
 
     const action = history.pop();
-    
+
     // Add to redo history
     const redoHistory = this.getCurrentRedoHistory();
     redoHistory.push(action);
-    
+
     if (action.type == "stroke") {
       const data = this.getData();
       if (data !== null) {
@@ -1005,9 +1041,7 @@ export class Whiteboard {
           const ref = action.ref as any[];
           const idx = data.checkboxes.findIndex(
             (cb: any) =>
-              cb[0] === ref[0] &&
-              cb[1] === ref[1] &&
-              cb[2] === ref[2],
+              cb[0] === ref[0] && cb[1] === ref[1] && cb[2] === ref[2],
           );
           if (idx !== -1) {
             data.checkboxes.splice(idx, 1);
@@ -1021,7 +1055,11 @@ export class Whiteboard {
       }
     } else if (action.type === "checkbox-toggle") {
       const data = this.getData();
-      if (data !== null && action.index !== undefined && data.checkboxes[action.index]) {
+      if (
+        data !== null &&
+        action.index !== undefined &&
+        data.checkboxes[action.index]
+      ) {
         data.checkboxes[action.index][3] = action.prevChecked;
         this.redrawDrawing();
       }
@@ -1042,11 +1080,11 @@ export class Whiteboard {
     if (redoHistory.length < 1) return;
 
     const action = redoHistory.pop();
-    
+
     // Add back to undo history
     const undoHistory = this.getCurrentUndoHistory();
     undoHistory.push(action);
-    
+
     if (action.type == "stroke") {
       const data = this.getData();
       if (data !== null) {
@@ -1087,7 +1125,11 @@ export class Whiteboard {
       }
     } else if (action.type === "checkbox-toggle") {
       const data = this.getData();
-      if (data !== null && action.index !== undefined && data.checkboxes[action.index]) {
+      if (
+        data !== null &&
+        action.index !== undefined &&
+        data.checkboxes[action.index]
+      ) {
         data.checkboxes[action.index][3] = action.newChecked;
         this.redrawDrawing();
       }
@@ -1340,7 +1382,7 @@ export class Whiteboard {
           stroke[1][1] - offsetY,
           5,
           0,
-          2 * Math.PI
+          2 * Math.PI,
         );
         DR.fill();
       } else {
@@ -1376,14 +1418,17 @@ export class Whiteboard {
         DR.strokeRect(x - boxSize / 2, y - boxSize / 2, boxSize, boxSize);
 
         if (checked) {
-          DR.strokeStyle = "#22c55e"; 
+          DR.strokeStyle = "#22c55e";
           DR.lineWidth = 12;
           DR.lineCap = "round";
           DR.lineJoin = "round";
           DR.beginPath();
           DR.moveTo(x - boxSize / 2 + checkPadding, y);
           DR.lineTo(x - boxSize / 6, y + boxSize / 2 - checkPadding);
-          DR.lineTo(x + boxSize / 2 - checkPadding, y - boxSize / 2 + checkPadding);
+          DR.lineTo(
+            x + boxSize / 2 - checkPadding,
+            y - boxSize / 2 + checkPadding,
+          );
           DR.stroke();
         }
       }
@@ -1449,9 +1494,28 @@ export class Whiteboard {
       .getElementById(`whiteboard-toolbar-mode-${mode}`)
       ?.classList.remove("text-zinc-300");
     this.mode = mode;
-    
-    const toggleViewButton = document.getElementById("whiteboard-toolbar-view-toggle");
-    if (mode === "notes") {
+
+    // Show/hide appropriate containers based on mode
+    const whiteboardWrapper = document.getElementById("whiteboard-wrapper");
+    const statboticsContainer = document.getElementById(
+      "whiteboard-statbotics-container",
+    );
+    const drawConfig = document.getElementById("whiteboard-draw-config");
+
+    if (mode === "statbotics") {
+      whiteboardWrapper?.classList.add("hidden");
+      statboticsContainer?.classList.remove("hidden");
+      drawConfig?.classList.add("hidden");
+    } else {
+      whiteboardWrapper?.classList.remove("hidden");
+      statboticsContainer?.classList.add("hidden");
+      drawConfig?.classList.remove("hidden");
+    }
+
+    const toggleViewButton = document.getElementById(
+      "whiteboard-toolbar-view-toggle",
+    );
+    if (mode === "notes" || mode === "statbotics") {
       toggleViewButton?.classList.add("hidden");
     } else {
       toggleViewButton?.classList.remove("hidden");
@@ -1477,11 +1541,12 @@ export class Whiteboard {
           ?.classList.remove("hidden");
       }
     }
-    
-    this.redrawAll();
 
-    // Update undo/redo buttons for the new mode
-    this.updateUndoRedoButtons();
+    if (mode !== "statbotics") {
+      this.redrawAll();
+      // Update undo/redo buttons for the new mode
+      this.updateUndoRedoButtons();
+    }
   }
 
   private isRobotAtPoint(robot: any, x: number, y: number) {
@@ -1634,10 +1699,10 @@ export class Whiteboard {
                 this.lastErasePoint.x,
                 this.lastErasePoint.y,
                 x,
-                y
+                y,
               );
 
-              shouldErase = distToEraser <= (eraserRadius + dotRadius);
+              shouldErase = distToEraser <= eraserRadius + dotRadius;
             } else {
               for (let j = 0; j < stroke.length - 2; j++) {
                 if (
@@ -1683,7 +1748,7 @@ export class Whiteboard {
               this.lastErasePoint.x,
               this.lastErasePoint.y,
               x,
-              y
+              y,
             );
             if (distToCheckbox <= boxSize / 2 + eraserRadius) {
               const erasedCheckbox = data.checkboxes.splice(i, 1)[0];
@@ -1828,7 +1893,10 @@ export class Whiteboard {
           const clickedCheckboxIndex = data.checkboxes.findIndex((cb: any) => {
             const cbX = cb[0];
             const cbY = cb[1];
-            return Math.abs(x - cbX) <= boxSize / 2 && Math.abs(y - cbY) <= boxSize / 2;
+            return (
+              Math.abs(x - cbX) <= boxSize / 2 &&
+              Math.abs(y - cbY) <= boxSize / 2
+            );
           });
 
           if (clickedCheckboxIndex !== -1) {
@@ -1843,12 +1911,7 @@ export class Whiteboard {
             });
           } else {
             // Create new checkbox (unchecked by default)
-            data.checkboxes.push([
-              x,
-              y,
-              this.currentColor,
-              false,
-            ]);
+            data.checkboxes.push([x, y, this.currentColor, false]);
             this.addUndoHistory({
               type: "checkbox",
               ref: [x, y, this.currentColor, false],
@@ -1867,8 +1930,7 @@ export class Whiteboard {
     this.cachedDrawingRect = null;
     try {
       drawing.releasePointerCapture(e.pointerId);
-    } catch (_err) {
-    }
+    } catch (_err) {}
 
     if (this.selected !== null) {
       if (this.currentAction !== "none") {
@@ -1896,7 +1958,7 @@ export class Whiteboard {
           point[1] - (this.camera.y - height / 2),
           5,
           0,
-          2 * Math.PI
+          2 * Math.PI,
         );
         DR.fill();
       } else {
@@ -1939,7 +2001,7 @@ export class Whiteboard {
           point[1] - (this.camera.y - height / 2),
           5, // radius of the dot (half of line width which is 10)
           0,
-          2 * Math.PI
+          2 * Math.PI,
         );
         DR.fill();
       } else {
@@ -2015,7 +2077,17 @@ function isSegmentInBound(x1, y1, x2, y2, minx, miny, maxx, maxy) {
   return false;
 }
 
-function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2, tolerance = 0) {
+function isSegmentsIntersecting(
+  ax1,
+  ay1,
+  ax2,
+  ay2,
+  bx1,
+  by1,
+  bx2,
+  by2,
+  tolerance = 0,
+) {
   const sx = ax2 - ax1;
   const sy = ay2 - ay1;
   const tx = bx2 - bx1;
@@ -2024,10 +2096,12 @@ function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2, toleranc
 
   if (Math.abs(d) < 1e-10) {
     if (tolerance > 0) {
-      return distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
-             distanceFromPointToSegment(ax2, ay2, bx1, by1, bx2, by2) <= tolerance ||
-             distanceFromPointToSegment(bx1, by1, ax1, ay1, ax2, ay2) <= tolerance ||
-             distanceFromPointToSegment(bx2, by2, ax1, ay1, ax2, ay2) <= tolerance;
+      return (
+        distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
+        distanceFromPointToSegment(ax2, ay2, bx1, by1, bx2, by2) <= tolerance ||
+        distanceFromPointToSegment(bx1, by1, ax1, ay1, ax2, ay2) <= tolerance ||
+        distanceFromPointToSegment(bx2, by2, ax1, ay1, ax2, ay2) <= tolerance
+      );
     }
     return false;
   }
@@ -2041,16 +2115,25 @@ function isSegmentsIntersecting(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2, toleranc
 
   // If tolerance is specified, check distance to line segments even if they don't intersect
   if (tolerance > 0) {
-    return distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
-           distanceFromPointToSegment(ax2, ay2, bx1, by1, bx2, by2) <= tolerance ||
-           distanceFromPointToSegment(bx1, by1, ax1, ay1, ax2, ay2) <= tolerance ||
-           distanceFromPointToSegment(bx2, by2, ax1, ay1, ax2, ay2) <= tolerance;
+    return (
+      distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
+      distanceFromPointToSegment(ax2, ay2, bx1, by1, bx2, by2) <= tolerance ||
+      distanceFromPointToSegment(bx1, by1, ax1, ay1, ax2, ay2) <= tolerance ||
+      distanceFromPointToSegment(bx2, by2, ax1, ay1, ax2, ay2) <= tolerance
+    );
   }
 
   return false;
 }
 
-function distanceFromPointToSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number): number {
+function distanceFromPointToSegment(
+  px: number,
+  py: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): number {
   const dx = x2 - x1;
   const dy = y2 - y1;
   const lengthSquared = dx * dx + dy * dy;

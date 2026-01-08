@@ -43,6 +43,7 @@ export interface TBASimpleMatch {
   matchName: string;
   redTeams: string[];
   blueTeams: string[];
+  matchKey: string;
 }
 
 export class TBAService {
@@ -320,6 +321,7 @@ export class TBAService {
         matchName,
         redTeams,
         blueTeams,
+        matchKey: match.key,
       };
     });
   }
