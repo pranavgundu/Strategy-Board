@@ -138,7 +138,6 @@ export class StatboticsService {
 
   private async makeRequest(endpoint: string): Promise<any> {
     const url = `${STATBOTICS_API_BASE}${endpoint}`;
-    console.log("[Statbotics] Fetching:", url);
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -153,7 +152,6 @@ export class StatboticsService {
     }
 
     const data = await response.json();
-    console.log("[Statbotics] Response:", data);
     return data;
   }
 
@@ -244,33 +242,23 @@ export class StatboticsService {
       let yearData: StatboticsYear | null = null;
       try {
         yearData = await this.getYear(year);
-        console.log(
-          "[Statbotics] Year data percentiles:",
-          yearData.percentiles,
-        );
       } catch (error) {
-        console.warn("Could not fetch year data from Statbotics", error);
+        console.error("[Statbotics] Failed to fetch year data:", error);
       }
 
       // Fetch EPA data for each team
       const redEPAPromises = redTeams.map((team) =>
         this.getTeamYear(team, year)
           .then((data) => {
-            console.log(`[Statbotics] Team ${team} data:`, data);
-            // EPA data is nested: epa.total_points.mean
             const epaData = data.epa || {};
-            console.log(`[Statbotics] Team ${team} epa object:`, epaData);
             const totalPoints = epaData.total_points || {};
             const breakdown = epaData.breakdown || {};
-            console.log(`[Statbotics] Team ${team} total_points:`, totalPoints);
             const epa =
               totalPoints.mean ||
               epaData.stats?.max ||
               epaData.stats?.start ||
               0;
-            console.log(`[Statbotics] Team ${team} EPA: ${epa}`);
 
-            // Store detailed data
             teamDetails.set(team, {
               team,
               teamName: data.name || `Team ${team}`,
@@ -285,10 +273,7 @@ export class StatboticsService {
             return { team, epa };
           })
           .catch((err) => {
-            console.warn(
-              `[Statbotics] Could not fetch EPA for team ${team}:`,
-              err,
-            );
+            console.error(`[Statbotics] Failed to fetch team ${team}:`, err);
             return { team, epa: 0 };
           }),
       );
@@ -296,21 +281,15 @@ export class StatboticsService {
       const blueEPAPromises = blueTeams.map((team) =>
         this.getTeamYear(team, year)
           .then((data) => {
-            console.log(`[Statbotics] Team ${team} data:`, data);
-            // EPA data is nested: epa.total_points.mean
             const epaData = data.epa || {};
-            console.log(`[Statbotics] Team ${team} epa object:`, epaData);
             const totalPoints = epaData.total_points || {};
             const breakdown = epaData.breakdown || {};
-            console.log(`[Statbotics] Team ${team} total_points:`, totalPoints);
             const epa =
               totalPoints.mean ||
               epaData.stats?.max ||
               epaData.stats?.start ||
               0;
-            console.log(`[Statbotics] Team ${team} EPA: ${epa}`);
 
-            // Store detailed data
             teamDetails.set(team, {
               team,
               teamName: data.name || `Team ${team}`,
@@ -325,10 +304,7 @@ export class StatboticsService {
             return { team, epa };
           })
           .catch((err) => {
-            console.warn(
-              `[Statbotics] Could not fetch EPA for team ${team}:`,
-              err,
-            );
+            console.error(`[Statbotics] Failed to fetch team ${team}:`, err);
             return { team, epa: 0 };
           }),
       );
@@ -372,12 +348,6 @@ export class StatboticsService {
           redWinProb = redEPASum / totalEPA;
           blueWinProb = blueEPASum / totalEPA;
         }
-        console.log("[Statbotics] Calculated win probabilities from EPA:", {
-          redEPASum,
-          blueEPASum,
-          redWinProb,
-          blueWinProb,
-        });
       }
 
       const result = {
@@ -393,7 +363,6 @@ export class StatboticsService {
         yearData: yearData,
       };
 
-      console.log("[Statbotics] Final match data:", result);
       return result;
     } catch (error) {
       console.error("[Statbotics] Error fetching Statbotics data:", error);

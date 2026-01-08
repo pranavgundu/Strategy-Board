@@ -1018,10 +1018,6 @@ export class View {
       this.tbaService = new TBAService();
     }
     await this.tbaService.loadApiKey();
-    console.log(
-      "TBA Service initialized, has key:",
-      this.tbaService.hasApiKey(),
-    );
   }
 
   private async initializeLastCommit(): Promise<void> {
@@ -1143,13 +1139,6 @@ export class View {
     this.setupEPAModalHandlers();
 
     try {
-      console.log("[View] Loading Statbotics data for match:", {
-        eventKey: match.tbaEventKey,
-        matchKey: match.tbaMatchKey,
-        year: match.tbaYear,
-        matchName: match.matchName,
-      });
-
       // Prepare team data
       const redTeams = [
         parseInt(match.redThree),
@@ -1162,11 +1151,6 @@ export class View {
         parseInt(match.blueTwo),
         parseInt(match.blueThree),
       ].filter((t) => !isNaN(t));
-
-      console.log("[View] Team data:", {
-        redTeams,
-        blueTeams,
-      });
 
       const matchData = await this.statboticsService.getMatchData(
         match.tbaMatchKey,
@@ -1573,7 +1557,7 @@ export class View {
 
             // Prepare QR export - let user click Start button manually
             this.qrexport.export(match, () => {
-              console.log("QR export ready - waiting for user to click Start");
+              // QR export ready
             });
           } catch (err) {
             console.error("View: failed to start QR export:", err);
@@ -1757,7 +1741,6 @@ export class View {
       this.whiteboard.setMatch(this.currentExportMatch);
 
       // Force a complete redraw of all canvases before export to ensure they're rendered
-      console.log("PNG Export: Forcing whiteboard redraw before export");
       this.whiteboard.forceRedraw();
 
       // Small delay to ensure rendering completes
@@ -1844,8 +1827,6 @@ export class View {
       );
 
       if (pdfBtn) pdfBtn.textContent = originalText;
-
-      console.log("PDF export completed successfully");
     } catch (error) {
       console.error("Failed to export PDF:", error);
       alert("Failed to generate PDF. Please try again.");
@@ -1868,7 +1849,6 @@ export class View {
   private selectedEventName: string = "";
 
   private async onClickTBAImport(e: Event): Promise<void> {
-    console.log("TBA Import clicked");
     this.show(E.TBAImportPanel);
 
     await this.tbaService.loadApiKey();
@@ -2088,11 +2068,6 @@ export class View {
   }
 
   private async loadTBAEvents(): Promise<void> {
-    console.log(
-      "Loading TBA events, has API key:",
-      this.tbaService.hasApiKey(),
-    );
-
     if (!this.tbaService.hasApiKey()) {
       console.error("No API key available");
       this.showTBAStatus("No API key available", true);
@@ -2103,8 +2078,6 @@ export class View {
 
     try {
       const currentYear = new Date().getFullYear();
-      console.log("Fetching events for year:", currentYear);
-
       const yearsToFetch = [currentYear, currentYear - 1, currentYear - 2];
       const allEventsPromises = yearsToFetch.map((year) =>
         this.tbaService.fetchAndParseEvents(year),
@@ -2113,14 +2086,6 @@ export class View {
       const allEventsArrays = await Promise.all(allEventsPromises);
       const allEvents = allEventsArrays.flat();
       const events = this.tbaService.filterEventsWithinOneWeek(allEvents);
-
-      console.log(
-        "Loaded events:",
-        events.length,
-        "(filtered from",
-        allEvents.length,
-        ")",
-      );
 
       if (!E?.TBAEventList) return;
 
