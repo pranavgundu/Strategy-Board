@@ -1501,15 +1501,18 @@ export class Whiteboard {
       "whiteboard-statbotics-container",
     );
     const drawConfig = document.getElementById("whiteboard-draw-config");
+    const colorConfig = document.getElementById("whiteboard-color-config");
 
     if (mode === "statbotics") {
       whiteboardWrapper?.classList.add("hidden");
       statboticsContainer?.classList.remove("hidden");
       drawConfig?.classList.add("hidden");
+      colorConfig?.classList.add("hidden");
     } else {
       whiteboardWrapper?.classList.remove("hidden");
       statboticsContainer?.classList.add("hidden");
       drawConfig?.classList.remove("hidden");
+      colorConfig?.classList.remove("hidden");
     }
 
     const toggleViewButton = document.getElementById(
