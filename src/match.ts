@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { getRobotPositionsForYear } from "./manager.ts";
 
 // the match class represents a robotics match with teams and phases
 
@@ -57,18 +58,6 @@ const DEFAULT_ROBOT_WIDTH = 152.4;
 const DEFAULT_ROBOT_HEIGHT = 152.4;
 const DEFAULT_ROBOT_ROTATION = 0;
 
-const DEFAULT_RED_POSITIONS = {
-  one: { x: 2055, y: 455 },
-  two: { x: 2055, y: 805 },
-  three: { x: 2055, y: 1155 },
-};
-
-const DEFAULT_BLUE_POSITIONS = {
-  one: { x: 1455, y: 455 },
-  two: { x: 1455, y: 805 },
-  three: { x: 1455, y: 1155 },
-};
-
 export class Match {
   public readonly matchName: string;
   public readonly redOne: string;
@@ -115,41 +104,46 @@ export class Match {
     this.tbaMatchKey = tbaMatchKey;
     this.tbaYear = tbaYear;
 
-    this.auto = this.createDefaultPhaseData();
-    this.teleop = this.createDefaultPhaseData();
-    this.endgame = this.createDefaultPhaseData();
-    this.notes = this.createDefaultPhaseData();
+    // Get year-specific robot positions
+    const positions = getRobotPositionsForYear(tbaYear);
+
+    this.auto = this.createDefaultPhaseData(positions);
+    this.teleop = this.createDefaultPhaseData(positions);
+    this.endgame = this.createDefaultPhaseData(positions);
+    this.notes = this.createDefaultPhaseData(positions);
 
     if (options) {
       this.applyOptions(options);
     }
   }
 
-  private createDefaultPhaseData(): PhaseData {
+  private createDefaultPhaseData(
+    positions: ReturnType<typeof getRobotPositionsForYear>,
+  ): PhaseData {
     return {
       redOneRobot: this.createDefaultRobotPosition(
-        DEFAULT_RED_POSITIONS.one.x,
-        DEFAULT_RED_POSITIONS.one.y,
+        positions.red.one.x,
+        positions.red.one.y,
       ),
       redTwoRobot: this.createDefaultRobotPosition(
-        DEFAULT_RED_POSITIONS.two.x,
-        DEFAULT_RED_POSITIONS.two.y,
+        positions.red.two.x,
+        positions.red.two.y,
       ),
       redThreeRobot: this.createDefaultRobotPosition(
-        DEFAULT_RED_POSITIONS.three.x,
-        DEFAULT_RED_POSITIONS.three.y,
+        positions.red.three.x,
+        positions.red.three.y,
       ),
       blueOneRobot: this.createDefaultRobotPosition(
-        DEFAULT_BLUE_POSITIONS.one.x,
-        DEFAULT_BLUE_POSITIONS.one.y,
+        positions.blue.one.x,
+        positions.blue.one.y,
       ),
       blueTwoRobot: this.createDefaultRobotPosition(
-        DEFAULT_BLUE_POSITIONS.two.x,
-        DEFAULT_BLUE_POSITIONS.two.y,
+        positions.blue.two.x,
+        positions.blue.two.y,
       ),
       blueThreeRobot: this.createDefaultRobotPosition(
-        DEFAULT_BLUE_POSITIONS.three.x,
-        DEFAULT_BLUE_POSITIONS.three.y,
+        positions.blue.three.x,
+        positions.blue.three.y,
       ),
       drawing: [],
       drawingBBox: [],

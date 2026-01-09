@@ -14,6 +14,23 @@ interface FieldImageMap {
   [year: number]: string;
 }
 
+interface RobotPositions {
+  red: {
+    one: { x: number; y: number };
+    two: { x: number; y: number };
+    three: { x: number; y: number };
+  };
+  blue: {
+    one: { x: number; y: number };
+    two: { x: number; y: number };
+    three: { x: number; y: number };
+  };
+}
+
+interface YearConfig {
+  [year: number]: RobotPositions;
+}
+
 /**
  * Map of available field images by year
  * Add new years here as new field images are added to the images directory
@@ -23,6 +40,54 @@ const FIELD_IMAGES: FieldImageMap = {
   // Add future years here:
   // 2026: field2026,
   // 2027: field2027,
+};
+
+/**
+ * Default robot starting positions for each year
+ * Customize these based on each year's game starting positions
+ */
+const YEAR_ROBOT_POSITIONS: YearConfig = {
+  2025: {
+    red: {
+      one: { x: 2055, y: 455 },
+      two: { x: 2055, y: 805 },
+      three: { x: 2055, y: 1155 },
+    },
+    blue: {
+      one: { x: 1455, y: 455 },
+      two: { x: 1455, y: 805 },
+      three: { x: 1455, y: 1155 },
+    },
+  },
+  // Add future years here with their specific starting positions:
+  // 2026: {
+  //   red: {
+  //     one: { x: 2100, y: 500 },
+  //     two: { x: 2100, y: 800 },
+  //     three: { x: 2100, y: 1100 },
+  //   },
+  //   blue: {
+  //     one: { x: 1400, y: 500 },
+  //     two: { x: 1400, y: 800 },
+  //     three: { x: 1400, y: 1100 },
+  //   },
+  // },
+};
+
+/**
+ * Fallback default positions if year not found
+ */
+const FALLBACK_POSITIONS: RobotPositions = {
+  red: {
+    one: { x: 2055, y: 455 },
+    two: { x: 2055, y: 805 },
+    three: { x: 2055, y: 1155 },
+  },
+  blue: {
+    one: { x: 1455, y: 455 },
+    two: { x: 1455, y: 805 },
+    three: { x: 1455, y: 1155 },
+  },
 };
 
 /**
@@ -145,4 +210,55 @@ export async function preloadFieldImages(): Promise<void> {
   } catch (error) {
     console.warn("[FieldManager] Some field images failed to preload:", error);
   }
+}
+
+/**
+ * Gets the default robot starting positions for a specific year
+ * Falls back to latest year's positions if not found
+ *
+ * @param year - The year to get positions for (optional)
+ * @returns Robot starting positions for red and blue alliances
+ */
+export function getRobotPositionsForYear(year?: number): RobotPositions {
+  // If no year specified, use the latest year
+  if (!year) {
+    const latestYear = getLatestFieldYear();
+    return YEAR_ROBOT_POSITIONS[latestYear] || FALLBACK_POSITIONS;
+  }
+
+  // If positions exist for this year, return them
+  if (YEAR_ROBOT_POSITIONS[year]) {
+    return YEAR_ROBOT_POSITIONS[year];
+  }
+
+  // Otherwise, find the closest year with positions
+  const availableYears = Object.keys(YEAR_ROBOT_POSITIONS)
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  if (availableYears.length === 0) {
+    return FALLBACK_POSITIONS;
+  }
+
+  // If requested year is before all available years, use the earliest
+  if (year < availableYears[0]) {
+    return YEAR_ROBOT_POSITIONS[availableYears[0]];
+  }
+
+  // If requested year is after all available years, use the latest
+  if (year > availableYears[availableYears.length - 1]) {
+    return YEAR_ROBOT_POSITIONS[availableYears[availableYears.length - 1]];
+  }
+
+  // Find the closest year (prefer earlier year for backward compatibility)
+  let closestYear = availableYears[0];
+  for (const availYear of availableYears) {
+    if (availYear <= year) {
+      closestYear = availYear;
+    } else {
+      break;
+    }
+  }
+
+  return YEAR_ROBOT_POSITIONS[closestYear] || FALLBACK_POSITIONS;
 }
