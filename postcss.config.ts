@@ -1,5 +1,7 @@
 export default {
   plugins: {
-    autoprefixer: {},
+    autoprefixer: {
+      flexbox: "no-2009",
+    },
   },
 };
