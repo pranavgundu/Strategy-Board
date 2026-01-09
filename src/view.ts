@@ -1331,48 +1331,47 @@ export class View {
 
       loadingState?.classList.add("hidden");
       loadingState?.classList.remove("flex");
-      dataContainer?.classList.remove("hidden");
+      dataContainer?.classList.add("hidden");
+      emptyState?.classList.remove("hidden");
 
-      const matchResult = document.getElementById("statbotics-match-result");
-      if (matchResult) {
+      // Show full-page error message
+      const emptyStateContent = emptyState;
+      if (emptyStateContent) {
         if (error instanceof Error && error.message.includes("500")) {
-          matchResult.innerHTML = `
-            <div class="text-center space-y-2">
-              <div class="text-lg font-semibold text-yellow-400">⚠️ Statbotics Temporarily Unavailable</div>
-              <div class="text-sm text-zinc-400">The Statbotics API is experiencing issues. Please try again later.</div>
-            </div>
+          emptyStateContent.innerHTML = `
+            <i class="fa fa-exclamation-triangle text-6xl text-yellow-500 mb-4"></i>
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+              Statbotics Temporarily Unavailable
+            </h2>
+            <p class="text-zinc-400 text-center max-w-md text-base md:text-lg">
+              The Statbotics API is experiencing issues. Please try again later or check your internet connection.
+            </p>
           `;
         } else if (
           error instanceof Error &&
           error.message.includes("not found")
         ) {
-          matchResult.innerHTML = `
-            <div class="text-center space-y-2">
-              <div class="text-lg font-semibold text-zinc-400">📊 No Data Available</div>
-              <div class="text-sm text-zinc-500">Statbotics data not found for this match.</div>
-            </div>
+          emptyStateContent.innerHTML = `
+            <i class="fa fa-chart-line text-6xl text-zinc-600 mb-4"></i>
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+              No Stats Data Available
+            </h2>
+            <p class="text-zinc-400 text-center max-w-md text-base md:text-lg">
+              Statbotics data not found for this match. The match may be too recent or data is not yet available.
+            </p>
           `;
         } else {
-          matchResult.innerHTML = `
-            <div class="text-center space-y-2">
-              <div class="text-lg font-semibold text-red-400">❌ Error Loading Data</div>
-              <div class="text-sm text-zinc-500">Unable to load Statbotics information.</div>
-            </div>
+          emptyStateContent.innerHTML = `
+            <i class="fa fa-wifi text-6xl text-red-500 mb-4"></i>
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+              Unable to Load Stats
+            </h2>
+            <p class="text-zinc-400 text-center max-w-md text-base md:text-lg">
+              Could not connect to Statbotics. Please check your internet connection and try again later.
+            </p>
           `;
         }
-        matchResult.className = "text-xl md:text-2xl";
       }
-
-      // Hide EPA displays on error
-      const redWinProb = document.getElementById("statbotics-red-win-prob");
-      const blueWinProb = document.getElementById("statbotics-blue-win-prob");
-      const redBar = document.getElementById("statbotics-prob-bar-red");
-      const blueBar = document.getElementById("statbotics-prob-bar-blue");
-
-      if (redWinProb) redWinProb.textContent = "--";
-      if (blueWinProb) blueWinProb.textContent = "--";
-      if (redBar) redBar.style.width = "50%";
-      if (blueBar) blueBar.style.width = "50%";
     }
   }
 
