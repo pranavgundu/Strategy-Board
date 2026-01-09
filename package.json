@@ -5,6 +5,7 @@
     "build": "tsx scripts/commit.ts && tsc && vite build",
     "preview": "vite preview --host",
     "spell": "cspell \"**/*.{ts,tsx,js,jsx,html,md}\"",
+    "assets": "pnpm exec capacitor-assets generate --iconBackgroundColor '#18181b' --iconBackgroundColorDark '#18181b' --splashBackgroundColor '#18181b' --splashBackgroundColorDark '#18181b'",
     "cap:sync": "pnpm run build && pnpm exec cap sync",
     "cap:open:ios": "pnpm exec cap open ios",
     "cap:open:android": "pnpm exec cap open android",
@@ -12,6 +13,7 @@
     "cap:run:android": "pnpm run cap:sync && pnpm exec cap run android"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^7.4.4",
     "@types/marked": "^5.0.2",
     "@types/node": "^24.10.4",
