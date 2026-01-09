@@ -116,3 +116,95 @@ export async function ENTRIES(
     }
   }
 }
+
+/**
+ * Interface for cached Statbotics data with timestamp.
+ */
+interface CachedStatboticsData {
+  data: any;
+  timestamp: number;
+  matchKey: string;
+}
+
+/**
+ * Saves Statbotics data to IndexedDB cache.
+ *
+ * @param matchKey - The TBA match key
+ * @param data - The Statbotics data to cache
+ * @returns A promise that resolves when data is saved
+ */
+export async function CACHE_STATBOTICS(
+  matchKey: string,
+  data: any,
+): Promise<void> {
+  const cacheKey = `statbotics_${matchKey}`;
+  const cached: CachedStatboticsData = {
+    data,
+    timestamp: Date.now(),
+    matchKey,
+  };
+  await SET(cacheKey, cached, (err) => {
+    console.error(`Failed to cache Statbotics data for ${matchKey}:`, err);
+  });
+}
+
+/**
+ * Retrieves cached Statbotics data from IndexedDB.
+ *
+ * @param matchKey - The TBA match key
+ * @param maxAgeMs - Maximum age of cached data in milliseconds (default: 24 hours)
+ * @returns The cached data if valid, or undefined if not found or expired
+ */
+export async function GET_CACHED_STATBOTICS(
+  matchKey: string,
+  maxAgeMs: number = 24 * 60 * 60 * 1000,
+): Promise<any | undefined> {
+  const cacheKey = `statbotics_${matchKey}`;
+  const cached = await GET<CachedStatboticsData>(cacheKey, (err) => {
+    console.error(
+      `Failed to load cached Statbotics data for ${matchKey}:`,
+      err,
+    );
+  });
+
+  if (!cached) {
+    return undefined;
+  }
+
+  const age = Date.now() - cached.timestamp;
+  if (age > maxAgeMs) {
+    console.log(
+      `[Cache] Statbotics data for ${matchKey} expired (${Math.round(age / 1000 / 60)} minutes old)`,
+    );
+    await DEL(cacheKey);
+    return undefined;
+  }
+
+  console.log(
+    `[Cache] Using cached Statbotics data for ${matchKey} (${Math.round(age / 1000 / 60)} minutes old)`,
+  );
+  return cached.data;
+}
+
+/**
+ * Clears all cached Statbotics data from IndexedDB.
+ *
+ * @returns A promise that resolves when all Statbotics caches are cleared
+ */
+export async function CLEAR_STATBOTICS_CACHE(): Promise<void> {
+  try {
+    const allEntries = await entries();
+    const statboticsKeys = allEntries
+      .map(([key]) => key)
+      .filter((key) => String(key).startsWith("statbotics_"));
+
+    for (const key of statboticsKeys) {
+      await del(key);
+    }
+    console.log(
+      `[Cache] Cleared ${statboticsKeys.length} Statbotics cache entries`,
+    );
+  } catch (err) {
+    console.error("Failed to clear Statbotics cache:", err);
+  }
+}

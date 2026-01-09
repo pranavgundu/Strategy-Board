@@ -2,7 +2,13 @@ import { Model } from "./model.ts";
 import { Whiteboard, updateCanvasSize } from "./whiteboard.ts";
 import { Match } from "./match.ts";
 import { QRImport, QRExport } from "./qr.ts";
-import { CLEAR, SET, GET } from "./db.ts";
+import {
+  CLEAR,
+  SET,
+  GET,
+  CACHE_STATBOTICS,
+  GET_CACHED_STATBOTICS,
+} from "./db.ts";
 import { ContributorsService } from "./contributors.ts";
 import { uploadMatch, downloadMatch } from "./cloud.ts";
 import {
@@ -1207,12 +1213,29 @@ export class View {
         parseInt(match.blueThree),
       ].filter((t) => !isNaN(t));
 
-      const matchData = await this.statboticsService.getMatchData(
-        match.tbaMatchKey,
-        redTeams,
-        blueTeams,
-        match.tbaYear,
-      );
+      // Try to load from cache first
+      let matchData = await GET_CACHED_STATBOTICS(match.tbaMatchKey);
+      let isFromCache = false;
+
+      if (matchData) {
+        isFromCache = true;
+        console.log(`[Statbotics] Using cached data for ${match.tbaMatchKey}`);
+      } else {
+        // Cache miss - fetch from API
+        console.log(
+          `[Statbotics] Cache miss for ${match.tbaMatchKey}, fetching from API...`,
+        );
+        matchData = await this.statboticsService.getMatchData(
+          match.tbaMatchKey,
+          redTeams,
+          blueTeams,
+          match.tbaYear,
+        );
+
+        // Cache the fetched data
+        await CACHE_STATBOTICS(match.tbaMatchKey, matchData);
+        console.log(`[Statbotics] Cached data for ${match.tbaMatchKey}`);
+      }
 
       this.currentStatboticsData = matchData;
 
