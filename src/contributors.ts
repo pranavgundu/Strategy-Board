@@ -76,8 +76,15 @@ export class ContributorsService {
 
       const contributorsData = await contributorsResponse.json();
 
+      // Filter out dependabot
+      const filteredContributors = contributorsData.filter(
+        (contributor: any) =>
+          contributor.login.toLowerCase() !== "dependabot[bot]" &&
+          contributor.login.toLowerCase() !== "dependabot",
+      );
+
       const detailedContributors = await Promise.all(
-        contributorsData.map(async (contributor: any) => {
+        filteredContributors.map(async (contributor: any) => {
           try {
             const userResponse = await fetch(
               `https://api.github.com/users/${contributor.login}`,
