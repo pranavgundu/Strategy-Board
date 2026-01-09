@@ -1648,7 +1648,11 @@ export class Whiteboard {
     }
 
     if (mode !== "statbotics") {
-      this.redrawAll();
+      // Update canvas size when switching from statbotics to ensure proper rendering
+      requestAnimationFrame(() => {
+        updateCanvasSize();
+        this.redrawAll();
+      });
       // Update undo/redo buttons for the new mode
       this.updateUndoRedoButtons();
     }
