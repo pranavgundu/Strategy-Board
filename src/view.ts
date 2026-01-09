@@ -1325,7 +1325,7 @@ export class View {
       });
 
       // Setup click handlers for EPA cards
-      this.setupEPACardClickHandlers(matchData.teamDetails, matchData.yearData, match.tbaYear);
+      this.setupEPACardClickHandlers(matchData.teamDetails, matchData.yearData);
     } catch (error) {
       console.error("Failed to load Statbotics data:", error);
 
@@ -1448,12 +1448,10 @@ export class View {
    *
    * @param teamDetails - Map of team numbers to their detailed statistics
    * @param yearData - Year-specific data including percentile thresholds
-   * @param year - The year for Statbotics link
    */
   private setupEPACardClickHandlers(
     teamDetails: Map<number, any>,
     yearData: any,
-    year?: number,
   ): void {
     const allCards = document.querySelectorAll("[data-team-index]");
 
@@ -1475,7 +1473,7 @@ export class View {
         const teamNumber = parseInt(teamEl?.textContent || "0");
 
         if (teamNumber && teamDetails.has(teamNumber)) {
-          this.showEPADetailsModal(teamDetails.get(teamNumber), yearData, year);
+          this.showEPADetailsModal(teamDetails.get(teamNumber), yearData);
         }
       });
     });
@@ -1486,17 +1484,10 @@ export class View {
    *
    * @param teamData - Team-specific data including EPA ratings and statistics
    * @param yearData - Year-specific data including percentile thresholds
-   * @param year - The year for Statbotics link
    */
-  private showEPADetailsModal(teamData: any, yearData: any, year?: number): void {
+  private showEPADetailsModal(teamData: any, yearData: any): void {
     const modal = document.getElementById("epa-details-modal");
     if (!modal) return;
-
-    // Store year data in modal for later use in click handler
-    if (year) {
-      (modal as any).dataset.year = year;
-      (modal as any).dataset.teamNumber = teamData.team;
-    }
 
     // Update modal content
     const teamEl = document.getElementById("epa-modal-team");
@@ -1507,22 +1498,7 @@ export class View {
     const rankEl = document.getElementById("epa-modal-rank");
     const percentileEl = document.getElementById("epa-modal-percentile");
 
-    if (teamEl) {
-      teamEl.textContent = teamData.team.toString();
-      
-      // Add click handler to navigate to Statbotics if year is available
-      if (year) {
-        teamEl.style.cursor = "pointer";
-        // Remove old listener by cloning
-        const newTeamEl = teamEl.cloneNode(true) as HTMLElement;
-        teamEl.parentNode?.replaceChild(newTeamEl, teamEl);
-        
-        newTeamEl.addEventListener("click", () => {
-          const statboticsUrl = `https://www.statbotics.org/team/${teamData.team}/${year}`;
-          window.open(statboticsUrl, "_blank");
-        });
-      }
-    }
+    if (teamEl) teamEl.textContent = teamData.team.toString();
 
     // Apply color to each stat based on global year percentiles
     if (totalEl) {
