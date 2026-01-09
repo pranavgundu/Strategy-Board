@@ -39,6 +39,7 @@ jobs:
       - name: Build
         env:
           TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
+          NODE_ENV: production
         run: pnpm run build
 
       - name: Setup Pages
