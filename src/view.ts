@@ -3089,6 +3089,53 @@ export class View {
         E.ShareLinkDisplay.value = shareUrl;
       }
 
+      // Generate QR code for the share link
+      try {
+        const qrContainer = document.getElementById("share-qr-code");
+        if (qrContainer) {
+          // Clear any existing QR code
+          qrContainer.innerHTML = "";
+
+          // Dynamically import QRCode to generate the QR
+          const QRCode = (await import("qrcode")) as any;
+          const canvas = await new Promise<HTMLCanvasElement>(
+            (resolve, reject) => {
+              try {
+                QRCode.toCanvas(
+                  shareUrl,
+                  {
+                    errorCorrectionLevel: "H",
+                    type: "image/png",
+                    quality: 0.95,
+                    margin: 1,
+                    width: 180,
+                    color: {
+                      dark: "#000000",
+                      light: "#ffffff",
+                    },
+                  },
+                  (err: Error | null, canvas?: HTMLCanvasElement) => {
+                    if (err) return reject(err);
+                    if (!canvas)
+                      return reject(
+                        new Error("QR code library did not return a canvas")
+                      );
+                    resolve(canvas);
+                  }
+                );
+              } catch (err) {
+                reject(err);
+              }
+            }
+          );
+
+          qrContainer.appendChild(canvas);
+        }
+      } catch (qrErr) {
+        console.warn("Failed to generate QR code:", qrErr);
+        // QR generation failure is not critical, continue with share functionality
+      }
+
       this.show(E.ShareSuccessPanel);
 
       try {

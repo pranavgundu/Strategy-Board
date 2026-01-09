@@ -771,15 +771,15 @@
       class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
     >
       <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl max-h-96 bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
         onclick="event.stopPropagation()"
       >
         <div
-          class="w-full pt-6 pb-4 text-xl sm:text-2xl md:text-3xl text-center text-slate-200 font-bold"
+          class="w-full pt-6 pb-4 text-xl sm:text-2xl md:text-3xl text-center text-slate-200 font-bold flex-shrink-0"
         >
           Share Link Generated!
         </div>
-        <div class="w-full px-6 sm:px-8 md:px-10 pb-6 flex flex-col gap-4">
+        <div class="w-full px-6 sm:px-8 md:px-10 pb-6 flex flex-col gap-4 overflow-y-auto flex-1">
           <div class="text-center text-slate-300">
             <p class="text-sm sm:text-base mb-2">Share Code:</p>
             <div class="flex items-center justify-center gap-2">
@@ -820,8 +820,17 @@
           <div class="text-center text-slate-400 text-xs sm:text-sm">
             <i class="fas fa-info-circle"></i> Link expires in 1 week
           </div>
+          <div class="w-full border-t border-slate-500 pt-6">
+            <p class="text-sm sm:text-base text-slate-300 mb-4 text-center">QR Code:</p>
+            <div class="flex justify-center">
+              <div id="share-qr-code" class="bg-white p-4 rounded-lg"></div>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400 text-center mt-4">
+              Scan to open link
+            </p>
+          </div>
         </div>
-        <div class="flex w-full">
+        <div class="flex w-full flex-shrink-0">
           <button
             id="share-success-close-btn"
             class="w-full text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-b-2xl md:rounded-b-3xl glossy-shine hover:bg-green-600 transition-colors"
