@@ -1186,6 +1186,13 @@ export class View {
 
     this.setupEPAModalHandlers();
 
+    // Clear any existing handler setup flags
+    const allCards = document.querySelectorAll("[data-team-index]");
+    allCards.forEach((card) => {
+      const element = card as HTMLElement;
+      delete element.dataset.handlerSetup;
+    });
+
     try {
       // Prepare team data
       const redTeams = [
@@ -1389,6 +1396,10 @@ export class View {
     const modal = document.getElementById("epa-details-modal");
     const closeBtn = document.getElementById("epa-modal-close");
 
+    // Check if handlers are already set up
+    if (modal?.dataset.handlersSetup === "true") return;
+    if (modal) modal.dataset.handlersSetup = "true";
+
     // Close modal on button click
     closeBtn?.addEventListener("click", () => {
       modal?.classList.add("hidden");
@@ -1402,11 +1413,12 @@ export class View {
     });
 
     // Close modal on Escape key
-    document.addEventListener("keydown", (e) => {
+    const escapeHandler = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !modal?.classList.contains("hidden")) {
         modal.classList.add("hidden");
       }
-    });
+    };
+    document.addEventListener("keydown", escapeHandler);
   }
 
   /**
@@ -1425,11 +1437,13 @@ export class View {
       const teamIndex = card.getAttribute("data-team-index");
       if (!teamIndex) return;
 
-      // Remove existing listeners by cloning
-      const newCard = card.cloneNode(true);
-      card.parentNode?.replaceChild(newCard, card);
+      const element = card as HTMLElement;
 
-      newCard.addEventListener("click", () => {
+      // Check if we've already set up the handler
+      if (element.dataset.handlerSetup === "true") return;
+      element.dataset.handlerSetup = "true";
+
+      element.addEventListener("click", () => {
         const [alliance, position] = teamIndex.split("-");
         const teamEl = document.getElementById(
           `statbotics-${alliance}-${position}-team`,
