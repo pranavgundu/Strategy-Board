@@ -18,6 +18,7 @@
 - Export match as a link, which saves the whiteboard to the cloud and allows any other person to access the same whiteboard with a 6 character code
 - Export a match as a QR code which another person can scan to get your whiteboard
 - Pull data from TBA ([The Blue Alliance](https://www.thebluealliance.com)) to get all matches for a single team
+- Plull statics from [Statbotics](https://www.statbotics.io) to help strategize for matches in one application
 - Saves data so you can use everything offline
 
 <div align="center">
