@@ -136,23 +136,58 @@ const STATBOTICS_API_BASE = "https://api.statbotics.io/v3";
 export class StatboticsService {
   constructor() {}
 
+  /**
+   * Makes an HTTP request to the Statbotics API.
+   *
+   * @param endpoint - The API endpoint to request (e.g., "/match/2024ncwak_qm1")
+   * @returns A promise that resolves to the JSON response data
+   * @throws Will throw an error if the API request fails
+   */
   private async makeRequest(endpoint: string): Promise<any> {
     const url = `${STATBOTICS_API_BASE}${endpoint}`;
-    const response = await fetch(url);
 
-    if (!response.ok) {
-      console.error(
-        "[Statbotics] API error:",
-        response.status,
-        response.statusText,
-      );
-      throw new Error(
-        `Statbotics API error: ${response.status} ${response.statusText}`,
-      );
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        let errorMessage = response.statusText || "Unknown error";
+
+        if (response.status === 500) {
+          console.warn(
+            `[Statbotics] Server error (500) for endpoint: ${endpoint}. The Statbotics API may be temporarily unavailable.`,
+          );
+          errorMessage =
+            "Server error - Statbotics API may be temporarily unavailable";
+        } else if (response.status === 404) {
+          console.warn(
+            `[Statbotics] Data not found (404) for endpoint: ${endpoint}`,
+          );
+          errorMessage = "Data not found";
+        } else {
+          console.error(
+            "[Statbotics] API error:",
+            response.status,
+            response.statusText,
+          );
+        }
+
+        throw new Error(
+          `Statbotics API error: ${response.status} - ${errorMessage}`,
+        );
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Statbotics API error")
+      ) {
+        throw error;
+      }
+      console.error("[Statbotics] Network or parsing error:", error);
+      throw new Error("Failed to connect to Statbotics API");
     }
-
-    const data = await response.json();
-    return data;
   }
 
   /**
@@ -208,13 +243,15 @@ export class StatboticsService {
   }
 
   /**
-   * Fetches comprehensive match data including EPAs for all teams.
+   * Retrieves comprehensive match data including EPA ratings, win probabilities, and team details.
+   * Aggregates data from multiple Statbotics API endpoints.
    *
-   * @param matchKey - The match key (e.g., "2024ncwak_qm1").
-   * @param redTeams - Array of red alliance team numbers.
-   * @param blueTeams - Array of blue alliance team numbers.
-   * @param year - The competition year.
-   * @returns Comprehensive match data with EPAs and predictions.
+   * @param matchKey - The TBA match key in format "yearEventKey_compLevel#"
+   * @param redTeams - Array of three red alliance team numbers
+   * @param blueTeams - Array of three blue alliance team numbers
+   * @param year - The competition year (e.g., 2024)
+   * @returns A promise that resolves to comprehensive match data with EPA ratings, win probabilities, and team statistics
+   * @throws Will log warnings if some data cannot be fetched, but returns partial data when possible
    */
   public async getMatchData(
     matchKey: string,
@@ -231,10 +268,16 @@ export class StatboticsService {
       try {
         matchData = await this.getMatch(matchKey);
       } catch (error) {
-        console.warn(
-          "Could not fetch match from Statbotics, using provided team data",
-          error,
-        );
+        if (error instanceof Error && error.message.includes("500")) {
+          console.warn(
+            `[Statbotics] Match data unavailable for ${matchKey} (server error). Calculating estimates from team EPA data.`,
+          );
+        } else {
+          console.warn(
+            `[Statbotics] Could not fetch match data for ${matchKey}. Using team EPA data for estimates.`,
+            error instanceof Error ? error.message : error,
+          );
+        }
       }
 
       let yearData: StatboticsYear | null = null;

@@ -9,12 +9,23 @@ injectSpeedInsights();
 
 registerSW({
   immediate: true,
+  /**
+   * Callback invoked when the PWA is ready for offline use.
+   */
   onOfflineReady() {
     console.log("PWA: Offline mode is now available!");
   },
+  /**
+   * Callback invoked when new content is available and a refresh is needed.
+   */
   onNeedRefresh() {
     console.log("PWA: New content available, please refresh.");
   },
+  /**
+   * Callback invoked when service worker registration fails.
+   *
+   * @param error - The error that occurred during registration
+   */
   onRegisterError(error) {
     console.error("PWA: Service worker registration failed:", error);
   },

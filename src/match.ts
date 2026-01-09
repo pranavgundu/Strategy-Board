@@ -75,6 +75,22 @@ export class Match {
   public endgame: PhaseData;
   public notes: PhaseData;
 
+  /**
+   * Creates a new Match instance.
+   *
+   * @param matchName - The name of the match
+   * @param redOne - Red alliance robot 1 team number
+   * @param redTwo - Red alliance robot 2 team number
+   * @param redThree - Red alliance robot 3 team number
+   * @param blueOne - Blue alliance robot 1 team number
+   * @param blueTwo - Blue alliance robot 2 team number
+   * @param blueThree - Blue alliance robot 3 team number
+   * @param id - Optional unique identifier for the match. If not provided, generates a UUID.
+   * @param options - Optional match configuration including robot dimensions and phase data
+   * @param tbaEventKey - Optional TBA event key for Statbotics integration
+   * @param tbaMatchKey - Optional TBA match key for Statbotics integration
+   * @param tbaYear - Optional year for year-specific field and robot positioning
+   */
   constructor(
     matchName: string,
     redOne: string,
@@ -113,6 +129,12 @@ export class Match {
     }
   }
 
+  /**
+   * Creates default phase data with robot positions initialized to year-specific starting positions.
+   *
+   * @param positions - Year-specific robot starting positions for red and blue alliances
+   * @returns A PhaseData object with all robots positioned at their starting locations
+   */
   private createDefaultPhaseData(
     positions: ReturnType<typeof getRobotPositionsForYear>,
   ): PhaseData {
@@ -147,6 +169,13 @@ export class Match {
     };
   }
 
+  /**
+   * Creates a default robot position with standard dimensions and rotation.
+   *
+   * @param x - The x-coordinate position on the field
+   * @param y - The y-coordinate position on the field
+   * @returns A RobotPosition object with default width, height, and rotation
+   */
   private createDefaultRobotPosition(x: number, y: number): RobotPosition {
     return {
       x,
@@ -157,6 +186,11 @@ export class Match {
     };
   }
 
+  /**
+   * Applies match options to all phases (auto, teleop, endgame, notes).
+   *
+   * @param options - Match options containing phase-specific data and robot dimensions
+   */
   private applyOptions(options: MatchOptions): void {
     this.applyPhaseOptions(this.auto, options.a, options.dim);
     this.applyPhaseOptions(this.teleop, options.t, options.dim);
@@ -166,6 +200,13 @@ export class Match {
     }
   }
 
+  /**
+   * Applies phase-specific options including robot positions, drawings, and dimensions.
+   *
+   * @param phase - The phase data object to update
+   * @param phaseOptions - Phase-specific options containing robot positions and drawing data
+   * @param dimensions - Robot dimensions for all six robots
+   */
   private applyPhaseOptions(
     phase: PhaseData,
     phaseOptions: PhaseOptions,

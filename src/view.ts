@@ -13,6 +13,13 @@ import {
 } from "./search.ts";
 import { StatboticsService, type StatboticsMatchData } from "./statbotics.ts";
 
+/**
+ * Creates a debounced version of a function that delays its execution.
+ *
+ * @param func - The function to debounce
+ * @param wait - The number of milliseconds to delay execution
+ * @returns A debounced version of the provided function
+ */
 function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number,
@@ -24,6 +31,12 @@ function debounce<T extends (...args: any[]) => any>(
   };
 }
 
+/**
+ * Retrieves an HTML element by its ID.
+ *
+ * @param id - The ID of the element to retrieve
+ * @returns The HTML element if found, or null if not found
+ */
 const get = (id: string): HTMLElement | null => document.getElementById(id);
 
 let B: {
@@ -968,6 +981,11 @@ export class View {
     this.checkShareCodeFromUrl();
   }
 
+  /**
+   * Initializes contributor team numbers for display animations.
+   *
+   * @returns A promise that resolves when team numbers are loaded
+   */
   private async initializeContributorTeams(): Promise<void> {
     try {
       this.contributorTeams = await this.contributorsService.fetchTeams();
@@ -977,6 +995,10 @@ export class View {
     }
   }
 
+  /**
+   * Refreshes the match list UI by re-rendering all matches.
+   * Shows or hides the empty placeholder based on whether matches exist.
+   */
   private refreshMatchList(): void {
     if (!E.MatchList) return;
     E.MatchList.innerHTML = "";
@@ -999,6 +1021,11 @@ export class View {
     }
   }
 
+  /**
+   * Lazy-loads and initializes The Blue Alliance (TBA) service.
+   *
+   * @returns A promise that resolves when TBA service is initialized and API key is loaded
+   */
   private async initializeTBAService(): Promise<void> {
     if (!this.tbaService) {
       const { TBAService } = await import("./tba.ts");
@@ -1007,6 +1034,12 @@ export class View {
     await this.tbaService.loadApiKey();
   }
 
+  /**
+   * Initializes and displays the last commit information in the UI.
+   * Fetches commit data and renders it with a time-ago display.
+   *
+   * @returns A promise that resolves when commit info is displayed
+   */
   private async initializeLastCommit(): Promise<void> {
     if (!E?.LastCommitInfo) return;
 
@@ -1033,6 +1066,12 @@ export class View {
     }
   }
 
+  /**
+   * Converts a date to a human-readable "time ago" string.
+   *
+   * @param date - The date to convert
+   * @returns A string representing the time elapsed (e.g., "2 hours ago", "just now")
+   */
   private getTimeAgo(date: Date): string {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
 
@@ -1055,6 +1094,12 @@ export class View {
     return "just now";
   }
 
+  /**
+   * Shows an HTML element by removing the 'hidden' class.
+   * Special handling for the Home element to set background color.
+   *
+   * @param e - The HTML element to show
+   */
   private show(e: HTMLElement | null): void {
     if (e === E.Home) {
       document.documentElement.style.backgroundColor = "#192334";
@@ -1064,10 +1109,18 @@ export class View {
     e?.classList.remove("hidden");
   }
 
+  /**
+   * Hides an HTML element by adding the 'hidden' class.
+   *
+   * @param e - The HTML element to hide
+   */
   private hide(e: HTMLElement | null): void {
     e?.classList.add("hidden");
   }
 
+  /**
+   * Hides the create match panel and clears all input fields.
+   */
   private hideCreateMatchPanel(): void {
     this.hide(E.CreateMatchPanel);
     I.MatchName.value = "";
@@ -1079,6 +1132,13 @@ export class View {
     I.BlueThree.value = "";
   }
 
+  /**
+   * Loads a match into the whiteboard for editing and visualization.
+   * Sets up the whiteboard canvas and loads Statbotics data if available.
+   *
+   * @param match - The match to load into the whiteboard
+   * @returns A promise that resolves when the whiteboard is loaded
+   */
   private async loadWhiteboard(match: Match): Promise<void> {
     this.whiteboard.setMatch(match);
     this.whiteboard.setActive(true);
@@ -1097,6 +1157,12 @@ export class View {
     }
   }
 
+  /**
+   * Loads and displays Statbotics data for a match including EPA ratings and win probabilities.
+   *
+   * @param match - The match to load Statbotics data for
+   * @returns A promise that resolves when data is loaded and displayed
+   */
   private async loadStatboticsData(match: Match): Promise<void> {
     if (!match.tbaEventKey || !match.tbaMatchKey || !match.tbaYear) {
       const emptyState = document.getElementById("statbotics-empty-state");
@@ -1232,14 +1298,61 @@ export class View {
       this.setupEPACardClickHandlers(matchData.teamDetails, matchData.yearData);
     } catch (error) {
       console.error("Failed to load Statbotics data:", error);
+
+      loadingState?.classList.add("hidden");
+      loadingState?.classList.remove("flex");
+      dataContainer?.classList.remove("hidden");
+
       const matchResult = document.getElementById("statbotics-match-result");
       if (matchResult) {
-        matchResult.textContent = "Error loading data";
-        matchResult.className = "text-xl md:text-2xl font-bold text-red-400";
+        if (error instanceof Error && error.message.includes("500")) {
+          matchResult.innerHTML = `
+            <div class="text-center space-y-2">
+              <div class="text-lg font-semibold text-yellow-400">⚠️ Statbotics Temporarily Unavailable</div>
+              <div class="text-sm text-zinc-400">The Statbotics API is experiencing issues. Please try again later.</div>
+            </div>
+          `;
+        } else if (
+          error instanceof Error &&
+          error.message.includes("not found")
+        ) {
+          matchResult.innerHTML = `
+            <div class="text-center space-y-2">
+              <div class="text-lg font-semibold text-zinc-400">📊 No Data Available</div>
+              <div class="text-sm text-zinc-500">Statbotics data not found for this match.</div>
+            </div>
+          `;
+        } else {
+          matchResult.innerHTML = `
+            <div class="text-center space-y-2">
+              <div class="text-lg font-semibold text-red-400">❌ Error Loading Data</div>
+              <div class="text-sm text-zinc-500">Unable to load Statbotics information.</div>
+            </div>
+          `;
+        }
+        matchResult.className = "text-xl md:text-2xl";
       }
+
+      // Hide EPA displays on error
+      const redWinProb = document.getElementById("statbotics-red-win-prob");
+      const blueWinProb = document.getElementById("statbotics-blue-win-prob");
+      const redBar = document.getElementById("statbotics-prob-bar-red");
+      const blueBar = document.getElementById("statbotics-prob-bar-blue");
+
+      if (redWinProb) redWinProb.textContent = "--";
+      if (blueWinProb) blueWinProb.textContent = "--";
+      if (redBar) redBar.style.width = "50%";
+      if (blueBar) blueBar.style.width = "50%";
     }
   }
 
+  /**
+   * Determines the appropriate color class for an EPA value based on percentile thresholds.
+   *
+   * @param value - The EPA value to evaluate
+   * @param percentiles - Object containing p25, p50, p75, p90, and p99 percentile thresholds
+   * @returns A CSS color class name based on the EPA value's percentile ranking
+   */
   private getEPAColorClass(
     value: number,
     percentiles:
@@ -1269,6 +1382,9 @@ export class View {
     return "text-zinc-300";
   }
 
+  /**
+   * Sets up event handlers for the EPA details modal that displays team statistics.
+   */
   private setupEPAModalHandlers(): void {
     const modal = document.getElementById("epa-details-modal");
     const closeBtn = document.getElementById("epa-modal-close");
@@ -1293,6 +1409,12 @@ export class View {
     });
   }
 
+  /**
+   * Sets up click handlers for EPA team cards to display detailed modal information.
+   *
+   * @param teamDetails - Map of team numbers to their detailed statistics
+   * @param yearData - Year-specific data including percentile thresholds
+   */
   private setupEPACardClickHandlers(
     teamDetails: Map<number, any>,
     yearData: any,
@@ -1321,6 +1443,12 @@ export class View {
     });
   }
 
+  /**
+   * Displays the EPA details modal with team statistics and percentile information.
+   *
+   * @param teamData - Team-specific data including EPA ratings and statistics
+   * @param yearData - Year-specific data including percentile thresholds
+   */
   private showEPADetailsModal(teamData: any, yearData: any): void {
     const modal = document.getElementById("epa-details-modal");
     if (!modal) return;
@@ -1384,6 +1512,19 @@ export class View {
     modal.classList.remove("hidden");
   }
 
+  /**
+   * Creates a new match list item in the UI with team numbers and event handlers.
+   * Applies special styling for contributor teams and team 834.
+   *
+   * @param id - Unique identifier for the match
+   * @param matchName - Display name of the match
+   * @param redOne - Red alliance robot 1 team number
+   * @param redTwo - Red alliance robot 2 team number
+   * @param redThree - Red alliance robot 3 team number
+   * @param blueOne - Blue alliance robot 1 team number
+   * @param blueTwo - Blue alliance robot 2 team number
+   * @param blueThree - Blue alliance robot 3 team number
+   */
   public createNewMatch(
     id: string,
     matchName: string,
@@ -1630,6 +1771,13 @@ export class View {
     }
   }
 
+  /**
+   * Duplicates an existing match with all its data and creates a new match entry.
+   * The duplicated match is prefixed with "Copy of" in its name.
+   *
+   * @param id - The ID of the match to duplicate
+   * @returns A promise that resolves when the match is duplicated and added to the UI
+   */
   public async duplicateMatch(id: string): Promise<void> {
     const match = this.model.getMatch(id);
     if (!match) return;
@@ -1666,14 +1814,30 @@ export class View {
     );
   }
 
+  /**
+   * Handles click event for creating a new match by showing the create match panel.
+   *
+   * @param e - The click event
+   */
   private onClickNewMatch(e: Event): void {
     this.show(E.CreateMatchPanel);
   }
 
+  /**
+   * Handles click event for canceling match creation and hiding the panel.
+   *
+   * @param e - The click event
+   */
   private onClickCancelCreateMatch(e: Event): void {
     this.hideCreateMatchPanel();
   }
 
+  /**
+   * Handles click event for creating a match from the input form data.
+   *
+   * @param e - The click event
+   * @returns A promise that resolves when the match is created
+   */
   private async onClickCreateMatch(e: Event): Promise<void> {
     const id = await this.model.createNewMatch(
       I.MatchName.value,
@@ -1706,6 +1870,9 @@ export class View {
     I.BlueThree.value = "";
   }
 
+  /**
+   * Handles exporting the current match as a PNG image.
+   */
   private onClickExportPNG(): void {
     if (!this.currentExportMatch) {
       console.error("No match available for PNG export");
@@ -1748,6 +1915,11 @@ export class View {
     }
   }
 
+  /**
+   * Handles exporting the current match as a PDF document.
+   *
+   * @returns A promise that resolves when the PDF export is complete
+   */
   private async onClickExportPDF(): Promise<void> {
     if (!this.currentExportMatch) {
       console.error("No match available for PDF export");
@@ -1813,18 +1985,34 @@ export class View {
     }
   }
 
+  /**
+   * Handles click event for navigating back from whiteboard to home screen.
+   *
+   * @param e - The click event
+   */
   private onClickBack(e: Event): void {
     this.whiteboard.setActive(false);
     this.show(E.Home);
     this.hide(E.Whiteboard);
   }
 
+  /**
+   * Handles click event for toggling the whiteboard view.
+   *
+   * @param e - The click event
+   */
   private onClickToggleView(e: Event): void {
     this.whiteboard.toggleView();
   }
 
   private selectedEventName: string = "";
 
+  /**
+   * Handles click event for importing matches from The Blue Alliance (TBA).
+   *
+   * @param e - The click event
+   * @returns A promise that resolves when TBA import panel is shown
+   */
   private async onClickTBAImport(e: Event): Promise<void> {
     this.show(E.TBAImportPanel);
 
@@ -1844,6 +2032,11 @@ export class View {
     this.setupTBADropdownListeners();
   }
 
+  /**
+   * Handles click event for canceling TBA import and closing the panel.
+   *
+   * @param e - The click event
+   */
   private onClickTBACancel(e: Event): void {
     this.hide(E.TBAImportPanel);
     this.hide(E.TBAStatusMessage);

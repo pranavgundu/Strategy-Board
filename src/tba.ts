@@ -90,6 +90,13 @@ export class TBAService {
     );
   }
 
+  /**
+   * Makes an authenticated HTTP request to The Blue Alliance API.
+   *
+   * @param endpoint - The API endpoint to request (e.g., "/event/2024ncwak/matches")
+   * @returns A promise that resolves to the JSON response data
+   * @throws Will throw an error if no API key is set or if the request fails
+   */
   private async makeRequest(endpoint: string): Promise<any> {
     const apiKey = this.apiKey || Config.sharedTBAApiKey;
 
@@ -144,10 +151,11 @@ export class TBAService {
   }
 
   /**
-   * Fetches all matches at an event.
+   * Retrieves all matches for a specific event from TBA.
    *
-   * @param eventKey - The event key to fetch matches from.
-   * @returns Array of TBA match data.
+   * @param eventKey - The TBA event key (e.g., "2024ncwak")
+   * @returns A promise that resolves to an array of match data
+   * @throws Will throw an error if the API request fails
    */
   public async getMatchesAtEvent(eventKey: string): Promise<TBAMatch[]> {
     const endpoint = `/event/${eventKey}/matches`;
@@ -189,10 +197,10 @@ export class TBAService {
   }
 
   /**
-   * Converts TBA event data to simplified format.
+   * Formats TBA event data into a simplified format for dropdown display.
    *
-   * @param events - Array of TBA event data.
-   * @returns Array of simplified event information.
+   * @param events - Array of TBA event objects
+   * @returns An array of simplified event objects with formatted names and dates
    */
   public parseEventsToSimple(events: TBAEvent[]): TBASimpleEvent[] {
     return events.map((event) => {
