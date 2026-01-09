@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { getRobotPositionsForYear } from "./manager.ts";
 
-// the match class represents a robotics match with teams and phases
-
 interface RobotPosition {
   x: number;
   y: number;
@@ -25,7 +23,7 @@ interface PhaseData {
 
 type DrawingStroke = [number, ...Array<[number, number]>];
 type BoundingBox = [number, number, number, number];
-type CheckboxAnnotation = [number, number, number, boolean]; // x, y, color, checked
+type CheckboxAnnotation = [number, number, number, boolean];
 
 interface MatchOptions {
   dim: {
@@ -68,7 +66,6 @@ export class Match {
   public readonly blueThree: string;
   public readonly id: string;
 
-  // TBA metadata for Statbotics integration
   public readonly tbaEventKey?: string;
   public readonly tbaMatchKey?: string;
   public readonly tbaYear?: number;
@@ -104,7 +101,6 @@ export class Match {
     this.tbaMatchKey = tbaMatchKey;
     this.tbaYear = tbaYear;
 
-    // Get year-specific robot positions
     const positions = getRobotPositionsForYear(tbaYear);
 
     this.auto = this.createDefaultPhaseData(positions);
@@ -295,9 +291,9 @@ export class Match {
             }
           : undefined,
       },
-      packet[9], // tbaEventKey
-      packet[10], // tbaMatchKey
-      packet[11], // tbaYear
+      packet[9],
+      packet[10],
+      packet[11],
     );
   }
 

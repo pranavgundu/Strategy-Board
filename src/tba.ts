@@ -424,7 +424,6 @@ export class TBAService {
       "Dec",
     ];
 
-    // Helper function to parse event date
     const parseEventDate = (event: TBASimpleEvent): Date | null => {
       const parts = event.dateRange.split(" ");
       const month = parts[0];
@@ -439,17 +438,14 @@ export class TBAService {
       return new Date(event.year, monthIndex, day);
     };
 
-    // Filter events
     const filteredEvents = events.filter((event) => {
       const eventDate = parseEventDate(event);
       if (!eventDate) {
         return false;
       }
-      // Show all past events and future events up to 1 week from now
       return eventDate <= oneWeekFromNow;
     });
 
-    // Sort events by date (most future first, descending order)
     filteredEvents.sort((a, b) => {
       const dateA = parseEventDate(a);
       const dateB = parseEventDate(b);
@@ -458,7 +454,6 @@ export class TBAService {
         return 0;
       }
 
-      // Descending order: most recent/future dates first
       return dateB.getTime() - dateA.getTime();
     });
 

@@ -6,10 +6,8 @@
  * - For TBA/historical matches, uses the field from that specific year
  */
 
-// Import all field images explicitly
-// As new years are added, import them here
 import field2025 from "./images/2025.png";
-// import field2026 from "./images/2026.png"; // Uncomment when 2026 field image is added
+// import field2026 from "./images/2026.png";
 
 interface FieldImageMap {
   [year: number]: string;
@@ -38,9 +36,7 @@ interface YearConfig {
  */
 const FIELD_IMAGES: FieldImageMap = {
   2025: field2025,
-  // 2026: field2026, // Uncomment when 2026 field image is added
-  // Add future years here:
-  // 2027: field2027,
+  // 2026: field2026,
 };
 
 /**
@@ -60,30 +56,16 @@ const YEAR_ROBOT_POSITIONS: YearConfig = {
       three: { x: 1455, y: 1155 },
     },
   },
-  // 2026 - Update these positions based on the 2026 game
-  2026: {
-    red: {
-      one: { x: 2055, y: 455 }, // Update X, Y for 2026 red robot 1 starting position
-      two: { x: 2055, y: 805 }, // Update X, Y for 2026 red robot 2 starting position
-      three: { x: 2055, y: 1155 }, // Update X, Y for 2026 red robot 3 starting position
-    },
-    blue: {
-      one: { x: 1455, y: 455 }, // Update X, Y for 2026 blue robot 1 starting position
-      two: { x: 1455, y: 805 }, // Update X, Y for 2026 blue robot 2 starting position
-      three: { x: 1455, y: 1155 }, // Update X, Y for 2026 blue robot 3 starting position
-    },
-  },
-  // Add future years here with their specific starting positions:
-  // 2027: {
+  // 2026: {
   //   red: {
-  //     one: { x: 2100, y: 500 },
-  //     two: { x: 2100, y: 800 },
-  //     three: { x: 2100, y: 1100 },
+  //     one: { x: 2055, y: 455 },
+  //     two: { x: 2055, y: 805 },
+  //     three: { x: 2055, y: 1155 },
   //   },
   //   blue: {
-  //     one: { x: 1400, y: 500 },
-  //     two: { x: 1400, y: 800 },
-  //     three: { x: 1400, y: 1100 },
+  //     one: { x: 1455, y: 455 },
+  //     two: { x: 1455, y: 805 },
+  //     three: { x: 1455, y: 1155 },
   //   },
   // },
 };
@@ -129,31 +111,25 @@ export function getLatestFieldYear(): number {
  * @returns The field image URL
  */
 export function getFieldImageForYear(year?: number): string {
-  // If no year specified, use the latest field
   if (!year) {
     const latestYear = getLatestFieldYear();
     return FIELD_IMAGES[latestYear];
   }
 
-  // If exact year exists, return it
   if (FIELD_IMAGES[year]) {
     return FIELD_IMAGES[year];
   }
 
-  // Otherwise, find the closest year (prefer earlier year for backward compatibility)
   const availableYears = getAvailableYears();
 
-  // If requested year is before all available years, use the earliest
   if (year < availableYears[0]) {
     return FIELD_IMAGES[availableYears[0]];
   }
 
-  // If requested year is after all available years, use the latest
   if (year > availableYears[availableYears.length - 1]) {
     return FIELD_IMAGES[availableYears[availableYears.length - 1]];
   }
 
-  // Find the closest year (prefer the year before or at the requested year)
   let closestYear = availableYears[0];
   for (const availYear of availableYears) {
     if (availYear <= year) {
@@ -234,18 +210,15 @@ export async function preloadFieldImages(): Promise<void> {
  * @returns Robot starting positions for red and blue alliances
  */
 export function getRobotPositionsForYear(year?: number): RobotPositions {
-  // If no year specified, use the latest year
   if (!year) {
     const latestYear = getLatestFieldYear();
     return YEAR_ROBOT_POSITIONS[latestYear] || FALLBACK_POSITIONS;
   }
 
-  // If positions exist for this year, return them
   if (YEAR_ROBOT_POSITIONS[year]) {
     return YEAR_ROBOT_POSITIONS[year];
   }
 
-  // Otherwise, find the closest year with positions
   const availableYears = Object.keys(YEAR_ROBOT_POSITIONS)
     .map(Number)
     .sort((a, b) => a - b);
@@ -254,17 +227,14 @@ export function getRobotPositionsForYear(year?: number): RobotPositions {
     return FALLBACK_POSITIONS;
   }
 
-  // If requested year is before all available years, use the earliest
   if (year < availableYears[0]) {
     return YEAR_ROBOT_POSITIONS[availableYears[0]];
   }
 
-  // If requested year is after all available years, use the latest
   if (year > availableYears[availableYears.length - 1]) {
     return YEAR_ROBOT_POSITIONS[availableYears[availableYears.length - 1]];
   }
 
-  // Find the closest year (prefer earlier year for backward compatibility)
   let closestYear = availableYears[0];
   for (const availYear of availableYears) {
     if (availYear <= year) {

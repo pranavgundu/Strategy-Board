@@ -106,8 +106,8 @@ export class View {
   private whiteboard: Whiteboard;
   private qrimport: QRImport;
   private qrexport: QRExport;
-  private tbaService: any = null; // Lazy-loaded
-  private pdfExport: any = null; // Lazy-loaded
+  private tbaService: any = null;
+  private pdfExport: any = null;
   private contributorsService: ContributorsService;
   private statboticsService: StatboticsService;
   private currentExportMatch: Match | null = null;
@@ -125,7 +125,6 @@ export class View {
     this.qrimport = qrimport;
     this.qrexport = qrexport;
 
-    // tbaService and pdfExport are lazy-loaded when needed
     this.contributorsService = new ContributorsService();
     this.statboticsService = new StatboticsService();
 
@@ -411,7 +410,6 @@ export class View {
         }
       }
 
-      // Contributors link button
       const contributorsLinkBtn = B?.ContributorsLink;
       if (contributorsLinkBtn) {
         console.debug(
@@ -433,7 +431,6 @@ export class View {
         }
       }
 
-      // Contributors close button
       const contributorsCloseBtn = B?.ContributorsClose;
       if (contributorsCloseBtn) {
         console.debug(
@@ -454,7 +451,6 @@ export class View {
         }
       }
 
-      // Contributors retry button
       const contributorsRetryBtn = B?.ContributorsRetry;
       if (contributorsRetryBtn) {
         console.debug(
@@ -475,7 +471,6 @@ export class View {
         }
       }
 
-      // Contributors panel backdrop click
       const contributorsPanel = E?.ContributorsPanel;
       if (contributorsPanel) {
         console.debug(
@@ -498,7 +493,6 @@ export class View {
         }
       }
 
-      // Link import panel backdrop click
       const linkImportPanel = E?.LinkImportPanel;
       if (linkImportPanel) {
         console.debug(
@@ -525,7 +519,6 @@ export class View {
         }
       }
 
-      // Share success panel event listeners
       const shareSuccessClose = B?.ShareSuccessClose;
       if (shareSuccessClose) {
         shareSuccessClose.addEventListener("click", () => {
@@ -693,7 +686,6 @@ export class View {
                 subtree: true,
               });
 
-              // Disconnect observer when overlay closes to prevent memory leak
               if (overlay) {
                 const cleanup = () => {
                   mo.disconnect();
@@ -702,7 +694,6 @@ export class View {
                 overlay.addEventListener("click", cleanup);
               }
             } catch (_err) {
-              // Fallback to polling if MutationObserver fails
               const poll = window.setInterval(() => {
                 updateProgressBarFromStatus(statusId, barId);
               }, 400);
@@ -795,7 +786,7 @@ export class View {
                 "toolbar-ultra",
               );
 
-              const slack = toolbarWidth - requiredWidth; // positive = space remaining
+              const slack = toolbarWidth - requiredWidth;
               if (slack < 0) {
                 if (slack < -120) {
                   toolbar.classList.add("toolbar-ultra");
@@ -980,7 +971,6 @@ export class View {
   private async initializeContributorTeams(): Promise<void> {
     try {
       this.contributorTeams = await this.contributorsService.fetchTeams();
-      // Re-render match list to apply team animations now that teams are loaded
       this.refreshMatchList();
     } catch (error) {
       console.error("Failed to load contributor teams:", error);
@@ -989,7 +979,6 @@ export class View {
 
   private refreshMatchList(): void {
     if (!E.MatchList) return;
-    // Clear and re-render all matches with updated team animations
     E.MatchList.innerHTML = "";
     for (const match of this.model.matches) {
       this.createNewMatch(
@@ -1003,7 +992,6 @@ export class View {
         match.blueThree,
       );
     }
-    // Show empty placeholder if no matches
     if (this.model.matches.length === 0) {
       this.show(E.EmptyMatchListPlaceholder);
     } else {
@@ -1012,7 +1000,6 @@ export class View {
   }
 
   private async initializeTBAService(): Promise<void> {
-    // Lazy-load TBA service when needed (saves bundle size on initial load)
     if (!this.tbaService) {
       const { TBAService } = await import("./tba.ts");
       this.tbaService = new TBAService();
@@ -1099,13 +1086,11 @@ export class View {
     this.hide(E.Home);
     updateCanvasSize();
 
-    // Show or hide Statbotics tab based on whether match is from TBA
     const statboticsTab = document.getElementById(
       "whiteboard-toolbar-mode-statbotics",
     );
     if (match.isFromTBA()) {
       statboticsTab?.classList.remove("hidden");
-      // Load Statbotics data in the background
       this.loadStatboticsData(match);
     } else {
       statboticsTab?.classList.add("hidden");
@@ -1114,7 +1099,6 @@ export class View {
 
   private async loadStatboticsData(match: Match): Promise<void> {
     if (!match.tbaEventKey || !match.tbaMatchKey || !match.tbaYear) {
-      // Show empty state
       const emptyState = document.getElementById("statbotics-empty-state");
       const dataContainer = document.getElementById(
         "statbotics-data-container",
@@ -1126,7 +1110,6 @@ export class View {
       return;
     }
 
-    // Show loading state
     const emptyState = document.getElementById("statbotics-empty-state");
     const dataContainer = document.getElementById("statbotics-data-container");
     const loadingState = document.getElementById("statbotics-loading-state");
@@ -1135,7 +1118,6 @@ export class View {
     loadingState?.classList.remove("hidden");
     loadingState?.classList.add("flex");
 
-    // Setup modal handlers
     this.setupEPAModalHandlers();
 
     try {
@@ -1161,12 +1143,10 @@ export class View {
 
       this.currentStatboticsData = matchData;
 
-      // Hide loading, show data
       loadingState?.classList.add("hidden");
       loadingState?.classList.remove("flex");
       dataContainer?.classList.remove("hidden");
 
-      // Update win probabilities and bars
       const redWinProb = document.getElementById("statbotics-red-win-prob");
       const blueWinProb = document.getElementById("statbotics-blue-win-prob");
       const redBar = document.getElementById("statbotics-prob-bar-red");
@@ -1181,7 +1161,6 @@ export class View {
       if (blueBar)
         blueBar.style.width = `${(matchData.blueWinProbability * 100).toFixed(1)}%`;
 
-      // Update match result
       const matchResult = document.getElementById("statbotics-match-result");
       if (matchData.hasScores && matchResult) {
         let resultText = "";
@@ -1209,7 +1188,6 @@ export class View {
         matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
       }
 
-      // Update Red Alliance EPAs
       const redTeamsDisplay = [
         parseInt(match.redOne),
         parseInt(match.redTwo),
@@ -1230,7 +1208,6 @@ export class View {
         }
       });
 
-      // Update Blue Alliance EPAs
       const blueTeamsDisplay = [
         parseInt(match.blueOne),
         parseInt(match.blueTwo),

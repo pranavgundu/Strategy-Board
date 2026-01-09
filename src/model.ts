@@ -7,7 +7,6 @@ declare global {
   }
 }
 
-// this class manages matches and their persistent storage
 export class Model {
   public matches: Array<Match> = [];
   private matchIds: Array<string> = [];

@@ -227,7 +227,6 @@ export class StatboticsService {
       const blueTeamEPAs = new Map<number, number>();
       const teamDetails = new Map<number, StatboticsTeamEventData>();
 
-      // Try to fetch match data from Statbotics
       let matchData: StatboticsMatch | null = null;
       try {
         matchData = await this.getMatch(matchKey);
@@ -238,7 +237,6 @@ export class StatboticsService {
         );
       }
 
-      // Fetch year data to get global percentile thresholds
       let yearData: StatboticsYear | null = null;
       try {
         yearData = await this.getYear(year);
@@ -246,7 +244,6 @@ export class StatboticsService {
         console.error("[Statbotics] Failed to fetch year data:", error);
       }
 
-      // Fetch EPA data for each team
       const redEPAPromises = redTeams.map((team) =>
         this.getTeamYear(team, year)
           .then((data) => {
@@ -315,7 +312,6 @@ export class StatboticsService {
       redEPAResults.forEach(({ team, epa }) => redTeamEPAs.set(team, epa));
       blueEPAResults.forEach(({ team, epa }) => blueTeamEPAs.set(team, epa));
 
-      // Calculate win probabilities
       let redWinProb = 0.5;
       let blueWinProb = 0.5;
       let redScore: number | undefined;
@@ -323,18 +319,15 @@ export class StatboticsService {
       let hasScores = false;
 
       if (matchData) {
-        // Win probability from predictions
         redWinProb = matchData.pred?.red_win_prob || 0.5;
         blueWinProb = 1 - redWinProb;
 
-        // Get actual scores if match is complete
         if (matchData.result) {
           redScore = matchData.result.red_score;
           blueScore = matchData.result.blue_score;
           hasScores = redScore !== undefined && blueScore !== undefined;
         }
       } else {
-        // Calculate simple win probability based on EPA sum if match data not available
         const redEPASum = Array.from(redTeamEPAs.values()).reduce(
           (sum, epa) => sum + epa,
           0,
@@ -378,7 +371,6 @@ export class StatboticsService {
    * @returns The Statbotics match key (e.g., "2024ncwak_qm1").
    */
   public constructMatchKey(eventKey: string, matchName: string): string {
-    // Extract just the match part without event name
     const matchPart = matchName.split(" @ ")[0].trim();
 
     let compLevel = "";

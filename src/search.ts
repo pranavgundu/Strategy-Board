@@ -17,7 +17,6 @@ export interface SearchableItem {
   key: string;
 }
 
-// Scoring weights
 const SCORE_EXACT_MATCH = 100;
 const SCORE_STARTS_WITH = 50;
 const SCORE_WORD_BOUNDARY = 30;
@@ -39,7 +38,7 @@ const SCORE_FIRST_CHAR_BONUS = 15;
 export function fuzzyMatch(
   searchTerm: string,
   target: string,
-  originalTarget?: string
+  originalTarget?: string,
 ): { score: number; matchedIndices: number[] } | null {
   if (!searchTerm) {
     return { score: 0, matchedIndices: [] };
@@ -51,7 +50,6 @@ export function fuzzyMatch(
 
   const original = originalTarget || target;
 
-  // Exact match gets highest score
   if (target === searchTerm) {
     return {
       score: SCORE_EXACT_MATCH + searchTerm.length * SCORE_CHARACTER_MATCH,
@@ -59,23 +57,20 @@ export function fuzzyMatch(
     };
   }
 
-  // Contains exact substring
   const exactIndex = target.indexOf(searchTerm);
   if (exactIndex !== -1) {
     const indices = Array.from(
       { length: searchTerm.length },
-      (_, i) => exactIndex + i
+      (_, i) => exactIndex + i,
     );
     let score =
       SCORE_CHARACTER_MATCH * searchTerm.length +
       SCORE_CONSECUTIVE_BONUS * (searchTerm.length - 1);
 
-    // Bonus if it starts with the search term
     if (exactIndex === 0) {
       score += SCORE_STARTS_WITH;
     }
 
-    // Bonus if match is at a word boundary
     if (exactIndex === 0 || isWordBoundary(target, exactIndex)) {
       score += SCORE_WORD_BOUNDARY;
     }
@@ -83,7 +78,6 @@ export function fuzzyMatch(
     return { score, matchedIndices: indices };
   }
 
-  // Fuzzy matching with scoring
   const matchResult = calculateFuzzyScore(searchTerm, target, original);
   return matchResult;
 }
@@ -110,19 +104,11 @@ function isWordBoundary(str: string, index: number): boolean {
 /**
  * Check if a character is uppercase in the original string (camelCase boundary)
  */
-function isCamelCaseBoundary(
-  original: string,
-  index: number
-): boolean {
+function isCamelCaseBoundary(original: string, index: number): boolean {
   if (index === 0) return false;
   const char = original[index];
   const prevChar = original[index - 1];
-  return (
-    char >= "A" &&
-    char <= "Z" &&
-    prevChar >= "a" &&
-    prevChar <= "z"
-  );
+  return char >= "A" && char <= "Z" && prevChar >= "a" && prevChar <= "z";
 }
 
 /**
@@ -131,7 +117,7 @@ function isCamelCaseBoundary(
 function calculateFuzzyScore(
   searchTerm: string,
   target: string,
-  original: string
+  original: string,
 ): { score: number; matchedIndices: number[] } | null {
   const searchLen = searchTerm.length;
   const targetLen = target.length;
@@ -140,7 +126,6 @@ function calculateFuzzyScore(
     return null;
   }
 
-  // First pass: check if all characters exist in order
   let searchIdx = 0;
   const matchedIndices: number[] = [];
 
@@ -151,12 +136,10 @@ function calculateFuzzyScore(
     }
   }
 
-  // Not all characters matched
   if (searchIdx !== searchLen) {
     return null;
   }
 
-  // Calculate score based on match quality
   let score = 0;
   let consecutiveCount = 0;
   let prevMatchIdx = -2;
@@ -164,41 +147,34 @@ function calculateFuzzyScore(
   for (let i = 0; i < matchedIndices.length; i++) {
     const matchIdx = matchedIndices[i];
 
-    // Base score for matching a character
     score += SCORE_CHARACTER_MATCH;
 
-    // First character match bonus
     if (i === 0 && matchIdx === 0) {
       score += SCORE_FIRST_CHAR_BONUS;
     }
 
-    // Word boundary bonus
     if (isWordBoundary(target, matchIdx)) {
       score += SCORE_WORD_BOUNDARY;
     }
 
-    // CamelCase boundary bonus
     if (isCamelCaseBoundary(original, matchIdx)) {
       score += SCORE_CAMEL_CASE_MATCH;
     }
 
-    // Consecutive character bonus
     if (matchIdx === prevMatchIdx + 1) {
       consecutiveCount++;
       score += SCORE_CONSECUTIVE_BONUS * consecutiveCount;
     } else {
       consecutiveCount = 0;
-      // Gap penalty (but not for first character)
       if (i > 0) {
         const gap = matchIdx - prevMatchIdx - 1;
-        score += SCORE_GAP_PENALTY * Math.min(gap, 5); // Cap gap penalty
+        score += SCORE_GAP_PENALTY * Math.min(gap, 5);
       }
     }
 
     prevMatchIdx = matchIdx;
   }
 
-  // Bonus for shorter targets (more relevant matches)
   score += Math.max(0, 20 - (targetLen - searchLen));
 
   return { score, matchedIndices };
@@ -215,7 +191,7 @@ function calculateFuzzyScore(
 export function fuzzySearchItems(
   items: SearchableItem[],
   searchTerm: string,
-  minScore: number = 0
+  minScore: number = 0,
 ): FuzzyMatch[] {
   const lowerSearch = searchTerm.toLowerCase();
   const matches: FuzzyMatch[] = [];
@@ -225,40 +201,29 @@ export function fuzzySearchItems(
     const nameMatch = fuzzyMatch(
       lowerSearch,
       item.name.toLowerCase(),
-      item.name
+      item.name,
     );
     const detailsMatch = fuzzyMatch(
       lowerSearch,
       item.details.toLowerCase(),
-      item.details
+      item.details,
     );
     const keyMatch = fuzzyMatch(lowerSearch, item.key.toLowerCase(), item.key);
 
-    // Take the best match
     let bestMatch: { score: number; matchedIndices: number[] } | null = null;
 
-    if (
-      nameMatch &&
-      (!bestMatch || nameMatch.score > bestMatch.score)
-    ) {
-      // Name matches get a bonus since they're more important
+    if (nameMatch && (!bestMatch || nameMatch.score > bestMatch.score)) {
       bestMatch = {
         score: nameMatch.score + 20,
         matchedIndices: nameMatch.matchedIndices,
       };
     }
 
-    if (
-      detailsMatch &&
-      (!bestMatch || detailsMatch.score > bestMatch.score)
-    ) {
+    if (detailsMatch && (!bestMatch || detailsMatch.score > bestMatch.score)) {
       bestMatch = detailsMatch;
     }
 
-    if (
-      keyMatch &&
-      (!bestMatch || keyMatch.score > bestMatch.score)
-    ) {
+    if (keyMatch && (!bestMatch || keyMatch.score > bestMatch.score)) {
       bestMatch = keyMatch;
     }
 
@@ -271,7 +236,6 @@ export function fuzzySearchItems(
     }
   }
 
-  // Sort by score descending
   matches.sort((a, b) => b.score - a.score);
 
   return matches;
@@ -286,10 +250,8 @@ export function extractEventItems(container: HTMLElement): SearchableItem[] {
 
   elements.forEach((element) => {
     const el = element as HTMLElement;
-    const name =
-      el.querySelector(".tba-event-name")?.textContent || "";
-    const details =
-      el.querySelector(".tba-event-details")?.textContent || "";
+    const name = el.querySelector(".tba-event-name")?.textContent || "";
+    const details = el.querySelector(".tba-event-details")?.textContent || "";
     const key = el.dataset.eventKey || "";
 
     items.push({

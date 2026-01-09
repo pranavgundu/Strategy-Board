@@ -23,8 +23,12 @@ export class PDFExport {
       const qrSize = 80;
       const spacing = 15;
 
-      const codesPerRow = Math.floor((pageWidth - 2 * margin) / (qrSize + spacing));
-      const codesPerColumn = Math.floor((pageHeight - 2 * margin - 30) / (qrSize + spacing));
+      const codesPerRow = Math.floor(
+        (pageWidth - 2 * margin) / (qrSize + spacing),
+      );
+      const codesPerColumn = Math.floor(
+        (pageHeight - 2 * margin - 30) / (qrSize + spacing),
+      );
       const codesPerPage = codesPerRow * codesPerColumn;
 
       pdf.setFontSize(20);
@@ -37,7 +41,7 @@ export class PDFExport {
         `Scan each QR code in order (${data.length} total)`,
         pageWidth / 2,
         margin + 10,
-        { align: "center" }
+        { align: "center" },
       );
 
       let currentPage = 0;
@@ -72,12 +76,9 @@ export class PDFExport {
 
         pdf.setFontSize(10);
         pdf.setFont("helvetica", "normal");
-        pdf.text(
-          `${i + 1} of ${data.length}`,
-          x + qrSize / 2,
-          y + qrSize + 5,
-          { align: "center" }
-        );
+        pdf.text(`${i + 1} of ${data.length}`, x + qrSize / 2, y + qrSize + 5, {
+          align: "center",
+        });
 
         codeIndex++;
       }
@@ -99,7 +100,7 @@ export class PDFExport {
    */
   public async exportToPDFLarge(
     data: string[],
-    matchName: string
+    matchName: string,
   ): Promise<void> {
     try {
       const pdf = new jsPDF({
@@ -110,7 +111,7 @@ export class PDFExport {
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const qrSize = 150; // Large QR code
+      const qrSize = 150;
 
       for (let i = 0; i < data.length; i++) {
         if (i > 0) {
@@ -123,12 +124,9 @@ export class PDFExport {
 
         pdf.setFontSize(16);
         pdf.setFont("helvetica", "normal");
-        pdf.text(
-          `QR Code ${i + 1} of ${data.length}`,
-          pageWidth / 2,
-          45,
-          { align: "center" }
-        );
+        pdf.text(`QR Code ${i + 1} of ${data.length}`, pageWidth / 2, 45, {
+          align: "center",
+        });
 
         const qrDataUrl = await QRCode.toDataURL(data[i], {
           width: 500,
@@ -146,7 +144,7 @@ export class PDFExport {
           "Scan this code, then move to the next page",
           pageWidth / 2,
           pageHeight - 30,
-          { align: "center" }
+          { align: "center" },
         );
       }
 

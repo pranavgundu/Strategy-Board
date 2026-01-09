@@ -307,14 +307,12 @@ export class QRExport {
           }, FRAME_DURATION_MS);
         };
 
-        // Show the first QR code immediately
         const firstEl = this.pool.find((x) => x) || null;
         if (firstEl) {
           const dom = document.getElementById(firstEl.id);
           if (dom) dom.classList.remove("hidden");
         }
 
-        // Wait for start button click or start immediately
         if (onReadyToStart) {
           onReadyToStart();
           const startBtn = document.getElementById("qr-export-start-btn");
@@ -322,7 +320,6 @@ export class QRExport {
             startBtn.onclick = startAnimation;
           }
         } else {
-          // Fallback: start immediately if no callback provided
           startAnimation();
         }
       } catch (err) {
@@ -395,7 +392,6 @@ export class QRExport {
       const progressWrap = document.getElementById("qr-export-progress-wrap");
       if (progressWrap) progressWrap.style.display = "none";
 
-      // Reset start button
       const startBtn = document.getElementById("qr-export-start-btn");
       if (startBtn) {
         startBtn.style.display = "block";
@@ -613,8 +609,7 @@ export class QRImport {
         this.receivedIds.length === this.expectedLength
       ) {
         if (statusEl)
-          statusEl.textContent =
-            "All chunks received — reconstructing data...";
+          statusEl.textContent = "All chunks received — reconstructing data...";
         try {
           const dots = document.getElementById(
             "qr-import-dots",

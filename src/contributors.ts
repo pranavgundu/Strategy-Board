@@ -1,4 +1,4 @@
-import { BUILD_COMMIT } from './build';
+import { BUILD_COMMIT } from "./build";
 
 export interface Contributor {
   login: string;
@@ -35,12 +35,15 @@ export class ContributorsService {
     }
 
     try {
-      const response = await fetch('/contributors.txt');
+      const response = await fetch("/contributors.txt");
       if (!response.ok) {
         throw new Error(`Failed to load contributors.txt: ${response.status}`);
       }
       const text = await response.text();
-      this.teams = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      this.teams = text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
       return this.teams;
     } catch (error) {
       console.error("Error fetching teams:", error);
@@ -63,9 +66,8 @@ export class ContributorsService {
     this.hasError = false;
 
     try {
-      // Fetch all contributors using the contributors API
       const contributorsResponse = await fetch(
-        "https://api.github.com/repos/pranavgundu/Strategy-Board/contributors?per_page=100"
+        "https://api.github.com/repos/pranavgundu/Strategy-Board/contributors?per_page=100",
       );
 
       if (!contributorsResponse.ok) {
@@ -78,7 +80,7 @@ export class ContributorsService {
         contributorsData.map(async (contributor: any) => {
           try {
             const userResponse = await fetch(
-              `https://api.github.com/users/${contributor.login}`
+              `https://api.github.com/users/${contributor.login}`,
             );
             if (userResponse.ok) {
               const userData = await userResponse.json();
@@ -86,13 +88,16 @@ export class ContributorsService {
                 login: contributor.login,
                 avatar_url: contributor.avatar_url,
                 html_url: contributor.html_url,
-                contributions: contributor.contributions, 
+                contributions: contributor.contributions,
                 name: userData.name,
                 bio: userData.bio,
               };
             }
           } catch (error) {
-            console.error(`Error fetching user details for ${contributor.login}:`, error);
+            console.error(
+              `Error fetching user details for ${contributor.login}:`,
+              error,
+            );
           }
           return {
             login: contributor.login,
@@ -100,7 +105,7 @@ export class ContributorsService {
             html_url: contributor.html_url,
             contributions: contributor.contributions,
           };
-        })
+        }),
       );
 
       this.contributors = detailedContributors;
