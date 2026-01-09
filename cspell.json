@@ -9,6 +9,23 @@
     "noopener",
     "noreferrer",
     "teleop",
-    "qrcode"
+    "qrcode",
+    "endgame",
+    "statbotics",
+    "jspdf",
+    "firestore",
+    "capacitor",
+    "tailwindcss",
+    "vercel",
+    "whiteboard",
+    "coords",
+    "bbox"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "build",
+    "*.lock",
+    "pnpm-lock.yaml"
   ]
 }
