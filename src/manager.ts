@@ -9,6 +9,7 @@
 // Import all field images explicitly
 // As new years are added, import them here
 import field2025 from "./images/2025.png";
+// import field2026 from "./images/2026.png"; // Uncomment when 2026 field image is added
 
 interface FieldImageMap {
   [year: number]: string;
@@ -37,8 +38,8 @@ interface YearConfig {
  */
 const FIELD_IMAGES: FieldImageMap = {
   2025: field2025,
+  // 2026: field2026, // Uncomment when 2026 field image is added
   // Add future years here:
-  // 2026: field2026,
   // 2027: field2027,
 };
 
@@ -59,8 +60,21 @@ const YEAR_ROBOT_POSITIONS: YearConfig = {
       three: { x: 1455, y: 1155 },
     },
   },
+  // 2026 - Update these positions based on the 2026 game
+  2026: {
+    red: {
+      one: { x: 2055, y: 455 }, // Update X, Y for 2026 red robot 1 starting position
+      two: { x: 2055, y: 805 }, // Update X, Y for 2026 red robot 2 starting position
+      three: { x: 2055, y: 1155 }, // Update X, Y for 2026 red robot 3 starting position
+    },
+    blue: {
+      one: { x: 1455, y: 455 }, // Update X, Y for 2026 blue robot 1 starting position
+      two: { x: 1455, y: 805 }, // Update X, Y for 2026 blue robot 2 starting position
+      three: { x: 1455, y: 1155 }, // Update X, Y for 2026 blue robot 3 starting position
+    },
+  },
   // Add future years here with their specific starting positions:
-  // 2026: {
+  // 2027: {
   //   red: {
   //     one: { x: 2100, y: 500 },
   //     two: { x: 2100, y: 800 },
