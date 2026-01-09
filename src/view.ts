@@ -2078,7 +2078,15 @@ export class View {
 
     try {
       const currentYear = new Date().getFullYear();
-      const yearsToFetch = [currentYear, currentYear - 1, currentYear - 2];
+      // Only fetch 2025 and beyond
+      const startYear = Math.max(2025, currentYear);
+      const yearsToFetch = [startYear];
+      // If current year is after 2025, also fetch previous years back to 2025
+      if (currentYear > 2025) {
+        for (let year = currentYear - 1; year >= 2025; year--) {
+          yearsToFetch.push(year);
+        }
+      }
       const allEventsPromises = yearsToFetch.map((year) =>
         this.tbaService.fetchAndParseEvents(year),
       );
@@ -2404,9 +2412,16 @@ export class View {
     this.showTBAStatus("Searching for events with this team...", false);
 
     try {
-      // Fetch team's events
+      // Fetch team's events (2025 and beyond only)
       const currentYear = new Date().getFullYear();
-      const yearsToFetch = [currentYear, currentYear - 1, currentYear - 2];
+      const startYear = Math.max(2025, currentYear);
+      const yearsToFetch = [startYear];
+      // If current year is after 2025, also fetch previous years back to 2025
+      if (currentYear > 2025) {
+        for (let year = currentYear - 1; year >= 2025; year--) {
+          yearsToFetch.push(year);
+        }
+      }
 
       const allTeamEventsPromises = yearsToFetch.map((year) =>
         this.tbaService.getTeamEvents(teamNumber, year).catch(() => []),

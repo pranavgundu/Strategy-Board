@@ -1,7 +1,7 @@
 import { Match } from "./match.ts";
 import { Model } from "./model.ts";
 import { Config } from "./config.ts";
-import fieldUrl from "./images/2025.png";
+import { getFieldImageForYear } from "./manager.ts";
 
 let _backgroundEl: HTMLCanvasElement | null = null;
 let _itemsEl: HTMLCanvasElement | null = null;
@@ -190,7 +190,7 @@ const realHeight = Config.fieldRealHeightInches;
 let scaling = 1;
 
 const fieldImage = new Image();
-fieldImage.src = fieldUrl;
+let currentFieldImageUrl: string = "";
 
 export function updateCanvasSize() {
   const wrapper = <HTMLElement>document.getElementById("whiteboard-wrapper");
@@ -303,6 +303,9 @@ export class Whiteboard {
 
   constructor(model: Model) {
     this.model = model;
+
+    // Initially load the latest field image
+    this.loadFieldImage();
 
     fieldImage.onload = () => this.drawBackground();
 
@@ -869,6 +872,8 @@ export class Whiteboard {
 
   public setMatch(match: Match) {
     this.match = match;
+    // Load the appropriate field image based on match year
+    this.loadFieldImage(match.tbaYear);
     this.redrawAll();
     this.updateUndoRedoButtons();
   }
@@ -1145,7 +1150,15 @@ export class Whiteboard {
     this.updateUndoRedoButtons();
   }
 
-  private drawBackground() {
+  private loadFieldImage(year?: number): void {
+    const newUrl = getFieldImageForYear(year);
+    if (newUrl !== currentFieldImageUrl) {
+      currentFieldImageUrl = newUrl;
+      fieldImage.src = newUrl;
+    }
+  }
+
+  private drawBackground(): void {
     BG.save();
     BG.clearRect(0, 0, width, height);
 
