@@ -16,7 +16,7 @@
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^7.4.4",
     "@types/marked": "^5.0.2",
-    "@types/node": "^24.10.4",
+    "@types/node": "^24.10.6",
     "autoprefixer": "^10.4.23",
     "cspell": "^9.4.0",
     "postcss": "^8.5.6",
