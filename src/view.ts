@@ -1258,7 +1258,9 @@ export class View {
         blueBar.style.width = `${(matchData.blueWinProbability * 100).toFixed(1)}%`;
 
       const matchResult = document.getElementById("statbotics-match-result");
-      if (matchData.hasScores && matchResult) {
+      const matchResultContainer = matchResult?.parentElement;
+
+      if (matchData.hasScores && matchResult && matchResultContainer) {
         let resultText = "";
         if (matchData.redScore && matchData.blueScore) {
           if (matchData.redScore > matchData.blueScore) {
@@ -1279,9 +1281,10 @@ export class View {
           matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
         }
         matchResult.textContent = resultText;
-      } else if (matchResult) {
-        matchResult.textContent = "Not Played";
-        matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
+        matchResultContainer.classList.remove("hidden");
+      } else if (matchResultContainer) {
+        // Hide the entire match result section if match hasn't been played
+        matchResultContainer.classList.add("hidden");
       }
 
       const redTeamsDisplay = [
@@ -3118,15 +3121,15 @@ export class View {
                     if (err) return reject(err);
                     if (!canvas)
                       return reject(
-                        new Error("QR code library did not return a canvas")
+                        new Error("QR code library did not return a canvas"),
                       );
                     resolve(canvas);
-                  }
+                  },
                 );
               } catch (err) {
                 reject(err);
               }
-            }
+            },
           );
 
           qrContainer.appendChild(canvas);
