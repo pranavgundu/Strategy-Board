@@ -1878,6 +1878,15 @@ export class View {
    * @returns A promise that resolves when the match is created
    */
   private async onClickCreateMatch(e: Event): Promise<void> {
+    // Validate team numbers (must be 1-5 digits)
+    const teamNumbers = [I.RedOne.value, I.RedTwo.value, I.RedThree.value, I.BlueOne.value, I.BlueTwo.value, I.BlueThree.value];
+    for (const num of teamNumbers) {
+      if (!num || !/^\d{1,5}$/.test(num.trim()) || num.trim() === "0") {
+        alert("Please enter all team numbers (1-5 digits, not 0).");
+        return;
+      }
+    }
+
     const id = await this.model.createNewMatch(
       I.MatchName.value,
       I.RedThree.value,
@@ -3179,7 +3188,7 @@ export class View {
 
     B?.TeamNumberSave?.addEventListener("click", () => {
       const teamNumber = I?.TeamNumber?.value?.trim();
-      if (teamNumber) {
+      if (teamNumber && /^\d{1,5}$/.test(teamNumber) && teamNumber !== "0") {
         localStorage.setItem(TEAM_NUMBER_KEY, teamNumber);
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
@@ -3190,7 +3199,7 @@ export class View {
         popup?.classList.add("hidden");
       } else {
         // Show validation error
-        alert("Please enter your team number to continue.");
+        alert("Please enter a valid team number (up to 5 digits) to continue.");
       }
     });
 
