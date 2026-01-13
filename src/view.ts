@@ -2311,12 +2311,12 @@ export class View {
 
     try {
       const currentYear = new Date().getFullYear();
-      // Only fetch 2026 and beyond
-      const startYear = Math.max(2026, currentYear);
+      // Only fetch 2025 and beyond
+      const startYear = Math.max(2025, currentYear);
       const yearsToFetch = [startYear];
-      // If current year is after 2026, also fetch previous years back to 2026
-      if (currentYear > 2026) {
-        for (let year = currentYear - 1; year >= 2026; year--) {
+      // If current year is after 2025, also fetch previous years back to 2025
+      if (currentYear > 2025) {
+        for (let year = currentYear - 1; year >= 2025; year--) {
           yearsToFetch.push(year);
         }
       }
@@ -2645,13 +2645,13 @@ export class View {
     this.showTBAStatus("Searching for events with this team...", false);
 
     try {
-      // Fetch team's events (2026 and beyond only)
+      // Fetch team's events (2025 and beyond only)
       const currentYear = new Date().getFullYear();
-      const startYear = Math.max(2026, currentYear);
+      const startYear = Math.max(2025, currentYear);
       const yearsToFetch = [startYear];
-      // If current year is after 2026, also fetch previous years back to 2026
-      if (currentYear > 2026) {
-        for (let year = currentYear - 1; year >= 2026; year--) {
+      // If current year is after 2025, also fetch previous years back to 2025
+      if (currentYear > 2025) {
+        for (let year = currentYear - 1; year >= 2025; year--) {
           yearsToFetch.push(year);
         }
       }
