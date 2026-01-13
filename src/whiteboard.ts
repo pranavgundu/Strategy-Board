@@ -230,20 +230,6 @@ export function updateCanvasSize() {
     Math.min(topOffset + visibleOffsetPx, maxTop),
   );
 
-  // Debug: log layout/scale values to help diagnose clipping issues
-  console.debug("[Whiteboard] updateCanvasSize:", {
-    fillWidth,
-    fillHeight,
-    scaledWidth,
-    scaledHeight,
-    leftOffset,
-    topOffset,
-    visibleOffsetPx,
-    topOffsetAdjusted,
-    fieldYear,
-    scaling,
-  });
-
   [background, items, drawing].forEach((e) => {
     e.style.scale = `${scaling}`;
     e.style.left = `${leftOffset}px`;
@@ -1274,17 +1260,7 @@ export class Whiteboard {
     BG.fillStyle = "#18181b";
     BG.fillRect(0, 0, width, height);
     BG.translate(width / 2 - this.camera.x, height / 2 - this.camera.y);
-    const imgYear = getYearFromFieldImage(currentFieldImageUrl);
-    console.debug("[Whiteboard] drawBackground:", {
-      imgYear,
-      currentFieldImageUrl,
-      camera: { x: this.camera.x, y: this.camera.y },
-      canvasWidth: width,
-      canvasHeight: height,
-      scaling,
-      naturalWidth: fieldImage.naturalWidth,
-      naturalHeight: fieldImage.naturalHeight,
-    });
+    const fieldYear = getYearFromFieldImage(currentFieldImageUrl);
     // Draw the field image scaled to the canvas size so it fills the full drawing area.
     // This ensures the entire image is rendered into the canvas regardless of the image's intrinsic dimensions.
     BG.drawImage(fieldImage, 0, 0, width, height);
@@ -1301,7 +1277,7 @@ export class Whiteboard {
     const clamp = (v: number, lo: number, hi: number) =>
       Math.max(lo, Math.min(v, hi));
 
-    const margin = 96;
+    const margin = fieldYear === 2026 ? 112 : 96;
 
     const drawStation = (
       stationX: number,
@@ -1315,7 +1291,16 @@ export class Whiteboard {
       const effectiveMarginX = margin;
       const effectiveMarginY = margin;
 
-      const cx = clamp(px, effectiveMarginX, width - effectiveMarginX);
+      // For 2026: push labels outward horizontally: blue side -> left, red side -> right
+      const outwardPx = fieldYear === 2026 ? 75 : 0;
+      const sideShift = stationX < width / 2 ? -outwardPx : outwardPx;
+
+      // Expand horizontal clamp bounds by outwardPx so labels can be positioned outside the image area
+      const cx = clamp(
+        px + sideShift,
+        effectiveMarginX - outwardPx,
+        width - effectiveMarginX + outwardPx,
+      );
       const cy = clamp(py, effectiveMarginY, height - effectiveMarginY);
 
       BG.save();
