@@ -1711,9 +1711,13 @@ export class View {
         setTimeout(() => {
           try {
             this.currentExportMatch = match;
+            // Attach selected field year so importers can pick the correct field
+            this.currentExportMatch.fieldMetadata = {
+              selectedFieldYear: this.whiteboard.getCurrentFieldYear() ?? null,
+            };
 
             // Prepare QR export - let user click Start button manually
-            this.qrexport.export(match, () => {
+            this.qrexport.export(this.currentExportMatch, () => {
               // QR export ready
             });
           } catch (err) {
@@ -1989,6 +1993,10 @@ export class View {
         this.pdfExport = new PDFExport();
       }
 
+      // Attach the currently-selected field for export so imports load the correct field year
+      this.currentExportMatch.fieldMetadata = {
+        selectedFieldYear: this.whiteboard.getCurrentFieldYear() ?? null,
+      };
       const packet = this.currentExportMatch.getAsPacket();
       packet.splice(7, 1);
       const raw = JSON.stringify(packet);
@@ -3098,6 +3106,10 @@ export class View {
 
   private async onClickShare(match: Match): Promise<void> {
     try {
+      // Ensure the selected field year is included with the match before uploading
+      match.fieldMetadata = {
+        selectedFieldYear: this.whiteboard.getCurrentFieldYear() ?? null,
+      };
       const shareCode = await uploadMatch(match);
       const shareUrl = `https://strategyboard.app/?share=${shareCode}`;
 

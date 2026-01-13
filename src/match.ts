@@ -69,6 +69,7 @@ export class Match {
   public readonly tbaEventKey?: string;
   public readonly tbaMatchKey?: string;
   public readonly tbaYear?: number;
+  public fieldMetadata?: { selectedFieldYear?: number | null };
 
   public auto: PhaseData;
   public teleop: PhaseData;
@@ -267,7 +268,7 @@ export class Match {
    * @returns A new Match instance.
    */
   static fromPacket(packet: any): Match {
-    return new Match(
+    const m = new Match(
       packet[0],
       packet[1],
       packet[2],
@@ -336,6 +337,11 @@ export class Match {
       packet[10],
       packet[11],
     );
+    // Optional field metadata lives at the next index (if present)
+    if (packet.length > 12 && packet[12]) {
+      m.fieldMetadata = packet[12];
+    }
+    return m;
   }
 
   /**
@@ -542,6 +548,8 @@ export class Match {
       this.tbaEventKey,
       this.tbaMatchKey,
       this.tbaYear,
+      // Optional final element for field metadata (kept for backwards compatibility)
+      this.fieldMetadata || null,
     ];
   }
 

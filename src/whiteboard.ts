@@ -896,16 +896,25 @@ export class Whiteboard {
 
   /**
    * Sets the match to be displayed and edited on the whiteboard.
-   * Loads the appropriate field image based on the match year.
+   * Loads the appropriate field image based on the match's field metadata or match year.
    *
    * @param match - The match object to display
    */
   public setMatch(match: Match) {
     this.match = match;
-    // Load the appropriate field image based on match year
-    this.loadFieldImage(match.tbaYear);
+    // Prefer an explicit selected field year (if the match included one) otherwise use the TBA year
+    const selectedYear =
+      (match as any).fieldMetadata?.selectedFieldYear ?? match.tbaYear;
+    this.loadFieldImage(selectedYear);
     this.redrawAll();
     this.updateUndoRedoButtons();
+  }
+
+  /**
+   * Returns the year of the currently loaded field image (if any).
+   */
+  public getCurrentFieldYear(): number | undefined {
+    return getYearFromFieldImage(currentFieldImageUrl);
   }
 
   /**
