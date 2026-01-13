@@ -9,17 +9,17 @@ importers:
   .:
     dependencies:
       '@capacitor/android':
-        specifier: ^7.4.4
-        version: 7.4.4(@capacitor/core@7.4.4)
+        specifier: ^7.4.5
+        version: 7.4.5(@capacitor/core@7.4.5)
       '@capacitor/core':
-        specifier: ^7.4.4
-        version: 7.4.4
+        specifier: ^7.4.5
+        version: 7.4.5
       '@capacitor/ios':
-        specifier: ^7.4.4
-        version: 7.4.4(@capacitor/core@7.4.4)
+        specifier: ^7.4.5
+        version: 7.4.5(@capacitor/core@7.4.5)
       '@tailwindcss/vite':
         specifier: ^4.1.18
-        version: 4.1.18(vite@6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.1.18(vite@6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       '@vercel/analytics':
         specifier: ^1.6.1
         version: 1.6.1
@@ -56,16 +56,16 @@ importers:
     devDependencies:
       '@capacitor/assets':
         specifier: ^3.0.5
-        version: 3.0.5(@types/node@24.10.7)(typescript@5.9.3)
+        version: 3.0.5(@types/node@24.10.8)(typescript@5.9.3)
       '@capacitor/cli':
-        specifier: ^7.4.4
-        version: 7.4.4
+        specifier: ^7.4.5
+        version: 7.4.5
       '@types/marked':
         specifier: ^5.0.2
         version: 5.0.2
       '@types/node':
-        specifier: ^24.10.7
-        version: 24.10.7
+        specifier: ^24.10.8
+        version: 24.10.8
       autoprefixer:
         specifier: ^10.4.23
         version: 10.4.23(postcss@8.5.6)
@@ -83,10 +83,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^6.4.1
-        version: 6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-pwa:
         specifier: ^1.2.0
-        version: 1.2.0(vite@6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(workbox-build@7.4.0)(workbox-window@7.4.0)
+        version: 1.2.0(vite@6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(workbox-build@7.4.0)(workbox-window@7.4.0)
       workbox-window:
         specifier: ^7.4.0
         version: 7.4.0
@@ -594,8 +594,8 @@ packages:
     resolution: {integrity: sha512-0ZrskXVEHSWIqZM/sQZ4EV3jZJXRkio/WCxaqKZP1g//CEWEPSfeZFcms4XeKBCHU0ZKnIkdJeU/kF+eRp5lBg==}
     engines: {node: '>=6.9.0'}
 
-  '@capacitor/android@7.4.4':
-    resolution: {integrity: sha512-y8knfV1JXNrd6XZZLZireGT+EBCN0lvOo+HZ/s7L8LkrPBu4nY5UZn0Wxz4yOezItEII9rqYJSHsS5fMJG9gdw==}
+  '@capacitor/android@7.4.5':
+    resolution: {integrity: sha512-G76C+PGIFkG+hxj6JLlY003txRaGZwsXBPo4b4xiZMZaD6DG++sDCoumYl/5xL40dL2b8P5tb3CKf/khWyL2Gw==}
     peerDependencies:
       '@capacitor/core': ^7.4.0
 
@@ -609,16 +609,16 @@ packages:
     engines: {node: '>=16.0.0'}
     hasBin: true
 
-  '@capacitor/cli@7.4.4':
-    resolution: {integrity: sha512-J7ciBE7GlJ70sr2s8oz1+H4ZdNk4MGG41fsakUlDHWva5UWgFIZYMiEdDvGbYazAYTaxN3lVZpH9zil9FfZj+Q==}
+  '@capacitor/cli@7.4.5':
+    resolution: {integrity: sha512-ApKxpzcWTqmyTD+WxBvL7UJt+x0xr9Vqa+S4Iqbl/R2kC0tf1ay22wE9pOrdWXbTqFbNhBuUuRvTvZ6Edp7QzQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  '@capacitor/core@7.4.4':
-    resolution: {integrity: sha512-xzjxpr+d2zwTpCaN0k+C6wKSZzWFAb9OVEUtmO72ihjr/NEDoLvsGl4WLfjWPcCO2zOy0b2X52tfRWjECFUjtw==}
+  '@capacitor/core@7.4.5':
+    resolution: {integrity: sha512-JnUywi0WRbqm4QYoplNsMQ7KAVuyrQFha0dOH9YDVCyrVHUvPcvrnK+9j5elUMgy+pOh3ve+pk6BVoySr91c+A==}
 
-  '@capacitor/ios@7.4.4':
-    resolution: {integrity: sha512-Xp3bGWlSQAwsZGngRMWTdoD2agdMV12Whnm+/xsYPxfQSj+Tksbr7r/8Mso7VWkpnTKO4iMlx762g3PjW+wi4w==}
+  '@capacitor/ios@7.4.5':
+    resolution: {integrity: sha512-i9cfo15Vn0GvFJ0Pm2zPhxQrK3NW5ISrf7bdzmKWUM5TUaCnWkCO4Zxsgjm8/VMXwt/gabA/di1O1c9pC3enCA==}
     peerDependencies:
       '@capacitor/core': ^7.4.0
 
@@ -1817,8 +1817,8 @@ packages:
   '@types/minimist@1.2.5':
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
 
-  '@types/node@24.10.7':
-    resolution: {integrity: sha512-+054pVMzVTmRQV8BhpGv3UyfZ2Llgl8rdpDTon+cUH9+na0ncBVXj3wTUKh14+Kiz18ziM3b4ikpP5/Pc0rQEQ==}
+  '@types/node@24.10.8':
+    resolution: {integrity: sha512-r0bBaXu5Swb05doFYO2kTWHMovJnNVbCsII0fhesM8bNRlLhXIuckley4a2DaD+vOdmm5G+zGkQZAPZsF80+YQ==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -5187,16 +5187,16 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@capacitor/android@7.4.4(@capacitor/core@7.4.4)':
+  '@capacitor/android@7.4.5(@capacitor/core@7.4.5)':
     dependencies:
-      '@capacitor/core': 7.4.4
+      '@capacitor/core': 7.4.5
 
-  '@capacitor/assets@3.0.5(@types/node@24.10.7)(typescript@5.9.3)':
+  '@capacitor/assets@3.0.5(@types/node@24.10.8)(typescript@5.9.3)':
     dependencies:
       '@capacitor/cli': 5.7.8
       '@ionic/utils-array': 2.1.6
       '@ionic/utils-fs': 3.1.7
-      '@trapezedev/project': 7.1.3(@types/node@24.10.7)(typescript@5.9.3)
+      '@trapezedev/project': 7.1.3(@types/node@24.10.8)(typescript@5.9.3)
       commander: 8.3.0
       debug: 4.3.4
       fs-extra: 10.1.0
@@ -5238,7 +5238,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/cli@7.4.4':
+  '@capacitor/cli@7.4.5':
     dependencies:
       '@ionic/cli-framework-output': 2.2.8
       '@ionic/utils-subprocess': 3.0.1
@@ -5260,13 +5260,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/core@7.4.4':
+  '@capacitor/core@7.4.5':
     dependencies:
       tslib: 2.8.1
 
-  '@capacitor/ios@7.4.4(@capacitor/core@7.4.4)':
+  '@capacitor/ios@7.4.5(@capacitor/core@7.4.5)':
     dependencies:
-      '@capacitor/core': 7.4.4
+      '@capacitor/core': 7.4.5
 
   '@cspell/cspell-bundled-dicts@9.6.0':
     dependencies:
@@ -5963,7 +5963,7 @@ snapshots:
   '@grpc/grpc-js@1.9.15':
     dependencies:
       '@grpc/proto-loader': 0.7.15
-      '@types/node': 24.10.7
+      '@types/node': 24.10.8
 
   '@grpc/proto-loader@0.7.15':
     dependencies:
@@ -6376,16 +6376,16 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.18
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.18
 
-  '@tailwindcss/vite@4.1.18(vite@6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@tailwindcss/vite@4.1.18(vite@6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
       tailwindcss: 4.1.18
-      vite: 6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
   '@trapezedev/gradle-parse@7.1.3': {}
 
-  '@trapezedev/project@7.1.3(@types/node@24.10.7)(typescript@5.9.3)':
+  '@trapezedev/project@7.1.3(@types/node@24.10.8)(typescript@5.9.3)':
     dependencies:
       '@ionic/utils-fs': 3.1.7
       '@ionic/utils-subprocess': 2.1.14
@@ -6407,7 +6407,7 @@ snapshots:
       replace: 1.2.2
       tempy: 1.0.1
       tmp: 0.2.5
-      ts-node: 10.9.2(@types/node@24.10.7)(typescript@5.9.3)
+      ts-node: 10.9.2(@types/node@24.10.8)(typescript@5.9.3)
       xcode: 3.0.1
       xml-js: 1.6.11
       xpath: 0.0.32
@@ -6433,13 +6433,13 @@ snapshots:
 
   '@types/fs-extra@8.1.5':
     dependencies:
-      '@types/node': 24.10.7
+      '@types/node': 24.10.8
 
   '@types/marked@5.0.2': {}
 
   '@types/minimist@1.2.5': {}
 
-  '@types/node@24.10.7':
+  '@types/node@24.10.8':
     dependencies:
       undici-types: 7.16.0
 
@@ -8350,7 +8350,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 24.10.7
+      '@types/node': 24.10.8
       long: 5.3.2
 
   pump@3.0.3:
@@ -8978,14 +8978,14 @@ snapshots:
 
   trim-newlines@3.0.1: {}
 
-  ts-node@10.9.2(@types/node@24.10.7)(typescript@5.9.3):
+  ts-node@10.9.2(@types/node@24.10.8)(typescript@5.9.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.12
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 24.10.7
+      '@types/node': 24.10.8
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -9111,18 +9111,18 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  vite-plugin-pwa@1.2.0(vite@6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(workbox-build@7.4.0)(workbox-window@7.4.0):
+  vite-plugin-pwa@1.2.0(vite@6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(workbox-build@7.4.0)(workbox-window@7.4.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: 6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       workbox-build: 7.4.0
       workbox-window: 7.4.0
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.4.1(@types/node@24.10.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2):
+  vite@6.4.1(@types/node@24.10.8)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
@@ -9131,7 +9131,7 @@ snapshots:
       rollup: 4.55.1
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.10.7
+      '@types/node': 24.10.8
       fsevents: 2.3.3
       jiti: 2.6.1
       lightningcss: 1.30.2
