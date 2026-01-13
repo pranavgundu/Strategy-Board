@@ -6,3 +6,10 @@ ignoredBuiltDependencies:
 
 onlyBuiltDependencies:
   - sharp
+
+packages:
+  - 'src'
+  - 'android'
+  - 'scripts'
+  - 'public'
+  - 'resources'
