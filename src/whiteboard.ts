@@ -1,7 +1,7 @@
 import { Match } from "./match.ts";
 import { Model } from "./model.ts";
 import { Config } from "./config.ts";
-import { getFieldImageForYear } from "./manager.ts";
+import { getFieldImageForYear, getYearFromFieldImage } from "./manager.ts";
 
 let _backgroundEl: HTMLCanvasElement | null = null;
 let _itemsEl: HTMLCanvasElement | null = null;
@@ -207,7 +207,11 @@ export function updateCanvasSize() {
   const ratioHeight = fillHeight / background.height;
 
   // Apply zoom factor to add padding (0.95 = 5% padding on each side)
-  scaling = Math.min(ratioWidth, ratioHeight) * 0.95;
+  const baseScale = Math.min(ratioWidth, ratioHeight) * 0.95;
+  const fieldYear = getYearFromFieldImage(currentFieldImageUrl);
+  // Apply tiny zoom-out for 2026 (0.98 ≈ 2% zoom out)
+  const yearZoomFactor = fieldYear === 2026 ? 1 : 1;
+  scaling = baseScale * yearZoomFactor;
 
   const scaledWidth = background.width * scaling;
   const scaledHeight = background.height * scaling;
@@ -215,10 +219,35 @@ export function updateCanvasSize() {
   const leftOffset = (fillWidth - scaledWidth) / 2;
   const topOffset = (fillHeight - scaledHeight) / 2;
 
+  // Visible offset in CSS pixels for the 2026 field (negative moves image up).
+  // This adjusts the canvas positioning (not the internal image drawing) so we don't clip
+  // the image inside the canvas when shifting vertically.
+  const visibleOffsetPx = fieldYear === 2026 ? -30 : 0;
+  const minTop = 0;
+  const maxTop = Math.max(0, fillHeight - scaledHeight);
+  const topOffsetAdjusted = Math.max(
+    minTop,
+    Math.min(topOffset + visibleOffsetPx, maxTop),
+  );
+
+  // Debug: log layout/scale values to help diagnose clipping issues
+  console.debug("[Whiteboard] updateCanvasSize:", {
+    fillWidth,
+    fillHeight,
+    scaledWidth,
+    scaledHeight,
+    leftOffset,
+    topOffset,
+    visibleOffsetPx,
+    topOffsetAdjusted,
+    fieldYear,
+    scaling,
+  });
+
   [background, items, drawing].forEach((e) => {
     e.style.scale = `${scaling}`;
     e.style.left = `${leftOffset}px`;
-    e.style.top = `${topOffset}px`;
+    e.style.top = `${topOffsetAdjusted}px`;
     e.style.transformOrigin = "top left";
   });
 }
@@ -1245,7 +1274,20 @@ export class Whiteboard {
     BG.fillStyle = "#18181b";
     BG.fillRect(0, 0, width, height);
     BG.translate(width / 2 - this.camera.x, height / 2 - this.camera.y);
-    BG.drawImage(fieldImage, 0, 0);
+    const imgYear = getYearFromFieldImage(currentFieldImageUrl);
+    console.debug("[Whiteboard] drawBackground:", {
+      imgYear,
+      currentFieldImageUrl,
+      camera: { x: this.camera.x, y: this.camera.y },
+      canvasWidth: width,
+      canvasHeight: height,
+      scaling,
+      naturalWidth: fieldImage.naturalWidth,
+      naturalHeight: fieldImage.naturalHeight,
+    });
+    // Draw the field image scaled to the canvas size so it fills the full drawing area.
+    // This ensures the entire image is rendered into the canvas regardless of the image's intrinsic dimensions.
+    BG.drawImage(fieldImage, 0, 0, width, height);
 
     BG.restore();
 

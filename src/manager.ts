@@ -7,7 +7,7 @@
  */
 
 import field2025 from "./images/2025.png";
-// import field2026 from "./images/2026.png";
+import field2026 from "./images/2026.png";
 
 interface FieldImageMap {
   [year: number]: string;
@@ -36,7 +36,7 @@ interface YearConfig {
  */
 const FIELD_IMAGES: FieldImageMap = {
   2025: field2025,
-  // 2026: field2026,
+  2026: field2026,
 };
 
 /**
@@ -56,18 +56,18 @@ const YEAR_ROBOT_POSITIONS: YearConfig = {
       three: { x: 1455, y: 1155 },
     },
   },
-  // 2026: {
-  //   red: {
-  //     one: { x: 2055, y: 455 },
-  //     two: { x: 2055, y: 805 },
-  //     three: { x: 2055, y: 1155 },
-  //   },
-  //   blue: {
-  //     one: { x: 1455, y: 455 },
-  //     two: { x: 1455, y: 805 },
-  //     three: { x: 1455, y: 1155 },
-  //   },
-  // },
+  2026: {
+    red: {
+      one: { x: 2055, y: 455 },
+      two: { x: 2055, y: 805 },
+      three: { x: 2055, y: 1155 },
+    },
+    blue: {
+      one: { x: 1455, y: 455 },
+      two: { x: 1455, y: 805 },
+      three: { x: 1455, y: 1155 },
+    },
+  },
 };
 
 /**
