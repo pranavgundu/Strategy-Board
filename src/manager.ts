@@ -58,14 +58,14 @@ const YEAR_ROBOT_POSITIONS: YearConfig = {
   },
   2026: {
     red: {
-      one: { x: 2055, y: 455 },
-      two: { x: 2055, y: 805 },
-      three: { x: 2055, y: 1155 },
+      one: { x: 2680, y: 205 },
+      two: { x: 2680, y: 805 },
+      three: { x: 2680, y: 1405 },
     },
     blue: {
-      one: { x: 1455, y: 455 },
-      two: { x: 1455, y: 805 },
-      three: { x: 1455, y: 1155 },
+      one: { x: 830, y: 205 },
+      two: { x: 830, y: 805 },
+      three: { x: 830, y: 1405 },
     },
   },
 };
