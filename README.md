@@ -59,7 +59,7 @@ To contribute to Strategy Board, follow these steps:
 **Feel free to reach out to [pranav@strategyboard.app](mailto:pranav@strategyboard.app) if you have any questions!**
 
 ## Credits
-The original version of Strategy Board was created by [Team 834](https://github.com/frcteam834) and [realTronsi](https://github.com/realTronsi). This project is being pursued **with explicit permission**.
+The original version of Strategy Board comes [Team 834](https://github.com/frcteam834) and [realTronsi](https://github.com/realTronsi).
 
 Field images come from [Pathplanner](https://github.com/mjansen4857/pathplanner).
 
