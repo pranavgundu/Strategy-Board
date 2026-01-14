@@ -2,7 +2,7 @@
 
 # Strategy Board
 
-![Strategy Board](https://github.com/user-attachments/assets/25f7d4d8-7919-40a0-ba6f-90830f2fc582)
+![Strategy Board]([https://github.com/user-attachments/assets/25f7d4d8-7919-40a0-ba6f-90830f2fc582](https://github.com/user-attachments/assets/4592b1b9-7846-4a74-a8c4-5cc435620fae))
 
 
 ## The Digital Strategy Whiteboard for FRC
