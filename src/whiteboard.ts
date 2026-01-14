@@ -1319,42 +1319,48 @@ export class Whiteboard {
       BG.restore();
     };
 
-    drawStation(
-      Config.redOneStationX,
-      Config.redOneStationY,
-      this.match.redOne,
-      Math.PI / 2,
-    );
-    drawStation(
-      Config.redTwoStationX,
-      Config.redTwoStationY,
-      this.match.redTwo,
-      Math.PI / 2,
-    );
-    drawStation(
-      Config.redThreeStationX,
-      Config.redThreeStationY,
-      this.match.redThree,
-      Math.PI / 2,
-    );
-    drawStation(
-      Config.blueOneStationX,
-      Config.blueOneStationY,
-      this.match.blueOne,
-      Math.PI / 2,
-    );
-    drawStation(
-      Config.blueTwoStationX,
-      Config.blueTwoStationY,
-      this.match.blueTwo,
-      Math.PI / 2,
-    );
-    drawStation(
-      Config.blueThreeStationX,
-      Config.blueThreeStationY,
-      this.match.blueThree,
-      Math.PI / 2,
-    );
+    // Only draw station labels for the focused side (or both when in 'full' view)
+    if (this.currentView === "full" || this.currentView === "red") {
+      drawStation(
+        Config.redOneStationX,
+        Config.redOneStationY,
+        this.match.redOne,
+        Math.PI / 2,
+      );
+      drawStation(
+        Config.redTwoStationX,
+        Config.redTwoStationY,
+        this.match.redTwo,
+        Math.PI / 2,
+      );
+      drawStation(
+        Config.redThreeStationX,
+        Config.redThreeStationY,
+        this.match.redThree,
+        Math.PI / 2,
+      );
+    }
+
+    if (this.currentView === "full" || this.currentView === "blue") {
+      drawStation(
+        Config.blueOneStationX,
+        Config.blueOneStationY,
+        this.match.blueOne,
+        Math.PI / 2,
+      );
+      drawStation(
+        Config.blueTwoStationX,
+        Config.blueTwoStationY,
+        this.match.blueTwo,
+        Math.PI / 2,
+      );
+      drawStation(
+        Config.blueThreeStationX,
+        Config.blueThreeStationY,
+        this.match.blueThree,
+        Math.PI / 2,
+      );
+    }
   }
 
   /**
@@ -1405,7 +1411,9 @@ export class Whiteboard {
     IT.fillStyle = "white";
     IT.textAlign = "center";
     IT.textBaseline = "middle";
-    IT.fillText(name, 0, 0);
+    if (this.currentView === "full" || this.currentView === team) {
+      IT.fillText(name, 0, 0);
+    }
 
     if (this.selected !== null && this.selected[0] == slot) {
       IT.beginPath();
