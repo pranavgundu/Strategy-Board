@@ -9,7 +9,7 @@ import {
 import { Match } from "./match";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDT2M0XwxAJxqrARFe3GVJKDds-IAwomMM",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
   authDomain: "strategyboard-app.firebaseapp.com",
   projectId: "strategyboard-app",
   storageBucket: "strategyboard-app.firebasestorage.app",
@@ -27,6 +27,11 @@ let db: Firestore | null = null;
  */
 function getDb(): Firestore {
   if (!db) {
+    if (!firebaseConfig.apiKey) {
+      console.warn(
+        "[Cloud] VITE_FIREBASE_API_KEY is not set. Firebase may not initialize correctly — check your .env or CI settings.",
+      );
+    }
     const app = initializeApp(firebaseConfig);
     db = getFirestore(app);
   }
@@ -49,7 +54,7 @@ function generateShareCode(): string {
 
 /**
  * Uploads a match to Firestore and generates a shareable code.
- * 
+ *
  * @param match - The Match object to upload
  * @returns A promise that resolves to a share code string for accessing the uploaded match
  * @throws Will throw an error if the Firestore operation fails
@@ -76,7 +81,7 @@ export async function uploadMatch(match: Match): Promise<string> {
 
 /**
  * Downloads a match from Firestore using a share code.
- * 
+ *
  * @param shareCode - The 6-character share code to retrieve the match. Will be trimmed and converted to uppercase.
  * @returns A Promise that resolves to the Match object if found and valid, or null if the document doesn't exist.
  * @throws {Error} If the share code format is invalid (not exactly 6 characters after trimming).
