@@ -1,6 +1,6 @@
 <div align="center">
 
-# Strategy Board
+# [Strategy Board](https://strategyboard.app)
 
 ![Strategy Board](https://github.com/user-attachments/assets/37d76b6e-2494-43f5-9217-2c596a29f59a)
 
