@@ -23,10 +23,6 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    padding-top: env(safe-area-inset-top);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: max(env(safe-area-inset-bottom), 20px);
-    padding-left: env(safe-area-inset-left);
 }
 
 body {
@@ -919,7 +915,7 @@ body {
         padding: 0 1rem;
     }
 
-    #home-bottom-bar {
+    #home-bottom-bar > div:first-child {
         height: 3rem !important;
     }
 
@@ -1186,17 +1182,18 @@ body #whiteboard-statbotics-container {
 
 /* Fix for iOS Safari address bar hiding */
 @supports (-webkit-touch-callout: none) {
+    /* Use 100dvh which handles dynamic viewport correctly on modern iOS/iPadOS */
     html,
     body {
-        height: -webkit-fill-available;
-        min-height: -webkit-fill-available;
+        height: 100dvh;
+        min-height: 100dvh;
     }
 
-    /* Ensure containers respect safe areas on iOS */
+    /* Ensure containers fill the viewport without gaps on iOS/iPadOS */
     #home-container,
     #whiteboard-container {
-        height: -webkit-fill-available;
-        min-height: -webkit-fill-available;
+        height: 100%;
+        min-height: 100%;
     }
 }
 
@@ -1704,7 +1701,7 @@ a:active,
         height: 2.5rem !important;
     }
 
-    #home-bottom-bar {
+    #home-bottom-bar > div:first-child {
         height: 2.5rem !important;
     }
 
