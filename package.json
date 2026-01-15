@@ -1,5 +1,10 @@
 {
+  "name": "strategy-board",
+  "version": "1.0.0",
+  "description": "The Digital Strategy Whiteboard for FRC",
+  "author": "Pranav Gundu",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite --host",
     "build": "tsx scripts/commit.ts && tsc && vite build",
@@ -10,7 +15,85 @@
     "cap:open:ios": "pnpm exec cap open ios",
     "cap:open:android": "pnpm exec cap open android",
     "cap:run:ios": "pnpm run cap:sync && pnpm exec cap run ios",
-    "cap:run:android": "pnpm run cap:sync && pnpm exec cap run android"
+    "cap:run:android": "pnpm run cap:sync && pnpm exec cap run android",
+    "electron:dev": "concurrently \"vite --host\" \"wait-on http://localhost:5173 && VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "electron:build": "pnpm run build && electron-builder",
+    "electron:build:mac": "pnpm run build && electron-builder --mac",
+    "electron:build:win": "pnpm run build && electron-builder --win",
+    "electron:build:linux": "pnpm run build && electron-builder --linux",
+    "electron:build:all": "pnpm run build && electron-builder --mac --win --linux"
+  },
+  "build": {
+    "appId": "com.strategyboard.app",
+    "productName": "Strategy Board",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "favicon/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "favicon/icon-512.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "favicon/favicon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "icon": "favicon/icon-512.png",
+      "category": "Utility",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "favicon/favicon.ico"
+    }
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
@@ -18,12 +101,16 @@
     "@types/marked": "^5.0.2",
     "@types/node": "^24.10.8",
     "autoprefixer": "^10.4.23",
+    "concurrently": "^9.2.1",
     "cspell": "^9.6.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.4.0",
     "postcss": "^8.5.6",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^6.4.1",
     "vite-plugin-pwa": "^1.2.0",
+    "wait-on": "^9.0.3",
     "workbox-window": "^7.4.0"
   },
   "dependencies": {
