@@ -60,6 +60,7 @@
     "node_modules",
     "dist",
     "build",
+    "release",
     "android",
     "ios",
     "references",

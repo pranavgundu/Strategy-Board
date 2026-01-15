@@ -2,7 +2,11 @@
   "name": "strategy-board",
   "version": "1.0.0",
   "description": "The Digital Strategy Whiteboard for FRC",
-  "author": "Pranav Gundu",
+  "homepage": "https://github.com/pranavgundu/strategy-board",
+  "author": {
+    "name": "Pranav Gundu",
+    "email": "pranav@strategyboard.app"
+  },
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
