@@ -1703,6 +1703,16 @@ export class Whiteboard {
   }
 
   /**
+   * Resets the whiteboard mode to the default "auto" mode.
+   * Should be called when loading a new match to clear previous state.
+   */
+  public resetMode() {
+    if (this.mode !== "auto") {
+      this.toggleMode("auto");
+    }
+  }
+
+  /**
    * Checks if a point is within a robot's rotated rectangle bounds.
    *
    * @param robot - The robot with position and dimensions

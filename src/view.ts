@@ -1147,6 +1147,7 @@ export class View {
    */
   private async loadWhiteboard(match: Match): Promise<void> {
     this.whiteboard.setMatch(match);
+    this.whiteboard.resetMode();
     this.whiteboard.setActive(true);
     this.show(E.Whiteboard);
     this.hide(E.Home);
