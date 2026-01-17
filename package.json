@@ -8,7 +8,7 @@
     "email": "pranav@strategyboard.app"
   },
   "type": "module",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --host",
     "build": "tsx scripts/commit.ts && tsc && vite build",
