@@ -74,7 +74,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["qrcode", "rgbcolor"],
+    include: ["qrcode"],
     esbuildOptions: {
       mainFields: ["module", "main"],
     },
