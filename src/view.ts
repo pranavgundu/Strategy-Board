@@ -948,10 +948,10 @@ export class View {
             const closeBtn = document.createElement("button");
             closeBtn.id = "qr-import-close-btn";
             closeBtn.className =
-              "text-slate-300 bg-transparent px-3 py-1 rounded-md hover:bg-slate-700";
+              "flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-all duration-200";
             closeBtn.title = "Close import";
             closeBtn.setAttribute("aria-label", "Close import dialog");
-            closeBtn.textContent = "Close";
+            closeBtn.innerHTML = '<i class="fas fa-times"></i>';
 
             closeBtn.style.position = "absolute";
             closeBtn.style.top = "8px";
