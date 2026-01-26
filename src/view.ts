@@ -1610,14 +1610,25 @@ export class View {
     item.children[0].textContent = matchName;
 
     // Helper function to create colored team number spans with glow effect for special teams
+    // Escape HTML special characters to prevent XSS
+    const escapeHtml = (str: string): string => {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    };
+
     const createTeamSpan = (
       teamNumber: string,
       animationType: "rainbow" | "gold" | "none",
       baseColor: string,
     ): string => {
+      const safeTeamNumber = escapeHtml(teamNumber);
       if (animationType === "rainbow") {
         // Create sequential rainbow glow animation for each digit (for contributor teams)
-        const digits = teamNumber.split("");
+        const digits = safeTeamNumber.split("");
         const animatedDigits = digits
           .map((digit, index) => {
             const delay = index * 0.3; // 0.3s delay between each digit
@@ -1628,7 +1639,7 @@ export class View {
       }
       if (animationType === "gold") {
         // Create sequential gold glow animation for each digit (for 834)
-        const digits = teamNumber.split("");
+        const digits = safeTeamNumber.split("");
         const animatedDigits = digits
           .map((digit, index) => {
             const delay = index * 0.3; // 0.3s delay between each digit
@@ -1637,7 +1648,7 @@ export class View {
           .join("");
         return `<span class="${baseColor}">${animatedDigits}</span>`;
       }
-      return `<span class="${baseColor}">${teamNumber}</span>`;
+      return `<span class="${baseColor}">${safeTeamNumber}</span>`;
     };
 
     const goldTeam = "834";
