@@ -2338,7 +2338,7 @@ export class View {
 
       const allEventsArrays = await Promise.all(allEventsPromises);
       const allEvents = allEventsArrays.flat();
-      const events = this.tbaService.filterEventsWithinOneWeek(allEvents);
+      const events = this.tbaService.filterAndSortEvents(allEvents);
 
       if (!E?.TBAEventList) return;
 

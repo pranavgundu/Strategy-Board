@@ -407,15 +407,13 @@ export class TBAService {
   }
 
   /**
-   * Filters events to show all past events and future events up to 1 week from now.
-   * Sorts events by date with most future dates first (descending order).
+   * Filters and sorts events from newest to latest, including only events on or after January 1, 2025.
    *
    * @param events - Array of TBA simple events.
    * @returns Array of filtered and sorted events.
    */
-  public filterEventsWithinOneWeek(events: TBASimpleEvent[]): TBASimpleEvent[] {
-    const now = new Date();
-    const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  public filterAndSortEvents(events: TBASimpleEvent[]): TBASimpleEvent[] {
+    const minDate = new Date("2025-01-01T00:00:00Z");
 
     const monthNames = [
       "Jan",
@@ -451,7 +449,7 @@ export class TBAService {
       if (!eventDate) {
         return false;
       }
-      return eventDate <= oneWeekFromNow;
+      return eventDate >= minDate;
     });
 
     filteredEvents.sort((a, b) => {
