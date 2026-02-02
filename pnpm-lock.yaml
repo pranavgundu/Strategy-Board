@@ -76,13 +76,8 @@ importers:
         specifier: ^9.6.2
         version: 9.6.2
       electron:
-<<<<<<< HEAD
         specifier: ^40.1.0
         version: 40.1.0
-=======
-        specifier: ^39.4.0
-        version: 39.4.0
->>>>>>> d0b7ceb (bug: allow no numbers)
       electron-builder:
         specifier: ^26.7.0
         version: 26.7.0(electron-builder-squirrel-windows@26.4.0)
@@ -2701,12 +2696,9 @@ packages:
   electron-publish@26.3.4:
     resolution: {integrity: sha512-5/ouDPb73SkKuay2EXisPG60LTFTMNHWo2WLrK5GDphnWK9UC+yzYrzVeydj078Yk4WUXi0+TaaZsNd6Zt5k/A==}
 
-<<<<<<< HEAD
-=======
   electron-publish@26.6.0:
     resolution: {integrity: sha512-LsyHMMqbvJ2vsOvuWJ19OezgF2ANdCiHpIucDHNiLhuI+/F3eW98ouzWSRmXXi82ZOPZXC07jnIravY4YYwCLQ==}
 
->>>>>>> d0b7ceb (bug: allow no numbers)
   electron-to-chromium@1.5.283:
     resolution: {integrity: sha512-3vifjt1HgrGW/h76UEeny+adYApveS9dH2h3p57JYzBSXJIKUJAvtmIytDKjcSCt9xHfrNCFJ7gts6vkhuq++w==}
 
@@ -2714,13 +2706,8 @@ packages:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
 
-<<<<<<< HEAD
   electron@40.1.0:
     resolution: {integrity: sha512-2j/kvw7uF0H1PnzYBzw2k2Q6q16J8ToKrtQzZfsAoXbbMY0l5gQi2DLOauIZLzwp4O01n8Wt/74JhSRwG0yj9A==}
-=======
-  electron@39.4.0:
-    resolution: {integrity: sha512-NCK/FTAqgG/N+09OXFES6bubamgPZs7TEPIjWZIrbEnm8GzEwxC22ZG6SEPid2DmJnJmBurJ6M0G4EShdSc28Q==}
->>>>>>> d0b7ceb (bug: allow no numbers)
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -4141,7 +4128,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qr-scanner@1.4.2:
@@ -8311,11 +8297,7 @@ snapshots:
       builder-util-runtime: 9.5.1
       chalk: 4.1.2
       ci-info: 4.4.0
-<<<<<<< HEAD
-      dmg-builder: 26.4.0(electron-builder-squirrel-windows@26.4.0)
-=======
       dmg-builder: 26.7.0(electron-builder-squirrel-windows@26.4.0)
->>>>>>> d0b7ceb (bug: allow no numbers)
       fs-extra: 10.1.0
       lazy-val: 1.0.5
       simple-update-notifier: 2.0.0
@@ -8337,8 +8319,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
-=======
   electron-publish@26.6.0:
     dependencies:
       '@types/fs-extra': 9.0.13
@@ -8352,7 +8332,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
->>>>>>> d0b7ceb (bug: allow no numbers)
   electron-to-chromium@1.5.283: {}
 
   electron-winstaller@5.4.0:
@@ -8367,11 +8346,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
   electron@40.1.0:
-=======
-  electron@39.4.0:
->>>>>>> d0b7ceb (bug: allow no numbers)
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 24.10.9
