@@ -1894,7 +1894,7 @@ export class View {
    * @returns A promise that resolves when the match is created
    */
   private async onClickCreateMatch(e: Event): Promise<void> {
-    // Validate team numbers (must be 1-5 digits)
+    // Validate team numbers (if provided, must be 1-5 digits)
     const teamNumbers = [
       I.RedOne.value,
       I.RedTwo.value,
@@ -1904,8 +1904,9 @@ export class View {
       I.BlueThree.value,
     ];
     for (const num of teamNumbers) {
-      if (!num || !/^\d{1,5}$/.test(num.trim()) || num.trim() === "0") {
-        alert("Please enter all team numbers (1-5 digits, not 0).");
+      const trimmed = num.trim();
+      if (trimmed && (!/^\d{1,5}$/.test(trimmed) || trimmed === "0")) {
+        alert("Team numbers must be 1-5 digits (not 0). Leave blank if unknown.");
         return;
       }
     }
