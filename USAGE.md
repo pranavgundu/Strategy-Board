@@ -22,7 +22,7 @@
 - <a href="#importing-matches" style="text-decoration: none; color: #3b82f6;">Importing Matches</a>
   - <a href="#importing-from-a-qr-code" style="text-decoration: none; color: #3b82f6;">Importing from a QR Code</a>
   - <a href="#importing-from-a-shareable-code" style="text-decoration: none; color: #3b82f6;">Importing from a Shareable Code</a>
-  > If you would like a Chinese translated version of this guide, [click here]([link-to-chinese-version](https://docs.google.com/document/d/1o_OxcQ1beBimggCccLMvfpWzumJgHTeq2R1PrQqqTPc/edit?usp=sharing)).
+#### If you would like a Chinese translated version of this guide, [click here]([link-to-chinese-version](https://docs.google.com/document/d/1o_OxcQ1beBimggCccLMvfpWzumJgHTeq2R1PrQqqTPc/edit?usp=sharing)).
 
 ## Accessing Strategy Board
 You can access Strategy Board from any of the following domains: 
