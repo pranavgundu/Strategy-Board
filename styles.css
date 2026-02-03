@@ -30,6 +30,11 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Override inline critical CSS - show all content once this stylesheet loads */
+body > * {
+    visibility: visible;
+}
+
 /* Early loading screen that shows before the app bundles finish loading */
 #app-loading {
     position: fixed;

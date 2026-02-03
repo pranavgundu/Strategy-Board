@@ -77,14 +77,14 @@ const _canvasStub = (() => {
 })();
 
 const background = new Proxy({} as HTMLCanvasElement, {
-  get(_t, prop: PropertyKey, receiver?: any) {
+  get(_t, prop: PropertyKey, _receiver?: any) {
     ensureCanvases();
     const el = _backgroundEl || _canvasStub;
     const value = (el as any)[prop];
     if (typeof value === "function") return value.bind(el);
     return value;
   },
-  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+  set(_t, prop: PropertyKey, val: any, _receiver?: any) {
     ensureCanvases();
     if (_backgroundEl) (_backgroundEl as any)[prop] = val;
     return true;
@@ -92,14 +92,14 @@ const background = new Proxy({} as HTMLCanvasElement, {
 }) as unknown as HTMLCanvasElement;
 
 const items = new Proxy({} as HTMLCanvasElement, {
-  get(_t, prop: PropertyKey, receiver?: any) {
+  get(_t, prop: PropertyKey, _receiver?: any) {
     ensureCanvases();
     const el = _itemsEl || _canvasStub;
     const value = (el as any)[prop];
     if (typeof value === "function") return value.bind(el);
     return value;
   },
-  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+  set(_t, prop: PropertyKey, val: any, _receiver?: any) {
     ensureCanvases();
     if (_itemsEl) (_itemsEl as any)[prop] = val;
     return true;
@@ -107,14 +107,14 @@ const items = new Proxy({} as HTMLCanvasElement, {
 }) as unknown as HTMLCanvasElement;
 
 const drawing = new Proxy({} as HTMLCanvasElement, {
-  get(_t, prop: PropertyKey, receiver?: any) {
+  get(_t, prop: PropertyKey, _receiver?: any) {
     ensureCanvases();
     const el = _drawingEl || _canvasStub;
     const value = (el as any)[prop];
     if (typeof value === "function") return value.bind(el);
     return value;
   },
-  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+  set(_t, prop: PropertyKey, val: any, _receiver?: any) {
     ensureCanvases();
     if (_drawingEl) (_drawingEl as any)[prop] = val;
     return true;
@@ -122,70 +122,70 @@ const drawing = new Proxy({} as HTMLCanvasElement, {
 }) as unknown as HTMLCanvasElement;
 
 const BG = new Proxy({} as CanvasRenderingContext2D, {
-  get(_t, prop: PropertyKey, receiver?: any) {
+  get(_t, prop: PropertyKey, _receiver?: any) {
     ensureCanvases();
     const ctx = _BGctx as any;
     const value = ctx[prop];
     if (typeof value === "function") return value.bind(ctx);
     return value;
   },
-  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+  set(_t, prop: PropertyKey, val: any, _receiver?: any) {
     ensureCanvases();
     const ctx = _BGctx as any;
     if (ctx) {
       try {
         ctx[prop as any] = val;
-      } catch (err) {}
+      } catch {}
     }
     return true;
   },
 }) as unknown as CanvasRenderingContext2D;
 
 const IT = new Proxy({} as CanvasRenderingContext2D, {
-  get(_t, prop: PropertyKey, receiver?: any) {
+  get(_t, prop: PropertyKey, _receiver?: any) {
     ensureCanvases();
     const ctx = _ITctx as any;
     const value = ctx[prop];
     if (typeof value === "function") return value.bind(ctx);
     return value;
   },
-  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+  set(_t, prop: PropertyKey, val: any, _receiver?: any) {
     ensureCanvases();
     const ctx = _ITctx as any;
     if (ctx) {
       try {
         ctx[prop as any] = val;
-      } catch (err) {}
+      } catch {}
     }
     return true;
   },
 }) as unknown as CanvasRenderingContext2D;
 
 const DR = new Proxy({} as CanvasRenderingContext2D, {
-  get(_t, prop: PropertyKey, receiver?: any) {
+  get(_t, prop: PropertyKey, _receiver?: any) {
     ensureCanvases();
     const ctx = _DRctx as any;
     const value = ctx[prop];
     if (typeof value === "function") return value.bind(ctx);
     return value;
   },
-  set(_t, prop: PropertyKey, val: any, receiver?: any) {
+  set(_t, prop: PropertyKey, val: any, _receiver?: any) {
     ensureCanvases();
     const ctx = _DRctx as any;
     if (ctx) {
       try {
         ctx[prop as any] = val;
-      } catch (err) {}
+      } catch {}
     }
     return true;
   },
 }) as unknown as CanvasRenderingContext2D;
 
-const dpr = window.devicePixelRatio || 1;
+const _dpr = window.devicePixelRatio || 1;
 const width = Config.fieldPNGPixelWidth;
 const height = Config.fieldPNGPixelHeight;
-const realWidth = Config.fieldRealWidthInches;
-const realHeight = Config.fieldRealHeightInches;
+const _realWidth = Config.fieldRealWidthInches;
+const _realHeight = Config.fieldRealHeightInches;
 
 let scaling = 1;
 
@@ -367,22 +367,22 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-toolbar-mode-auto")
-      ?.addEventListener("click", (e) => this.toggleMode("auto"));
+      ?.addEventListener("click", (_e) => this.toggleMode("auto"));
     document
       .getElementById("whiteboard-toolbar-mode-teleop")
-      ?.addEventListener("click", (e) => this.toggleMode("teleop"));
+      ?.addEventListener("click", (_e) => this.toggleMode("teleop"));
     document
       .getElementById("whiteboard-toolbar-mode-endgame")
-      ?.addEventListener("click", (e) => this.toggleMode("endgame"));
+      ?.addEventListener("click", (_e) => this.toggleMode("endgame"));
     document
       .getElementById("whiteboard-toolbar-mode-notes")
-      ?.addEventListener("click", (e) => this.toggleMode("notes"));
+      ?.addEventListener("click", (_e) => this.toggleMode("notes"));
     document
       .getElementById("whiteboard-toolbar-mode-statbotics")
-      ?.addEventListener("click", (e) => this.toggleMode("statbotics"));
+      ?.addEventListener("click", (_e) => this.toggleMode("statbotics"));
     document
       .getElementById("whiteboard-draw-config")
-      ?.addEventListener("click", (e) => {
+      ?.addEventListener("click", (_e) => {
         if (this.currentTool == "marker") {
           this.currentTool = "eraser";
           document
@@ -447,7 +447,7 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-color-close")
-      ?.addEventListener("click", (e) => {
+      ?.addEventListener("click", (_e) => {
         document
           .getElementById("whiteboard-color-config")
           ?.classList.add("color-picker-hidden");
@@ -529,7 +529,7 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-color-white")
-      ?.addEventListener("click", (e) => {
+      ?.addEventListener("click", (_e) => {
         if (
           document
             .getElementById("whiteboard-color-close")
@@ -578,7 +578,7 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-color-red")
-      ?.addEventListener("click", (e) => {
+      ?.addEventListener("click", (_e) => {
         if (
           document
             .getElementById("whiteboard-color-close")
@@ -627,7 +627,7 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-color-blue")
-      ?.addEventListener("click", (e) => {
+      ?.addEventListener("click", (_e) => {
         if (
           document
             .getElementById("whiteboard-color-close")
@@ -676,7 +676,7 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-color-green")
-      ?.addEventListener("click", (e) => {
+      ?.addEventListener("click", (_e) => {
         if (
           document
             .getElementById("whiteboard-color-close")
@@ -725,7 +725,7 @@ export class Whiteboard {
 
     document
       .getElementById("whiteboard-color-yellow")
-      ?.addEventListener("click", (e) => {
+      ?.addEventListener("click", (_e) => {
         if (
           document
             .getElementById("whiteboard-color-close")
@@ -1181,7 +1181,7 @@ export class Whiteboard {
         // Re-apply the erase by removing the strokes at the stored indexes
         // Sort indexes in descending order to avoid index shifting issues
         const sortedIndexes = [...action.indexes].sort((a, b) => b - a);
-        for (let idx of sortedIndexes) {
+        for (const idx of sortedIndexes) {
           if (idx < data.drawing.length) {
             data.drawing.splice(idx, 1);
             data.drawingBBox.splice(idx, 1);
@@ -1494,7 +1494,7 @@ export class Whiteboard {
 
     let currentStrokeColor = "";
 
-    for (let stroke of data.drawing) {
+    for (const stroke of data.drawing) {
       if (stroke.length < 2) continue;
 
       const color = this.getStrokeColor(stroke[0]);
@@ -1536,7 +1536,7 @@ export class Whiteboard {
       const boxSize = 150;
       const checkPadding = 15;
 
-      for (let checkbox of data.checkboxes) {
+      for (const checkbox of data.checkboxes) {
         const x = checkbox[0] - offsetX;
         const y = checkbox[1] - offsetY;
         const color = this.getStrokeColor(checkbox[2]);
@@ -1792,10 +1792,10 @@ export class Whiteboard {
 
   private onClick(e: MouseEvent) {
     const rect = drawing.getBoundingClientRect();
-    const x =
+    const _x =
       Math.round(e.clientX / scaling - rect.left / scaling) -
       (width / 2 - this.camera.x);
-    const y =
+    const _y =
       Math.round(e.clientY / scaling - rect.top / scaling) -
       (height / 2 - this.camera.y);
     if (clickMovement > 30) return;
@@ -2163,7 +2163,7 @@ export class Whiteboard {
     this.currentStrokePoints = [];
   }
 
-  private onPointerLeave(e: Event) {
+  private onPointerLeave(_e: Event) {
     this.isPointerDown = false;
 
     this.cachedDrawingRect = null;
@@ -2335,7 +2335,7 @@ function getBBox(stroke: any): [number, number, number, number] {
   let maxx = minx;
   let maxy = miny;
   for (let i = 1; i < stroke.length; i++) {
-    let point = stroke[i];
+    const point = stroke[i];
     if (point[0] < minx) {
       minx = point[0];
     } else if (point[0] > maxx) {
@@ -2360,12 +2360,12 @@ function getBBox(stroke: any): [number, number, number, number] {
   return [minx, miny, maxx, maxy];
 }
 
-function getSortedIndex(arr: number[], num: number): number {
+function _getSortedIndex(arr: number[], num: number): number {
   let left = 0,
     right = arr.length;
 
   while (left < right) {
-    let mid = Math.floor((left + right) / 2);
+    const mid = Math.floor((left + right) / 2);
     if (arr[mid] < num) left = mid + 1;
     else right = mid;
   }

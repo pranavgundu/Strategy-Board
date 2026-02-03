@@ -78,7 +78,7 @@ async function initializeApp(): Promise<void> {
     const qrimport = new qrModule.QRImport();
     const qrexport = new qrModule.QRExport();
 
-    const app = new viewModule.View(model, whiteboard, qrimport, qrexport);
+    const _app = new viewModule.View(model, whiteboard, qrimport, qrexport);
     console.log("Application initialized successfully");
     try {
       document.documentElement.setAttribute("data-app-ready", "true");
@@ -95,7 +95,7 @@ async function initializeApp(): Promise<void> {
 
     try {
       document.documentElement.setAttribute("data-app-ready", "false");
-    } catch (err) {}
+    } catch (_err) {}
     try {
       window.dispatchEvent(
         new CustomEvent("app:moduleerror", { detail: error }),

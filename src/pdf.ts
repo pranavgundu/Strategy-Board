@@ -45,7 +45,6 @@ export class PDFExport {
       );
 
       let currentPage = 0;
-      let codeIndex = 0;
 
       for (let i = 0; i < data.length; i++) {
         const page = Math.floor(i / codesPerPage);
@@ -80,7 +79,7 @@ export class PDFExport {
           align: "center",
         });
 
-        codeIndex++;
+        // codeIndex tracked via loop variable i
       }
 
       const filename = `${matchName.replace(/[^a-z0-9]/gi, "_")}_QRCodes.pdf`;

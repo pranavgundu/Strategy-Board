@@ -5,7 +5,6 @@ import { QRImport, QRExport } from "./qr.ts";
 import {
   CLEAR,
   SET,
-  GET,
   CACHE_STATBOTICS,
   GET_CACHED_STATBOTICS,
 } from "./db.ts";
@@ -15,7 +14,6 @@ import {
   fuzzySearchItems,
   extractEventItems,
   extractTeamItems,
-  type SearchableItem,
 } from "./search.ts";
 import { StatboticsService, type StatboticsMatchData } from "./statbotics.ts";
 
@@ -370,7 +368,7 @@ export class View {
               }),
             );
           } catch (_err) {}
-          clearBtn.addEventListener("click", (e) => {
+          clearBtn.addEventListener("click", (_e) => {
             this.show(E.ClearConfirmPanel);
           });
           console.debug(
@@ -394,7 +392,7 @@ export class View {
           "View: attaching 'click' handler to #clear-confirm-clear-btn",
         );
         try {
-          clearConfirmClear.addEventListener("click", (e) => {
+          clearConfirmClear.addEventListener("click", (_e) => {
             CLEAR();
             location.reload();
           });
@@ -415,7 +413,7 @@ export class View {
           "View: attaching 'click' handler to #clear-confirm-cancel-btn",
         );
         try {
-          clearConfirmCancel.addEventListener("click", (e) => {
+          clearConfirmCancel.addEventListener("click", (_e) => {
             this.hide(E.ClearConfirmPanel);
           });
           console.debug(
@@ -435,8 +433,8 @@ export class View {
           "View: attaching 'click' handler to #contributors-link-btn",
         );
         try {
-          contributorsLinkBtn.addEventListener("click", (e) => {
-            e.preventDefault();
+          contributorsLinkBtn.addEventListener("click", (ev) => {
+            ev.preventDefault();
             this.showContributors();
           });
           console.debug(
@@ -456,7 +454,7 @@ export class View {
           "View: attaching 'click' handler to #contributors-close-btn",
         );
         try {
-          contributorsCloseBtn.addEventListener("click", (e) => {
+          contributorsCloseBtn.addEventListener("click", (_e) => {
             this.hide(E.ContributorsPanel);
           });
           console.debug(
@@ -476,7 +474,7 @@ export class View {
           "View: attaching 'click' handler to #contributors-retry-btn",
         );
         try {
-          contributorsRetryBtn.addEventListener("click", (e) => {
+          contributorsRetryBtn.addEventListener("click", (_e) => {
             this.loadContributors();
           });
           console.debug(
@@ -1216,10 +1214,8 @@ export class View {
 
       // Try to load from cache first
       let matchData = await GET_CACHED_STATBOTICS(match.tbaMatchKey);
-      let isFromCache = false;
 
       if (matchData) {
-        isFromCache = true;
         console.log(`[Statbotics] Using cached data for ${match.tbaMatchKey}`);
       } else {
         // Cache miss - fetch from API
@@ -1874,7 +1870,7 @@ export class View {
    *
    * @param e - The click event
    */
-  private onClickNewMatch(e: Event): void {
+  private onClickNewMatch(_e: Event): void {
     this.show(E.CreateMatchPanel);
   }
 
@@ -1883,7 +1879,7 @@ export class View {
    *
    * @param e - The click event
    */
-  private onClickCancelCreateMatch(e: Event): void {
+  private onClickCancelCreateMatch(_e: Event): void {
     this.hideCreateMatchPanel();
   }
 
@@ -1893,7 +1889,7 @@ export class View {
    * @param e - The click event
    * @returns A promise that resolves when the match is created
    */
-  private async onClickCreateMatch(e: Event): Promise<void> {
+  private async onClickCreateMatch(_e: Event): Promise<void> {
     // Validate team numbers (if provided, must be 1-5 digits)
     const teamNumbers = [
       I.RedOne.value,
@@ -2066,7 +2062,7 @@ export class View {
    *
    * @param e - The click event
    */
-  private onClickBack(e: Event): void {
+  private onClickBack(_e: Event): void {
     this.whiteboard.setActive(false);
     this.show(E.Home);
     this.hide(E.Whiteboard);
@@ -2077,7 +2073,7 @@ export class View {
    *
    * @param e - The click event
    */
-  private onClickToggleView(e: Event): void {
+  private onClickToggleView(_e: Event): void {
     this.whiteboard.toggleView();
   }
 
@@ -2089,7 +2085,7 @@ export class View {
    * @param e - The click event
    * @returns A promise that resolves when TBA import panel is shown
    */
-  private async onClickTBAImport(e: Event): Promise<void> {
+  private async onClickTBAImport(_e: Event): Promise<void> {
     this.show(E.TBAImportPanel);
 
     await this.tbaService.loadApiKey();
@@ -2113,7 +2109,7 @@ export class View {
    *
    * @param e - The click event
    */
-  private onClickTBACancel(e: Event): void {
+  private onClickTBACancel(_e: Event): void {
     this.hide(E.TBAImportPanel);
     this.hide(E.TBAStatusMessage);
     this.hide(E.TBAEventDropdown);
@@ -2709,7 +2705,7 @@ export class View {
     }
   }
 
-  private async onClickImportMatch(e: Event): Promise<void> {
+  private async onClickImportMatch(_e: Event): Promise<void> {
     const videoEl = get("qr-import-video") as HTMLVideoElement | null;
 
     try {
@@ -2797,7 +2793,7 @@ export class View {
     }
   }
 
-  private onCancelExport(e: Event): void {
+  private onCancelExport(_e: Event): void {
     try {
       this.qrexport.close();
     } catch (err) {
@@ -2809,7 +2805,7 @@ export class View {
     if (status) status.textContent = "";
   }
 
-  private onCancelImport(e: Event): void {
+  private onCancelImport(_e: Event): void {
     try {
       this.qrimport.stop();
     } catch (err) {
@@ -2970,7 +2966,7 @@ export class View {
     }
   }
 
-  private onClickImportLink(e: Event): void {
+  private onClickImportLink(_e: Event): void {
     this.show(E.LinkImportPanel);
     if (I?.LinkImportCode) {
       I.LinkImportCode.value = "";
@@ -2978,7 +2974,7 @@ export class View {
     this.hide(E.LinkImportStatus);
   }
 
-  private async onClickLinkImportSubmit(e: Event): Promise<void> {
+  private async onClickLinkImportSubmit(_e: Event): Promise<void> {
     if (!I?.LinkImportCode) {
       console.error("Link import code input not found");
       return;
@@ -3031,7 +3027,7 @@ export class View {
     }
   }
 
-  private onClickLinkImportCancel(e: Event): void {
+  private onClickLinkImportCancel(_e: Event): void {
     this.hide(E.LinkImportPanel);
     this.hide(E.LinkImportStatus);
     if (I?.LinkImportCode) {
@@ -3193,7 +3189,7 @@ export class View {
     }
   }
 
-  private async onClickExportPDFFromModal(e: Event): Promise<void> {
+  private async onClickExportPDFFromModal(_e: Event): Promise<void> {
     if (!this.currentExportMatch) {
       console.error("No match available for PDF export");
       alert("No match data available for export");
