@@ -498,11 +498,9 @@
             </div>
             <div
                 id="home-bottom-bar"
-                class="w-full bg-slate-700 flex flex-col border-t border-slate-600 transition-all duration-300"
+                class="w-full bg-slate-700 flex items-center justify-center border-t border-slate-600 transition-all duration-300 relative"
+                style="min-height: 4rem; padding-bottom: env(safe-area-inset-bottom, 0px);"
             >
-                <div
-                    class="w-full h-16 flex items-center justify-center relative"
-                >
                     <a
                         href="https://github.com/pranavgundu/Strategy-Board"
                         target="_blank"
@@ -515,18 +513,18 @@
                     <div
                         id="last-commit-info"
                         class="absolute left-6 text-slate-400 text-xs hidden"
+                        style="top: 50%; transform: translateY(-50%);"
                     >
                         <span class="opacity-0">Loading...</span>
                     </div>
                     <a
                         id="contributors-link-btn"
                         href="#"
-                        class="absolute right-6 flex items-center h-full text-slate-300 hover:text-white transition-colors text-lg font-semibold"
+                        class="absolute right-6 flex items-center text-slate-300 hover:text-white transition-colors text-lg font-semibold"
+                        style="top: 50%; transform: translateY(-50%);"
                     >
                         strategyboard.app
                     </a>
-                </div>
-                <div class="w-full h-[env(safe-area-inset-bottom)]"></div>
             </div>
         </div>
         <div

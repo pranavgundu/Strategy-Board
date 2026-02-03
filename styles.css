@@ -915,8 +915,8 @@ body {
         padding: 0 1rem;
     }
 
-    #home-bottom-bar > div:first-child {
-        height: 3rem !important;
+    #home-bottom-bar {
+        min-height: 3rem !important;
     }
 
     /* Make better use of screen space in landscape */
@@ -1701,8 +1701,8 @@ a:active,
         height: 2.5rem !important;
     }
 
-    #home-bottom-bar > div:first-child {
-        height: 2.5rem !important;
+    #home-bottom-bar {
+        min-height: 2.5rem !important;
     }
 
     .glass-modal {
