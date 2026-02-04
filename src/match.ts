@@ -36,6 +36,10 @@ interface MatchOptions {
   };
   a: PhaseOptions;
   t: PhaseOptions;
+  s1?: PhaseOptions;
+  s2?: PhaseOptions;
+  s3?: PhaseOptions;
+  s4?: PhaseOptions;
   e: PhaseOptions;
   n?: PhaseOptions;
 }
@@ -73,6 +77,10 @@ export class Match {
 
   public auto: PhaseData;
   public teleop: PhaseData;
+  public shift1: PhaseData;
+  public shift2: PhaseData;
+  public shift3: PhaseData;
+  public shift4: PhaseData;
   public endgame: PhaseData;
   public notes: PhaseData;
 
@@ -122,6 +130,10 @@ export class Match {
 
     this.auto = this.createDefaultPhaseData(positions);
     this.teleop = this.createDefaultPhaseData(positions);
+    this.shift1 = this.createDefaultPhaseData(positions);
+    this.shift2 = this.createDefaultPhaseData(positions);
+    this.shift3 = this.createDefaultPhaseData(positions);
+    this.shift4 = this.createDefaultPhaseData(positions);
     this.endgame = this.createDefaultPhaseData(positions);
     this.notes = this.createDefaultPhaseData(positions);
 
@@ -195,6 +207,18 @@ export class Match {
   private applyOptions(options: MatchOptions): void {
     this.applyPhaseOptions(this.auto, options.a, options.dim);
     this.applyPhaseOptions(this.teleop, options.t, options.dim);
+    if (options.s1) {
+      this.applyPhaseOptions(this.shift1, options.s1, options.dim);
+    }
+    if (options.s2) {
+      this.applyPhaseOptions(this.shift2, options.s2, options.dim);
+    }
+    if (options.s3) {
+      this.applyPhaseOptions(this.shift3, options.s3, options.dim);
+    }
+    if (options.s4) {
+      this.applyPhaseOptions(this.shift4, options.s4, options.dim);
+    }
     this.applyPhaseOptions(this.endgame, options.e, options.dim);
     if (options.n) {
       this.applyPhaseOptions(this.notes, options.n, options.dim);
@@ -308,18 +332,20 @@ export class Match {
           dx: packet[8][2][7],
           cb: packet[8][2][8] || [],
         },
-        e: {
-          r1: Match.robotFromArrayPacket(packet[8][3][0]),
-          r2: Match.robotFromArrayPacket(packet[8][3][1]),
-          r3: Match.robotFromArrayPacket(packet[8][3][2]),
-          b1: Match.robotFromArrayPacket(packet[8][3][3]),
-          b2: Match.robotFromArrayPacket(packet[8][3][4]),
-          b3: Match.robotFromArrayPacket(packet[8][3][5]),
-          d: packet[8][3][6],
-          dx: packet[8][3][7],
-          cb: packet[8][3][8] || [],
-        },
-        n: packet[8][4]
+        s1: packet[8][3]
+          ? {
+              r1: Match.robotFromArrayPacket(packet[8][3][0]),
+              r2: Match.robotFromArrayPacket(packet[8][3][1]),
+              r3: Match.robotFromArrayPacket(packet[8][3][2]),
+              b1: Match.robotFromArrayPacket(packet[8][3][3]),
+              b2: Match.robotFromArrayPacket(packet[8][3][4]),
+              b3: Match.robotFromArrayPacket(packet[8][3][5]),
+              d: packet[8][3][6],
+              dx: packet[8][3][7],
+              cb: packet[8][3][8] || [],
+            }
+          : undefined,
+        s2: packet[8][4]
           ? {
               r1: Match.robotFromArrayPacket(packet[8][4][0]),
               r2: Match.robotFromArrayPacket(packet[8][4][1]),
@@ -330,6 +356,56 @@ export class Match {
               d: packet[8][4][6],
               dx: packet[8][4][7],
               cb: packet[8][4][8] || [],
+            }
+          : undefined,
+        s3: packet[8][5]
+          ? {
+              r1: Match.robotFromArrayPacket(packet[8][5][0]),
+              r2: Match.robotFromArrayPacket(packet[8][5][1]),
+              r3: Match.robotFromArrayPacket(packet[8][5][2]),
+              b1: Match.robotFromArrayPacket(packet[8][5][3]),
+              b2: Match.robotFromArrayPacket(packet[8][5][4]),
+              b3: Match.robotFromArrayPacket(packet[8][5][5]),
+              d: packet[8][5][6],
+              dx: packet[8][5][7],
+              cb: packet[8][5][8] || [],
+            }
+          : undefined,
+        s4: packet[8][6]
+          ? {
+              r1: Match.robotFromArrayPacket(packet[8][6][0]),
+              r2: Match.robotFromArrayPacket(packet[8][6][1]),
+              r3: Match.robotFromArrayPacket(packet[8][6][2]),
+              b1: Match.robotFromArrayPacket(packet[8][6][3]),
+              b2: Match.robotFromArrayPacket(packet[8][6][4]),
+              b3: Match.robotFromArrayPacket(packet[8][6][5]),
+              d: packet[8][6][6],
+              dx: packet[8][6][7],
+              cb: packet[8][6][8] || [],
+            }
+          : undefined,
+        e: {
+          r1: Match.robotFromArrayPacket(packet[8][7][0]),
+          r2: Match.robotFromArrayPacket(packet[8][7][1]),
+          r3: Match.robotFromArrayPacket(packet[8][7][2]),
+          b1: Match.robotFromArrayPacket(packet[8][7][3]),
+          b2: Match.robotFromArrayPacket(packet[8][7][4]),
+          b3: Match.robotFromArrayPacket(packet[8][7][5]),
+          d: packet[8][7][6],
+          dx: packet[8][7][7],
+          cb: packet[8][7][8] || [],
+        },
+        n: packet[8][8]
+          ? {
+              r1: Match.robotFromArrayPacket(packet[8][8][0]),
+              r2: Match.robotFromArrayPacket(packet[8][8][1]),
+              r3: Match.robotFromArrayPacket(packet[8][8][2]),
+              b1: Match.robotFromArrayPacket(packet[8][8][3]),
+              b2: Match.robotFromArrayPacket(packet[8][8][4]),
+              b3: Match.robotFromArrayPacket(packet[8][8][5]),
+              d: packet[8][8][6],
+              dx: packet[8][8][7],
+              cb: packet[8][8][8] || [],
             }
           : undefined,
       },
@@ -473,6 +549,146 @@ export class Match {
           this.teleop.drawing,
           this.teleop.drawingBBox,
           this.teleop.checkboxes,
+        ],
+        [
+          [
+            this.shift1.redOneRobot.x,
+            this.shift1.redOneRobot.y,
+            Number(this.shift1.redOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift1.redTwoRobot.x,
+            this.shift1.redTwoRobot.y,
+            Number(this.shift1.redTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift1.redThreeRobot.x,
+            this.shift1.redThreeRobot.y,
+            Number(this.shift1.redThreeRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift1.blueOneRobot.x,
+            this.shift1.blueOneRobot.y,
+            Number(this.shift1.blueOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift1.blueTwoRobot.x,
+            this.shift1.blueTwoRobot.y,
+            Number(this.shift1.blueTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift1.blueThreeRobot.x,
+            this.shift1.blueThreeRobot.y,
+            Number(this.shift1.blueThreeRobot.r.toFixed(2)),
+          ],
+          this.shift1.drawing,
+          this.shift1.drawingBBox,
+          this.shift1.checkboxes,
+        ],
+        [
+          [
+            this.shift2.redOneRobot.x,
+            this.shift2.redOneRobot.y,
+            Number(this.shift2.redOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift2.redTwoRobot.x,
+            this.shift2.redTwoRobot.y,
+            Number(this.shift2.redTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift2.redThreeRobot.x,
+            this.shift2.redThreeRobot.y,
+            Number(this.shift2.redThreeRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift2.blueOneRobot.x,
+            this.shift2.blueOneRobot.y,
+            Number(this.shift2.blueOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift2.blueTwoRobot.x,
+            this.shift2.blueTwoRobot.y,
+            Number(this.shift2.blueTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift2.blueThreeRobot.x,
+            this.shift2.blueThreeRobot.y,
+            Number(this.shift2.blueThreeRobot.r.toFixed(2)),
+          ],
+          this.shift2.drawing,
+          this.shift2.drawingBBox,
+          this.shift2.checkboxes,
+        ],
+        [
+          [
+            this.shift3.redOneRobot.x,
+            this.shift3.redOneRobot.y,
+            Number(this.shift3.redOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift3.redTwoRobot.x,
+            this.shift3.redTwoRobot.y,
+            Number(this.shift3.redTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift3.redThreeRobot.x,
+            this.shift3.redThreeRobot.y,
+            Number(this.shift3.redThreeRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift3.blueOneRobot.x,
+            this.shift3.blueOneRobot.y,
+            Number(this.shift3.blueOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift3.blueTwoRobot.x,
+            this.shift3.blueTwoRobot.y,
+            Number(this.shift3.blueTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift3.blueThreeRobot.x,
+            this.shift3.blueThreeRobot.y,
+            Number(this.shift3.blueThreeRobot.r.toFixed(2)),
+          ],
+          this.shift3.drawing,
+          this.shift3.drawingBBox,
+          this.shift3.checkboxes,
+        ],
+        [
+          [
+            this.shift4.redOneRobot.x,
+            this.shift4.redOneRobot.y,
+            Number(this.shift4.redOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift4.redTwoRobot.x,
+            this.shift4.redTwoRobot.y,
+            Number(this.shift4.redTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift4.redThreeRobot.x,
+            this.shift4.redThreeRobot.y,
+            Number(this.shift4.redThreeRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift4.blueOneRobot.x,
+            this.shift4.blueOneRobot.y,
+            Number(this.shift4.blueOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift4.blueTwoRobot.x,
+            this.shift4.blueTwoRobot.y,
+            Number(this.shift4.blueTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.shift4.blueThreeRobot.x,
+            this.shift4.blueThreeRobot.y,
+            Number(this.shift4.blueThreeRobot.r.toFixed(2)),
+          ],
+          this.shift4.drawing,
+          this.shift4.drawingBBox,
+          this.shift4.checkboxes,
         ],
         [
           [

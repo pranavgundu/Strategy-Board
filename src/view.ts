@@ -68,6 +68,12 @@ let B: {
   ShareCodeCopy?: HTMLElement | null;
   ShareLinkCopy?: HTMLElement | null;
   TeamNumberSave?: HTMLElement | null;
+  HomeSettingsBtn?: HTMLElement | null;
+  WhiteboardSettingsBtn?: HTMLElement | null;
+  SettingsClose?: HTMLElement | null;
+  SettingsThemeToggle?: HTMLElement | null;
+  SettingsShiftModeToggle?: HTMLElement | null;
+  SettingsAbout?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -116,6 +122,7 @@ let E: {
   ShareSuccessPanel?: HTMLElement | null;
   ShareCodeDisplay?: HTMLElement | null;
   ShareLinkDisplay?: HTMLInputElement | null;
+  SettingsMenuPanel?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -173,6 +180,12 @@ export class View {
         ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
         ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
         TeamNumberSave: get("team-number-save-btn") as HTMLElement | null,
+        HomeSettingsBtn: get("home-toolbar-settings-btn") as HTMLElement | null,
+        WhiteboardSettingsBtn: get("whiteboard-toolbar-settings-btn") as HTMLElement | null,
+        SettingsClose: get("settings-close-btn") as HTMLElement | null,
+        SettingsThemeToggle: get("settings-theme-toggle") as HTMLElement | null,
+        SettingsShiftModeToggle: get("settings-shift-mode-toggle") as HTMLElement | null,
+        SettingsAbout: get("settings-about-btn") as HTMLElement | null,
       };
 
       I = {
@@ -225,6 +238,7 @@ export class View {
         ShareSuccessPanel: get("share-success-container") as HTMLElement | null,
         ShareCodeDisplay: get("share-code-display") as HTMLElement | null,
         ShareLinkDisplay: get("share-link-display") as HTMLInputElement | null,
+        SettingsMenuPanel: get("settings-menu-container") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -422,6 +436,136 @@ export class View {
         } catch (err) {
           console.error(
             "View: failed to attach 'click' handler to #clear-confirm-cancel-btn:",
+            err,
+          );
+        }
+      }
+
+      // Settings menu handlers
+      const homeSettingsBtn = B?.HomeSettingsBtn;
+      if (homeSettingsBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #home-toolbar-settings-btn",
+        );
+        try {
+          homeSettingsBtn.addEventListener("click", (_e) => {
+            this.show(E.SettingsMenuPanel);
+          });
+          console.debug(
+            "View: attached 'click' handler to #home-toolbar-settings-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #home-toolbar-settings-btn:",
+            err,
+          );
+        }
+      }
+
+      const whiteboardSettingsBtn = B?.WhiteboardSettingsBtn;
+      if (whiteboardSettingsBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #whiteboard-toolbar-settings-btn",
+        );
+        try {
+          whiteboardSettingsBtn.addEventListener("click", (_e) => {
+            this.show(E.SettingsMenuPanel);
+          });
+          console.debug(
+            "View: attached 'click' handler to #whiteboard-toolbar-settings-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #whiteboard-toolbar-settings-btn:",
+            err,
+          );
+        }
+      }
+
+      const settingsCloseBtn = B?.SettingsClose;
+      if (settingsCloseBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #settings-close-btn",
+        );
+        try {
+          settingsCloseBtn.addEventListener("click", (_e) => {
+            this.hide(E.SettingsMenuPanel);
+          });
+          console.debug(
+            "View: attached 'click' handler to #settings-close-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #settings-close-btn:",
+            err,
+          );
+        }
+      }
+
+      const settingsThemeToggle = B?.SettingsThemeToggle;
+      if (settingsThemeToggle) {
+        console.debug(
+          "View: attaching 'click' handler to #settings-theme-toggle",
+        );
+        try {
+          settingsThemeToggle.addEventListener("click", (_e) => {
+            const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+            const newTheme = currentTheme === "light" ? "dark" : "light";
+            document.documentElement.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+          });
+          console.debug(
+            "View: attached 'click' handler to #settings-theme-toggle",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #settings-theme-toggle:",
+            err,
+          );
+        }
+      }
+
+      const settingsShiftModeToggle = B?.SettingsShiftModeToggle;
+      if (settingsShiftModeToggle) {
+        console.debug(
+          "View: attaching 'click' handler to #settings-shift-mode-toggle",
+        );
+        try {
+          settingsShiftModeToggle.addEventListener("click", (_e) => {
+            const isEnabled = localStorage.getItem("shiftMode") === "true";
+            const newValue = !isEnabled;
+            localStorage.setItem("shiftMode", String(newValue));
+            this.updateShiftModeUI(newValue);
+          });
+          // Initialize UI on load
+          const initialShiftMode = localStorage.getItem("shiftMode") === "true";
+          this.updateShiftModeUI(initialShiftMode);
+          console.debug(
+            "View: attached 'click' handler to #settings-shift-mode-toggle",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #settings-shift-mode-toggle:",
+            err,
+          );
+        }
+      }
+
+      const settingsAboutBtn = B?.SettingsAbout;
+      if (settingsAboutBtn) {
+        console.debug(
+          "View: attaching 'click' handler to #settings-about-btn",
+        );
+        try {
+          settingsAboutBtn.addEventListener("click", (_e) => {
+            alert("Strategy Board v1.0.0\n\nA digital strategy whiteboard for FIRST Robotics Competition teams.\n\nFor more information, visit strategyboard.app");
+          });
+          console.debug(
+            "View: attached 'click' handler to #settings-about-btn",
+          );
+        } catch (err) {
+          console.error(
+            "View: failed to attach 'click' handler to #settings-about-btn:",
             err,
           );
         }
@@ -1096,6 +1240,51 @@ export class View {
     }
 
     return "just now";
+  }
+
+  /**
+   * Updates the UI to show/hide shift mode elements.
+   * 
+   * @param enabled - Whether shift mode is enabled
+   */
+  private updateShiftModeUI(enabled: boolean): void {
+    // Update toggle button UI
+    const statusSpan = document.getElementById("settings-shift-mode-status");
+    const toggleIcon = document.querySelector("#settings-shift-mode-toggle i");
+    
+    if (statusSpan) {
+      statusSpan.textContent = enabled ? "ON" : "OFF";
+      statusSpan.classList.toggle("text-green-400", enabled);
+      statusSpan.classList.toggle("text-gray-400", !enabled);
+    }
+    
+    if (toggleIcon) {
+      toggleIcon.classList.toggle("fa-toggle-on", enabled);
+      toggleIcon.classList.toggle("fa-toggle-off", !enabled);
+      toggleIcon.classList.toggle("text-green-400", enabled);
+      toggleIcon.classList.toggle("text-gray-400", !enabled);
+    }
+
+    // Show/hide mode tabs
+    const teleopTab = document.getElementById("whiteboard-toolbar-mode-teleop");
+    const shift1Tab = document.getElementById("whiteboard-toolbar-mode-shift1");
+    const shift2Tab = document.getElementById("whiteboard-toolbar-mode-shift2");
+    const shift3Tab = document.getElementById("whiteboard-toolbar-mode-shift3");
+    const shift4Tab = document.getElementById("whiteboard-toolbar-mode-shift4");
+
+    if (enabled) {
+      teleopTab?.classList.add("hidden");
+      shift1Tab?.classList.remove("hidden");
+      shift2Tab?.classList.remove("hidden");
+      shift3Tab?.classList.remove("hidden");
+      shift4Tab?.classList.remove("hidden");
+    } else {
+      teleopTab?.classList.remove("hidden");
+      shift1Tab?.classList.add("hidden");
+      shift2Tab?.classList.add("hidden");
+      shift3Tab?.classList.add("hidden");
+      shift4Tab?.classList.add("hidden");
+    }
   }
 
   /**

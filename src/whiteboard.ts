@@ -372,6 +372,18 @@ export class Whiteboard {
       .getElementById("whiteboard-toolbar-mode-teleop")
       ?.addEventListener("click", (_e) => this.toggleMode("teleop"));
     document
+      .getElementById("whiteboard-toolbar-mode-shift1")
+      ?.addEventListener("click", (_e) => this.toggleMode("shift1"));
+    document
+      .getElementById("whiteboard-toolbar-mode-shift2")
+      ?.addEventListener("click", (_e) => this.toggleMode("shift2"));
+    document
+      .getElementById("whiteboard-toolbar-mode-shift3")
+      ?.addEventListener("click", (_e) => this.toggleMode("shift3"));
+    document
+      .getElementById("whiteboard-toolbar-mode-shift4")
+      ?.addEventListener("click", (_e) => this.toggleMode("shift4"));
+    document
       .getElementById("whiteboard-toolbar-mode-endgame")
       ?.addEventListener("click", (_e) => this.toggleMode("endgame"));
     document
@@ -1438,6 +1450,18 @@ export class Whiteboard {
     }
     if (this.mode === "teleop") {
       return this.match.teleop;
+    }
+    if (this.mode === "shift1") {
+      return this.match.shift1;
+    }
+    if (this.mode === "shift2") {
+      return this.match.shift2;
+    }
+    if (this.mode === "shift3") {
+      return this.match.shift3;
+    }
+    if (this.mode === "shift4") {
+      return this.match.shift4;
     }
     if (this.mode === "endgame") {
       return this.match.endgame;
