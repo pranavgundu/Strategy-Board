@@ -22,6 +22,8 @@
     "cap:open:android": "pnpm exec cap open android",
     "cap:run:ios": "pnpm run cap:sync && pnpm exec cap run ios",
     "cap:run:android": "pnpm run cap:sync && pnpm exec cap run android",
+    "cap:build:android": "pnpm run cap:sync && cd android && ./gradlew assembleDebug && cp app/build/outputs/apk/debug/app-debug.apk ../release/\"Strategy Board-$npm_package_version.apk\"",
+    "cap:build:ios": "pnpm run cap:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath ../../release/ios-build archive",
     "electron:dev": "concurrently \"vite --host\" \"wait-on http://localhost:5173 && VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "electron:build": "pnpm run build && electron-builder",
     "electron:build:mac": "pnpm run build && electron-builder --mac",
