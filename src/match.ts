@@ -57,13 +57,13 @@ const DEFAULT_ROBOT_HEIGHT = 152.4;
 const DEFAULT_ROBOT_ROTATION = 0;
 
 export class Match {
-  public readonly matchName: string;
-  public readonly redOne: string;
-  public readonly redTwo: string;
-  public readonly redThree: string;
-  public readonly blueOne: string;
-  public readonly blueTwo: string;
-  public readonly blueThree: string;
+  public matchName: string;
+  public redOne: string;
+  public redTwo: string;
+  public redThree: string;
+  public blueOne: string;
+  public blueTwo: string;
+  public blueThree: string;
   public readonly id: string;
 
   public readonly tbaEventKey?: string;
@@ -259,6 +259,35 @@ export class Match {
       w: dimensions.b3.w,
       h: dimensions.b3.h,
     };
+  }
+
+  /**
+   * Updates the match name and team numbers.
+   *
+   * @param matchName - The new name for the match
+   * @param redOne - Red alliance robot 1 team number
+   * @param redTwo - Red alliance robot 2 team number
+   * @param redThree - Red alliance robot 3 team number
+   * @param blueOne - Blue alliance robot 1 team number
+   * @param blueTwo - Blue alliance robot 2 team number
+   * @param blueThree - Blue alliance robot 3 team number
+   */
+  public updateInfo(
+    matchName: string,
+    redOne: string,
+    redTwo: string,
+    redThree: string,
+    blueOne: string,
+    blueTwo: string,
+    blueThree: string,
+  ): void {
+    this.matchName = matchName;
+    this.redOne = redOne;
+    this.redTwo = redTwo;
+    this.redThree = redThree;
+    this.blueOne = blueOne;
+    this.blueTwo = blueTwo;
+    this.blueThree = blueThree;
   }
 
   /**

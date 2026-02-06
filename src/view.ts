@@ -68,6 +68,8 @@ let B: {
   ShareCodeCopy?: HTMLElement | null;
   ShareLinkCopy?: HTMLElement | null;
   TeamNumberSave?: HTMLElement | null;
+  EditMatch?: HTMLElement | null;
+  CancelEdit?: HTMLElement | null;
 } | null = null;
 
 let I: {
@@ -85,6 +87,13 @@ let I: {
   TBATeamSearch?: HTMLInputElement | null;
   LinkImportCode?: HTMLInputElement | null;
   TeamNumber?: HTMLInputElement | null;
+  EditMatchName?: HTMLInputElement | null;
+  EditRedOne?: HTMLInputElement | null;
+  EditRedTwo?: HTMLInputElement | null;
+  EditRedThree?: HTMLInputElement | null;
+  EditBlueOne?: HTMLInputElement | null;
+  EditBlueTwo?: HTMLInputElement | null;
+  EditBlueThree?: HTMLInputElement | null;
 } | null = null;
 
 let E: {
@@ -116,6 +125,7 @@ let E: {
   ShareSuccessPanel?: HTMLElement | null;
   ShareCodeDisplay?: HTMLElement | null;
   ShareLinkDisplay?: HTMLInputElement | null;
+  EditMatchPanel?: HTMLElement | null;
 } | null = null;
 
 export class View {
@@ -128,6 +138,7 @@ export class View {
   private contributorsService: ContributorsService;
   private statboticsService: StatboticsService;
   private currentExportMatch: Match | null = null;
+  private currentEditMatchId: string | null = null;
   private contributorTeams: string[] = [];
   private currentStatboticsData: StatboticsMatchData | null = null;
 
@@ -173,6 +184,8 @@ export class View {
         ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
         ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
         TeamNumberSave: get("team-number-save-btn") as HTMLElement | null,
+        EditMatch: get("edit-match-save-btn") as HTMLElement | null,
+        CancelEdit: get("edit-match-cancel-btn") as HTMLElement | null,
       };
 
       I = {
@@ -190,6 +203,13 @@ export class View {
         TBATeamSearch: get("tba-team-search") as HTMLInputElement | null,
         LinkImportCode: get("link-import-code") as HTMLInputElement | null,
         TeamNumber: get("team-number-input") as HTMLInputElement | null,
+        EditMatchName: get("edit-match-name") as HTMLInputElement | null,
+        EditRedOne: get("edit-match-red-1") as HTMLInputElement | null,
+        EditRedTwo: get("edit-match-red-2") as HTMLInputElement | null,
+        EditRedThree: get("edit-match-red-3") as HTMLInputElement | null,
+        EditBlueOne: get("edit-match-blue-1") as HTMLInputElement | null,
+        EditBlueTwo: get("edit-match-blue-2") as HTMLInputElement | null,
+        EditBlueThree: get("edit-match-blue-3") as HTMLInputElement | null,
       };
 
       E = {
@@ -225,6 +245,7 @@ export class View {
         ShareSuccessPanel: get("share-success-container") as HTMLElement | null,
         ShareCodeDisplay: get("share-code-display") as HTMLElement | null,
         ShareLinkDisplay: get("share-link-display") as HTMLInputElement | null,
+        EditMatchPanel: get("edit-match-container") as HTMLElement | null,
       };
 
       for (const match of this.model.matches) {
@@ -258,6 +279,18 @@ export class View {
           id: "create-match-cancel-btn",
           evt: "click",
           fn: (e: Event) => this.onClickCancelCreateMatch(e),
+        },
+        {
+          el: B?.EditMatch,
+          id: "edit-match-save-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickSaveEditMatch(e),
+        },
+        {
+          el: B?.CancelEdit,
+          id: "edit-match-cancel-btn",
+          evt: "click",
+          fn: (e: Event) => this.onClickCancelEditMatch(e),
         },
         {
           el: B?.Back,
@@ -1678,11 +1711,12 @@ export class View {
 
     const kebab = item.children[2].children[0] as HTMLElement;
     const options = item.children[2].children[1] as HTMLElement;
-    const duplicateOption = options.children[0] as HTMLElement;
-    const exportPNGOption = options.children[1] as HTMLElement;
-    const exportQROption = options.children[2] as HTMLElement;
-    const exportPDFOption = options.children[3] as HTMLElement;
-    const deleteOption = options.children[4] as HTMLElement;
+    const editOption = options.children[0] as HTMLElement;
+    const duplicateOption = options.children[1] as HTMLElement;
+    const exportPNGOption = options.children[2] as HTMLElement;
+    const exportQROption = options.children[3] as HTMLElement;
+    const exportPDFOption = options.children[4] as HTMLElement;
+    const deleteOption = options.children[5] as HTMLElement;
 
     options.addEventListener("click", (e) => e.stopPropagation());
 
@@ -1777,6 +1811,13 @@ export class View {
       this.show(kebab);
     });
 
+    editOption.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.openEditMatchDialog(id);
+      this.hide(options);
+      this.show(kebab);
+    });
+
     duplicateOption.addEventListener("click", (e) => {
       e.stopPropagation();
       this.duplicateMatch(item.id);
@@ -1820,6 +1861,108 @@ export class View {
     if (E.MatchList.children.length < 3) {
       this.show(E.EmptyMatchListPlaceholder);
     }
+  }
+
+  /**
+   * Updates an existing match list item with new data.
+   *
+   * @param id - The ID of the match to update
+   * @param matchName - The new match name
+   * @param redOne - Red alliance robot 1 team number
+   * @param redTwo - Red alliance robot 2 team number
+   * @param redThree - Red alliance robot 3 team number
+   * @param blueOne - Blue alliance robot 1 team number
+   * @param blueTwo - Blue alliance robot 2 team number
+   * @param blueThree - Blue alliance robot 3 team number
+   */
+  private updateMatchListItem(
+    id: string,
+    matchName: string,
+    redOne: string,
+    redTwo: string,
+    redThree: string,
+    blueOne: string,
+    blueTwo: string,
+    blueThree: string,
+  ): void {
+    const item = get(id);
+    if (!item) return;
+
+    matchName = matchName || "Untitled";
+    redOne = redOne || "---";
+    redTwo = redTwo || "---";
+    redThree = redThree || "---";
+    blueOne = blueOne || "---";
+    blueTwo = blueTwo || "---";
+    blueThree = blueThree || "---";
+
+    // Update match name
+    item.children[0].textContent = matchName;
+
+    // Helper function to escape HTML special characters to prevent XSS
+    const escapeHtml = (str: string): string => {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    };
+
+    const createTeamSpan = (
+      teamNumber: string,
+      animationType: "rainbow" | "gold" | "none",
+      baseColor: string,
+    ): string => {
+      const safeTeamNumber = escapeHtml(teamNumber);
+      if (animationType === "rainbow") {
+        const digits = safeTeamNumber.split("");
+        const animatedDigits = digits
+          .map((digit, index) => {
+            const delay = index * 0.3;
+            return `<span class="special-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
+          })
+          .join("");
+        return `<span class="${baseColor}">${animatedDigits}</span>`;
+      } else if (animationType === "gold") {
+        const digits = safeTeamNumber.split("");
+        const animatedDigits = digits
+          .map((digit, index) => {
+            const delay = index * 0.3;
+            return `<span class="special-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
+          })
+          .join("");
+        return `<span class="${baseColor}">${animatedDigits}</span>`;
+      }
+      return `<span class="${baseColor}">${safeTeamNumber}</span>`;
+    };
+
+    const goldTeam = "834";
+    const contributorTeams = this.contributorTeams || [];
+
+    const getAnimationType = (team: string): "rainbow" | "gold" | "none" => {
+      if (team === goldTeam) return "gold";
+      if (contributorTeams.includes(team)) return "rainbow";
+      return "none";
+    };
+
+    // Update red alliance team numbers
+    const redTeamsElement = item.children[1].children[0] as HTMLElement;
+    const redTeamsHTML = [redThree, redTwo, redOne]
+      .map((team) =>
+        createTeamSpan(team, getAnimationType(team), "text-red-400"),
+      )
+      .join(" ");
+    redTeamsElement.innerHTML = redTeamsHTML;
+
+    // Update blue alliance team numbers
+    const blueTeamsElement = item.children[1].children[2] as HTMLElement;
+    const blueTeamsHTML = [blueOne, blueTwo, blueThree]
+      .map((team) =>
+        createTeamSpan(team, getAnimationType(team), "text-blue-400"),
+      )
+      .join(" ");
+    blueTeamsElement.innerHTML = blueTeamsHTML;
   }
 
   /**
@@ -1936,6 +2079,99 @@ export class View {
     I.BlueOne.value = "";
     I.BlueTwo.value = "";
     I.BlueThree.value = "";
+  }
+
+  /**
+   * Opens the edit match dialog and populates it with the current match data.
+   *
+   * @param id - The ID of the match to edit
+   */
+  private openEditMatchDialog(id: string): void {
+    const match = this.model.getMatch(id);
+    if (!match) return;
+
+    this.currentEditMatchId = id;
+
+    // Populate the edit form with current values
+    I.EditMatchName.value = match.matchName;
+    I.EditRedOne.value = match.redOne;
+    I.EditRedTwo.value = match.redTwo;
+    I.EditRedThree.value = match.redThree;
+    I.EditBlueOne.value = match.blueOne;
+    I.EditBlueTwo.value = match.blueTwo;
+    I.EditBlueThree.value = match.blueThree;
+
+    this.show(E.EditMatchPanel);
+  }
+
+  /**
+   * Handles click event for saving edit changes to a match.
+   *
+   * @param e - The click event
+   * @returns A promise that resolves when the match is updated
+   */
+  private async onClickSaveEditMatch(_e: Event): Promise<void> {
+    if (!this.currentEditMatchId) return;
+
+    // Validate team numbers (if provided, must be 1-5 digits)
+    const teamNumbers = [
+      I.EditRedOne.value,
+      I.EditRedTwo.value,
+      I.EditRedThree.value,
+      I.EditBlueOne.value,
+      I.EditBlueTwo.value,
+      I.EditBlueThree.value,
+    ];
+    for (const num of teamNumbers) {
+      const trimmed = num.trim();
+      if (trimmed && (!/^\d{1,5}$/.test(trimmed) || trimmed === "0")) {
+        alert("Team numbers must be 1-5 digits (not 0). Leave blank if unknown.");
+        return;
+      }
+    }
+
+    const match = this.model.getMatch(this.currentEditMatchId);
+    if (!match) return;
+
+    // Update the match with new values
+    match.updateInfo(
+      I.EditMatchName.value,
+      I.EditRedOne.value,
+      I.EditRedTwo.value,
+      I.EditRedThree.value,
+      I.EditBlueOne.value,
+      I.EditBlueTwo.value,
+      I.EditBlueThree.value,
+    );
+
+    // Persist the changes
+    await this.model.updateMatch(this.currentEditMatchId);
+
+    // Update the UI
+    this.updateMatchListItem(
+      this.currentEditMatchId,
+      match.matchName,
+      match.redOne,
+      match.redTwo,
+      match.redThree,
+      match.blueOne,
+      match.blueTwo,
+      match.blueThree,
+    );
+
+    // Clear and hide the edit dialog
+    this.currentEditMatchId = null;
+    this.hide(E.EditMatchPanel);
+  }
+
+  /**
+   * Handles click event for canceling match editing and hiding the panel.
+   *
+   * @param e - The click event
+   */
+  private onClickCancelEditMatch(_e: Event): void {
+    this.currentEditMatchId = null;
+    this.hide(E.EditMatchPanel);
   }
 
   /**

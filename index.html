@@ -33,7 +33,7 @@
         />
         <meta
             name="viewport"
-            content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
         />
         <meta name="theme-color" content="#000000" />
         <meta name="screen-orientation" content="landscape" />
@@ -462,33 +462,38 @@
                             ></div>
                         </button>
                         <div
-                            class="hidden flex items-center justify-center gap-2"
+                            class="hidden flex items-center justify-center gap-1 sm:gap-2"
                         >
                             <button
-                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-green-500 rounded-xl glass-button glossy-shine"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-yellow-500 rounded-lg glass-button glossy-shine"
+                            >
+                                Edit
+                            </button>
+                            <button
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-green-500 rounded-lg glass-button glossy-shine"
                             >
                                 Duplicate
                             </button>
                             <button
-                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-blue-500 rounded-xl glass-button glossy-shine whitespace-nowrap"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-blue-500 rounded-lg glass-button glossy-shine whitespace-nowrap"
                             >
                                 Export PNG
                             </button>
                             <button
-                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-orange-500 rounded-xl glass-button glossy-shine whitespace-nowrap"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-orange-500 rounded-lg glass-button glossy-shine whitespace-nowrap"
                             >
                                 Export QR
                             </button>
                             <button
-                                class="w-24 sm:w-32 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-purple-500 rounded-xl glass-button glossy-shine whitespace-nowrap flex items-center justify-center gap-1"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-purple-500 rounded-lg glass-button glossy-shine whitespace-nowrap flex items-center justify-center gap-1"
                             >
                                 <span>Share</span>
                                 <i
-                                    class="fas fa-link text-xs sm:text-sm md:text-base"
+                                    class="fas fa-link text-sm"
                                 ></i>
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 sm:p-2 text-xs sm:text-sm md:text-base lg:text-xl text-white bg-red-500 rounded-xl glass-button glossy-shine"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-red-500 rounded-lg glass-button glossy-shine"
                             >
                                 Delete
                             </button>
@@ -654,6 +659,107 @@
                     </button>
                     <button
                         id="create-match-cancel-btn"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Edit Match Overlay -->
+        <div
+            id="edit-match-container"
+            class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
+        >
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal max-h-[90vh] overflow-y-auto"
+            >
+                <input
+                    id="edit-match-name"
+                    placeholder="Match Name"
+                    maxlength="25"
+                    class="w-full pt-4 pb-4 sm:pt-6 sm:pb-6 text-xl sm:text-2xl md:text-3xl text-center text-slate-300 font-bold rounded-t-2xl md:rounded-t-3xl bg-slate-500 outline-0"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                />
+                <div class="grid grid-cols-3 w-full">
+                    <input
+                        type="number"
+                        id="edit-match-red-1"
+                        placeholder="Red 1"
+                        maxlength="5"
+                        inputmode="numeric"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="edit-match-red-2"
+                        placeholder="Red 2"
+                        maxlength="5"
+                        inputmode="numeric"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="edit-match-red-3"
+                        placeholder="Red 3"
+                        maxlength="5"
+                        inputmode="numeric"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="edit-match-blue-1"
+                        placeholder="Blue 1"
+                        maxlength="5"
+                        inputmode="numeric"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="edit-match-blue-2"
+                        placeholder="Blue 2"
+                        maxlength="5"
+                        inputmode="numeric"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                    <input
+                        type="number"
+                        id="edit-match-blue-3"
+                        placeholder="Blue 3"
+                        maxlength="5"
+                        inputmode="numeric"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    />
+                </div>
+                <div class="flex w-full">
+                    <button
+                        id="edit-match-save-btn"
+                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
+                    >
+                        Save
+                    </button>
+                    <button
+                        id="edit-match-cancel-btn"
                         class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
                     >
                         Cancel
