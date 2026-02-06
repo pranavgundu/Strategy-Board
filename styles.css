@@ -23,11 +23,15 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 body {
     font-size: 16px;
     -webkit-overflow-scrolling: touch;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 /* Early loading screen that shows before the app bundles finish loading */
@@ -282,7 +286,7 @@ body {
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
         padding: 5px 8px;
-        font-size: 0.8rem;
+        font-size: 0.875rem;
         min-width: 52px;
     }
     #whiteboard-toolbar .toolbar-right .flex.items-center {
@@ -307,7 +311,7 @@ body {
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
         padding: 4px 6px;
-        font-size: 0.75rem;
+        font-size: 0.875rem;
         min-width: 48px;
     }
 }
@@ -322,13 +326,13 @@ body {
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.3rem;
-        font-size: 0.75rem;
+        font-size: 0.875rem;
         white-space: nowrap;
         overflow: hidden;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
         padding: 4px 8px !important; /* Reduce padding on mode labels */
-        font-size: 0.7rem !important;
+        font-size: 0.875rem !important;
     }
     #whiteboard-toolbar .toolbar-left,
     #whiteboard-toolbar .toolbar-right {
@@ -338,7 +342,7 @@ body {
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
         padding: 4px 6px;
-        font-size: 0.7rem;
+        font-size: 0.875rem;
         min-width: 50px;
         white-space: nowrap;
     }
@@ -353,14 +357,14 @@ body {
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
         min-width: 45px;
-        font-size: 0.65rem;
+        font-size: 0.875rem;
         padding: 3px 5px;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.2rem;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
-        font-size: 0.65rem !important;
+        font-size: 0.875rem !important;
         padding: 3px 6px !important;
     }
     #whiteboard-toolbar .toolbar-left,
@@ -387,14 +391,14 @@ body {
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
         min-width: 40px;
-        font-size: 0.6rem;
+        font-size: 0.875rem;
         padding: 2px 4px;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.15rem;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
-        font-size: 0.6rem !important;
+        font-size: 0.875rem !important;
         padding: 2px 4px !important;
     }
     #whiteboard-toolbar .toolbar-left,
@@ -505,6 +509,8 @@ body {
 #whiteboard-wrapper {
     position: relative;
     overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: none;
 }
 
 #whiteboard-canvas-background,
@@ -513,6 +519,13 @@ body {
     position: absolute;
     top: 0;
     left: 0;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* Hardware acceleration for better mobile performance */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 /* Draw config morphing animation */
@@ -892,7 +905,7 @@ body {
 
 @media (max-width: 480px) {
     #home-toolbar-logo {
-        font-size: 1.1rem !important;
+        font-size: 1.25rem !important;
     }
     #home-toolbar > div:last-child {
         gap: 0.25rem !important;
@@ -904,7 +917,7 @@ body {
     #home-toolbar-clear-btn {
         min-height: 2.25rem !important;
         padding: 0.4rem 0.6rem !important;
-        font-size: 0.75rem !important;
+        font-size: 0.875rem !important;
     }
 }
 
@@ -1333,15 +1346,32 @@ body #whiteboard-statbotics-container {
         ) {
         min-height: 5rem !important;
         padding: 0.75rem 0.5rem !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 0.5rem !important;
     }
 
-    /* Make team numbers more readable on mobile */
+    /* Make name take more space on mobile */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
         )
         > div:first-child {
         font-size: 1rem !important;
+        flex: 1 1 120px !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+
+    /* Make team numbers section narrower on mobile */
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:nth-child(2) {
+        width: auto !important;
+        flex: 0 0 auto !important;
+        max-width: 200px !important;
     }
 
     /* Better spacing for VS display */
@@ -1359,7 +1389,16 @@ body #whiteboard-statbotics-container {
         )
         > div:nth-child(2)
         > div {
-        font-size: 0.9rem !important;
+        font-size: 0.875rem !important;
+    }
+
+    /* Action buttons container */
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:last-child {
+        flex: 0 0 auto !important;
     }
 
     /* Larger touch target for kebab menu */
@@ -1373,7 +1412,7 @@ body #whiteboard-statbotics-container {
         min-height: 2.5rem !important;
     }
 
-    /* Better action button sizing */
+    /* Better action button sizing - override template font sizes */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1382,8 +1421,10 @@ body #whiteboard-statbotics-container {
         > div
         > button {
         min-height: 2rem !important;
-        padding: 0.4rem 0.6rem !important;
-        font-size: 0.75rem !important;
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.875rem !important;
+        width: auto !important;
+        min-width: 60px !important;
     }
 }
 
@@ -1399,6 +1440,7 @@ body #whiteboard-statbotics-container {
         ) {
         min-height: 4.5rem !important;
         padding: 0.6rem 0.4rem !important;
+        gap: 0.35rem !important;
     }
 
     #home-match-list
@@ -1406,7 +1448,16 @@ body #whiteboard-statbotics-container {
             #home-match-list-item-template
         )
         > div:first-child {
-        font-size: 0.9rem !important;
+        font-size: 0.875rem !important;
+        flex: 1 1 100px !important;
+    }
+
+    #home-match-list
+        > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:nth-child(2) {
+        max-width: 180px !important;
     }
 
     #home-match-list
@@ -1415,7 +1466,7 @@ body #whiteboard-statbotics-container {
         )
         > div:nth-child(2)
         > div {
-        font-size: 0.8rem !important;
+        font-size: 0.75rem !important;
     }
 
     #home-match-list
@@ -1426,9 +1477,9 @@ body #whiteboard-statbotics-container {
         > div
         > button {
         min-height: 1.75rem !important;
-        padding: 0.3rem 0.5rem !important;
-        font-size: 0.7rem !important;
-        min-width: 4.5rem !important;
+        padding: 0.25rem 0.4rem !important;
+        font-size: 0.875rem !important;
+        min-width: 58px !important;
     }
 }
 
@@ -1455,6 +1506,10 @@ a,
     /* Ensure minimum touch target size */
     min-height: 44px;
     min-width: 44px;
+    /* Improve performance on mobile */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 /* Improve touch scrolling on mobile */
