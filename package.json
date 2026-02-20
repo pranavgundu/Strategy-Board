@@ -136,7 +136,7 @@
     "es-abstract": "^1.24.1",
     "firebase": "^12.9.0",
     "idb-keyval": "^6.2.2",
-    "jspdf": "^4.1.0",
+    "jspdf": "^4.2.0",
     "marked": "^17.0.2",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
