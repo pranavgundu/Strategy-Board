@@ -76,7 +76,6 @@ export class ContributorsService {
 
       const contributorsData = await contributorsResponse.json();
 
-      // Filter out dependabot
       const filteredContributors = contributorsData.filter(
         (contributor: any) =>
           contributor.login.toLowerCase() !== "dependabot[bot]" &&

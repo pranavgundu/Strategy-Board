@@ -206,10 +206,8 @@ export function updateCanvasSize() {
   const ratioWidth = fillWidth / background.width;
   const ratioHeight = fillHeight / background.height;
 
-  // Apply zoom factor to add padding (0.95 = 5% padding on each side)
   const baseScale = Math.min(ratioWidth, ratioHeight) * 0.95;
   const fieldYear = getYearFromFieldImage(currentFieldImageUrl);
-  // Apply tiny zoom-out for 2026 (0.98 ≈ 2% zoom out)
   const yearZoomFactor = fieldYear === 2026 ? 1 : 1;
   scaling = baseScale * yearZoomFactor;
 
@@ -219,9 +217,6 @@ export function updateCanvasSize() {
   const leftOffset = (fillWidth - scaledWidth) / 2;
   const topOffset = (fillHeight - scaledHeight) / 2;
 
-  // Visible offset in CSS pixels for the 2026 field (negative moves image up).
-  // This adjusts the canvas positioning (not the internal image drawing) so we don't clip
-  // the image inside the canvas when shifting vertically.
   const visibleOffsetPx = fieldYear === 2026 ? -30 : 0;
   const minTop = 0;
   const maxTop = Math.max(0, fillHeight - scaledHeight);
@@ -323,7 +318,6 @@ export class Whiteboard {
   constructor(model: Model) {
     this.model = model;
 
-    // Initially load the latest field image
     this.loadFieldImage();
 
     fieldImage.onload = () => this.drawBackground();
@@ -398,7 +392,6 @@ export class Whiteboard {
             .getElementById("whiteboard-color-config")
             ?.classList.add("hidden");
         } else if (this.currentTool == "eraser") {
-          // Only show checkbox tool in notes mode, otherwise cycle back to marker
           if (this.mode === "notes") {
             this.currentTool = "checkbox";
             document
@@ -877,7 +870,6 @@ export class Whiteboard {
       this.lastSelected = null;
       this.selected = null;
 
-      // Clear history arrays
       this.autoActionHistory = [];
       this.teleopActionHistory = [];
       this.endgameActionHistory = [];
@@ -902,7 +894,6 @@ export class Whiteboard {
    */
   public setMatch(match: Match) {
     this.match = match;
-    // Prefer an explicit selected field year (if the match included one) otherwise use the TBA year
     const selectedYear =
       (match as any).fieldMetadata?.selectedFieldYear ?? match.tbaYear;
     this.loadFieldImage(selectedYear);
@@ -955,7 +946,7 @@ export class Whiteboard {
       history.push(action);
 
       if (history.length > Whiteboard.MAX_HISTORY_SIZE) {
-        history.shift(); // Remove oldest action
+        history.shift();
       }
     }
 
@@ -1009,7 +1000,6 @@ export class Whiteboard {
     const undoHistory = this.getCurrentUndoHistory();
     const redoHistory = this.getCurrentRedoHistory();
 
-    // Update undo button
     const undoBtn = document.getElementById("whiteboard-toolbar-undo");
     if (undoBtn) {
       if (undoHistory.length > 0) {
@@ -1021,7 +1011,6 @@ export class Whiteboard {
       }
     }
 
-    // Update redo button
     const redoBtn = document.getElementById("whiteboard-toolbar-redo");
     if (redoBtn) {
       if (redoHistory.length > 0) {
@@ -1065,7 +1054,6 @@ export class Whiteboard {
 
     const action = history.pop();
 
-    // Add to redo history
     const redoHistory = this.getCurrentRedoHistory();
     redoHistory.push(action);
 
@@ -1135,7 +1123,6 @@ export class Whiteboard {
         this.redrawDrawing();
       }
     } else if (action.type === "checkbox-erase") {
-      // Undo erasing a checkbox - restore it at the original index
       const data = this.getData();
       if (data !== null && action.ref) {
         data.checkboxes.splice(action.index, 0, action.ref);
@@ -1155,7 +1142,6 @@ export class Whiteboard {
 
     const action = redoHistory.pop();
 
-    // Add back to undo history
     const undoHistory = this.getCurrentUndoHistory();
     undoHistory.push(action);
 
@@ -1178,8 +1164,6 @@ export class Whiteboard {
     } else if (action.type == "erase") {
       const data = this.getData();
       if (data !== null) {
-        // Re-apply the erase by removing the strokes at the stored indexes
-        // Sort indexes in descending order to avoid index shifting issues
         const sortedIndexes = [...action.indexes].sort((a, b) => b - a);
         for (const idx of sortedIndexes) {
           if (idx < data.drawing.length) {
@@ -1208,7 +1192,6 @@ export class Whiteboard {
         this.redrawDrawing();
       }
     } else if (action.type === "checkbox-erase") {
-      // Redo erasing a checkbox - remove it again
       const data = this.getData();
       if (data !== null && action.index !== undefined) {
         data.checkboxes.splice(action.index, 1);
@@ -1270,8 +1253,6 @@ export class Whiteboard {
     BG.fillRect(0, 0, width, height);
     BG.translate(width / 2 - this.camera.x, height / 2 - this.camera.y);
     const fieldYear = getYearFromFieldImage(currentFieldImageUrl);
-    // Draw the field image scaled to the canvas size so it fills the full drawing area.
-    // This ensures the entire image is rendered into the canvas regardless of the image's intrinsic dimensions.
     BG.drawImage(fieldImage, 0, 0, width, height);
 
     BG.restore();
@@ -1300,11 +1281,9 @@ export class Whiteboard {
       const effectiveMarginX = margin;
       const effectiveMarginY = margin;
 
-      // For 2026: push labels outward horizontally: blue side -> left, red side -> right
       const outwardPx = fieldYear === 2026 ? 75 : 0;
       const sideShift = stationX < width / 2 ? -outwardPx : outwardPx;
 
-      // Expand horizontal clamp bounds by outwardPx so labels can be positioned outside the image area
       const cx = clamp(
         px + sideShift,
         effectiveMarginX - outwardPx,
@@ -1319,7 +1298,6 @@ export class Whiteboard {
       BG.restore();
     };
 
-    // Only draw station labels for the focused side (or both when in 'full' view)
     if (this.currentView === "full" || this.currentView === "red") {
       drawStation(
         Config.redOneStationX,
@@ -1641,7 +1619,6 @@ export class Whiteboard {
       ?.classList.remove("text-zinc-300");
     this.mode = mode;
 
-    // Show/hide appropriate containers based on mode
     const whiteboardWrapper = document.getElementById("whiteboard-wrapper");
     const statboticsContainer = document.getElementById(
       "whiteboard-statbotics-container",
@@ -1692,12 +1669,10 @@ export class Whiteboard {
     }
 
     if (mode !== "statbotics") {
-      // Update canvas size when switching from statbotics to ensure proper rendering
       requestAnimationFrame(() => {
         updateCanvasSize();
         this.redrawAll();
       });
-      // Update undo/redo buttons for the new mode
       this.updateUndoRedoButtons();
     }
   }
@@ -1802,7 +1777,6 @@ export class Whiteboard {
   }
 
   private onPointerMove(e: PointerEvent) {
-    // Performance: Use cached rect if available, otherwise get fresh one
     const rect = this.cachedDrawingRect || drawing.getBoundingClientRect();
     const x =
       Math.round(e.clientX / scaling - rect.left / scaling) -
@@ -1813,8 +1787,6 @@ export class Whiteboard {
     clickMovement += Math.abs(x) + Math.abs(y);
     if (this.selected == null && this.isPointerDown) {
       if (this.currentTool == "marker") {
-        // Performance: Reduce distance threshold from 10px to 2px for better tracking
-        // This captures more points during fast movements
         if (
           Math.hypot(
             x -
@@ -1865,11 +1837,10 @@ export class Whiteboard {
             const stroke = data.drawing[i];
             let shouldErase = false;
 
-            // Handle single-point strokes (dots) - length is 2: [color, point]
             if (stroke.length === 2) {
               const dotX = stroke[1][0];
               const dotY = stroke[1][1];
-              const dotRadius = 5; // Match the dot radius from drawing code
+              const dotRadius = 5;
 
               const distToEraser = distanceFromPointToSegment(
                 dotX,
@@ -1912,14 +1883,12 @@ export class Whiteboard {
           }
         }
 
-        // Erase checkboxes
         if (data.checkboxes && data.checkboxes.length > 0) {
           const boxSize = 200;
           for (let i = data.checkboxes.length - 1; i >= 0; i--) {
             const cb = data.checkboxes[i];
             const cbX = cb[0];
             const cbY = cb[1];
-            // Check if eraser line passes through or near the checkbox
             const distToCheckbox = distanceFromPointToSegment(
               cbX,
               cbY,
@@ -1995,7 +1964,6 @@ export class Whiteboard {
   private onPointerDown(e: PointerEvent) {
     this.isPointerDown = true;
 
-    // Performance: Cache bounding rect and enable pointer capture for better tracking
     this.cachedDrawingRect = drawing.getBoundingClientRect();
     drawing.setPointerCapture(e.pointerId);
 
@@ -2066,7 +2034,6 @@ export class Whiteboard {
       } else if (this.currentTool == "checkbox") {
         const data = this.getData();
         if (data !== null) {
-          // Check if clicking on an existing checkbox to toggle it
           const boxSize = 120;
           const clickedCheckboxIndex = data.checkboxes.findIndex((cb: any) => {
             const cbX = cb[0];
@@ -2078,7 +2045,6 @@ export class Whiteboard {
           });
 
           if (clickedCheckboxIndex !== -1) {
-            // Toggle existing checkbox
             const prevChecked = data.checkboxes[clickedCheckboxIndex][3];
             data.checkboxes[clickedCheckboxIndex][3] = !prevChecked;
             this.addUndoHistory({
@@ -2088,7 +2054,6 @@ export class Whiteboard {
               newChecked: !prevChecked,
             });
           } else {
-            // Create new checkbox (unchecked by default)
             data.checkboxes.push([x, y, this.currentColor, false]);
             this.addUndoHistory({
               type: "checkbox",
@@ -2177,7 +2142,7 @@ export class Whiteboard {
         DR.arc(
           point[0] - (this.camera.x - width / 2),
           point[1] - (this.camera.y - height / 2),
-          5, // radius of the dot (half of line width which is 10)
+          5,
           0,
           2 * Math.PI,
         );
@@ -2291,7 +2256,6 @@ function isSegmentsIntersecting(
     return true;
   }
 
-  // If tolerance is specified, check distance to line segments even if they don't intersect
   if (tolerance > 0) {
     return (
       distanceFromPointToSegment(ax1, ay1, bx1, by1, bx2, by2) <= tolerance ||
@@ -2348,7 +2312,6 @@ function getBBox(stroke: any): [number, number, number, number] {
     }
   }
 
-  // For single-point strokes (dots), add margin for the dot radius
   if (stroke.length === 2) {
     const dotRadius = 5;
     minx -= dotRadius;

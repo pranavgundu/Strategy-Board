@@ -1,8 +1,3 @@
-/**
- * Fuzzy search utility with scoring algorithm for better search results.
- * Inspired by algorithms used in tools like fzf, VS Code, and Sublime Text.
- */
-
 export interface FuzzyMatch {
   item: HTMLElement;
   score: number;
@@ -197,7 +192,6 @@ export function fuzzySearchItems(
   const matches: FuzzyMatch[] = [];
 
   for (const item of items) {
-    // Try matching against name, details, and key
     const nameMatch = fuzzyMatch(
       lowerSearch,
       item.name.toLowerCase(),
