@@ -117,9 +117,6 @@ export async function ENTRIES(
   }
 }
 
-/**
- * Interface for cached Statbotics data with timestamp.
- */
 interface CachedStatboticsData {
   data: any;
   timestamp: number;

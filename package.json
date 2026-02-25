@@ -126,6 +126,12 @@
     "wait-on": "^9.0.4",
     "workbox-window": "^7.4.0"
   },
+  "pnpm": {
+    "overrides": {
+      "tar": ">=7.5.8",
+      "minimatch": ">=10.2.1"
+    }
+  },
   "dependencies": {
     "@capacitor/android": "^8.1.0",
     "@capacitor/core": "^8.1.0",
