@@ -366,7 +366,6 @@ export class Match {
       packet[10],
       packet[11],
     );
-    // Optional field metadata lives at the next index (if present)
     if (packet.length > 12 && packet[12]) {
       m.fieldMetadata = packet[12];
     }
@@ -577,7 +576,6 @@ export class Match {
       this.tbaEventKey,
       this.tbaMatchKey,
       this.tbaYear,
-      // Optional final element for field metadata (kept for backwards compatibility)
       this.fieldMetadata || null,
     ];
   }

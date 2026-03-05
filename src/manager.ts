@@ -1,11 +1,3 @@
-/**
- * Field Manager - Dynamically manages field images based on year
- *
- * This module handles the selection of field images based on the match year:
- * - For new matches (no year specified), uses the latest available field
- * - For TBA/historical matches, uses the field from that specific year
- */
-
 import field2025 from "./images/2025.png";
 import field2026 from "./images/2026.png";
 
@@ -30,19 +22,11 @@ interface YearConfig {
   [year: number]: RobotPositions;
 }
 
-/**
- * Map of available field images by year
- * Add new years here as new field images are added to the images directory
- */
 const FIELD_IMAGES: FieldImageMap = {
   2025: field2025,
   2026: field2026,
 };
 
-/**
- * Default robot starting positions for each year
- * Customize these based on each year's game starting positions
- */
 const YEAR_ROBOT_POSITIONS: YearConfig = {
   2025: {
     red: {
@@ -70,9 +54,6 @@ const YEAR_ROBOT_POSITIONS: YearConfig = {
   },
 };
 
-/**
- * Fallback default positions if year not found
- */
 const FALLBACK_POSITIONS: RobotPositions = {
   red: {
     one: { x: 2055, y: 455 },

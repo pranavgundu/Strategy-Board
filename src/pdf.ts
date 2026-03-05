@@ -79,7 +79,6 @@ export class PDFExport {
           align: "center",
         });
 
-        // codeIndex tracked via loop variable i
       }
 
       const filename = `${matchName.replace(/[^a-z0-9]/gi, "_")}_QRCodes.pdf`;

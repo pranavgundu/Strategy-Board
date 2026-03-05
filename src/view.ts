@@ -1224,7 +1224,6 @@ export class View {
 
     this.setupEPAModalHandlers();
 
-    // Clear any existing handler setup flags
     const allCards = document.querySelectorAll("[data-team-index]");
     allCards.forEach((card) => {
       const element = card as HTMLElement;
@@ -1232,7 +1231,6 @@ export class View {
     });
 
     try {
-      // Prepare team data
       const redTeams = [
         parseInt(match.redThree),
         parseInt(match.redTwo),
@@ -1245,13 +1243,11 @@ export class View {
         parseInt(match.blueThree),
       ].filter((t) => !isNaN(t));
 
-      // Try to load from cache first
       let matchData = await GET_CACHED_STATBOTICS(match.tbaMatchKey);
 
       if (matchData) {
         console.log(`[Statbotics] Using cached data for ${match.tbaMatchKey}`);
       } else {
-        // Cache miss - fetch from API
         console.log(
           `[Statbotics] Cache miss for ${match.tbaMatchKey}, fetching from API...`,
         );
@@ -1262,7 +1258,6 @@ export class View {
           match.tbaYear,
         );
 
-        // Cache the fetched data
         await CACHE_STATBOTICS(match.tbaMatchKey, matchData);
         console.log(`[Statbotics] Cached data for ${match.tbaMatchKey}`);
       }
@@ -1313,7 +1308,6 @@ export class View {
         matchResult.textContent = resultText;
         matchResultContainer.classList.remove("hidden");
       } else if (matchResultContainer) {
-        // Hide the entire match result section if match hasn't been played
         matchResultContainer.classList.add("hidden");
       }
 
@@ -1357,7 +1351,6 @@ export class View {
         }
       });
 
-      // Setup click handlers for EPA cards
       this.setupEPACardClickHandlers(matchData.teamDetails, matchData.yearData);
     } catch (error) {
       console.error("Failed to load Statbotics data:", error);
@@ -1367,7 +1360,6 @@ export class View {
       dataContainer?.classList.add("hidden");
       emptyState?.classList.remove("hidden");
 
-      // Show full-page error message
       const emptyStateContent = emptyState;
       if (emptyStateContent) {
         if (error instanceof Error && error.message.includes("500")) {
@@ -1423,24 +1415,15 @@ export class View {
   ): string {
     if (!percentiles) return "text-zinc-300";
 
-    // Compare value against global year percentiles (like Statbotics does)
-    // Top 1% - Blue
     if (value >= percentiles.p99) {
       return "text-blue-400";
-    }
-    // Top 10% - Dark Green
-    else if (value >= percentiles.p90) {
+    } else if (value >= percentiles.p90) {
       return "text-green-500";
-    }
-    // Top 25% - Light Green
-    else if (value >= percentiles.p75) {
+    } else if (value >= percentiles.p75) {
       return "text-green-300";
-    }
-    // Bottom 25% - Red
-    else if (value < percentiles.p25) {
+    } else if (value < percentiles.p25) {
       return "text-red-400";
     }
-    // Middle 50% - No color/default
     return "text-zinc-300";
   }
 
@@ -1451,23 +1434,19 @@ export class View {
     const modal = document.getElementById("epa-details-modal");
     const closeBtn = document.getElementById("epa-modal-close");
 
-    // Check if handlers are already set up
     if (modal?.dataset.handlersSetup === "true") return;
     if (modal) modal.dataset.handlersSetup = "true";
 
-    // Close modal on button click
     closeBtn?.addEventListener("click", () => {
       modal?.classList.add("hidden");
     });
 
-    // Close modal on backdrop click
     modal?.addEventListener("click", (e) => {
       if (e.target === modal) {
         modal.classList.add("hidden");
       }
     });
 
-    // Close modal on Escape key
     const escapeHandler = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !modal?.classList.contains("hidden")) {
         modal.classList.add("hidden");
@@ -1494,7 +1473,6 @@ export class View {
 
       const element = card as HTMLElement;
 
-      // Check if we've already set up the handler
       if (element.dataset.handlerSetup === "true") return;
       element.dataset.handlerSetup = "true";
 
@@ -1522,7 +1500,6 @@ export class View {
     const modal = document.getElementById("epa-details-modal");
     if (!modal) return;
 
-    // Update modal content
     const teamEl = document.getElementById("epa-modal-team");
     const totalEl = document.getElementById("epa-modal-total");
     const autoEl = document.getElementById("epa-modal-auto");
@@ -1533,7 +1510,6 @@ export class View {
 
     if (teamEl) teamEl.textContent = teamData.team.toString();
 
-    // Apply color to each stat based on global year percentiles
     if (totalEl) {
       totalEl.textContent = teamData.totalEPA.toFixed(1);
       const totalColorClass = this.getEPAColorClass(
@@ -1577,7 +1553,6 @@ export class View {
       percentileEl.className = "text-zinc-300 font-bold";
     }
 
-    // Show modal
     modal.classList.remove("hidden");
   }
 
@@ -1638,8 +1613,6 @@ export class View {
 
     item.children[0].textContent = matchName;
 
-    // Helper function to create colored team number spans with glow effect for special teams
-    // Escape HTML special characters to prevent XSS
     const escapeHtml = (str: string): string => {
       return str
         .replace(/&/g, "&amp;")
@@ -1656,22 +1629,20 @@ export class View {
     ): string => {
       const safeTeamNumber = escapeHtml(teamNumber);
       if (animationType === "rainbow") {
-        // Create sequential rainbow glow animation for each digit (for contributor teams)
         const digits = safeTeamNumber.split("");
         const animatedDigits = digits
           .map((digit, index) => {
-            const delay = index * 0.3; // 0.3s delay between each digit
+            const delay = index * 0.3;
             return `<span class="rainbow-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
           })
           .join("");
         return `<span class="${baseColor}">${animatedDigits}</span>`;
       }
       if (animationType === "gold") {
-        // Create sequential gold glow animation for each digit (for 834)
         const digits = safeTeamNumber.split("");
         const animatedDigits = digits
           .map((digit, index) => {
-            const delay = index * 0.3; // 0.3s delay between each digit
+            const delay = index * 0.3;
             return `<span class="special-team-digit" style="animation-delay: ${delay}s;">${digit}</span>`;
           })
           .join("");
@@ -1689,7 +1660,6 @@ export class View {
       return "none";
     };
 
-    // Build HTML for red alliance with individual team colors
     const redAllianceElement = item.children[1].children[0] as HTMLElement;
     const redTeamsHTML = [redThree, redTwo, redOne]
       .map((team) =>
@@ -1698,7 +1668,6 @@ export class View {
       .join(" ");
     redAllianceElement.innerHTML = redTeamsHTML;
 
-    // Build HTML for blue alliance with individual team colors
     const blueAllianceElement = item.children[1].children[2] as HTMLElement;
     const blueTeamsHTML = [blueOne, blueTwo, blueThree]
       .map((team) =>
@@ -1739,29 +1708,22 @@ export class View {
       this.deleteMatch(item.id);
     });
 
-    // Export QR - directly start QR code animation
     exportQROption.addEventListener("click", (e) => {
       e.stopPropagation();
       const match = this.model.getMatch(id);
       if (match) {
-        // Hide the options menu first
         this.hide(options);
         this.show(kebab);
 
-        // Then show the export overlay
         this.show(E.Export);
         setTimeout(() => {
           try {
             this.currentExportMatch = match;
-            // Attach selected field year so importers can pick the correct field
             this.currentExportMatch.fieldMetadata = {
               selectedFieldYear: this.whiteboard.getCurrentFieldYear() ?? null,
             };
 
-            // Prepare QR export - let user click Start button manually
-            this.qrexport.export(this.currentExportMatch, () => {
-              // QR export ready
-            });
+            this.qrexport.export(this.currentExportMatch, () => {});
           } catch (err) {
             console.error("View: failed to start QR export:", err);
             alert("Failed to start QR export. See console for details.");
@@ -1774,7 +1736,6 @@ export class View {
       }
     });
 
-    // Export PNG - directly export to PNG
     exportPNGOption.addEventListener("click", (e) => {
       e.stopPropagation();
       const match = this.model.getMatch(id);
@@ -1782,7 +1743,6 @@ export class View {
         try {
           this.currentExportMatch = match;
           this.onClickExportPNG();
-          // Note: currentExportMatch is cleared after the async export completes in onClickExportPNG
         } catch (err) {
           console.error("View: failed to export PNG:", err);
           alert("Failed to export PNG. See console for details.");
@@ -1794,7 +1754,6 @@ export class View {
       this.show(kebab);
     });
 
-    // Share - generate Firebase link and copy to clipboard
     exportPDFOption.addEventListener("click", async (e) => {
       e.stopPropagation();
       const match = this.model.getMatch(id);
@@ -1896,10 +1855,8 @@ export class View {
     blueTwo = blueTwo || "---";
     blueThree = blueThree || "---";
 
-    // Update match name
     item.children[0].textContent = matchName;
 
-    // Helper function to escape HTML special characters to prevent XSS
     const escapeHtml = (str: string): string => {
       return str
         .replace(/&/g, "&amp;")
@@ -1946,7 +1903,6 @@ export class View {
       return "none";
     };
 
-    // Update red alliance team numbers
     const redTeamsElement = item.children[1].children[0] as HTMLElement;
     const redTeamsHTML = [redThree, redTwo, redOne]
       .map((team) =>
@@ -1955,7 +1911,6 @@ export class View {
       .join(" ");
     redTeamsElement.innerHTML = redTeamsHTML;
 
-    // Update blue alliance team numbers
     const blueTeamsElement = item.children[1].children[2] as HTMLElement;
     const blueTeamsHTML = [blueOne, blueTwo, blueThree]
       .map((team) =>
@@ -2033,7 +1988,6 @@ export class View {
    * @returns A promise that resolves when the match is created
    */
   private async onClickCreateMatch(_e: Event): Promise<void> {
-    // Validate team numbers (if provided, must be 1-5 digits)
     const teamNumbers = [
       I.RedOne.value,
       I.RedTwo.value,
@@ -2071,7 +2025,6 @@ export class View {
     );
     this.hide(E.CreateMatchPanel);
 
-    // Clear all input fields
     I.MatchName.value = "";
     I.RedOne.value = "";
     I.RedTwo.value = "";
@@ -2092,7 +2045,6 @@ export class View {
 
     this.currentEditMatchId = id;
 
-    // Populate the edit form with current values
     I.EditMatchName.value = match.matchName;
     I.EditRedOne.value = match.redOne;
     I.EditRedTwo.value = match.redTwo;
@@ -2113,7 +2065,6 @@ export class View {
   private async onClickSaveEditMatch(_e: Event): Promise<void> {
     if (!this.currentEditMatchId) return;
 
-    // Validate team numbers (if provided, must be 1-5 digits)
     const teamNumbers = [
       I.EditRedOne.value,
       I.EditRedTwo.value,
@@ -2133,7 +2084,6 @@ export class View {
     const match = this.model.getMatch(this.currentEditMatchId);
     if (!match) return;
 
-    // Update the match with new values
     match.updateInfo(
       I.EditMatchName.value,
       I.EditRedOne.value,
@@ -2144,10 +2094,8 @@ export class View {
       I.EditBlueThree.value,
     );
 
-    // Persist the changes
     await this.model.updateMatch(this.currentEditMatchId);
 
-    // Update the UI
     this.updateMatchListItem(
       this.currentEditMatchId,
       match.matchName,
@@ -2159,7 +2107,6 @@ export class View {
       match.blueThree,
     );
 
-    // Clear and hide the edit dialog
     this.currentEditMatchId = null;
     this.hide(E.EditMatchPanel);
   }
@@ -2185,20 +2132,15 @@ export class View {
     }
 
     try {
-      // Set the match on the whiteboard so it knows what to draw
       this.whiteboard.setMatch(this.currentExportMatch);
 
-      // Force a complete redraw of all canvases before export to ensure they're rendered
       this.whiteboard.forceRedraw();
 
-      // Small delay to ensure rendering completes
       setTimeout(() => {
         try {
-          // Call the global exportPNG function defined in index.html
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
           const filename = `strategy-board-${this.currentExportMatch?.matchName ?? "unknown"}-${timestamp}.png`;
 
-          // Access the global exportPNG function
           const win = window as any;
           if (typeof win.exportPNG === "function") {
             win.exportPNG(filename);
@@ -2232,13 +2174,11 @@ export class View {
     }
 
     try {
-      // Lazy-load PDF export module only when needed (saves 380KB on initial load)
       if (!this.pdfExport) {
         const { PDFExport } = await import("./pdf.ts");
         this.pdfExport = new PDFExport();
       }
 
-      // Attach the currently-selected field for export so imports load the correct field year
       this.currentExportMatch.fieldMetadata = {
         selectedFieldYear: this.whiteboard.getCurrentFieldYear() ?? null,
       };
@@ -2556,10 +2496,8 @@ export class View {
 
     try {
       const currentYear = new Date().getFullYear();
-      // Only fetch 2025 and beyond
       const startYear = Math.max(2025, currentYear);
       const yearsToFetch = [startYear];
-      // If current year is after 2025, also fetch previous years back to 2025
       if (currentYear > 2025) {
         for (let year = currentYear - 1; year >= 2025; year--) {
           yearsToFetch.push(year);
@@ -2685,7 +2623,6 @@ export class View {
   }
 
   private setupTBADropdownListeners(): void {
-    // Save API key when user enters it (on blur or change)
     if (I?.TBAApiKey) {
       const saveApiKey = async () => {
         const apiKey = I.TBAApiKey!.value.trim();
@@ -2703,20 +2640,17 @@ export class View {
     }
 
     if (I?.TBAEventSearch) {
-      // Debounce search to prevent lag on rapid typing
       const debouncedEventSearch = debounce((searchTerm: string) => {
         this.filterTBAEvents(searchTerm);
-      }, 200); // 200ms debounce - feels instant but reduces calls by 80%
+      }, 200);
 
       I.TBAEventSearch.addEventListener("input", (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
         debouncedEventSearch(searchTerm);
 
-        // Show dropdown when user types, hide when empty
         if (searchTerm.length > 0) {
           this.show(E.TBAEventDropdown);
         } else {
-          // Show all events in original sorted order when cleared
           this.filterTBAEvents("");
           if (E?.TBAEventList?.children.length) {
             this.show(E.TBAEventDropdown);
@@ -2725,7 +2659,6 @@ export class View {
       });
 
       I.TBAEventSearch.addEventListener("focus", () => {
-        // Show all events in sorted order when focused
         const currentValue = I.TBAEventSearch?.value || "";
         if (currentValue.length === 0) {
           this.filterTBAEvents("");
@@ -2737,33 +2670,28 @@ export class View {
     }
 
     if (I?.TBATeamSearch) {
-      // Debounce search to prevent lag on rapid typing
       const debouncedTeamSearch = debounce(async (searchTerm: string) => {
-        // If team search has content and no event is selected, filter events by team
         if (
           searchTerm.length > 0 &&
           (!I?.TBAEventKey || !I.TBAEventKey.value)
         ) {
           await this.filterEventsByTeam(searchTerm);
         } else {
-          // Otherwise, filter teams normally
           this.filterTBATeams(searchTerm);
         }
-      }, 200); // 200ms debounce
+      }, 200);
 
       I.TBATeamSearch.addEventListener("input", (e) => {
         const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
         debouncedTeamSearch(searchTerm);
 
         if (searchTerm.length > 0) {
-          // Show team dropdown if event is selected, otherwise show event dropdown
           if (I?.TBAEventKey && I.TBAEventKey.value) {
             this.show(E.TBATeamDropdown);
           } else {
             this.show(E.TBAEventDropdown);
           }
         } else {
-          // Show all teams in original sorted order when cleared
           this.filterTBATeams("");
           if (
             I?.TBAEventKey &&
@@ -2778,7 +2706,6 @@ export class View {
       });
 
       I.TBATeamSearch.addEventListener("focus", () => {
-        // Show all teams in sorted order when focused
         const currentValue = I.TBATeamSearch?.value || "";
         if (currentValue.length === 0) {
           this.filterTBATeams("");
@@ -2811,7 +2738,6 @@ export class View {
 
     const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
 
-    // If no search term, show all items in original sorted order (by date)
     if (!searchTerm || searchTerm.trim() === "") {
       items.forEach((item) => {
         (item as HTMLElement).style.display = "";
@@ -2819,23 +2745,17 @@ export class View {
       return;
     }
 
-    // Extract searchable items from the dropdown
     const searchableItems = extractEventItems(E.TBAEventList);
 
-    // Perform fuzzy search with ranking
     const matches = fuzzySearchItems(searchableItems, searchTerm, 5);
 
-    // Hide all items first
     items.forEach((item) => {
       (item as HTMLElement).style.display = "none";
     });
 
-    // Show and reorder matched items by score
     if (matches.length > 0) {
-      // Reorder DOM elements based on match score
       matches.forEach((match) => {
         match.item.style.display = "";
-        // Move to end of list (maintains score order since we process in order)
         E.TBAEventList!.appendChild(match.item);
       });
     }
@@ -2846,7 +2766,6 @@ export class View {
 
     const items = E.TBATeamList.querySelectorAll(".tba-team-item");
 
-    // If no search term, show all items in original sorted order (by team number)
     if (!searchTerm || searchTerm.trim() === "") {
       items.forEach((item) => {
         (item as HTMLElement).style.display = "";
@@ -2854,23 +2773,17 @@ export class View {
       return;
     }
 
-    // Extract searchable items from the dropdown
     const searchableItems = extractTeamItems(E.TBATeamList);
 
-    // Perform fuzzy search with ranking
     const matches = fuzzySearchItems(searchableItems, searchTerm, 5);
 
-    // Hide all items first
     items.forEach((item) => {
       (item as HTMLElement).style.display = "none";
     });
 
-    // Show and reorder matched items by score
     if (matches.length > 0) {
-      // Reorder DOM elements based on match score
       matches.forEach((match) => {
         match.item.style.display = "";
-        // Move to end of list (maintains score order since we process in order)
         E.TBATeamList!.appendChild(match.item);
       });
     }
@@ -2879,7 +2792,6 @@ export class View {
   private async filterEventsByTeam(searchTerm: string): Promise<void> {
     if (!E?.TBAEventList) return;
 
-    // Extract team number from search term (remove "team" prefix if present)
     const teamNumber = searchTerm.replace(/^team\s*/i, "").trim();
 
     if (!teamNumber || !this.tbaService.hasApiKey()) {
@@ -2890,11 +2802,9 @@ export class View {
     this.showTBAStatus("Searching for events with this team...", false);
 
     try {
-      // Fetch team's events (2025 and beyond only)
       const currentYear = new Date().getFullYear();
       const startYear = Math.max(2025, currentYear);
       const yearsToFetch = [startYear];
-      // If current year is after 2025, also fetch previous years back to 2025
       if (currentYear > 2025) {
         for (let year = currentYear - 1; year >= 2025; year--) {
           yearsToFetch.push(year);
@@ -2910,7 +2820,6 @@ export class View {
         allTeamEventsArrays.flat().map((e) => e.key),
       );
 
-      // Filter the event list to show only events this team is attending
       const items = E.TBAEventList.querySelectorAll(".tba-dropdown-item");
       let visibleCount = 0;
 
@@ -2936,7 +2845,6 @@ export class View {
     } catch (error) {
       console.error("Failed to filter events by team:", error);
       this.showTBAStatus("Failed to search for team events", true);
-      // Fallback to regular event filtering
       this.filterTBAEvents(searchTerm);
     }
   }
@@ -3113,23 +3021,19 @@ export class View {
       return;
     }
 
-    // Show loading state
     E.ContributorsLoading.classList.remove("hidden");
     E.ContributorsError.classList.add("hidden");
     E.ContributorsList.classList.add("hidden");
 
     try {
-      // Fetch both contributors and teams
       const [contributors, teams] = await Promise.all([
         this.contributorsService.fetchContributors(),
         this.contributorsService.fetchTeams(),
       ]);
 
-      // Clear existing content
       E.ContributorsGrid.innerHTML = "";
       E.TeamsGrid.innerHTML = "";
 
-      // Populate contributors
       contributors.forEach((contributor) => {
         const contributorCard = document.createElement("a");
         contributorCard.href = contributor.html_url;
@@ -3159,7 +3063,6 @@ export class View {
           </div>
         `;
 
-        // Add hover effect for name color
         contributorCard.addEventListener("mouseenter", () => {
           const nameEl = contributorCard.querySelector(".contributor-name");
           if (nameEl) nameEl.classList.replace("text-white", "text-blue-400");
@@ -3172,7 +3075,6 @@ export class View {
         E.ContributorsGrid?.appendChild(contributorCard);
       });
 
-      // Populate teams with same styling as contributors
       teams.forEach((teamNumber) => {
         const teamCard = document.createElement("div");
         teamCard.className = `
@@ -3288,13 +3190,11 @@ export class View {
 
       if (!shareCode) return;
 
-      // Clean up URL without reloading
       const cleanUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
 
       console.log("Found share code in URL:", shareCode);
 
-      // Wait for DOM to be ready
       const waitForDOM = () => {
         return new Promise<void>((resolve) => {
           if (document.readyState === "loading") {
@@ -3309,7 +3209,6 @@ export class View {
 
       await waitForDOM();
 
-      // Show loading status
       this.show(E.LinkImportPanel);
       this.showLinkImportStatus("Loading shared match...", false);
 
@@ -3337,7 +3236,6 @@ export class View {
       setTimeout(() => {
         this.hide(E.LinkImportPanel);
         this.hide(E.LinkImportStatus);
-        // Open the imported match
         this.loadWhiteboard(match);
       }, 1000);
     } catch (error) {
@@ -3351,7 +3249,6 @@ export class View {
 
   private async onClickShare(match: Match): Promise<void> {
     try {
-      // Ensure the selected field year is included with the match before uploading
       match.fieldMetadata = {
         selectedFieldYear: this.whiteboard.getCurrentFieldYear() ?? null,
       };
@@ -3365,14 +3262,11 @@ export class View {
         E.ShareLinkDisplay.value = shareUrl;
       }
 
-      // Generate QR code for the share link
       try {
         const qrContainer = document.getElementById("share-qr-code");
         if (qrContainer) {
-          // Clear any existing QR code
           qrContainer.innerHTML = "";
 
-          // Dynamically import QRCode to generate the QR
           const QRCode = (await import("qrcode")) as any;
           const canvas = await new Promise<HTMLCanvasElement>(
             (resolve, reject) => {
@@ -3409,7 +3303,6 @@ export class View {
         }
       } catch (qrErr) {
         console.warn("Failed to generate QR code:", qrErr);
-        // QR generation failure is not critical, continue with share functionality
       }
 
       this.show(E.ShareSuccessPanel);
@@ -3462,12 +3355,10 @@ export class View {
         console.log(`Team number saved and sent to GA: ${teamNumber}`);
         popup?.classList.add("hidden");
       } else {
-        // Show validation error
         alert("Please enter a valid team number (up to 5 digits) to continue.");
       }
     });
 
-    // Allow Enter key to save
     I?.TeamNumber?.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         B?.TeamNumberSave?.click();
