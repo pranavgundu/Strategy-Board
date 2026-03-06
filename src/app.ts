@@ -84,6 +84,10 @@ async function initializeApp(): Promise<void> {
     } catch (err) {
       console.warn("Failed to dispatch app:initialized event:", err);
     }
+    // Warm up the field image cache in the background so the first whiteboard open is instant
+    import("./manager.ts").then(({ preloadFieldImages }) =>
+      preloadFieldImages(),
+    );
   } catch (error) {
     console.error("Failed to initialize application:", error);
 
