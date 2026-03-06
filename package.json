@@ -140,7 +140,8 @@
   "pnpm": {
     "overrides": {
       "tar": ">=7.5.8",
-      "minimatch": ">=10.2.1"
+      "minimatch": ">=10.2.1",
+      "serialize-javascript": ">=7.0.3"
     }
   },
   "dependencies": {
