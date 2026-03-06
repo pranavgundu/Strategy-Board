@@ -45,6 +45,7 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "favicon/icon-512.png",
+      "artifactName": "Strategy.Board-${version}-${arch}.${ext}",
       "target": [
         {
           "target": "dmg",
@@ -79,6 +80,15 @@
         }
       ]
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "favicon/favicon.ico",
+      "artifactName": "Strategy.Board.Setup.${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Strategy.Board.${version}.${ext}"
+    },
     "linux": {
       "icon": "favicon/icon-512.png",
       "category": "Utility",
@@ -97,10 +107,11 @@
         }
       ]
     },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "installerIcon": "favicon/favicon.ico"
+    "appImage": {
+      "artifactName": "Strategy.Board-${version}.${ext}"
+    },
+    "deb": {
+      "artifactName": "strategy-board_${version}_${arch}.${ext}"
     }
   },
   "devDependencies": {
