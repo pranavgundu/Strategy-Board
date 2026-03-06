@@ -57,55 +57,6 @@
                     console.log("APP-DEBUG:", msg);
                 }
 
-                // Instrument addEventListener to surface startup handler attachments.
-                // This runs early in the page lifecycle so it can capture when the View attaches
-                // event handlers to known elements during initialization.
-                (function () {
-                    const originalAdd = EventTarget.prototype.addEventListener;
-                    EventTarget.prototype.addEventListener = function (
-                        type,
-                        listener,
-                        options,
-                    ) {
-                        try {
-                            const el =
-                                this instanceof Element
-                                    ? this
-                                    : this && this.target
-                                      ? this.target
-                                      : null;
-                            const id = el && el.id ? el.id : null;
-                            const tracked = [
-                                "home-toolbar-new-btn",
-                                "home-toolbar-import-btn",
-                                "home-toolbar-clear-btn",
-                                "create-match-create-btn",
-                                "create-match-cancel-btn",
-                                "whiteboard-toolbar-back",
-                                "whiteboard-toolbar-view-toggle",
-                                "qr-export-container",
-                                "qr-import-container",
-                                "qr-import-inner-container",
-                            ];
-                            if (id && tracked.indexOf(id) !== -1) {
-                                try {
-                                    log(
-                                        `Attached handler: "${type}" on #${id}`,
-                                    );
-                                } catch (err) {
-                                    console.log(
-                                        "APP-DEBUG: Attached handler:",
-                                        type,
-                                        id,
-                                    );
-                                }
-                            }
-                        } catch (err) {
-                            console.warn("Instrumentation failed:", err);
-                        }
-                        return originalAdd.call(this, type, listener, options);
-                    };
-                })();
                 function setStatus(text) {
                     var s = qs("app-debug-status");
                     if (s) s.textContent = text;
@@ -239,12 +190,23 @@
             })();
         </script>
         <link
-            rel="stylesheet"
+            rel="preload"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+            as="style"
             integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
             crossorigin="anonymous"
             referrerpolicy="no-referrer"
+            onload="this.onload=null;this.rel='stylesheet'"
         />
+        <noscript>
+            <link
+                rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+                integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+                crossorigin="anonymous"
+                referrerpolicy="no-referrer"
+            />
+        </noscript>
     </head>
     <body class="overflow-hidden">
         <!-- Google Tag Manager (noscript) -->
