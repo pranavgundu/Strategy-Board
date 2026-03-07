@@ -1,5 +1,34 @@
 import { Model } from "./model.ts";
 import { registerSW } from "virtual:pwa-register";
+
+// Polyfill for CanvasRenderingContext2D.roundRect — not available in Safari < 16 (iOS 15 and earlier)
+if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D.prototype.roundRect) {
+  (CanvasRenderingContext2D.prototype as any).roundRect = function (
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radii?: number | number[],
+  ) {
+    let r = 0;
+    if (typeof radii === "number") {
+      r = radii;
+    } else if (Array.isArray(radii) && radii.length > 0) {
+      r = radii[0];
+    }
+    r = Math.min(r, Math.abs(width) / 2, Math.abs(height) / 2);
+    this.moveTo(x + r, y);
+    this.lineTo(x + width - r, y);
+    this.arcTo(x + width, y, x + width, y + r, r);
+    this.lineTo(x + width, y + height - r);
+    this.arcTo(x + width, y + height, x + width - r, y + height, r);
+    this.lineTo(x + r, y + height);
+    this.arcTo(x, y + height, x, y + height - r, r);
+    this.lineTo(x, y + r);
+    this.arcTo(x, y, x + r, y, r);
+    this.closePath();
+  };
+}
 import { inject } from "@vercel/analytics";
 import { injectSpeedInsights } from "@vercel/speed-insights";
 
