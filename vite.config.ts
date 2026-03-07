@@ -182,6 +182,15 @@ export default defineConfig({
       include: [/node_modules/],
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("firebase")) {
+            return "firebase";
+          }
+        },
+      },
+    },
   },
   optimizeDeps: {
     include: ["qrcode"],

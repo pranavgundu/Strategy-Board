@@ -1,142 +1,78 @@
-# Strategy Board
+# Strategy Board - Gemini Context
+
+This file provides essential context for Gemini CLI when working in this repository.
 
 ## Project Overview
 
-This is a digital strategy whiteboard for FIRST Robotics Competition (FRC) teams. It allows users to plan and visualize match strategies, including autonomous and tele-operated periods. The application is built as a cross-platform tool that can be accessed via a web browser, installed as a Progressive Web App (PWA), or run as a native desktop application on Windows, macOS, and Linux.
+**Strategy Board** is a digital strategy whiteboard specifically designed for FIRST Robotics Competition (FRC) teams. It allows users to plan and visualize match strategies (Auto, Teleop, Endgame) using virtual field images and robot representations.
 
 ### Key Features:
--   **Multi-Platform Support:** Web, PWA, and desktop versions for all major operating systems.
--   **Real-time Collaboration:** Share and import strategies via QR codes and links.
--   **FRC-Specific:** Tailored for FRC, with FRC field diagrams and robot representations.
--   **Data Integration:** Pulls data from The Blue Alliance (TBA) and Statbotics for match analysis.
--   **Offline First:** Uses IndexedDB to store data locally, allowing for offline use.
+- **Multi-Platform:** Ships as a Web app (PWA), Desktop app (Electron for Mac/Win/Linux), and Mobile app (Capacitor for iOS/Android).
+- **Real-time Collaboration:** Share matches via 6-character cloud codes or QR codes.
+- **Data Integration:** Pulls team and match data from **The Blue Alliance (TBA)** and analytics from **Statbotics**.
+- **Offline First:** Uses IndexedDB for local persistence, ensuring reliability at competitions.
 
-### Architecture:
-The application is a vanilla TypeScript app (no React/Vue) built with Vite and Tailwind CSS. It ships as a web app, PWA, Electron desktop app (Mac/Win/Linux), and Capacitor mobile app (iOS/Android).
+## Tech Stack
+- **Language:** Vanilla TypeScript (no frontend framework like React/Vue).
+- **Build Tool:** Vite.
+- **Styling:** Tailwind CSS.
+- **Persistence:** IndexedDB (via `idb-keyval`).
+- **Backend/Cloud:** Firebase Firestore (for sharing).
+- **Platforms:** Electron (Desktop), Capacitor (Mobile).
 
-#### Core Source Files (src/):
--   **app.ts** - Entry point; registers PWA service worker, initializes modules.
--   **model.ts** - Central state management for matches; persists to IndexedDB.
--   **whiteboard.ts** - Canvas rendering engine for field images, robots, and drawings.
--   **view.ts** - UI controller; handles all DOM manipulation and event binding.
--   **match.ts** - Match data model and serialization.
--   **db.ts** - IndexedDB wrapper using idb-keyval.
--   **cloud.ts** - Firebase/Firestore integration for cloud sharing.
--   **qr.ts** - QR code generation (export) and scanning (import).
--   **tba.ts** - The Blue Alliance API client.
--   **statbotics.ts** - Statbotics API client for team analytics.
--   **manager.ts** - Field image asset management.
--   **pdf.ts** - PDF export functionality.
+## Building and Running
 
-#### Key Patterns:
--   All UI is vanilla DOM manipulation in `view.ts` (3000+ lines).
--   Canvas rendering uses multiple layers (background, items, drawing).
--   Data flows: User action → `view.ts` → `model.ts` → `db.ts` (IndexedDB).
--   Cloud sync: `model.ts` ↔ `cloud.ts` ↔ Firebase Firestore.
+Always use `pnpm`.
 
-#### Configuration:
--   **vite.config.ts** - Vite + PWA + Tailwind plugins; path alias `@/` → `src/`.
--   **capacitor.config.ts** - App ID: `com.strategyboard.app`.
--   **electron/main.cjs** - Electron main process entry point.
+### Core Commands:
+- `pnpm dev`: Start the Vite development server.
+- `pnpm build`: Build the web application (runs `scripts/commit.ts`, `tsc`, and `vite build`).
+- `pnpm lint`: Run ESLint on `src/`.
+- `pnpm spell`: Run `cspell` for spell checking.
 
-### Important Considerations:
--   TypeScript strict mode is disabled (`strict: false` in `tsconfig.json`).
--   PWA service worker handles offline caching via Workbox.
--   Changes must work across all platforms (web, Electron, iOS, Android).
--   The largest files are `view.ts` and `whiteboard.ts` - consider breaking into modules for major features.
+### Desktop (Electron):
+- `pnpm electron:dev`: Run Electron in development mode.
+- `pnpm electron:build`: Build Electron for the current platform.
+- `pnpm electron:build:mac | :win | :linux`: Targeted builds.
 
-### Technologies Used:
--   **Frontend:** HTML, CSS, TypeScript
--   **Frameworks & Libraries:**
-    -   **Vite:** Build tool for the web application.
-    -   **Tailwind CSS:** Utility-first CSS framework for styling.
-    -   **Capacitor:** For building the native mobile (iOS and Android) versions.
-    -   **Electron:** For building the native desktop (Windows, macOS, Linux) versions.
--   **Database:** IndexedDB for local storage.
+### Mobile (Capacitor):
+- `pnpm cap:sync`: Build web assets and sync with native projects.
+- `pnpm cap:run:ios | :android`: Build and run on a connected device/emulator.
+- `pnpm cap:open:ios | :android`: Open the project in Xcode or Android Studio.
 
-## Environment Variables
+## Architecture & Modules
 
-The project requires the following environment variables to be set in a `.env` file:
+The application follows a custom MVC-like architecture focused on direct DOM manipulation and Canvas rendering.
 
--   `VITE_TBA_API_KEY`: The Blue Alliance API key.
--   `VITE_FIREBASE_API_KEY`: Firebase project API key.
+### Data Flow:
+`User Action → view.ts → model.ts → db.ts (IndexedDB)`
+`model.ts → whiteboard.ts (Canvas rendering)`
 
-
-### Development
-To run the application in development mode with hot-reloading, use the following command:
-
-```bash
-pnpm dev
-```
-
-### Building for Production
-To build the application for production, which includes generating the necessary files for the web, mobile, and desktop versions, use the following command:
-
-```bash
-pnpm build
-```
-
-### Running Tests
-There are no explicit test commands in `package.json`. However, the project uses `cspell` for spell checking. To run the spell checker, use the following command:
-
-```bash
-pnpm spell
-```
-
-### Mobile App (Capacitor)
-To sync the web build with the native mobile projects, run:
-
-```bash
-pnpm cap:sync
-```
-
-To open the native project in their respective IDEs, use:
-
-```bash
-# For iOS
-pnpm cap:open:ios
-
-# For Android
-pnpm cap:open:android
-```
-
-To run the app directly on a connected device or emulator, use:
-
-```bash
-# For iOS
-pnpm cap:run:ios
-
-# For Android
-pnpm cap:run:android
-```
-
-### Desktop App (Electron)
-To run the app in development mode with Electron, use:
-
-```bash
-pnpm electron:dev
-```
-
-To build the desktop app for different platforms, use the following commands:
-
-```bash
-# For macOS
-pnpm electron:build:mac
-
-# For Windows
-pnpm electron:build:win
-
-# For Linux
-pnpm electron:build:linux
-
-# For all platforms
-pnpm electron:build:all
-```
+### Core Modules (`src/`):
+- `app.ts`: Entry point; initializes the model, registers the PWA service worker, and parallelizes module imports.
+- `view.ts`: UI controller (~3200 lines); handles all DOM manipulation, event binding, and panel management.
+- `whiteboard.ts`: Canvas rendering engine (~2400 lines); manages three layers (background, items, drawing).
+- `model.ts`: Central state management; handles match data and IndexedDB persistence.
+- `match.ts`: Match data model and serialization logic.
+- `db.ts`: IndexedDB wrapper for local storage.
+- `cloud.ts`: Firebase integration for cloud sharing (lazy-loaded).
+- `tba.ts`: The Blue Alliance API client (lazy-loaded).
+- `statbotics.ts`: Statbotics API client for team analytics.
+- `manager.ts`: Asset management for field images.
 
 ## Development Conventions
 
--   **Package Manager:** The project uses `pnpm` for package management.
--   **Code Style:** The codebase is written in TypeScript and follows standard modern TypeScript conventions. There is a `.prettierrc` file, which suggests that Prettier is used for code formatting, although there is no explicit format script in `package.json`.
--   **Linting:** The project uses `cspell` for spell checking. There are no other explicit linting configurations, but it's likely that a linter is used during development.
--   **Modularity:** The code is organized into modules by feature, such as `model.ts`, `view.ts`, `whiteboard.ts`, etc. The `app.ts` file serves as the main entry point for the application logic.
--   **Data Flow:** The application follows a Model-View-Controller (MVC) like pattern, where the `Model` manages the application's data, the `View` handles the UI and user interactions, and the various services and utility modules provide additional functionality.
+1. **Vanilla TS & DOM:** Avoid adding external UI frameworks. Use direct DOM manipulation in `view.ts`.
+2. **Lazy Loading:** Heavy modules (`cloud.ts`, `tba.ts`, `pdf.ts`) must be dynamically imported at call sites to keep initial bundle size small.
+3. **Cross-Platform Compatibility:** Ensure all changes work across Web, Electron, iOS, and Android. Avoid Node-only or Browser-only APIs without appropriate guards.
+4. **Persistence:** Use the single `"appData"` key in IndexedDB for match storage. Statbotics data is cached under `"statbotics_<matchKey>"`.
+5. **Canvas Layers:** `whiteboard.ts` uses three overlapping `<canvas>` elements for optimized rendering (Background, Items, Drawing).
+6. **No Automated Tests:** Changes require manual verification on targeted platforms.
+
+## Environment Variables
+
+Create a `.env` file with:
+```env
+VITE_TBA_API_KEY=<Your TBA API Key>
+VITE_FIREBASE_API_KEY=<Your Firebase API Key>
+```
