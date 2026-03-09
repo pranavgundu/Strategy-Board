@@ -81,8 +81,8 @@ export class PDFExport {
 
       }
 
-      const filename = `${matchName.replace(/[^a-z0-9]/gi, "_")}_QRCodes.pdf`;
-      pdf.save(filename);
+      const blobUrl = pdf.output("bloburl") as unknown as string;
+      window.open(blobUrl, "_blank");
     } catch (error) {
       console.error("Failed to export PDF:", error);
       throw new Error("Failed to generate PDF");
@@ -146,8 +146,8 @@ export class PDFExport {
         );
       }
 
-      const filename = `${matchName.replace(/[^a-z0-9]/gi, "_")}_QRCodes_Large.pdf`;
-      pdf.save(filename);
+      const blobUrl = pdf.output("bloburl") as unknown as string;
+      window.open(blobUrl, "_blank");
     } catch (error) {
       console.error("Failed to export large PDF:", error);
       throw new Error("Failed to generate large PDF");
