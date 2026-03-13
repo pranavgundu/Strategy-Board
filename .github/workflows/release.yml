@@ -154,6 +154,9 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
         run: pnpm run build
 
+      - name: Add Android platform
+        run: pnpm exec cap add android
+
       - name: Sync Capacitor
         run: pnpm exec cap sync android
 
