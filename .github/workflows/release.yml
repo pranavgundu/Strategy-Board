@@ -163,8 +163,7 @@ jobs:
       - name: Decode keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
 
       - name: Create keystore.properties
         env:
@@ -172,50 +171,42 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          cat > android/keystore.properties <<EOF
-          storeFile=release.keystore
-          storePassword=$ANDROID_KEYSTORE_PASSWORD
-          keyAlias=$ANDROID_KEY_ALIAS
-          keyPassword=$ANDROID_KEY_PASSWORD
-          EOF
+          printf 'storeFile=release.keystore\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_ALIAS" "$ANDROID_KEY_PASSWORD" \
+            > android/keystore.properties
 
       - name: Inject signing config into build.gradle
         run: |
-          python3 << 'PYEOF'
-          import re
-
-          with open("android/app/build.gradle", "r") as f:
+          python3 -c "
+          with open('android/app/build.gradle', 'r') as f:
               content = f.read()
 
-          signing_config = """
-    signingConfigs {
-        release {
-            def ksFile = rootProject.file("keystore.properties")
-            if (ksFile.exists()) {
-                def ksProps = new Properties()
-                ksProps.load(new FileInputStream(ksFile))
-                storeFile file(ksProps["storeFile"])
-                storePassword ksProps["storePassword"]
-                keyAlias ksProps["keyAlias"]
-                keyPassword ksProps["keyPassword"]
-            }
-        }
-    }
-    buildTypes {"""
+          signing = '''    signingConfigs {
+                  release {
+                      def ksFile = rootProject.file('keystore.properties')
+                      if (ksFile.exists()) {
+                          def ksProps = new Properties()
+                          ksProps.load(new FileInputStream(ksFile))
+                          storeFile file(ksProps['storeFile'])
+                          storePassword ksProps['storePassword']
+                          keyAlias ksProps['keyAlias']
+                          keyPassword ksProps['keyPassword']
+                      }
+                  }
+              }
+              buildTypes {'''
 
-          content = content.replace("buildTypes {", signing_config, 1)
-
+          content = content.replace('buildTypes {', signing, 1)
           content = content.replace(
-              "minifyEnabled false",
-              "signingConfig signingConfigs.release\n            minifyEnabled false",
+              'minifyEnabled false',
+              'signingConfig signingConfigs.release\n            minifyEnabled false',
               1
           )
 
-          with open("android/app/build.gradle", "w") as f:
+          with open('android/app/build.gradle', 'w') as f:
               f.write(content)
-
-          print("Signing config injected successfully")
-          PYEOF
+          print('Signing config injected')
+          "
 
       - name: Build signed APK
         run: |
@@ -242,25 +233,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
 
       - name: Get release name from tag annotation
         id: tag_info
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-
-          # Try to get the annotated tag message for the release name
           ANNOTATION=$(git tag -l --format='%(contents:subject)' "$TAG" 2>/dev/null || true)
-
           if [ -z "$ANNOTATION" ] || [ "$ANNOTATION" = "$TAG" ]; then
-            # Fallback: use the tag commit message
             ANNOTATION=$(git log -1 --format='%s' 2>/dev/null || echo "")
           fi
-
           if [ -z "$ANNOTATION" ]; then
             ANNOTATION="Release ${TAG}"
           fi
-
           echo "name=${ANNOTATION}" >> "$GITHUB_OUTPUT"
 
       - name: Download all artifacts
