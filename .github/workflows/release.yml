@@ -242,9 +242,12 @@ jobs:
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          ANNOTATION=$(git tag -l --format='%(contents:subject)' "$TAG" 2>/dev/null || true)
-          if [ -z "$ANNOTATION" ] || [ "$ANNOTATION" = "$TAG" ]; then
-            ANNOTATION=$(git log -1 --format='%s' 2>/dev/null || echo "")
+          git fetch origin "refs/tags/${TAG}:refs/tags/${TAG}" --force 2>/dev/null || true
+          TYPE=$(git cat-file -t "refs/tags/${TAG}" 2>/dev/null || echo "unknown")
+          echo "Tag type: ${TYPE}"
+          if [ "$TYPE" = "tag" ]; then
+            ANNOTATION=$(git for-each-ref "refs/tags/${TAG}" --format='%(contents:subject)')
+            echo "Annotation from tag object: ${ANNOTATION}"
           fi
           if [ -z "$ANNOTATION" ]; then
             ANNOTATION="Release ${TAG}"
