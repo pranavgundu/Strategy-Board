@@ -34,3 +34,8 @@ analytics/
 references/
 
 release/
+build-release.sh
+
+*.keystore
+*.jks
+keystore.properties

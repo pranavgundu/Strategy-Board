@@ -1175,16 +1175,12 @@ body #whiteboard-statbotics-container {
 
 #home-bottom-bar a:hover {
     text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(255, 255, 255, 0.6),
-        0 0 30px rgba(255, 255, 255, 0.4),
-        0 0 40px rgba(255, 255, 255, 0.2);
+        0 0 6px rgba(255, 255, 255, 0.4),
+        0 0 12px rgba(255, 255, 255, 0.2);
 }
 
 #home-bottom-bar a:hover i {
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5))
-        drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))
-        drop-shadow(0 0 18px rgba(255, 255, 255, 0.2));
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
 }
 
 /* Ensure proper scrolling on all mobile devices */

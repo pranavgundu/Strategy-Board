@@ -57,55 +57,6 @@
                     console.log("APP-DEBUG:", msg);
                 }
 
-                // Instrument addEventListener to surface startup handler attachments.
-                // This runs early in the page lifecycle so it can capture when the View attaches
-                // event handlers to known elements during initialization.
-                (function () {
-                    const originalAdd = EventTarget.prototype.addEventListener;
-                    EventTarget.prototype.addEventListener = function (
-                        type,
-                        listener,
-                        options,
-                    ) {
-                        try {
-                            const el =
-                                this instanceof Element
-                                    ? this
-                                    : this && this.target
-                                      ? this.target
-                                      : null;
-                            const id = el && el.id ? el.id : null;
-                            const tracked = [
-                                "home-toolbar-new-btn",
-                                "home-toolbar-import-btn",
-                                "home-toolbar-clear-btn",
-                                "create-match-create-btn",
-                                "create-match-cancel-btn",
-                                "whiteboard-toolbar-back",
-                                "whiteboard-toolbar-view-toggle",
-                                "qr-export-container",
-                                "qr-import-container",
-                                "qr-import-inner-container",
-                            ];
-                            if (id && tracked.indexOf(id) !== -1) {
-                                try {
-                                    log(
-                                        `Attached handler: "${type}" on #${id}`,
-                                    );
-                                } catch (err) {
-                                    console.log(
-                                        "APP-DEBUG: Attached handler:",
-                                        type,
-                                        id,
-                                    );
-                                }
-                            }
-                        } catch (err) {
-                            console.warn("Instrumentation failed:", err);
-                        }
-                        return originalAdd.call(this, type, listener, options);
-                    };
-                })();
                 function setStatus(text) {
                     var s = qs("app-debug-status");
                     if (s) s.textContent = text;
@@ -239,12 +190,23 @@
             })();
         </script>
         <link
-            rel="stylesheet"
+            rel="preload"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+            as="style"
             integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
             crossorigin="anonymous"
             referrerpolicy="no-referrer"
+            onload="this.onload=null;this.rel='stylesheet'"
         />
+        <noscript>
+            <link
+                rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+                integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+                crossorigin="anonymous"
+                referrerpolicy="no-referrer"
+            />
+        </noscript>
     </head>
     <body class="overflow-hidden">
         <!-- Google Tag Manager (noscript) -->
@@ -465,27 +427,27 @@
                             class="hidden flex items-center justify-center gap-1 sm:gap-2"
                         >
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-yellow-500 rounded-lg glass-button glossy-shine"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-yellow-500 rounded-xl md:rounded-2xl glass-button glossy-shine"
                             >
                                 Edit
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-green-500 rounded-lg glass-button glossy-shine"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-green-500 rounded-xl md:rounded-2xl glass-button glossy-shine"
                             >
                                 Duplicate
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-blue-500 rounded-lg glass-button glossy-shine whitespace-nowrap"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-blue-500 rounded-xl md:rounded-2xl glass-button glossy-shine whitespace-nowrap"
                             >
                                 Export PNG
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-orange-500 rounded-lg glass-button glossy-shine whitespace-nowrap"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-orange-500 rounded-xl md:rounded-2xl glass-button glossy-shine whitespace-nowrap"
                             >
                                 Export QR
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-purple-500 rounded-lg glass-button glossy-shine whitespace-nowrap flex items-center justify-center gap-1"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-purple-500 rounded-xl md:rounded-2xl glass-button glossy-shine whitespace-nowrap flex items-center justify-center gap-1"
                             >
                                 <span>Share</span>
                                 <i
@@ -493,7 +455,7 @@
                                 ></i>
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-red-500 rounded-lg glass-button glossy-shine"
+                                class="w-20 sm:w-24 p-1 text-sm text-white bg-red-500 rounded-xl md:rounded-2xl glass-button glossy-shine"
                             >
                                 Delete
                             </button>
@@ -504,17 +466,24 @@
             <div
                 id="home-bottom-bar"
                 class="w-full bg-slate-700 flex items-center justify-center border-t border-slate-600 transition-all duration-300 relative"
-                style="min-height: 4rem; padding-bottom: env(safe-area-inset-bottom, 0px);"
+                style="min-height: 4rem; padding-top: env(safe-area-inset-bottom, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);"
             >
-                    <a
-                        href="https://github.com/pranavgundu/Strategy-Board"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
-                    >
-                        <i class="fab fa-github text-2xl"></i>
-                        <span class="text-lg font-semibold"></span>
-                    </a>
+                    <div class="flex items-center justify-center gap-4">
+                        <a
+                            href="https://github.com/pranavgundu/Strategy-Board"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                        >
+                            <i class="fab fa-github text-2xl leading-none"></i>
+                        </a>
+                        <a
+                            href="mailto:pranav@strategyboard.app"
+                            class="flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                        >
+                            <i class="fas fa-envelope text-2xl leading-none"></i>
+                        </a>
+                    </div>
                     <div
                         id="last-commit-info"
                         class="absolute left-6 text-slate-400 text-xs hidden"

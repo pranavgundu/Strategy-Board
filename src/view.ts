@@ -9,7 +9,6 @@ import {
   GET_CACHED_STATBOTICS,
 } from "./db.ts";
 import { ContributorsService } from "./contributors.ts";
-import { uploadMatch, downloadMatch } from "./cloud.ts";
 import {
   fuzzySearchItems,
   extractEventItems,
@@ -362,27 +361,7 @@ export class View {
 
       for (const h of trackedHandlers) {
         if (h.el) {
-          console.debug(`View: attaching '${h.evt}' handler to #${h.id}`);
-          try {
-            try {
-              window.dispatchEvent(
-                new CustomEvent("app:handlerattached", {
-                  detail: { id: h.id, event: h.evt },
-                }),
-              );
-            } catch (_err) {}
-
-            (h.el as HTMLElement).addEventListener(
-              h.evt,
-              h.fn as EventListener,
-            );
-            console.debug(`View: attached '${h.evt}' handler to #${h.id}`);
-          } catch (err) {
-            console.error(
-              `View: failed to attach handler '${h.evt}' to #${h.id}:`,
-              err,
-            );
-          }
+          (h.el as HTMLElement).addEventListener(h.evt, h.fn as EventListener);
         } else {
           console.warn(`Missing element: ${h.id}`);
         }
@@ -390,29 +369,9 @@ export class View {
 
       const clearBtn = B?.Clear;
       if (clearBtn) {
-        console.debug(
-          "View: attaching 'click' handler to #home-toolbar-clear-btn",
-        );
-        try {
-          try {
-            window.dispatchEvent(
-              new CustomEvent("app:handlerattached", {
-                detail: { id: "home-toolbar-clear-btn", event: "click" },
-              }),
-            );
-          } catch (_err) {}
-          clearBtn.addEventListener("click", (_e) => {
-            this.show(E.ClearConfirmPanel);
-          });
-          console.debug(
-            "View: attached 'click' handler to #home-toolbar-clear-btn",
-          );
-        } catch (err) {
-          console.error(
-            "View: failed to attach 'click' handler to #home-toolbar-clear-btn:",
-            err,
-          );
-        }
+        clearBtn.addEventListener("click", (_e) => {
+          this.show(E.ClearConfirmPanel);
+        });
       } else {
         console.warn(
           "Missing element: home-toolbar-clear-btn (no clear handler attached here)",
@@ -421,120 +380,49 @@ export class View {
 
       const clearConfirmClear = B?.ClearConfirmClear;
       if (clearConfirmClear) {
-        console.debug(
-          "View: attaching 'click' handler to #clear-confirm-clear-btn",
-        );
-        try {
-          clearConfirmClear.addEventListener("click", (_e) => {
-            CLEAR();
-            location.reload();
-          });
-          console.debug(
-            "View: attached 'click' handler to #clear-confirm-clear-btn",
-          );
-        } catch (err) {
-          console.error(
-            "View: failed to attach 'click' handler to #clear-confirm-clear-btn:",
-            err,
-          );
-        }
+        clearConfirmClear.addEventListener("click", (_e) => {
+          CLEAR();
+          location.reload();
+        });
       }
 
       const clearConfirmCancel = B?.ClearConfirmCancel;
       if (clearConfirmCancel) {
-        console.debug(
-          "View: attaching 'click' handler to #clear-confirm-cancel-btn",
-        );
-        try {
-          clearConfirmCancel.addEventListener("click", (_e) => {
-            this.hide(E.ClearConfirmPanel);
-          });
-          console.debug(
-            "View: attached 'click' handler to #clear-confirm-cancel-btn",
-          );
-        } catch (err) {
-          console.error(
-            "View: failed to attach 'click' handler to #clear-confirm-cancel-btn:",
-            err,
-          );
-        }
+        clearConfirmCancel.addEventListener("click", (_e) => {
+          this.hide(E.ClearConfirmPanel);
+        });
       }
 
       const contributorsLinkBtn = B?.ContributorsLink;
       if (contributorsLinkBtn) {
-        console.debug(
-          "View: attaching 'click' handler to #contributors-link-btn",
-        );
-        try {
-          contributorsLinkBtn.addEventListener("click", (ev) => {
-            ev.preventDefault();
-            this.showContributors();
-          });
-          console.debug(
-            "View: attached 'click' handler to #contributors-link-btn",
-          );
-        } catch (err) {
-          console.error(
-            "View: failed to attach 'click' handler to #contributors-link-btn:",
-            err,
-          );
-        }
+        contributorsLinkBtn.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          this.showContributors();
+        });
       }
 
       const contributorsCloseBtn = B?.ContributorsClose;
       if (contributorsCloseBtn) {
-        console.debug(
-          "View: attaching 'click' handler to #contributors-close-btn",
-        );
-        try {
-          contributorsCloseBtn.addEventListener("click", (_e) => {
-            this.hide(E.ContributorsPanel);
-          });
-          console.debug(
-            "View: attached 'click' handler to #contributors-close-btn",
-          );
-        } catch (err) {
-          console.error(
-            "View: failed to attach 'click' handler to #contributors-close-btn:",
-            err,
-          );
-        }
+        contributorsCloseBtn.addEventListener("click", (_e) => {
+          this.hide(E.ContributorsPanel);
+        });
       }
 
       const contributorsRetryBtn = B?.ContributorsRetry;
       if (contributorsRetryBtn) {
-        console.debug(
-          "View: attaching 'click' handler to #contributors-retry-btn",
-        );
-        try {
-          contributorsRetryBtn.addEventListener("click", (_e) => {
-            this.loadContributors();
-          });
-          console.debug(
-            "View: attached 'click' handler to #contributors-retry-btn",
-          );
-        } catch (err) {
-          console.error(
-            "View: failed to attach 'click' handler to #contributors-retry-btn:",
-            err,
-          );
-        }
+        contributorsRetryBtn.addEventListener("click", (_e) => {
+          this.loadContributors();
+        });
       }
 
       const contributorsPanel = E?.ContributorsPanel;
       if (contributorsPanel) {
-        console.debug(
-          "View: attaching 'click' handler to #contributors-container",
-        );
         try {
           contributorsPanel.addEventListener("click", (e) => {
             if (e.target === contributorsPanel) {
               this.hide(E.ContributorsPanel);
             }
           });
-          console.debug(
-            "View: attached 'click' handler to #contributors-container",
-          );
         } catch (err) {
           console.error(
             "View: failed to attach 'click' handler to #contributors-container:",
@@ -545,9 +433,6 @@ export class View {
 
       const linkImportPanel = E?.LinkImportPanel;
       if (linkImportPanel) {
-        console.debug(
-          "View: attaching 'click' handler to #link-import-container",
-        );
         try {
           linkImportPanel.addEventListener("click", (e) => {
             if (e.target === linkImportPanel) {
@@ -558,9 +443,6 @@ export class View {
               }
             }
           });
-          console.debug(
-            "View: attached 'click' handler to #link-import-container",
-          );
         } catch (err) {
           console.error(
             "View: failed to attach 'click' handler to #link-import-container:",
@@ -627,17 +509,7 @@ export class View {
 
       const exportEl = E?.Export;
       if (exportEl) {
-        console.debug(
-          "View: attaching 'click' handler to #qr-export-container",
-        );
         try {
-          try {
-            window.dispatchEvent(
-              new CustomEvent("app:handlerattached", {
-                detail: { id: "qr-export-container", event: "click" },
-              }),
-            );
-          } catch (_err) {}
           exportEl.addEventListener("click", (e) => this.onCancelExport(e));
 
           const exportCloseBtn = get(
@@ -645,18 +517,8 @@ export class View {
           ) as HTMLElement | null;
           if (exportCloseBtn) {
             try {
-              window.dispatchEvent(
-                new CustomEvent("app:handlerattached", {
-                  detail: { id: "qr-export-close-btn", event: "click" },
-                }),
-              );
-            } catch (_err) {}
-            try {
               exportCloseBtn.addEventListener("click", (e) =>
                 this.onCancelExport(e),
-              );
-              console.debug(
-                "View: attached 'click' handler to #qr-export-close-btn",
               );
             } catch (err) {
               console.error(
@@ -927,9 +789,6 @@ export class View {
               } catch (_err) {}
             });
           }
-          console.debug(
-            "View: attached 'click' handler to #qr-export-container",
-          );
         } catch (err) {
           console.error(
             "View: failed to attach 'click' handler to #qr-export-container:",
@@ -942,36 +801,13 @@ export class View {
 
       const importEl = E?.Import;
       if (importEl) {
-        console.debug(
-          "View: attaching 'click' handler to #qr-import-container",
-        );
-        try {
-          try {
-            window.dispatchEvent(
-              new CustomEvent("app:handlerattached", {
-                detail: { id: "qr-import-container", event: "click" },
-              }),
-            );
-          } catch (_err) {}
-          importEl.addEventListener("click", (e) => this.onCancelImport(e));
-          console.debug(
-            "View: attached 'click' handler to #qr-import-container",
-          );
-        } catch (err) {
-          console.error(
-            "View: failed to attach 'click' handler to #qr-import-container:",
-            err,
-          );
-        }
+        importEl.addEventListener("click", (e) => this.onCancelImport(e));
       } else {
         console.warn("Missing element: qr-import-container");
       }
 
       const importInner = E?.ImportInner;
       if (importInner) {
-        console.debug(
-          "View: attaching 'click' handler to #qr-import-inner-container (stopPropagation)",
-        );
         importInner.addEventListener("click", (e) => e.stopPropagation());
 
         if (!document.getElementById("qr-import-close-btn")) {
@@ -997,9 +833,6 @@ export class View {
           }
         }
 
-        console.debug(
-          "View: attached 'click' handler to #qr-import-inner-container",
-        );
       } else {
         console.warn("Missing element: qr-import-inner-container");
       }
@@ -3128,6 +2961,7 @@ export class View {
     this.showLinkImportStatus("Loading match...", false);
 
     try {
+      const { downloadMatch } = await import("./cloud.ts");
       const match = await downloadMatch(shareCode);
 
       if (!match) {
@@ -3212,6 +3046,7 @@ export class View {
       this.show(E.LinkImportPanel);
       this.showLinkImportStatus("Loading shared match...", false);
 
+      const { downloadMatch } = await import("./cloud.ts");
       const match = await downloadMatch(shareCode.trim().toUpperCase());
 
       if (!match) {
@@ -3252,6 +3087,7 @@ export class View {
       match.fieldMetadata = {
         selectedFieldYear: this.whiteboard.getCurrentFieldYear() ?? null,
       };
+      const { uploadMatch } = await import("./cloud.ts");
       const shareCode = await uploadMatch(match);
       const shareUrl = `https://strategyboard.app/?share=${shareCode}`;
 

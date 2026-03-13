@@ -71,35 +71,30 @@ async function initializeApp(): Promise<void> {
 
   try {
     const model = new Model();
-    console.log("Loading persistent data...");
-    await model.loadPersistentData();
-    console.log("Persistent data loaded");
 
-    if (document.readyState === "loading") {
-      console.log(
-        "DOM not ready. Waiting for DOMContentLoaded to import UI modules...",
-      );
-      await new Promise<void>((resolve) => {
-        document.addEventListener(
-          "DOMContentLoaded",
-          () => {
-            console.log("DOMContentLoaded received");
-            resolve();
-          },
-          { once: true },
-        );
-      });
-    } else {
-      console.log("DOM already ready — proceeding with UI initialization");
-    }
-
-    console.log("Dynamically importing UI and QR modules...");
-    const [whiteboardModule, qrModule, viewModule] = await Promise.all([
+    // Start fetching modules and waiting for DOM immediately — parallel with DB load
+    const moduleImports = Promise.all([
       import("./whiteboard.ts"),
       import("./qr.ts"),
       import("./view.ts"),
     ]);
+    const domReady =
+      document.readyState === "loading"
+        ? new Promise<void>((resolve) => {
+            document.addEventListener("DOMContentLoaded", () => resolve(), {
+              once: true,
+            });
+          })
+        : Promise.resolve();
+
+    console.log("Loading persistent data...");
+    await model.loadPersistentData();
+    console.log("Persistent data loaded");
+
+    await domReady;
+
     console.log("UI and QR modules imported");
+    const [whiteboardModule, qrModule, viewModule] = await moduleImports;
 
     console.log("Creating UI instances...");
     const whiteboard = new whiteboardModule.Whiteboard(model);
@@ -118,6 +113,10 @@ async function initializeApp(): Promise<void> {
     } catch (err) {
       console.warn("Failed to dispatch app:initialized event:", err);
     }
+    // Warm up the field image cache in the background so the first whiteboard open is instant
+    import("./manager.ts").then(({ preloadFieldImages }) =>
+      preloadFieldImages(),
+    );
   } catch (error) {
     console.error("Failed to initialize application:", error);
 

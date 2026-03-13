@@ -1,5 +1,7 @@
-import { GET, GETMANY, SET, DEL, CLEAR } from "./db.ts";
+import { GET, GETMANY, SET, CLEAR } from "./db.ts";
 import { Match } from "./match.ts";
+
+const APP_DATA_KEY = "appData";
 
 declare global {
   interface Window {
@@ -17,6 +19,22 @@ export class Model {
    * Loads match data from IndexedDB storage.
    */
   public async loadPersistentData(): Promise<void> {
+    // Try the consolidated single-key format first (new format)
+    const appData = await GET<any[][]>(APP_DATA_KEY);
+
+    if (appData !== undefined) {
+      for (const packet of appData) {
+        try {
+          this.matches.push(Match.fromPacket(packet));
+          this.matchIds.push(packet[7]);
+        } catch (error) {
+          console.error("Failed to parse match data:", error);
+        }
+      }
+      return;
+    }
+
+    // Legacy migration: two-step load from old per-match key format
     const matchIds: Array<string> | undefined = await GET("matchIds", (e) => {
       console.error("Failed to load match IDs from IndexedDB:", e);
       alert(
@@ -26,22 +44,26 @@ export class Model {
 
     if (matchIds === undefined) return;
 
-    const matches = await GETMANY(matchIds, (e) => {
+    const packets = await GETMANY(matchIds, (e) => {
       console.error("Failed to load matches from IndexedDB:", e);
       alert(
         "Could not load data from IndexedDB. Data will not persist. This could be a permissions issue or code bug.",
       );
     });
 
-    if (matches !== undefined) {
-      for (const match of matches) {
+    if (packets !== undefined) {
+      for (const packet of packets) {
         try {
-          this.matches.push(Match.fromPacket(match));
-          this.matchIds.push(match[7]);
+          this.matches.push(Match.fromPacket(packet));
+          this.matchIds.push(packet[7]);
         } catch (error) {
           console.error("Failed to parse match data:", error);
         }
       }
+      // Migrate to new consolidated format
+      await SET(APP_DATA_KEY, packets, (e) => {
+        console.error("Failed to migrate match data to new format:", e);
+      });
     }
   }
 
@@ -102,11 +124,8 @@ export class Model {
     window.dataLayer.push({
       event: "match_creation",
     });
-    await SET(match.id, match.getAsPacket(), (e) => {
+    await SET(APP_DATA_KEY, this.matches.map((m) => m.getAsPacket()), (e) => {
       console.error("Failed to save match to IndexedDB:", e);
-    });
-    await SET("matchIds", this.matchIds, (e) => {
-      console.error("Failed to save match IDs to IndexedDB:", e);
     });
     return match.id;
   }
@@ -123,10 +142,9 @@ export class Model {
     this.matches.splice(index, 1);
     this.matchIds.splice(index, 1);
 
-    await SET("matchIds", this.matchIds, (e) => {
+    await SET(APP_DATA_KEY, this.matches.map((m) => m.getAsPacket()), (e) => {
       console.error("Failed to update match IDs after deletion:", e);
     });
-    await DEL(id);
   }
 
   /**
@@ -150,8 +168,7 @@ export class Model {
     const index = this.matches.findIndex((e) => e.id === id);
     if (index === -1) return;
 
-    const match = this.matches[index];
-    await SET(match.id, match.getAsPacket(), (e) => {
+    await SET(APP_DATA_KEY, this.matches.map((m) => m.getAsPacket()), (e) => {
       console.error("Failed to update match in IndexedDB:", e);
     });
   }
