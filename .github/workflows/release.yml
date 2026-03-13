@@ -181,9 +181,41 @@ jobs:
 
       - name: Inject signing config into build.gradle
         run: |
-          cd android/app
-          sed -i 's|buildTypes {|signingConfigs {\n        release {\n            def keystorePropsFile = rootProject.file("keystore.properties")\n            if (keystorePropsFile.exists()) {\n                def keystoreProps = new Properties()\n                keystoreProps.load(new FileInputStream(keystorePropsFile))\n                storeFile file(keystoreProps["storeFile"])\n                storePassword keystoreProps["storePassword"]\n                keyAlias keystoreProps["keyAlias"]\n                keyPassword keystoreProps["keyPassword"]\n            }\n        }\n    }\n    buildTypes {|' build.gradle
-          sed -i 's|release {|release {\n            def keystorePropsFile = rootProject.file("keystore.properties")\n            if (keystorePropsFile.exists()) {\n                signingConfig signingConfigs.release\n            }|' build.gradle
+          python3 << 'PYEOF'
+          import re
+
+          with open("android/app/build.gradle", "r") as f:
+              content = f.read()
+
+          signing_config = """
+    signingConfigs {
+        release {
+            def ksFile = rootProject.file("keystore.properties")
+            if (ksFile.exists()) {
+                def ksProps = new Properties()
+                ksProps.load(new FileInputStream(ksFile))
+                storeFile file(ksProps["storeFile"])
+                storePassword ksProps["storePassword"]
+                keyAlias ksProps["keyAlias"]
+                keyPassword ksProps["keyPassword"]
+            }
+        }
+    }
+    buildTypes {"""
+
+          content = content.replace("buildTypes {", signing_config, 1)
+
+          content = content.replace(
+              "minifyEnabled false",
+              "signingConfig signingConfigs.release\n            minifyEnabled false",
+              1
+          )
+
+          with open("android/app/build.gradle", "w") as f:
+              f.write(content)
+
+          print("Signing config injected successfully")
+          PYEOF
 
       - name: Build signed APK
         run: |
