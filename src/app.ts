@@ -1,4 +1,5 @@
 import { Model } from "./model.ts";
+import { preloadFieldImages } from "./manager.ts";
 import { registerSW } from "virtual:pwa-register";
 
 // Polyfill for CanvasRenderingContext2D.roundRect — not available in Safari < 16 (iOS 15 and earlier)
@@ -114,9 +115,7 @@ async function initializeApp(): Promise<void> {
       console.warn("Failed to dispatch app:initialized event:", err);
     }
     // Warm up the field image cache in the background so the first whiteboard open is instant
-    import("./manager.ts").then(({ preloadFieldImages }) =>
-      preloadFieldImages(),
-    );
+    preloadFieldImages();
   } catch (error) {
     console.error("Failed to initialize application:", error);
 

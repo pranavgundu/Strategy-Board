@@ -194,7 +194,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["qrcode"],
-    esbuildOptions: {
+    rolldownOptions: {
       mainFields: ["module", "main"],
     },
   },
