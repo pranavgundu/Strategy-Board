@@ -85,7 +85,7 @@ export class PDFExport {
       window.open(blobUrl, "_blank");
     } catch (error) {
       console.error("Failed to export PDF:", error);
-      throw new Error("Failed to generate PDF");
+      throw new Error("Failed to generate PDF", { cause: error });
     }
   }
 
@@ -150,7 +150,7 @@ export class PDFExport {
       window.open(blobUrl, "_blank");
     } catch (error) {
       console.error("Failed to export large PDF:", error);
-      throw new Error("Failed to generate large PDF");
+      throw new Error("Failed to generate large PDF", { cause: error });
     }
   }
 }

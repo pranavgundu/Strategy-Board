@@ -186,7 +186,7 @@ export class StatboticsService {
         throw error;
       }
       console.error("[Statbotics] Network or parsing error:", error);
-      throw new Error("Failed to connect to Statbotics API");
+      throw new Error("Failed to connect to Statbotics API", { cause: error });
     }
   }
 

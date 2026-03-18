@@ -149,7 +149,7 @@
     "@capacitor/android": "^8.2.0",
     "@capacitor/core": "^8.2.0",
     "@capacitor/ios": "^8.2.0",
-    "@tailwindcss/vite": "^4.2.1",
+    "@tailwindcss/vite": "^4.2.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "es-abstract": "^1.24.1",
@@ -159,7 +159,7 @@
     "marked": "^17.0.4",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "^4.2.2",
     "uuid": "^13.0.0"
   }
 }
