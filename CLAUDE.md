@@ -8,22 +8,22 @@ Strategy Board is a digital strategy whiteboard for FIRST Robotics Competition (
 
 ## Commands
 
-**Use `pnpm` — not npm or yarn.**
+**Use `bun` — not npm, yarn, or pnpm.**
 
 ```bash
-pnpm dev                  # Start Vite dev server
-pnpm build                # tsx scripts/commit.ts + tsc + vite build
-pnpm spell                # cspell spell checker
-pnpm electron:dev         # Run Electron in dev mode
-pnpm electron:build       # Build Electron for current platform
-pnpm electron:build:mac   # macOS (x64 + arm64)
-pnpm electron:build:win   # Windows (x64)
-pnpm electron:build:linux # Linux (x64)
-pnpm cap:sync             # Build + sync Capacitor
-pnpm cap:run:ios          # Build + run on iOS
-pnpm cap:run:android      # Build + run on Android
-pnpm cap:open:ios         # Open in Xcode
-pnpm cap:open:android     # Open in Android Studio
+bun dev                  # Start Vite dev server
+bun run build            # tsx scripts/commit.ts + tsc + vite build
+bun run spell            # cspell spell checker
+bun run electron:dev     # Run Electron in dev mode
+bun run electron:build   # Build Electron for current platform
+bun run electron:build:mac   # macOS (x64 + arm64)
+bun run electron:build:win   # Windows (x64)
+bun run electron:build:linux # Linux (x64)
+bun run cap:sync         # Build + sync Capacitor
+bun run cap:run:ios      # Build + run on iOS
+bun run cap:run:android  # Build + run on Android
+bun run cap:open:ios     # Open in Xcode
+bun run cap:open:android # Open in Android Studio
 ```
 
 There are **no automated tests**. Manual testing across platforms is required.
@@ -83,10 +83,10 @@ VITE_FIREBASE_API_KEY=<Firebase project API key>
 
 ### Security / Dependency Overrides
 
-`pnpm.overrides` in `package.json` forces patched transitive dependency versions. When Dependabot can't auto-update a transitive dep, add it there.
+`overrides` in `package.json` forces patched transitive dependency versions. When Dependabot can't auto-update a transitive dep, add it there.
 
 ### Deployment
 
 - Web/PWA: Vercel (auto-deploy from `main`)
-- Electron: manual via `pnpm electron:build:*`
-- Mobile: Xcode / Android Studio after `pnpm cap:sync`
+- Electron: manual via `bun run electron:build:*`
+- Mobile: Xcode / Android Studio after `bun run cap:sync`

@@ -2,6 +2,7 @@
   "name": "strategy-board",
   "version": "2026.2.0",
   "description": "The Digital Strategy Whiteboard for FRC",
+  "packageManager": "bun@1.2.5",
   "homepage": "https://github.com/pranavgundu/strategy-board",
   "author": {
     "name": "Pranav Gundu",
@@ -16,20 +17,20 @@
     "spell": "cspell \"**/*.{ts,tsx,js,jsx,html,md}\"",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "assets": "pnpm exec capacitor-assets generate --iconBackgroundColor '#18181b' --iconBackgroundColorDark '#18181b' --splashBackgroundColor '#18181b' --splashBackgroundColorDark '#18181b'",
-    "cap:sync": "pnpm run build && pnpm exec cap sync",
-    "cap:open:ios": "pnpm exec cap open ios",
-    "cap:open:android": "pnpm exec cap open android",
-    "cap:run:ios": "pnpm run cap:sync && pnpm exec cap run ios",
-    "cap:run:android": "pnpm run cap:sync && pnpm exec cap run android",
-    "cap:build:android": "pnpm run cap:sync && cd android && ./gradlew assembleDebug && cp app/build/outputs/apk/debug/app-debug.apk ../release/\"Strategy Board-$npm_package_version.apk\"",
-    "cap:build:ios": "pnpm run cap:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath ../../release/ios-build archive",
+    "assets": "bunx capacitor-assets generate --iconBackgroundColor '#18181b' --iconBackgroundColorDark '#18181b' --splashBackgroundColor '#18181b' --splashBackgroundColorDark '#18181b'",
+    "cap:sync": "bun run build && bunx cap sync",
+    "cap:open:ios": "bunx cap open ios",
+    "cap:open:android": "bunx cap open android",
+    "cap:run:ios": "bun run cap:sync && bunx cap run ios",
+    "cap:run:android": "bun run cap:sync && bunx cap run android",
+    "cap:build:android": "bun run cap:sync && cd android && ./gradlew assembleDebug && cp app/build/outputs/apk/debug/app-debug.apk ../release/\"Strategy Board-$npm_package_version.apk\"",
+    "cap:build:ios": "bun run cap:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath ../../release/ios-build archive",
     "electron:dev": "concurrently \"vite --host\" \"wait-on http://localhost:5173 && VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
-    "electron:build": "pnpm run build && electron-builder",
-    "electron:build:mac": "pnpm run build && electron-builder --mac",
-    "electron:build:win": "pnpm run build && electron-builder --win",
-    "electron:build:linux": "pnpm run build && electron-builder --linux",
-    "electron:build:all": "pnpm run build && electron-builder --mac --win --linux"
+    "electron:build": "bun run build && electron-builder",
+    "electron:build:mac": "bun run build && electron-builder --mac",
+    "electron:build:win": "bun run build && electron-builder --win",
+    "electron:build:linux": "bun run build && electron-builder --linux",
+    "electron:build:all": "bun run build && electron-builder --mac --win --linux"
   },
   "build": {
     "appId": "com.strategyboard.app",
@@ -137,12 +138,10 @@
     "wait-on": "^9.0.4",
     "workbox-window": "^7.4.0"
   },
-  "pnpm": {
-    "overrides": {
-      "tar": ">=7.5.8",
-      "minimatch": ">=10.2.1",
-      "serialize-javascript": ">=7.0.3"
-    }
+  "overrides": {
+    "tar": ">=7.5.8",
+    "minimatch": ">=10.2.1",
+    "serialize-javascript": ">=7.0.3"
   },
   "dependencies": {
     "@capacitor/android": "^8.2.0",

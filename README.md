@@ -38,9 +38,9 @@ To contribute to Strategy Board, follow these steps:
     ```bash
     git clone https://github.com/YOUR_USERNAME/Strategy-Board.git
     ```
-3. Install dependencies using pnpm:
+3. Install dependencies using bun:
     ```bash
-    pnpm install
+    bun install
     ```
 4. Create a new branch for your feature:
     ```bash

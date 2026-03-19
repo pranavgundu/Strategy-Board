@@ -89,9 +89,9 @@ Do not enable `nodeIntegration` without understanding the implications.
 
 ## Dependency Security
 
-Security patches are pinned via `pnpm` overrides in `package.json` for known
+Security patches are pinned via `overrides` in `package.json` for known
 vulnerable transitive dependencies. When contributing, keep dependencies up to
 date and check for advisories with:
 
 ```bash
-pnpm audit
+bun pm audit

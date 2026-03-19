@@ -22,26 +22,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build
         env:
           TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           NODE_ENV: production
-        run: pnpm run build
+        run: bun run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
