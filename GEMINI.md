@@ -22,23 +22,23 @@ This file provides essential context for Gemini CLI when working in this reposit
 
 ## Building and Running
 
-Always use `pnpm`.
+Always use `bun`.
 
 ### Core Commands:
-- `pnpm dev`: Start the Vite development server.
-- `pnpm build`: Build the web application (runs `scripts/commit.ts`, `tsc`, and `vite build`).
-- `pnpm lint`: Run ESLint on `src/`.
-- `pnpm spell`: Run `cspell` for spell checking.
+- `bun dev`: Start the Vite development server.
+- `bun run build`: Build the web application (runs `scripts/commit.ts`, `tsc`, and `vite build`).
+- `bun run lint`: Run ESLint on `src/`.
+- `bun run spell`: Run `cspell` for spell checking.
 
 ### Desktop (Electron):
-- `pnpm electron:dev`: Run Electron in development mode.
-- `pnpm electron:build`: Build Electron for the current platform.
-- `pnpm electron:build:mac | :win | :linux`: Targeted builds.
+- `bun run electron:dev`: Run Electron in development mode.
+- `bun run electron:build`: Build Electron for the current platform.
+- `bun run electron:build:mac | :win | :linux`: Targeted builds.
 
 ### Mobile (Capacitor):
-- `pnpm cap:sync`: Build web assets and sync with native projects.
-- `pnpm cap:run:ios | :android`: Build and run on a connected device/emulator.
-- `pnpm cap:open:ios | :android`: Open the project in Xcode or Android Studio.
+- `bun run cap:sync`: Build web assets and sync with native projects.
+- `bun run cap:run:ios | :android`: Build and run on a connected device/emulator.
+- `bun run cap:open:ios | :android`: Open the project in Xcode or Android Studio.
 
 ## Architecture & Modules
 

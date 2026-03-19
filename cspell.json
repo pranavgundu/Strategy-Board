@@ -56,7 +56,8 @@
     "ios",
     "references",
     "*.lock",
-    "pnpm-lock.yaml",
+    "bun.lockb",
+    "bun.lock",
     "**/*.min.js",
     "**/*-*.js"
   ]

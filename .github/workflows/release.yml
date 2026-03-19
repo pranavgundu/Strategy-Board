@@ -15,28 +15,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build web app
         env:
           VITE_TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-        run: pnpm run build
+        run: bun run build
 
       - name: Build macOS (x64 + arm64)
-        run: pnpm exec electron-builder --mac --publish never
+        run: bunx electron-builder --mac --publish never
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
@@ -52,28 +44,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build web app
         env:
           VITE_TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-        run: pnpm run build
+        run: bun run build
 
       - name: Build Windows (x64)
-        run: pnpm exec electron-builder --win --publish never
+        run: bunx electron-builder --win --publish never
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -88,28 +72,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build web app
         env:
           VITE_TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-        run: pnpm run build
+        run: bun run build
 
       - name: Build Linux (x64)
-        run: pnpm exec electron-builder --linux --publish never
+        run: bunx electron-builder --linux --publish never
 
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
@@ -125,16 +101,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -146,19 +114,19 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build web app
         env:
           VITE_TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-        run: pnpm run build
+        run: bun run build
 
       - name: Add Android platform
-        run: pnpm exec cap add android
+        run: bunx cap add android
 
       - name: Sync Capacitor
-        run: pnpm exec cap sync android
+        run: bunx cap sync android
 
       - name: Decode keystore
         env:

@@ -5,17 +5,17 @@ Digital strategy whiteboard for FIRST Robotics Competition (FRC). Cross-platform
 ## Commands
 
 ```bash
-pnpm dev                # Vite dev server
-pnpm build              # TypeScript check + Vite production build
-pnpm lint               # ESLint
-pnpm lint:fix           # ESLint with auto-fix
-pnpm spell              # cspell spell checker
-pnpm electron:dev       # Electron dev mode
-pnpm electron:build     # Electron build (current platform)
-pnpm cap:sync           # Build + sync Capacitor apps
+bun dev                # Vite dev server
+bun run build          # TypeScript check + Vite production build
+bun run lint           # ESLint
+bun run lint:fix       # ESLint with auto-fix
+bun run spell          # cspell spell checker
+bun run electron:dev   # Electron dev mode
+bun run electron:build # Electron build (current platform)
+bun run cap:sync       # Build + sync Capacitor apps
 ```
 
-There are no automated tests. Validate changes with `pnpm build` and manual testing.
+There are no automated tests. Validate changes with `bun run build` and manual testing.
 
 ## Architecture
 
@@ -39,7 +39,7 @@ User Action → view.ts → model.ts → db.ts (IndexedDB)
 
 ## Key Conventions
 
-- **Package manager**: pnpm (not npm/yarn)
+- **Package manager**: bun (not npm/yarn/pnpm)
 - **Path alias**: `@/` maps to `src/` (configured in `vite.config.ts`)
 - **TypeScript**: `strict: false`, no implicit-any errors, target ES2022
 - **ESLint**: `@typescript-eslint/no-explicit-any` is off; unused vars are warnings (prefix with `_` to suppress)
