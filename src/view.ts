@@ -118,6 +118,7 @@ let E: {
   ContributorsList?: HTMLElement | null;
   ContributorsGrid?: HTMLElement | null;
   TeamsGrid?: HTMLElement | null;
+  DonatorsGrid?: HTMLElement | null;
   LastCommitInfo?: HTMLElement | null;
   LinkImportPanel?: HTMLElement | null;
   LinkImportStatus?: HTMLElement | null;
@@ -238,6 +239,7 @@ export class View {
         ContributorsList: get("contributors-list") as HTMLElement | null,
         ContributorsGrid: get("contributors-grid") as HTMLElement | null,
         TeamsGrid: get("teams-grid") as HTMLElement | null,
+        DonatorsGrid: get("donators-grid") as HTMLElement | null,
         LastCommitInfo: get("last-commit-info") as HTMLElement | null,
         LinkImportPanel: get("link-import-container") as HTMLElement | null,
         LinkImportStatus: get("link-import-status") as HTMLElement | null,
@@ -1020,7 +1022,16 @@ export class View {
     const statboticsTab = document.getElementById(
       "whiteboard-toolbar-mode-statbotics",
     );
-    if (match.isFromTBA()) {
+    const hasTeams = [
+      match.redOne,
+      match.redTwo,
+      match.redThree,
+      match.blueOne,
+      match.blueTwo,
+      match.blueThree,
+    ].some((t) => t && t.trim() !== "");
+
+    if (hasTeams) {
       statboticsTab?.classList.remove("hidden");
       this.loadStatboticsData(match);
     } else {
@@ -1035,18 +1046,6 @@ export class View {
    * @returns A promise that resolves when data is loaded and displayed
    */
   private async loadStatboticsData(match: Match): Promise<void> {
-    if (!match.tbaEventKey || !match.tbaMatchKey || !match.tbaYear) {
-      const emptyState = document.getElementById("statbotics-empty-state");
-      const dataContainer = document.getElementById(
-        "statbotics-data-container",
-      );
-      const loadingState = document.getElementById("statbotics-loading-state");
-      emptyState?.classList.remove("hidden");
-      dataContainer?.classList.add("hidden");
-      loadingState?.classList.add("hidden");
-      return;
-    }
-
     const emptyState = document.getElementById("statbotics-empty-state");
     const dataContainer = document.getElementById("statbotics-data-container");
     const loadingState = document.getElementById("statbotics-loading-state");
@@ -1076,23 +1075,36 @@ export class View {
         parseInt(match.blueThree),
       ].filter((t) => !isNaN(t));
 
-      let matchData = await GET_CACHED_STATBOTICS(match.tbaMatchKey);
+      const year = match.tbaYear || new Date().getFullYear();
+      const cacheKey = match.tbaMatchKey || `user_${match.id}`;
+
+      let matchData = await GET_CACHED_STATBOTICS(cacheKey);
 
       if (matchData) {
-        console.log(`[Statbotics] Using cached data for ${match.tbaMatchKey}`);
+        console.log(`[Statbotics] Using cached data for ${cacheKey}`);
       } else {
         console.log(
-          `[Statbotics] Cache miss for ${match.tbaMatchKey}, fetching from API...`,
-        );
-        matchData = await this.statboticsService.getMatchData(
-          match.tbaMatchKey,
-          redTeams,
-          blueTeams,
-          match.tbaYear,
+          `[Statbotics] Cache miss for ${cacheKey}, fetching from API...`,
         );
 
-        await CACHE_STATBOTICS(match.tbaMatchKey, matchData);
-        console.log(`[Statbotics] Cached data for ${match.tbaMatchKey}`);
+        if (match.isFromTBA()) {
+          matchData = await this.statboticsService.getMatchData(
+            match.tbaMatchKey!,
+            redTeams,
+            blueTeams,
+            year,
+          );
+        } else {
+          matchData = await this.statboticsService.getMatchData(
+            `user_${match.id}`,
+            redTeams,
+            blueTeams,
+            year,
+          );
+        }
+
+        await CACHE_STATBOTICS(cacheKey, matchData);
+        console.log(`[Statbotics] Cached data for ${cacheKey}`);
       }
 
       this.currentStatboticsData = matchData;
@@ -2849,7 +2861,8 @@ export class View {
       !E.ContributorsError ||
       !E.ContributorsList ||
       !E.ContributorsGrid ||
-      !E.TeamsGrid
+      !E.TeamsGrid ||
+      !E.DonatorsGrid
     ) {
       return;
     }
@@ -2925,6 +2938,45 @@ export class View {
         `;
 
         E.TeamsGrid?.appendChild(teamCard);
+      });
+
+      E.DonatorsGrid.innerHTML = "";
+      const donators = [
+        { name: "John Finnegan" },
+      ];
+      donators.forEach((donator) => {
+        const donatorCard = document.createElement("div");
+        donatorCard.className = `
+          flex flex-col items-center justify-center p-6 rounded-xl
+          hover:scale-105 transition-all duration-300
+          cursor-default relative overflow-hidden
+        `;
+        donatorCard.style.cssText = `
+          background: linear-gradient(145deg, #d4a44a, #b8860b, #d4a44a, #f0d68a, #d4a44a);
+          background-size: 300% 100%;
+          border: 3px solid #f0d68a;
+          box-shadow: inset 0 2px 4px rgba(255,248,220,0.4), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.4);
+          transition: background-position 0.8s ease;
+          background-position: 0% 0%;
+        `;
+
+        donatorCard.innerHTML = `
+          <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px);"></div>
+          <div class="relative text-center">
+            <div class="text-xl font-bold text-white tracking-wide">
+              ${donator.name}
+            </div>
+          </div>
+        `;
+
+        donatorCard.addEventListener("mouseenter", () => {
+          donatorCard.style.backgroundPosition = "100% 0%";
+        });
+        donatorCard.addEventListener("mouseleave", () => {
+          donatorCard.style.backgroundPosition = "0% 0%";
+        });
+
+        E.DonatorsGrid?.appendChild(donatorCard);
       });
 
       E.ContributorsLoading.classList.add("hidden");
