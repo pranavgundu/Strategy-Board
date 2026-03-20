@@ -129,9 +129,10 @@ export interface StatboticsMatchData {
   hasScores: boolean;
   teamDetails: Map<number, StatboticsTeamEventData>;
   yearData: StatboticsYear | null;
+  hadErrors?: boolean;
 }
 
-import { GET, SET } from "@/db";
+import { GET, SET } from "./db.ts";
 
 const STATBOTICS_API_BASE = "https://api.statbotics.io/v3";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -146,7 +147,7 @@ export class StatboticsService {
    * @returns A promise that resolves to the JSON response data
    * @throws Will throw an error if the API request fails
    */
-  private async makeRequest(endpoint: string): Promise<any> {
+  private async makeRequest(endpoint: string, retries = 2): Promise<any> {
     const cacheKey = `sb_${endpoint}`;
     const cached = await GET<{ data: any; ts: number }>(cacheKey);
     if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
@@ -155,48 +156,39 @@ export class StatboticsService {
 
     const url = `${STATBOTICS_API_BASE}${endpoint}`;
 
-    try {
-      const response = await fetch(url);
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(url);
 
-      if (!response.ok) {
-        let errorMessage = response.statusText || "Unknown error";
-
-        if (response.status === 500) {
-          console.warn(
-            `[Statbotics] Server error (500) for endpoint: ${endpoint}. The Statbotics API may be temporarily unavailable.`,
-          );
-          errorMessage =
-            "Server error - Statbotics API may be temporarily unavailable";
-        } else if (response.status === 404) {
-          console.warn(
-            `[Statbotics] Data not found (404) for endpoint: ${endpoint}`,
-          );
-          errorMessage = "Data not found";
-        } else {
-          console.error(
-            "[Statbotics] API error:",
-            response.status,
-            response.statusText,
-          );
+        if (!response.ok) {
+          if (response.status === 404) {
+            console.warn(`[Statbotics] Data not found (404) for endpoint: ${endpoint}`);
+            throw new Error(`Statbotics API error: 404 - Data not found`);
+          }
+          if (response.status === 500) {
+            console.warn(`[Statbotics] Server error (500) for endpoint: ${endpoint}`);
+            throw new Error(`Statbotics API error: 500 - Server error`);
+          }
+          throw new Error(`Statbotics API error: ${response.status} - ${response.statusText || "Unknown error"}`);
         }
 
-        throw new Error(
-          `Statbotics API error: ${response.status} - ${errorMessage}`,
-        );
-      }
+        const data = await response.json();
+        SET(cacheKey, { data, ts: Date.now() });
+        return data;
+      } catch (error) {
+        const isApiError = error instanceof Error && error.message.startsWith("Statbotics API error:");
+        // Don't retry 404s or other definitive API errors
+        if (isApiError) throw error;
 
-      const data = await response.json();
-      SET(cacheKey, { data, ts: Date.now() });
-      return data;
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes("Statbotics API error")
-      ) {
-        throw error;
+        if (attempt < retries) {
+          const delay = (attempt + 1) * 750;
+          console.warn(`[Statbotics] Request failed (attempt ${attempt + 1}/${retries + 1}), retrying in ${delay}ms...`);
+          await new Promise((r) => setTimeout(r, delay));
+        } else {
+          console.error("[Statbotics] Network or parsing error after retries:", error);
+          throw new Error("Failed to connect to Statbotics API", { cause: error });
+        }
       }
-      console.error("[Statbotics] Network or parsing error:", error);
-      throw new Error("Failed to connect to Statbotics API", { cause: error });
     }
   }
 
@@ -297,73 +289,59 @@ export class StatboticsService {
         console.error("[Statbotics] Failed to fetch year data:", error);
       }
 
+      const buildTeamDetail = (team: number, data: any): { team: number; epa: number } => {
+        const epaData = data.epa ?? {};
+        const totalPoints = epaData.total_points ?? {};
+        const breakdown = epaData.breakdown ?? {};
+        const epa =
+          totalPoints.mean ??
+          epaData.stats?.max ??
+          epaData.stats?.start ??
+          0;
+
+        teamDetails.set(team, {
+          team,
+          teamName: data.name ?? `Team ${team}`,
+          totalEPA: epa,
+          autoEPA: breakdown.auto_points ?? 0,
+          teleopEPA: breakdown.teleop_points ?? 0,
+          endgameEPA: breakdown.endgame_points ?? 0,
+          rank: epaData.ranks?.total?.rank ?? null,
+          percentile: epaData.ranks?.total?.percentile ?? null,
+        });
+
+        return { team, epa };
+      };
+
+      let hadErrors = false;
+
       const redEPAPromises = redTeams.map((team) =>
         this.getTeamYear(team, year)
-          .then((data) => {
-            const epaData = data.epa || {};
-            const totalPoints = epaData.total_points || {};
-            const breakdown = epaData.breakdown || {};
-            const epa =
-              totalPoints.mean ||
-              epaData.stats?.max ||
-              epaData.stats?.start ||
-              0;
-
-            teamDetails.set(team, {
-              team,
-              teamName: data.name || `Team ${team}`,
-              totalEPA: epa,
-              autoEPA: breakdown.auto_points || 0,
-              teleopEPA: breakdown.teleop_points || 0,
-              endgameEPA: breakdown.endgame_points || 0,
-              rank: epaData.ranks?.total?.rank || null,
-              percentile: epaData.ranks?.total?.percentile || null,
-            });
-
-            return { team, epa };
-          })
+          .then((data) => buildTeamDetail(team, data))
           .catch((err) => {
-            console.error(`[Statbotics] Failed to fetch team ${team}:`, err);
-            return { team, epa: 0 };
+            const is404 = err instanceof Error && err.message.includes("404");
+            if (!is404) hadErrors = true;
+            else console.warn(`[Statbotics] Team ${team} not found in Statbotics for ${year}`);
+            return { team, epa: null as null };
           }),
       );
 
       const blueEPAPromises = blueTeams.map((team) =>
         this.getTeamYear(team, year)
-          .then((data) => {
-            const epaData = data.epa || {};
-            const totalPoints = epaData.total_points || {};
-            const breakdown = epaData.breakdown || {};
-            const epa =
-              totalPoints.mean ||
-              epaData.stats?.max ||
-              epaData.stats?.start ||
-              0;
-
-            teamDetails.set(team, {
-              team,
-              teamName: data.name || `Team ${team}`,
-              totalEPA: epa,
-              autoEPA: breakdown.auto_points || 0,
-              teleopEPA: breakdown.teleop_points || 0,
-              endgameEPA: breakdown.endgame_points || 0,
-              rank: epaData.ranks?.total?.rank || null,
-              percentile: epaData.ranks?.total?.percentile || null,
-            });
-
-            return { team, epa };
-          })
+          .then((data) => buildTeamDetail(team, data))
           .catch((err) => {
-            console.error(`[Statbotics] Failed to fetch team ${team}:`, err);
-            return { team, epa: 0 };
+            const is404 = err instanceof Error && err.message.includes("404");
+            if (!is404) hadErrors = true;
+            else console.warn(`[Statbotics] Team ${team} not found in Statbotics for ${year}`);
+            return { team, epa: null as null };
           }),
       );
 
       const redEPAResults = await Promise.all(redEPAPromises);
       const blueEPAResults = await Promise.all(blueEPAPromises);
 
-      redEPAResults.forEach(({ team, epa }) => redTeamEPAs.set(team, epa));
-      blueEPAResults.forEach(({ team, epa }) => blueTeamEPAs.set(team, epa));
+      redEPAResults.forEach(({ team, epa }) => { if (epa !== null) redTeamEPAs.set(team, epa); });
+      blueEPAResults.forEach(({ team, epa }) => { if (epa !== null) blueTeamEPAs.set(team, epa); });
 
       let redWinProb = 0.5;
       let blueWinProb = 0.5;
@@ -407,6 +385,7 @@ export class StatboticsService {
         hasScores: hasScores,
         teamDetails: teamDetails,
         yearData: yearData,
+        hadErrors,
       };
 
       return result;
