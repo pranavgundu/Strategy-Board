@@ -194,9 +194,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["qrcode"],
-    rolldownOptions: {
-      mainFields: ["module", "main"],
-    },
   },
   resolve: {
     alias: {
