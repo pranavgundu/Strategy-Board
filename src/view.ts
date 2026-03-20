@@ -118,6 +118,7 @@ let E: {
   ContributorsList?: HTMLElement | null;
   ContributorsGrid?: HTMLElement | null;
   TeamsGrid?: HTMLElement | null;
+  DonatorsGrid?: HTMLElement | null;
   LastCommitInfo?: HTMLElement | null;
   LinkImportPanel?: HTMLElement | null;
   LinkImportStatus?: HTMLElement | null;
@@ -238,6 +239,7 @@ export class View {
         ContributorsList: get("contributors-list") as HTMLElement | null,
         ContributorsGrid: get("contributors-grid") as HTMLElement | null,
         TeamsGrid: get("teams-grid") as HTMLElement | null,
+        DonatorsGrid: get("donators-grid") as HTMLElement | null,
         LastCommitInfo: get("last-commit-info") as HTMLElement | null,
         LinkImportPanel: get("link-import-container") as HTMLElement | null,
         LinkImportStatus: get("link-import-status") as HTMLElement | null,
@@ -2859,7 +2861,8 @@ export class View {
       !E.ContributorsError ||
       !E.ContributorsList ||
       !E.ContributorsGrid ||
-      !E.TeamsGrid
+      !E.TeamsGrid ||
+      !E.DonatorsGrid
     ) {
       return;
     }
@@ -2935,6 +2938,45 @@ export class View {
         `;
 
         E.TeamsGrid?.appendChild(teamCard);
+      });
+
+      E.DonatorsGrid.innerHTML = "";
+      const donators = [
+        { name: "John Finnegan" },
+      ];
+      donators.forEach((donator) => {
+        const donatorCard = document.createElement("div");
+        donatorCard.className = `
+          flex flex-col items-center justify-center p-6 rounded-xl
+          hover:scale-105 transition-all duration-300
+          cursor-default relative overflow-hidden
+        `;
+        donatorCard.style.cssText = `
+          background: linear-gradient(145deg, #d4a44a, #b8860b, #d4a44a, #f0d68a, #d4a44a);
+          background-size: 300% 100%;
+          border: 3px solid #f0d68a;
+          box-shadow: inset 0 2px 4px rgba(255,248,220,0.4), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.4);
+          transition: background-position 0.8s ease;
+          background-position: 0% 0%;
+        `;
+
+        donatorCard.innerHTML = `
+          <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px);"></div>
+          <div class="relative text-center">
+            <div class="text-xl font-bold text-white tracking-wide">
+              ${donator.name}
+            </div>
+          </div>
+        `;
+
+        donatorCard.addEventListener("mouseenter", () => {
+          donatorCard.style.backgroundPosition = "100% 0%";
+        });
+        donatorCard.addEventListener("mouseleave", () => {
+          donatorCard.style.backgroundPosition = "0% 0%";
+        });
+
+        E.DonatorsGrid?.appendChild(donatorCard);
       });
 
       E.ContributorsLoading.classList.add("hidden");

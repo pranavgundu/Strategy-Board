@@ -63,6 +63,8 @@ The original version of Strategy Board comes from [Team 834](https://github.com/
 
 Field images come from [Pathplanner](https://github.com/mjansen4857/pathplanner).
 
+Thanks to **John Finnegan** for covering the Apple App Store and Google Play Store listing fees.
+
 ## License
 Strategy Board is [GNU General Public](https://github.com/pranavgundu/Strategy-Board/blob/main/LICENSE) licensed.
 
