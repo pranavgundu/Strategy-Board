@@ -897,6 +897,7 @@ export class Whiteboard {
     const selectedYear =
       (match as any).fieldMetadata?.selectedFieldYear ?? match.tbaYear;
     this.loadFieldImage(selectedYear);
+    this.updatePhaseLabels();
     this.redrawAll();
     this.updateUndoRedoButtons();
   }
@@ -906,6 +907,21 @@ export class Whiteboard {
    */
   public getCurrentFieldYear(): number | undefined {
     return getYearFromFieldImage(currentFieldImageUrl);
+  }
+
+  private updatePhaseLabels(): void {
+    const fieldYear = this.getCurrentFieldYear();
+    const teleopTab = document.getElementById("whiteboard-toolbar-mode-teleop");
+    const endgameTab = document.getElementById(
+      "whiteboard-toolbar-mode-endgame",
+    );
+    if (fieldYear === 2026) {
+      if (teleopTab) teleopTab.textContent = "ACTIVE";
+      if (endgameTab) endgameTab.textContent = "INACTIVE";
+    } else {
+      if (teleopTab) teleopTab.textContent = "TELEOP";
+      if (endgameTab) endgameTab.textContent = "ENDGAME";
+    }
   }
 
   /**
