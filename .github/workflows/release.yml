@@ -113,6 +113,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -123,10 +128,10 @@ jobs:
         run: bun run build
 
       - name: Add Android platform
-        run: bunx cap add android
+        run: npx cap add android
 
       - name: Sync Capacitor
-        run: bunx cap sync android
+        run: npx cap sync android
 
       - name: Decode keystore
         env:
