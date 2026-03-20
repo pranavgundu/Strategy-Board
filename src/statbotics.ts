@@ -131,19 +131,28 @@ export interface StatboticsMatchData {
   yearData: StatboticsYear | null;
 }
 
+import { GET, SET } from "@/db";
+
 const STATBOTICS_API_BASE = "https://api.statbotics.io/v3";
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export class StatboticsService {
   constructor() {}
 
   /**
-   * Makes an HTTP request to the Statbotics API.
+   * Makes an HTTP request to the Statbotics API, with IndexedDB caching.
    *
    * @param endpoint - The API endpoint to request (e.g., "/match/2024ncwak_qm1")
    * @returns A promise that resolves to the JSON response data
    * @throws Will throw an error if the API request fails
    */
   private async makeRequest(endpoint: string): Promise<any> {
+    const cacheKey = `sb_${endpoint}`;
+    const cached = await GET<{ data: any; ts: number }>(cacheKey);
+    if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     const url = `${STATBOTICS_API_BASE}${endpoint}`;
 
     try {
@@ -177,6 +186,7 @@ export class StatboticsService {
       }
 
       const data = await response.json();
+      SET(cacheKey, { data, ts: Date.now() });
       return data;
     } catch (error) {
       if (
