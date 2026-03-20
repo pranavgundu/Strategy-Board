@@ -1040,6 +1040,40 @@ export class View {
   }
 
   /**
+   * Silently prefetches and caches Statbotics data for a list of matches in the background.
+   * Runs sequentially with a small delay to avoid hammering the API.
+   */
+  private prefetchStatboticsQueue(
+    queue: Array<{ matchKey: string; redTeams: number[]; blueTeams: number[]; year: number }>,
+  ): void {
+    if (queue.length === 0) return;
+
+    (async () => {
+      for (const item of queue) {
+        const existing = await GET_CACHED_STATBOTICS(item.matchKey);
+        if (existing) continue;
+
+        try {
+          const matchData = await this.statboticsService.getMatchData(
+            item.matchKey,
+            item.redTeams,
+            item.blueTeams,
+            item.year,
+          );
+
+          if (!matchData.hadErrors) {
+            await CACHE_STATBOTICS(item.matchKey, matchData);
+          }
+        } catch {
+          // silently skip — will retry when user opens the match
+        }
+
+        await new Promise((r) => setTimeout(r, 150));
+      }
+    })();
+  }
+
+  /**
    * Loads and displays Statbotics data for a match including EPA ratings and win probabilities.
    *
    * @param match - The match to load Statbotics data for
@@ -1103,8 +1137,12 @@ export class View {
           );
         }
 
-        await CACHE_STATBOTICS(cacheKey, matchData);
-        console.log(`[Statbotics] Cached data for ${cacheKey}`);
+        if (!matchData.hadErrors) {
+          await CACHE_STATBOTICS(cacheKey, matchData);
+          console.log(`[Statbotics] Cached data for ${cacheKey}`);
+        } else {
+          console.warn(`[Statbotics] Not caching ${cacheKey} due to fetch errors — will retry next load`);
+        }
       }
 
       this.currentStatboticsData = matchData;
@@ -2190,12 +2228,14 @@ export class View {
 
       this.showTBAStatus(`Importing ${matches.length} matches...`, false);
 
+      const year = parseInt(eventKey.substring(0, 4));
+      const prefetchQueue: Array<{ matchKey: string; redTeams: number[]; blueTeams: number[]; year: number }> = [];
+
       for (const match of matches) {
         const formattedMatchName = this.selectedEventName
           ? `${match.matchName} @ ${this.selectedEventName}`
           : match.matchName;
 
-        const year = parseInt(eventKey.substring(0, 4));
         const id = await this.model.createNewMatch(
           formattedMatchName,
           match.redTeams[2] || "",
@@ -2219,7 +2259,16 @@ export class View {
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
         );
+
+        prefetchQueue.push({
+          matchKey: match.matchKey,
+          redTeams: [...match.redTeams].reverse().map(Number).filter((t) => !isNaN(t)),
+          blueTeams: match.blueTeams.map(Number).filter((t) => !isNaN(t)),
+          year,
+        });
       }
+
+      this.prefetchStatboticsQueue(prefetchQueue);
 
       this.showTBAStatus(
         `Successfully imported ${matches.length} matches!`,
@@ -2274,12 +2323,14 @@ export class View {
 
       this.showTBAStatus(`Importing ${matches.length} matches...`, false);
 
+      const year = parseInt(eventKey.substring(0, 4));
+      const prefetchQueue: Array<{ matchKey: string; redTeams: number[]; blueTeams: number[]; year: number }> = [];
+
       for (const match of matches) {
         const formattedMatchName = this.selectedEventName
           ? `${match.matchName} @ ${this.selectedEventName}`
           : match.matchName;
 
-        const year = parseInt(eventKey.substring(0, 4));
         const id = await this.model.createNewMatch(
           formattedMatchName,
           match.redTeams[2] || "",
@@ -2303,7 +2354,16 @@ export class View {
           match.blueTeams[1] || "",
           match.blueTeams[2] || "",
         );
+
+        prefetchQueue.push({
+          matchKey: match.matchKey,
+          redTeams: [...match.redTeams].reverse().map(Number).filter((t) => !isNaN(t)),
+          blueTeams: match.blueTeams.map(Number).filter((t) => !isNaN(t)),
+          year,
+        });
       }
+
+      this.prefetchStatboticsQueue(prefetchQueue);
 
       this.showTBAStatus(
         `Successfully imported ${matches.length} matches!`,
