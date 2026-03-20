@@ -1020,7 +1020,16 @@ export class View {
     const statboticsTab = document.getElementById(
       "whiteboard-toolbar-mode-statbotics",
     );
-    if (match.isFromTBA()) {
+    const hasTeams = [
+      match.redOne,
+      match.redTwo,
+      match.redThree,
+      match.blueOne,
+      match.blueTwo,
+      match.blueThree,
+    ].some((t) => t && t.trim() !== "");
+
+    if (hasTeams) {
       statboticsTab?.classList.remove("hidden");
       this.loadStatboticsData(match);
     } else {
@@ -1035,18 +1044,6 @@ export class View {
    * @returns A promise that resolves when data is loaded and displayed
    */
   private async loadStatboticsData(match: Match): Promise<void> {
-    if (!match.tbaEventKey || !match.tbaMatchKey || !match.tbaYear) {
-      const emptyState = document.getElementById("statbotics-empty-state");
-      const dataContainer = document.getElementById(
-        "statbotics-data-container",
-      );
-      const loadingState = document.getElementById("statbotics-loading-state");
-      emptyState?.classList.remove("hidden");
-      dataContainer?.classList.add("hidden");
-      loadingState?.classList.add("hidden");
-      return;
-    }
-
     const emptyState = document.getElementById("statbotics-empty-state");
     const dataContainer = document.getElementById("statbotics-data-container");
     const loadingState = document.getElementById("statbotics-loading-state");
@@ -1076,23 +1073,36 @@ export class View {
         parseInt(match.blueThree),
       ].filter((t) => !isNaN(t));
 
-      let matchData = await GET_CACHED_STATBOTICS(match.tbaMatchKey);
+      const year = match.tbaYear || new Date().getFullYear();
+      const cacheKey = match.tbaMatchKey || `user_${match.id}`;
+
+      let matchData = await GET_CACHED_STATBOTICS(cacheKey);
 
       if (matchData) {
-        console.log(`[Statbotics] Using cached data for ${match.tbaMatchKey}`);
+        console.log(`[Statbotics] Using cached data for ${cacheKey}`);
       } else {
         console.log(
-          `[Statbotics] Cache miss for ${match.tbaMatchKey}, fetching from API...`,
-        );
-        matchData = await this.statboticsService.getMatchData(
-          match.tbaMatchKey,
-          redTeams,
-          blueTeams,
-          match.tbaYear,
+          `[Statbotics] Cache miss for ${cacheKey}, fetching from API...`,
         );
 
-        await CACHE_STATBOTICS(match.tbaMatchKey, matchData);
-        console.log(`[Statbotics] Cached data for ${match.tbaMatchKey}`);
+        if (match.isFromTBA()) {
+          matchData = await this.statboticsService.getMatchData(
+            match.tbaMatchKey!,
+            redTeams,
+            blueTeams,
+            year,
+          );
+        } else {
+          matchData = await this.statboticsService.getMatchData(
+            `user_${match.id}`,
+            redTeams,
+            blueTeams,
+            year,
+          );
+        }
+
+        await CACHE_STATBOTICS(cacheKey, matchData);
+        console.log(`[Statbotics] Cached data for ${cacheKey}`);
       }
 
       this.currentStatboticsData = matchData;
