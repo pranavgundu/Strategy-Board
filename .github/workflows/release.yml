@@ -184,7 +184,7 @@ jobs:
 
       - name: Rename APK
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=$(bun -e "console.log(require('./package.json').version)")
           mkdir -p release
           APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
           cp "$APK" "release/Strategy.Board-${VERSION}.apk"

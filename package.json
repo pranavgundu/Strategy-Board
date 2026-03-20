@@ -23,7 +23,7 @@
     "cap:open:android": "bunx cap open android",
     "cap:run:ios": "bun run cap:sync && bunx cap run ios",
     "cap:run:android": "bun run cap:sync && bunx cap run android",
-    "cap:build:android": "bun run cap:sync && cd android && ./gradlew assembleDebug && cp app/build/outputs/apk/debug/app-debug.apk ../release/\"Strategy Board-$npm_package_version.apk\"",
+    "cap:build:android": "bun run cap:sync && cd android && ./gradlew assembleDebug && cp app/build/outputs/apk/debug/app-debug.apk ../release/\"Strategy Board-$(bun -e \"console.log(require('../package.json').version)\").apk\"",
     "cap:build:ios": "bun run cap:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath ../../release/ios-build archive",
     "electron:dev": "concurrently \"vite --host\" \"wait-on http://localhost:5173 && VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "electron:build": "bun run build && electron-builder",
@@ -138,6 +138,15 @@
     "wait-on": "^9.0.4",
     "workbox-window": "^7.4.0"
   },
+  "ignoredBuiltDependencies": [
+    "@firebase/util",
+    "core-js",
+    "esbuild",
+    "protobufjs"
+  ],
+  "trustedDependencies": [
+    "sharp"
+  ],
   "overrides": {
     "tar": ">=7.5.8",
     "minimatch": ">=10.2.1",
