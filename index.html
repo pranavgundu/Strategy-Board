@@ -1,5 +1,5 @@
 <!doctype html>
-<html style="background-color: #192334">
+<html style="background-color: #0d0d0d">
     <head>
         <script>
             (function (w, d, s, l, i) {
@@ -273,17 +273,17 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-[99999]"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-md bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-md bg-[#141414] border border-[#1e1e1e] rounded-[6px] overflow-hidden"
             >
                 <div
-                    class="w-full pt-6 pb-4 px-6 bg-slate-500 rounded-t-2xl md:rounded-t-3xl"
+                    class="w-full pt-5 pb-4 px-6 bg-[#111111] border-b border-[#1e1e1e]"
                 >
                     <h2
-                        class="text-2xl sm:text-3xl text-center text-slate-100 font-bold"
+                        class="text-base text-center text-[#e8e8e8] font-semibold"
                     >
                         Welcome to Strategy Board!
                     </h2>
-                    <p class="text-center text-slate-300 mt-2">
+                    <p class="text-center text-[#999] text-sm mt-1">
                         What's your team number?
                     </p>
                 </div>
@@ -294,7 +294,7 @@
                         placeholder="Enter team number"
                         maxlength="5"
                         inputmode="numeric"
-                        class="w-full text-xl sm:text-2xl text-center text-slate-200 p-4 bg-slate-700 rounded-xl outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="w-full text-xl text-center text-[#e8e8e8] p-4 bg-[#0d0d0d] border border-[#2a2a2a] rounded-[6px] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -303,7 +303,7 @@
                 <div class="flex w-full">
                     <button
                         id="team-number-save-btn"
-                        class="w-full text-center text-lg sm:text-xl font-bold text-white bg-green-600 p-4 sm:p-5 rounded-b-2xl md:rounded-b-3xl glossy-shine hover:bg-green-500"
+                        class="w-full text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none"
                     >
                         Continue
                     </button>
@@ -313,27 +313,27 @@
         <div id="home-container" class="flex flex-col w-full h-full touch-none">
             <div
                 id="home-toolbar"
-                class="flex items-center justify-between w-full h-16 sm:h-20 md:h-24 bg-slate-600 px-4 sm:px-8 md:px-12 pt-[env(safe-area-inset-top)]"
+                class="flex items-center justify-between w-full h-14 bg-[#111111] border-b border-[#1e1e1e] px-4 sm:px-6 md:px-8 pt-[env(safe-area-inset-top)]"
             >
                 <div
                     id="home-toolbar-logo"
-                    class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white select-none cursor-pointer"
+                    class="text-sm font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
                     onclick="location.reload()"
                 >
                     Strategy Board
                 </div>
                 <div
-                    class="flex gap-2 sm:gap-3 md:gap-4 text-base sm:text-xl md:text-2xl text-white"
+                    class="flex gap-2 items-center"
                 >
                     <button
                         id="home-toolbar-new-btn"
-                        class="flex items-center justify-center w-16 sm:w-20 md:w-24 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-green-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
+                        class="flex items-center justify-center px-4 h-8 btn-accent text-xs"
                     >
                         New
                     </button>
                     <button
                         id="home-toolbar-tba-btn"
-                        class="flex items-center justify-center w-16 sm:w-20 md:w-24 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-blue-500 glass-button glossy-shine gap-1 sm:gap-2 text-sm sm:text-base md:text-lg lg:text-xl"
+                        class="flex items-center justify-center gap-1.5 px-4 h-8 btn-secondary text-xs"
                     >
                         <span>TBA</span>
                         <img
@@ -344,21 +344,21 @@
                     </button>
                     <button
                         id="home-toolbar-import-btn"
-                        class="flex items-center justify-center w-20 sm:w-28 md:w-32 lg:w-40 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-orange-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
+                        class="flex items-center justify-center px-4 h-8 btn-secondary text-xs"
                     >
                         <span class="hidden sm:inline">Import QR</span>
                         <span class="sm:hidden">Import</span>
                     </button>
                     <button
                         id="home-toolbar-import-link-btn"
-                        class="flex items-center justify-center gap-1 sm:gap-2 w-22 sm:w-28 md:w-32 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-purple-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
+                        class="flex items-center justify-center gap-1.5 px-4 h-8 btn-secondary text-xs"
                     >
                         <span>Import</span>
                         <i class="fas fa-link"></i>
                     </button>
                     <button
                         id="home-toolbar-clear-btn"
-                        class="flex items-center justify-center w-16 sm:w-20 md:w-24 lg:w-36 h-10 sm:h-11 md:h-12 rounded-xl md:rounded-2xl bg-red-500 glass-button glossy-shine text-sm sm:text-base md:text-lg lg:text-xl"
+                        class="flex items-center justify-center px-4 h-8 btn-danger text-xs"
                     >
                         Clear
                     </button>
@@ -366,25 +366,25 @@
             </div>
             <div
                 id="home-match-list"
-                class="w-full p-6 flex-1 flex flex-col gap-2 items-center overflow-y-auto bg-slate-800"
+                class="w-full p-3 flex-1 flex flex-col gap-1 items-stretch overflow-y-auto bg-[#0d0d0d]"
             >
                 <div
                     id="home-match-list-empty-placeholder"
-                    class="absolute top-1/2 text-slate-300 text-base sm:text-lg md:text-xl italic pointer-events-none"
+                    class="absolute top-1/2 text-[#3a3a3a] text-sm pointer-events-none"
                 >
                     Click
                     <span
-                        class="not-italic text-white bg-green-500 px-2 py-1 rounded-lg"
+                        class="not-italic text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-2 py-0.5 rounded"
                         >New</span
                     >
                     to add matches
                 </div>
                 <div
                     id="home-match-list-item-template"
-                    class="hidden w-full h-20 sm:h-22 md:h-24 bg-slate-700 flex shrink-0 justify-between items-center rounded-xl glass-card px-4 sm:px-6 md:px-8"
+                    class="hidden w-full bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-[6px] px-4 py-3"
                 >
                     <div
-                        class="grow-1 basis-0 text-slate-200 font-bold text-base sm:text-lg md:text-xl lg:text-2xl select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                        class="grow-1 basis-0 text-[#e8e8e8] font-semibold text-sm select-none overflow-hidden text-ellipsis whitespace-nowrap"
                     >
                         Match Name
                     </div>
@@ -392,17 +392,17 @@
                         class="w-1/2 flex justify-center items-center gap-2 sm:gap-4 md:gap-6"
                     >
                         <div
-                            class="w-1/2 text-red-400 text-sm sm:text-base md:text-lg lg:text-2xl text-right select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                            class="w-1/2 text-[#c97070] text-xs text-right select-none overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                             000 000 000
                         </div>
                         <div
-                            class="text-slate-200 text-sm sm:text-base md:text-lg lg:text-2xl select-none"
+                            class="text-[#3a3a3a] text-xs select-none"
                         >
                             VS
                         </div>
                         <div
-                            class="w-1/2 text-blue-400 text-sm sm:text-base md:text-lg lg:text-2xl select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                            class="w-1/2 text-[#6090c9] text-xs select-none overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                             000 000 000
                         </div>
@@ -414,40 +414,40 @@
                             class="flex flex-col w-8 sm:w-10 md:w-12 gap-1 items-center justify-center"
                         >
                             <div
-                                class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
+                                class="w-1 h-1 rounded-full bg-[#333]"
                             ></div>
                             <div
-                                class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
+                                class="w-1 h-1 rounded-full bg-[#333]"
                             ></div>
                             <div
-                                class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
+                                class="w-1 h-1 rounded-full bg-[#333]"
                             ></div>
                         </button>
                         <div
                             class="hidden flex items-center justify-center gap-1 sm:gap-2"
                         >
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-yellow-500 rounded-xl md:rounded-2xl glass-button glossy-shine"
+                                class="px-3 py-1.5 text-xs btn-secondary"
                             >
                                 Edit
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-green-500 rounded-xl md:rounded-2xl glass-button glossy-shine"
+                                class="px-3 py-1.5 text-xs btn-secondary"
                             >
                                 Duplicate
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-blue-500 rounded-xl md:rounded-2xl glass-button glossy-shine whitespace-nowrap"
+                                class="px-3 py-1.5 text-xs btn-secondary whitespace-nowrap"
                             >
                                 Export PNG
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-orange-500 rounded-xl md:rounded-2xl glass-button glossy-shine whitespace-nowrap"
+                                class="px-3 py-1.5 text-xs btn-secondary whitespace-nowrap"
                             >
                                 Export QR
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-purple-500 rounded-xl md:rounded-2xl glass-button glossy-shine whitespace-nowrap flex items-center justify-center gap-1"
+                                class="px-3 py-1.5 text-xs btn-secondary whitespace-nowrap flex items-center gap-1"
                             >
                                 <span>Share</span>
                                 <i
@@ -455,7 +455,7 @@
                                 ></i>
                             </button>
                             <button
-                                class="w-20 sm:w-24 p-1 text-sm text-white bg-red-500 rounded-xl md:rounded-2xl glass-button glossy-shine"
+                                class="px-3 py-1.5 text-xs btn-danger"
                             >
                                 Delete
                             </button>
@@ -465,7 +465,7 @@
             </div>
             <div
                 id="home-bottom-bar"
-                class="w-full bg-slate-700 flex items-center justify-center border-t border-slate-600 transition-all duration-300 relative"
+                class="w-full bg-[#0d0d0d] flex items-center justify-center border-t border-[#1a1a1a] relative"
                 style="min-height: 4rem; padding-top: env(safe-area-inset-bottom, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);"
             >
                     <div class="flex items-center justify-center gap-4">
@@ -473,20 +473,20 @@
                             href="https://github.com/pranavgundu/Strategy-Board"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                            class="flex items-center justify-center text-[#383838] hover:text-[#666] transition-colors"
                         >
                             <i class="fab fa-github text-2xl leading-none"></i>
                         </a>
                         <a
                             href="mailto:pranav@strategyboard.app"
-                            class="flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                            class="flex items-center justify-center text-[#383838] hover:text-[#666] transition-colors"
                         >
                             <i class="fas fa-envelope text-2xl leading-none"></i>
                         </a>
                     </div>
                     <div
                         id="last-commit-info"
-                        class="absolute left-6 text-slate-400 text-xs hidden"
+                        class="absolute left-6 text-[#2d2d2d] text-xs hidden"
                         style="top: 50%; transform: translateY(-50%);"
                     >
                         <span class="opacity-0">Loading...</span>
@@ -494,7 +494,7 @@
                     <a
                         id="contributors-link-btn"
                         href="#"
-                        class="absolute right-6 flex items-center text-slate-300 hover:text-white transition-colors text-lg font-semibold"
+                        class="absolute right-6 flex items-center text-[#383838] hover:text-[#666] transition-colors text-xs"
                         style="top: 50%; transform: translateY(-50%);"
                     >
                         strategyboard.app
@@ -506,15 +506,15 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-xl bg-[#141414] border border-[#1e1e1e] rounded-[6px] overflow-hidden"
             >
                 <div
-                    class="w-full pt-6 pb-4 text-xl sm:text-2xl md:text-3xl text-center text-slate-200 font-bold"
+                    class="w-full pt-5 pb-4 text-center text-[#e8e8e8] text-base font-semibold border-b border-[#1e1e1e] bg-[#111111]"
                 >
                     Clear All Data?
                 </div>
                 <div
-                    class="w-full px-6 sm:px-8 md:px-10 pb-6 text-base sm:text-lg text-center text-slate-300"
+                    class="w-full px-6 py-5 text-sm text-center text-[#999]"
                 >
                     This will permanently delete all matches and data. This
                     action cannot be undone.
@@ -522,13 +522,13 @@
                 <div class="flex w-full">
                     <button
                         id="clear-confirm-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-blue-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine hover:bg-blue-600 transition-colors"
+                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] rounded-none"
                     >
                         Cancel
                     </button>
                     <button
                         id="clear-confirm-clear-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine hover:bg-red-600 transition-colors"
+                        class="w-1/2 text-center text-sm btn-danger p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
                     >
                         Clear All
                     </button>
@@ -540,13 +540,13 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal max-h-[90vh] overflow-y-auto"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-[#141414] border border-[#1e1e1e] rounded-[6px] max-h-[90vh] overflow-y-auto"
             >
                 <input
                     id="create-match-name"
                     placeholder="Match Name"
                     maxlength="25"
-                    class="w-full pt-4 pb-4 sm:pt-6 sm:pb-6 text-xl sm:text-2xl md:text-3xl text-center text-slate-300 font-bold rounded-t-2xl md:rounded-t-3xl bg-slate-500 outline-0"
+                    class="w-full py-4 px-6 text-base text-center text-[#e8e8e8] font-semibold bg-[#111111] border-b border-[#1e1e1e] outline-0 rounded-none"
                     autocomplete="off"
                     autocapitalize="off"
                     spellcheck="false"
@@ -558,7 +558,7 @@
                         placeholder="Red 1"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#c97070] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-b border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -569,7 +569,7 @@
                         placeholder="Red 2"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#c97070] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-b border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -580,7 +580,7 @@
                         placeholder="Red 3"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#c97070] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-b border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -591,7 +591,7 @@
                         placeholder="Blue 1"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#6090c9] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -602,7 +602,7 @@
                         placeholder="Blue 2"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#6090c9] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -613,7 +613,7 @@
                         placeholder="Blue 3"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#6090c9] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -622,13 +622,13 @@
                 <div class="flex w-full">
                     <button
                         id="create-match-create-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
+                        class="w-1/2 text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none"
                     >
                         Create
                     </button>
                     <button
                         id="create-match-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
+                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
                     >
                         Cancel
                     </button>
@@ -641,13 +641,13 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal max-h-[90vh] overflow-y-auto"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-[#141414] border border-[#1e1e1e] rounded-[6px] max-h-[90vh] overflow-y-auto"
             >
                 <input
                     id="edit-match-name"
                     placeholder="Match Name"
                     maxlength="25"
-                    class="w-full pt-4 pb-4 sm:pt-6 sm:pb-6 text-xl sm:text-2xl md:text-3xl text-center text-slate-300 font-bold rounded-t-2xl md:rounded-t-3xl bg-slate-500 outline-0"
+                    class="w-full py-4 px-6 text-base text-center text-[#e8e8e8] font-semibold bg-[#111111] border-b border-[#1e1e1e] outline-0 rounded-none"
                     autocomplete="off"
                     autocapitalize="off"
                     spellcheck="false"
@@ -659,7 +659,7 @@
                         placeholder="Red 1"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#c97070] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-b border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -670,7 +670,7 @@
                         placeholder="Red 2"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#c97070] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-b border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -681,7 +681,7 @@
                         placeholder="Red 3"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-red-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#c97070] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-b border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -692,7 +692,7 @@
                         placeholder="Blue 1"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#6090c9] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -703,7 +703,7 @@
                         placeholder="Blue 2"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#6090c9] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -714,7 +714,7 @@
                         placeholder="Blue 3"
                         maxlength="5"
                         inputmode="numeric"
-                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-blue-400 p-2 sm:p-3 md:p-4 bg-slate-700 outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="text-lg sm:text-xl md:text-2xl lg:text-3xl text-center text-[#6090c9] p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-r border-[#1e1e1e] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -723,13 +723,13 @@
                 <div class="flex w-full">
                     <button
                         id="edit-match-save-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
+                        class="w-1/2 text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none"
                     >
                         Save
                     </button>
                     <button
                         id="edit-match-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
+                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
                     >
                         Cancel
                     </button>
@@ -741,51 +741,51 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal max-h-[90vh] overflow-hidden"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl bg-[#141414] border border-[#1e1e1e] rounded-[6px] max-h-[90vh] overflow-hidden"
             >
                 <div
-                    class="w-full pt-4 sm:pt-5 md:pt-6 pb-3 sm:pb-4 text-lg sm:text-xl md:text-2xl text-center text-slate-200 font-bold flex-shrink-0"
+                    class="w-full px-6 py-4 text-base text-center text-[#e8e8e8] font-semibold flex-shrink-0 bg-[#111111] border-b border-[#1e1e1e]"
                 >
                     Import from The Blue Alliance
                 </div>
                 <div class="w-full flex-1 overflow-y-auto">
-                    <div class="w-full px-4 sm:px-6 md:px-8 pb-3 sm:pb-4">
+                    <div class="w-full px-6 pb-4">
                         <input
                             id="tba-api-key"
                             placeholder="TBA API Key (optional)"
                             type="password"
-                            class="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base md:text-lg lg:text-xl text-center text-slate-300 rounded-lg md:rounded-xl bg-slate-700 outline-0"
+                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0"
                             autocomplete="off"
                             autocapitalize="off"
                             spellcheck="false"
                         />
                         <div
-                            class="text-xs sm:text-sm text-slate-400 text-center mt-2"
+                            class="text-xs text-[#707070] text-center mt-2"
                         >
                             Using shared API key. Add your own at
                             <a
                                 href="https://www.thebluealliance.com/account"
                                 target="_blank"
-                                class="text-blue-400 underline"
+                                class="text-[#60a5fa] underline"
                                 >thebluealliance.com/account</a
                             >
                             for higher rate limits
                         </div>
                     </div>
                     <div
-                        class="w-full px-4 sm:px-6 md:px-8 pb-3 sm:pb-4 relative"
+                        class="w-full px-6 pb-4 relative"
                     >
                         <input
                             id="tba-event-search"
                             placeholder="Search events..."
-                            class="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base md:text-lg lg:text-xl text-center text-slate-300 rounded-lg md:rounded-xl bg-slate-700 outline-0"
+                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0"
                             autocomplete="off"
                             autocapitalize="off"
                             spellcheck="false"
                         />
                         <div
                             id="tba-event-dropdown"
-                            class="hidden absolute top-full left-4 right-4 sm:left-6 sm:right-6 md:left-8 md:right-8 mt-1 bg-slate-700 rounded-lg md:rounded-xl max-h-64 sm:max-h-80 md:max-h-96 overflow-y-auto z-50 shadow-2xl"
+                            class="hidden absolute top-full left-6 right-6 mt-1 bg-[#1e1e1e] rounded-[6px] max-h-64 overflow-y-auto z-50 shadow-2xl"
                         >
                             <div
                                 id="tba-event-list"
@@ -795,25 +795,25 @@
                         <input id="tba-event-key" type="hidden" />
                     </div>
                     <div
-                        class="w-full px-4 sm:px-6 md:px-8 pb-4 sm:pb-5 md:pb-6 relative"
+                        class="w-full px-6 pb-6 relative"
                     >
                         <input
                             id="tba-team-search"
                             placeholder="Select event first..."
                             disabled
-                            class="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base md:text-lg lg:text-xl text-center text-slate-300 rounded-lg md:rounded-xl bg-slate-700 outline-0 disabled:opacity-50"
+                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0 disabled:opacity-50"
                             autocomplete="off"
                             autocapitalize="off"
                             spellcheck="false"
                         />
                         <div
                             id="tba-team-dropdown"
-                            class="hidden absolute top-full left-4 right-4 sm:left-6 sm:right-6 md:left-8 md:right-8 mt-1 bg-slate-700 rounded-lg md:rounded-xl max-h-64 sm:max-h-80 md:max-h-96 overflow-y-auto z-50 shadow-2xl"
+                            class="hidden absolute top-full left-6 right-6 mt-1 bg-[#1e1e1e] rounded-[6px] max-h-64 overflow-y-auto z-50 shadow-2xl"
                         >
                             <div id="tba-team-list" class="flex flex-col"></div>
                             <button
                                 id="tba-all-matches-btn"
-                                class="w-full p-3 sm:p-4 text-sm sm:text-base md:text-lg text-center text-slate-200 font-bold bg-green-500 hover:bg-green-600 transition-colors border-t border-slate-600"
+                                class="w-full p-3 text-sm text-center text-[#e8e8e8] font-semibold bg-[#22c55e] hover:bg-[#16a34a] transition-colors border-t border-[#141414]"
                             >
                                 All Matches
                             </button>
@@ -822,19 +822,19 @@
                     </div>
                     <div
                         id="tba-status-message"
-                        class="hidden w-full px-4 sm:px-6 md:px-8 pb-3 sm:pb-4 text-center text-sm sm:text-base text-slate-300"
+                        class="hidden w-full px-6 pb-4 text-center text-sm text-[#a0a0a0]"
                     ></div>
                 </div>
                 <div class="flex w-full flex-shrink-0">
                     <button
                         id="tba-import-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine"
+                        class="w-1/2 text-center text-base font-semibold text-white bg-[#22c55e] p-4 rounded-bl-[6px] hover:bg-[#16a34a] transition-colors"
                     >
                         Import
                     </button>
                     <button
                         id="tba-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine"
+                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
                     >
                         Cancel
                     </button>
@@ -847,11 +847,11 @@
         >
             <div
                 id="qr-import-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-slate-600 rounded-3xl p-4 glass-modal max-h-[90vh] overflow-y-auto"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-4 max-h-[90vh] overflow-y-auto"
             >
                 <div
                     id="qr-import-status"
-                    class="mb-3 text-slate-100 font-bold select-none"
+                    class="mb-3 text-[#e8e8e8] font-semibold select-none"
                     aria-hidden="true"
                 >
                     <span id="qr-import-status-text" aria-hidden="false"></span>
@@ -902,72 +902,72 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl max-h-96 bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl max-h-96 bg-[#141414] border border-[#1e1e1e] rounded-[6px] overflow-hidden"
                 onclick="event.stopPropagation()"
             >
                 <div
-                    class="w-full pt-6 pb-4 text-xl sm:text-2xl md:text-3xl text-center text-slate-200 font-bold flex-shrink-0"
+                    class="w-full px-6 py-4 text-base text-center text-[#e8e8e8] font-semibold flex-shrink-0 bg-[#111111] border-b border-[#1e1e1e]"
                 >
                     Share Link Generated!
                 </div>
                 <div
-                    class="w-full px-6 sm:px-8 md:px-10 pb-6 flex flex-col gap-4 overflow-y-auto flex-1"
+                    class="w-full px-6 pb-6 flex flex-col gap-4 overflow-y-auto flex-1"
                 >
-                    <div class="text-center text-slate-300">
-                        <p class="text-sm sm:text-base mb-2">Share Code:</p>
+                    <div class="text-center text-[#a0a0a0]">
+                        <p class="text-sm mb-2">Share Code:</p>
                         <div class="flex items-center justify-center gap-2">
                             <p
                                 id="share-code-display"
-                                class="text-2xl sm:text-3xl md:text-4xl font-mono font-bold tracking-wider text-white bg-slate-700 px-4 py-2 rounded-xl"
+                                class="text-xl font-mono font-semibold tracking-wider text-white bg-[#1e1e1e] px-4 py-2 rounded-[6px]"
                             >
                                 ABC123
                             </p>
                             <button
                                 id="share-code-copy-btn"
-                                class="px-4 py-2 bg-blue-500 text-white rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors"
+                                class="px-4 py-2 bg-[#2563eb] text-white rounded-[6px] hover:bg-[#1d4ed8] transition-colors"
                                 title="Copy code"
                             >
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="text-center text-slate-300">
-                        <p class="text-sm sm:text-base mb-2">Share Link:</p>
+                    <div class="text-center text-[#a0a0a0]">
+                        <p class="text-sm mb-2">Share Link:</p>
                         <div class="flex items-center justify-center gap-2">
                             <input
                                 id="share-link-display"
                                 type="text"
                                 readonly
                                 value="https://strategyboard.app/?share=ABC123"
-                                class="flex-1 text-sm sm:text-base text-slate-200 bg-slate-700 px-4 py-2 rounded-xl outline-0 font-mono"
+                                class="flex-1 text-sm text-[#e8e8e8] bg-[#1e1e1e] px-4 py-2 rounded-[6px] outline-0 font-mono"
                             />
                             <button
                                 id="share-link-copy-btn"
-                                class="px-4 py-2 bg-blue-500 text-white rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors"
+                                class="px-4 py-2 bg-[#2563eb] text-white rounded-[6px] hover:bg-[#1d4ed8] transition-colors"
                                 title="Copy link"
                             >
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="text-center text-slate-400 text-xs sm:text-sm">
+                    <div class="text-center text-[#707070] text-xs">
                         <i class="fas fa-info-circle"></i> Link expires in 1
                         week
                     </div>
-                    <div class="w-full border-t border-slate-500 pt-6">
+                    <div class="w-full border-t border-[#1e1e1e] pt-6">
                         <p
-                            class="text-sm sm:text-base text-slate-300 mb-4 text-center"
+                            class="text-sm text-[#a0a0a0] mb-4 text-center"
                         >
                             QR Code:
                         </p>
                         <div class="flex justify-center">
                             <div
                                 id="share-qr-code"
-                                class="bg-white p-4 rounded-lg"
+                                class="bg-white p-4 rounded-[6px]"
                             ></div>
                         </div>
                         <p
-                            class="text-xs sm:text-sm text-slate-400 text-center mt-4"
+                            class="text-xs text-[#707070] text-center mt-4"
                         >
                             Scan to open link
                         </p>
@@ -976,7 +976,7 @@
                 <div class="flex w-full flex-shrink-0">
                     <button
                         id="share-success-close-btn"
-                        class="w-full text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-b-2xl md:rounded-b-3xl glossy-shine hover:bg-green-600 transition-colors"
+                        class="w-full text-center text-base font-semibold text-white bg-[#22c55e] p-4 rounded-b-[6px] hover:bg-[#16a34a] transition-colors"
                     >
                         Done
                     </button>
@@ -988,40 +988,40 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal overflow-hidden"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-xl bg-[#141414] border border-[#1e1e1e] rounded-[6px] overflow-hidden"
             >
                 <div
-                    class="w-full pt-6 pb-4 text-xl sm:text-2xl md:text-3xl text-center text-slate-200 font-bold"
+                    class="w-full px-6 py-4 text-base text-center text-[#e8e8e8] font-semibold bg-[#111111] border-b border-[#1e1e1e]"
                 >
                     Import from Link
                 </div>
                 <div
-                    class="w-full px-6 sm:px-8 md:px-10 pb-6 text-base sm:text-lg text-center text-slate-300"
+                    class="w-full px-6 pb-6 text-base text-center text-[#a0a0a0]"
                 >
                     <input
                         id="link-import-code"
                         placeholder="Enter 6-character share code"
                         maxlength="6"
-                        class="w-full p-3 sm:p-4 text-lg sm:text-xl md:text-2xl text-center text-slate-200 rounded-xl bg-slate-700 outline-0 uppercase tracking-wider font-mono"
+                        class="w-full p-3 text-base text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0 uppercase tracking-wider font-mono"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
                     />
                     <div
                         id="link-import-status"
-                        class="hidden mt-4 text-sm sm:text-base text-slate-300"
+                        class="hidden mt-4 text-sm text-[#a0a0a0]"
                     ></div>
                 </div>
                 <div class="flex w-full">
                     <button
                         id="link-import-import-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-green-500 p-4 sm:p-5 md:p-6 rounded-bl-2xl md:rounded-bl-3xl glossy-shine hover:bg-green-600 transition-colors"
+                        class="w-1/2 text-center text-base font-semibold text-white bg-[#22c55e] p-4 rounded-bl-[6px] hover:bg-[#16a34a] transition-colors"
                     >
                         Import
                     </button>
                     <button
                         id="link-import-cancel-btn"
-                        class="w-1/2 text-center text-lg sm:text-xl md:text-2xl font-bold text-white bg-red-500 p-4 sm:p-5 md:p-6 rounded-br-2xl md:rounded-br-3xl glossy-shine hover:bg-red-600 transition-colors"
+                        class="w-1/2 text-center text-base font-semibold text-white bg-[#ef4444] p-4 rounded-br-[6px] hover:bg-[#dc2626] transition-colors"
                     >
                         Cancel
                     </button>
@@ -1038,7 +1038,7 @@
                  handler only runs when the backdrop itself is clicked. -->
             <div
                 id="qr-export-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 bg-slate-600 rounded-3xl p-6 glass-modal"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-6"
                 style="max-height: 95vh; max-width: 95vw; overflow: hidden"
                 onclick="event.stopPropagation()"
                 role="dialog"
@@ -1069,13 +1069,13 @@
                     <div class="flex gap-3">
                         <button
                             id="qr-export-start-btn"
-                            class="px-8 py-3 text-xl font-bold text-white bg-green-500 rounded-xl glass-button glossy-shine hover:bg-green-600 transition-colors"
+                            class="px-6 py-3 text-base font-semibold text-white bg-[#22c55e] rounded-[6px] hover:bg-[#16a34a] transition-colors"
                         >
                             Start
                         </button>
                         <button
                             id="qr-export-pdf-btn"
-                            class="px-8 py-3 text-xl font-bold text-white bg-blue-500 rounded-xl glass-button glossy-shine hover:bg-blue-600 transition-colors"
+                            class="px-6 py-3 text-base font-semibold text-white bg-[#2563eb] rounded-[6px] hover:bg-[#1d4ed8] transition-colors"
                         >
                             Export as PDF
                         </button>
@@ -1084,7 +1084,7 @@
                     <!-- Status area updated by the QR export code (e.g. "Page 1 / 3"). -->
                     <div
                         id="qr-export-status"
-                        class="text-slate-100 font-bold select-none"
+                        class="text-[#e8e8e8] font-semibold select-none"
                         aria-hidden="true"
                         style="display: none"
                     >
@@ -1163,14 +1163,14 @@
         >
             <div
                 id="contributors-inner-container"
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-5/6 md:w-4/5 lg:w-3/4 max-w-6xl bg-slate-600 rounded-2xl md:rounded-3xl glass-modal max-h-[90vh] overflow-hidden"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-11/12 sm:w-5/6 md:w-4/5 lg:w-3/4 max-w-6xl bg-[#141414] border border-[#1e1e1e] rounded-[6px] max-h-[90vh] overflow-hidden"
                 onclick="event.stopPropagation()"
             >
                 <div
-                    class="w-full pt-6 pb-4 px-6 flex justify-between items-center border-b border-slate-500"
+                    class="w-full px-6 py-4 flex justify-between items-center bg-[#111111] border-b border-[#1e1e1e]"
                 >
                     <h2
-                        class="text-2xl sm:text-3xl md:text-4xl text-slate-200 font-bold"
+                        class="text-base text-[#e8e8e8] font-semibold"
                     >
                         Contributors
                     </h2>
@@ -1193,7 +1193,7 @@
                         <div
                             class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mb-4"
                         ></div>
-                        <p class="text-slate-300 text-lg">
+                        <p class="text-[#a0a0a0] text-base">
                             Loading contributors...
                         </p>
                     </div>
@@ -1202,12 +1202,12 @@
                         id="contributors-error"
                         class="hidden flex flex-col items-center justify-center h-full"
                     >
-                        <p class="text-red-400 text-lg mb-4">
+                        <p class="text-[#ef4444] text-base mb-4">
                             Failed to load contributors
                         </p>
                         <button
                             id="contributors-retry-btn"
-                            class="px-6 py-3 bg-green-500 text-white rounded-xl glass-button glossy-shine hover:bg-green-600 transition-colors font-semibold"
+                            class="px-6 py-3 bg-[#22c55e] text-white rounded-[6px] hover:bg-[#16a34a] transition-colors font-semibold"
                         >
                             Retry
                         </button>
@@ -1227,7 +1227,7 @@
                             <!-- Teams will be dynamically inserted here -->
                         </div>
 
-                        <h3 class="text-xl sm:text-2xl md:text-3xl text-slate-200 font-bold pt-4">
+                        <h3 class="text-base text-[#e8e8e8] font-semibold pt-4">
                             Donators
                         </h3>
                         <div
@@ -1252,13 +1252,13 @@
                 <div class="toolbar-left flex items-center ml-6 md:ml-12 gap-3">
                     <button
                         id="whiteboard-toolbar-back"
-                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-red-500 glass-button glossy-shine"
+                        class="text-sm md:text-base font-semibold text-white select-none touch-none rounded-[6px] px-4 py-2 bg-[#ef4444] hover:bg-[#dc2626] transition-colors"
                     >
                         EXIT
                     </button>
                     <button
                         id="whiteboard-toolbar-undo"
-                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-orange-500 glass-button glossy-shine"
+                        class="text-sm md:text-base font-semibold text-white select-none touch-none rounded-[6px] px-4 py-2 bg-[#f97316] hover:bg-[#ea580c] transition-colors"
                     >
                         UNDO
                     </button>
@@ -1305,7 +1305,7 @@
                 >
                     <button
                         id="whiteboard-toolbar-view-toggle"
-                        class="text-sm md:text-lg font-bold text-white select-none touch-none rounded-xl px-4 py-2 bg-purple-500 glass-button glossy-shine"
+                        class="text-sm md:text-base font-semibold text-white select-none touch-none rounded-[6px] px-4 py-2 bg-[#a855f7] hover:bg-[#9333ea] transition-colors"
                     >
                         TOGGLE VIEW
                     </button>

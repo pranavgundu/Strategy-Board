@@ -34,6 +34,38 @@ body {
     text-size-adjust: 100%;
 }
 
+/* ── Minimalist button utilities ── */
+.btn-accent {
+    background: #ebebeb;
+    color: #0d0d0d;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.btn-accent:hover { background: #d4d4d4; }
+
+.btn-secondary {
+    background: #181818;
+    color: #999;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.btn-secondary:hover { background: #1e1e1e; color: #bbb; }
+
+.btn-danger {
+    background: transparent;
+    color: #b87070;
+    border: 1px solid #4a2020;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.btn-danger:hover { border-color: #7a3030; color: #d08080; }
+
 /* Early loading screen that shows before the app bundles finish loading */
 #app-loading {
     position: fixed;
@@ -41,19 +73,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-        radial-gradient(
-            circle at 20% 20%,
-            rgba(59, 130, 246, 0.22),
-            transparent 45%
-        ),
-        radial-gradient(
-            circle at 80% 0%,
-            rgba(16, 185, 129, 0.2),
-            transparent 40%
-        ),
-        #0f172a;
-    color: #e2e8f0;
+    background: #0d0d0d;
+    color: #e8e8e8;
     z-index: 99990;
     transition:
         opacity 220ms ease,
@@ -67,12 +88,10 @@ body {
 }
 
 #app-loading .loading-card {
-    background: rgba(15, 23, 42, 0.88);
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    box-shadow:
-        0 20px 80px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-    border-radius: 18px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    box-shadow: none;
+    border-radius: 6px;
     padding: 24px 28px;
     min-width: min(92vw, 420px);
     display: grid;
@@ -89,7 +108,7 @@ body {
 
 #app-loading .loading-subtitle {
     font-size: clamp(0.95rem, 2.4vw, 1.1rem);
-    color: #cbd5e1;
+    color: #999;
 }
 
 #app-loading .loading-spinner {
@@ -97,7 +116,7 @@ body {
     height: 48px;
     border-radius: 999px;
     border: 4px solid rgba(148, 163, 184, 0.25);
-    border-top-color: #38bdf8;
+    border-top-color: #888;
     animation: app-loading-spin 1s linear infinite;
 }
 
@@ -742,45 +761,32 @@ body {
     filter: grayscale(0.5);
 }
 
-/* Glassmorphism Effects */
+/* glass-button: stripped — kept for whiteboard compatibility but no longer decorative */
 .glass-button {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow:
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
-
 .glass-button:hover {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow:
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+    border: none;
+    box-shadow: none;
 }
 
 .glass-card {
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(51, 65, 85, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.125);
-    box-shadow:
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 /* Match item hover effect */
 #home-match-list > div:hover {
-    background-color: rgba(71, 85, 105, 0.85);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow:
-        0 12px 40px 0 rgba(0, 0, 0, 0.45),
-        inset 0 1px 2px 0 rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    transition: all 0.2s ease;
+    background-color: #191919;
+    border-color: #282828;
+    box-shadow: none;
+    transform: none;
     cursor: pointer;
 }
 
@@ -789,24 +795,19 @@ body {
 }
 
 .glass-modal {
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    background-color: rgba(71, 85, 105, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow:
-        0 16px 48px 0 rgba(0, 0, 0, 0.5),
-        inset 0 2px 2px 0 rgba(255, 255, 255, 0.15),
-        inset 0 -2px 4px 0 rgba(0, 0, 0, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 .glass-toolbar {
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-    background-color: rgba(63, 63, 70, 0.85);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow:
-        0 4px 24px 0 rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: transparent;
+    border-bottom: none;
+    box-shadow: none;
 }
 
 /* Landscape orientation warning for mobile devices */
@@ -938,10 +939,8 @@ body {
     }
 }
 
-.glossy-shine {
-    position: relative;
-    overflow: hidden;
-}
+/* glossy-shine: stripped */
+.glossy-shine { }
 
 /* Statbotics container - ensure no scrolling and content fits */
 body #whiteboard-statbotics-container {
@@ -1021,41 +1020,9 @@ body #whiteboard-statbotics-container {
     box-shadow: none !important;
 }
 
-.glossy-shine::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent
-    );
-    transition: left 0.5s ease;
-}
-
-.glossy-shine:hover::before {
-    left: 100%;
-}
-
-.glossy-shine::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.2) 0%,
-        rgba(255, 255, 255, 0.05) 50%,
-        transparent 100%
-    );
-    pointer-events: none;
-}
+.glossy-shine::before { display: none; }
+.glossy-shine:hover::before { display: none; }
+.glossy-shine::after { display: none; }
 
 /* Frosted glass effect for backdrops */
 .backdrop-blur-xs {
