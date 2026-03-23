@@ -134,7 +134,7 @@
     "typescript-eslint": "^8.57.1",
     "vite": "^8.0.1",
     "vite-plugin-pwa": "^1.2.0",
-    "vite-plugin-static-copy": "^3.3.0",
+    "vite-plugin-static-copy": "^4.0.0",
     "wait-on": "^9.0.4",
     "workbox-window": "^7.4.0"
   },
