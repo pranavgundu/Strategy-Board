@@ -1620,19 +1620,19 @@ export class Whiteboard {
       ?.classList.remove("font-extrabold");
     document
       .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
-      ?.classList.remove("text-zinc-100");
+      ?.classList.remove("text-[#e8e8e8]");
     document
       .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
-      ?.classList.add("text-zinc-300");
+      ?.classList.add("text-[#555]");
     document
       .getElementById(`whiteboard-toolbar-mode-${mode}`)
       ?.classList.add("font-extrabold");
     document
       .getElementById(`whiteboard-toolbar-mode-${mode}`)
-      ?.classList.add("text-zinc-100");
+      ?.classList.add("text-[#e8e8e8]");
     document
       .getElementById(`whiteboard-toolbar-mode-${mode}`)
-      ?.classList.remove("text-zinc-300");
+      ?.classList.remove("text-[#555]");
     this.mode = mode;
 
     const whiteboardWrapper = document.getElementById("whiteboard-wrapper");

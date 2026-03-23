@@ -715,44 +715,11 @@ body {
         inset 0 -2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Toolbar button enhancements */
+/* Toolbar button transitions */
 #whiteboard-toolbar-back,
 #whiteboard-toolbar-undo,
 #whiteboard-toolbar-view-toggle {
-    transition: all 0.3s ease;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        inset 0 1px 2px rgba(255, 255, 255, 0.2);
-}
-
-#whiteboard-toolbar-back:hover {
-    background-color: rgb(220 38 38) !important; /* red-600 */
-    transform: translateY(-2px);
-    box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-#whiteboard-toolbar-undo:hover {
-    background-color: rgb(249 115 22) !important; /* orange-600 */
-    transform: translateY(-2px);
-    box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-#whiteboard-toolbar-view-toggle:hover {
-    background-color: rgb(168 85 247) !important; /* purple-600 */
-    transform: translateY(-2px);
-    box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-#whiteboard-toolbar-back:active,
-#whiteboard-toolbar-undo:active,
-#whiteboard-toolbar-view-toggle:active {
-    transform: translateY(0);
+    transition: all 0.2s ease;
 }
 
 /* Undo button disabled state */
@@ -1034,7 +1001,7 @@ body #whiteboard-statbotics-container {
 .tba-dropdown-item {
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid #1e1e1e;
     transition: background-color 0.2s;
 }
 
@@ -1049,17 +1016,17 @@ body #whiteboard-statbotics-container {
 }
 
 .tba-dropdown-item:hover {
-    background-color: rgba(59, 130, 246, 0.3);
+    background-color: #1e1e1e;
 }
 
 .tba-dropdown-item.selected {
-    background-color: rgba(59, 130, 246, 0.5);
+    background-color: #242424;
 }
 
 .tba-event-name {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #e8e8e8;
     margin-bottom: 4px;
 }
 
@@ -1071,7 +1038,7 @@ body #whiteboard-statbotics-container {
 
 .tba-event-details {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: #666;
 }
 
 @media (min-width: 640px) {
@@ -1083,11 +1050,11 @@ body #whiteboard-statbotics-container {
 .tba-team-item {
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid #1e1e1e;
     transition: background-color 0.2s;
     text-align: center;
     font-size: 1rem;
-    color: #e2e8f0;
+    color: #e8e8e8;
 }
 
 @media (min-width: 640px) {
@@ -1102,11 +1069,11 @@ body #whiteboard-statbotics-container {
 }
 
 .tba-team-item:hover {
-    background-color: rgba(59, 130, 246, 0.3);
+    background-color: #1e1e1e;
 }
 
 .tba-team-item.selected {
-    background-color: rgba(59, 130, 246, 0.5);
+    background-color: #242424;
 }
 
 #tba-event-dropdown::-webkit-scrollbar,
@@ -1122,13 +1089,13 @@ body #whiteboard-statbotics-container {
 
 #tba-event-dropdown::-webkit-scrollbar-thumb,
 #tba-team-dropdown::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.5);
+    background: #333;
     border-radius: 4px;
 }
 
 #tba-event-dropdown::-webkit-scrollbar-thumb:hover,
 #tba-team-dropdown::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.7);
+    background: #444;
 }
 
 /* Glow effect for strategyboard.app and GitHub logo on hover */

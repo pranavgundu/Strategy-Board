@@ -754,7 +754,7 @@
                             id="tba-api-key"
                             placeholder="TBA API Key (optional)"
                             type="password"
-                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0"
+                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#0d0d0d] border border-[#2a2a2a] outline-0"
                             autocomplete="off"
                             autocapitalize="off"
                             spellcheck="false"
@@ -778,14 +778,14 @@
                         <input
                             id="tba-event-search"
                             placeholder="Search events..."
-                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0"
+                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#0d0d0d] border border-[#2a2a2a] outline-0"
                             autocomplete="off"
                             autocapitalize="off"
                             spellcheck="false"
                         />
                         <div
                             id="tba-event-dropdown"
-                            class="hidden absolute top-full left-6 right-6 mt-1 bg-[#1e1e1e] rounded-[6px] max-h-64 overflow-y-auto z-50 shadow-2xl"
+                            class="hidden absolute top-full left-6 right-6 mt-1 bg-[#141414] border border-[#1e1e1e] rounded-[6px] max-h-64 overflow-y-auto z-50"
                         >
                             <div
                                 id="tba-event-list"
@@ -801,19 +801,19 @@
                             id="tba-team-search"
                             placeholder="Select event first..."
                             disabled
-                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0 disabled:opacity-50"
+                            class="w-full p-3 text-sm text-center text-[#e8e8e8] rounded-[6px] bg-[#0d0d0d] border border-[#2a2a2a] outline-0 disabled:opacity-40"
                             autocomplete="off"
                             autocapitalize="off"
                             spellcheck="false"
                         />
                         <div
                             id="tba-team-dropdown"
-                            class="hidden absolute top-full left-6 right-6 mt-1 bg-[#1e1e1e] rounded-[6px] max-h-64 overflow-y-auto z-50 shadow-2xl"
+                            class="hidden absolute top-full left-6 right-6 mt-1 bg-[#141414] border border-[#1e1e1e] rounded-[6px] max-h-64 overflow-y-auto z-50"
                         >
                             <div id="tba-team-list" class="flex flex-col"></div>
                             <button
                                 id="tba-all-matches-btn"
-                                class="w-full p-3 text-sm text-center text-[#e8e8e8] font-semibold bg-[#22c55e] hover:bg-[#16a34a] transition-colors border-t border-[#141414]"
+                                class="w-full p-3 text-sm text-center btn-accent border-t border-[#2a2a2a] rounded-none"
                             >
                                 All Matches
                             </button>
@@ -828,7 +828,7 @@
                 <div class="flex w-full flex-shrink-0">
                     <button
                         id="tba-import-btn"
-                        class="w-1/2 text-center text-base font-semibold text-white bg-[#22c55e] p-4 rounded-bl-[6px] hover:bg-[#16a34a] transition-colors"
+                        class="w-1/2 text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none rounded-bl-[6px]"
                     >
                         Import
                     </button>
@@ -887,12 +887,12 @@
 
                 <select
                     id="qr-import-camera-select"
-                    class="text-md md:text-xl mt-3 w-full rounded-xl p-2"
+                    class="text-sm mt-3 w-full rounded-[6px] p-2 bg-[#111111] border border-[#2a2a2a] text-[#e8e8e8] outline-0"
                 ></select>
                 <video
                     id="qr-import-video"
                     playsinline
-                    class="w-full mt-3 rounded-xl"
+                    class="w-full mt-3 rounded-[6px]"
                     style="max-height: 44vh"
                 ></video>
             </div>
@@ -924,7 +924,7 @@
                             </p>
                             <button
                                 id="share-code-copy-btn"
-                                class="px-4 py-2 bg-[#2563eb] text-white rounded-[6px] hover:bg-[#1d4ed8] transition-colors"
+                                class="px-4 py-2 btn-secondary"
                                 title="Copy code"
                             >
                                 <i class="fas fa-copy"></i>
@@ -943,7 +943,7 @@
                             />
                             <button
                                 id="share-link-copy-btn"
-                                class="px-4 py-2 bg-[#2563eb] text-white rounded-[6px] hover:bg-[#1d4ed8] transition-colors"
+                                class="px-4 py-2 btn-secondary"
                                 title="Copy link"
                             >
                                 <i class="fas fa-copy"></i>
@@ -976,7 +976,7 @@
                 <div class="flex w-full flex-shrink-0">
                     <button
                         id="share-success-close-btn"
-                        class="w-full text-center text-base font-semibold text-white bg-[#22c55e] p-4 rounded-b-[6px] hover:bg-[#16a34a] transition-colors"
+                        class="w-full text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none rounded-b-[6px]"
                     >
                         Done
                     </button>
@@ -1002,7 +1002,7 @@
                         id="link-import-code"
                         placeholder="Enter 6-character share code"
                         maxlength="6"
-                        class="w-full p-3 text-base text-center text-[#e8e8e8] rounded-[6px] bg-[#1e1e1e] outline-0 uppercase tracking-wider font-mono"
+                        class="w-full p-3 text-base text-center text-[#e8e8e8] rounded-[6px] bg-[#0d0d0d] border border-[#2a2a2a] outline-0 uppercase tracking-wider font-mono"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -1015,13 +1015,13 @@
                 <div class="flex w-full">
                     <button
                         id="link-import-import-btn"
-                        class="w-1/2 text-center text-base font-semibold text-white bg-[#22c55e] p-4 rounded-bl-[6px] hover:bg-[#16a34a] transition-colors"
+                        class="w-1/2 text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none rounded-bl-[6px]"
                     >
                         Import
                     </button>
                     <button
                         id="link-import-cancel-btn"
-                        class="w-1/2 text-center text-base font-semibold text-white bg-[#ef4444] p-4 rounded-br-[6px] hover:bg-[#dc2626] transition-colors"
+                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none rounded-br-[6px]"
                     >
                         Cancel
                     </button>
@@ -1050,7 +1050,7 @@
                 <div class="w-full flex justify-end">
                     <button
                         id="qr-export-close-btn"
-                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-all duration-200"
+                        class="flex items-center justify-center w-8 h-8 rounded-[6px] bg-[#1e1e1e] hover:bg-[#2a2a2a] text-[#999] hover:text-[#e8e8e8] transition-colors"
                         title="Close export"
                         onclick="
                             document
@@ -1069,13 +1069,13 @@
                     <div class="flex gap-3">
                         <button
                             id="qr-export-start-btn"
-                            class="px-6 py-3 text-base font-semibold text-white bg-[#22c55e] rounded-[6px] hover:bg-[#16a34a] transition-colors"
+                            class="px-6 py-3 text-sm btn-accent"
                         >
                             Start
                         </button>
                         <button
                             id="qr-export-pdf-btn"
-                            class="px-6 py-3 text-base font-semibold text-white bg-[#2563eb] rounded-[6px] hover:bg-[#1d4ed8] transition-colors"
+                            class="px-6 py-3 text-sm btn-secondary"
                         >
                             Export as PDF
                         </button>
@@ -1176,7 +1176,7 @@
                     </h2>
                     <button
                         id="contributors-close-btn"
-                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-all duration-200"
+                        class="flex items-center justify-center w-8 h-8 rounded-[6px] bg-[#1e1e1e] hover:bg-[#2a2a2a] text-[#999] hover:text-[#e8e8e8] transition-colors"
                     >
                         <i class="fas fa-times"></i>
                     </button>
@@ -1190,10 +1190,8 @@
                         id="contributors-loading"
                         class="flex flex-col items-center justify-center h-full"
                     >
-                        <div
-                            class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mb-4"
-                        ></div>
-                        <p class="text-[#a0a0a0] text-base">
+                        <div class="loading-spinner mb-4"></div>
+                        <p class="text-[#666] text-base">
                             Loading contributors...
                         </p>
                     </div>
@@ -1207,7 +1205,7 @@
                         </p>
                         <button
                             id="contributors-retry-btn"
-                            class="px-6 py-3 bg-[#22c55e] text-white rounded-[6px] hover:bg-[#16a34a] transition-colors font-semibold"
+                            class="px-6 py-3 btn-accent"
                         >
                             Retry
                         </button>
@@ -1246,19 +1244,19 @@
         >
             <div
                 id="whiteboard-toolbar"
-                class="relative items-center w-full h-12 md:h-16 bg-zinc-700 glass-toolbar pt-[env(safe-area-inset-top)]"
+                class="relative items-center w-full h-12 md:h-16 bg-[#111111] border-b border-[#1e1e1e] glass-toolbar pt-[env(safe-area-inset-top)]"
                 style="z-index: 999"
             >
                 <div class="toolbar-left flex items-center ml-6 md:ml-12 gap-3">
                     <button
                         id="whiteboard-toolbar-back"
-                        class="text-sm md:text-base font-semibold text-white select-none touch-none rounded-[6px] px-4 py-2 bg-[#ef4444] hover:bg-[#dc2626] transition-colors"
+                        class="text-sm md:text-base font-semibold select-none touch-none btn-danger px-4 py-2"
                     >
                         EXIT
                     </button>
                     <button
                         id="whiteboard-toolbar-undo"
-                        class="text-sm md:text-base font-semibold text-white select-none touch-none rounded-[6px] px-4 py-2 bg-[#f97316] hover:bg-[#ea580c] transition-colors"
+                        class="text-sm md:text-base font-semibold select-none touch-none btn-secondary px-4 py-2"
                     >
                         UNDO
                     </button>
@@ -1270,31 +1268,31 @@
                 >
                     <div
                         id="whiteboard-toolbar-mode-auto"
-                        class="text-xl md:text-3xl text-zinc-100 font-extrabold select-none select-none touch-none"
+                        class="text-xl md:text-3xl text-[#e8e8e8] font-extrabold select-none touch-none"
                     >
                         AUTO
                     </div>
                     <div
                         id="whiteboard-toolbar-mode-teleop"
-                        class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none"
+                        class="text-xl md:text-3xl text-[#555] select-none touch-none"
                     >
                         TELEOP
                     </div>
                     <div
                         id="whiteboard-toolbar-mode-endgame"
-                        class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none"
+                        class="text-xl md:text-3xl text-[#555] select-none touch-none"
                     >
                         ENDGAME
                     </div>
                     <div
                         id="whiteboard-toolbar-mode-notes"
-                        class="text-xl md:text-3xl text-zinc-300 select-none select-none touch-none"
+                        class="text-xl md:text-3xl text-[#555] select-none touch-none"
                     >
                         NOTES
                     </div>
                     <div
                         id="whiteboard-toolbar-mode-statbotics"
-                        class="text-xl md:text-3xl text-zinc-300 select-none touch-none hidden"
+                        class="text-xl md:text-3xl text-[#555] select-none touch-none hidden"
                     >
                         STATS
                     </div>
@@ -1305,7 +1303,7 @@
                 >
                     <button
                         id="whiteboard-toolbar-view-toggle"
-                        class="text-sm md:text-base font-semibold text-white select-none touch-none rounded-[6px] px-4 py-2 bg-[#a855f7] hover:bg-[#9333ea] transition-colors"
+                        class="text-sm md:text-base font-semibold select-none touch-none btn-secondary px-4 py-2"
                     >
                         TOGGLE VIEW
                     </button>
@@ -1313,7 +1311,7 @@
             </div>
             <div
                 id="whiteboard-wrapper"
-                class="w-full flex-1 min-h-0 m-0 p-0 bg-zinc-900"
+                class="w-full flex-1 min-h-0 m-0 p-0 bg-[#0d0d0d]"
             >
                 <canvas
                     id="whiteboard-canvas-background"
@@ -1336,18 +1334,18 @@
             </div>
             <div
                 id="whiteboard-statbotics-container"
-                class="w-full flex-1 min-h-0 m-0 p-0 bg-zinc-900 hidden flex-col overflow-y-auto"
+                class="w-full flex-1 min-h-0 m-0 p-0 bg-[#0d0d0d] hidden flex-col overflow-y-auto"
             >
                 <!-- Empty State (shown when no match key) -->
                 <div
                     id="statbotics-empty-state"
                     class="flex flex-col items-center justify-center h-full p-4 md:p-8"
                 >
-                    <i class="fa fa-chart-line text-6xl text-zinc-600 mb-4"></i>
-                    <h2 class="text-2xl font-bold text-white mb-2">
+                    <i class="fa fa-chart-line text-6xl text-[#333] mb-4"></i>
+                    <h2 class="text-2xl font-bold text-[#e8e8e8] mb-2">
                         Stats Data Not Available
                     </h2>
-                    <p class="text-zinc-400 text-center max-w-md">
+                    <p class="text-[#666] text-center max-w-md">
                         This match was not imported from The Blue Alliance.
                         Stats analytics are only available for TBA-imported
                         matches.
@@ -1362,16 +1360,16 @@
                     <div class="flex flex-col items-center">
                         <div class="relative w-16 h-16 mb-4">
                             <div
-                                class="absolute inset-0 border-4 border-zinc-700 rounded-full"
+                                class="absolute inset-0 border-4 border-[#222] rounded-full"
                             ></div>
                             <div
-                                class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"
+                                class="absolute inset-0 border-4 border-[#888] rounded-full border-t-transparent animate-spin"
                             ></div>
                         </div>
-                        <h2 class="text-xl font-bold text-white mb-2">
+                        <h2 class="text-xl font-bold text-[#e8e8e8] mb-2">
                             Loading Stats...
                         </h2>
-                        <p class="text-zinc-400 text-center">
+                        <p class="text-[#666] text-center">
                             Fetching data from Statbotics
                         </p>
                     </div>
@@ -1384,10 +1382,10 @@
                 >
                     <!-- Win Probability Section -->
                     <div
-                        class="bg-zinc-800 rounded-lg p-4 md:p-6 glass-card mb-4"
+                        class="bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-4 md:p-6 mb-4"
                     >
                         <h3
-                            class="text-xl md:text-2xl font-bold text-white mb-3 text-center"
+                            class="text-xl md:text-2xl font-bold text-[#e8e8e8] mb-3 text-center"
                         >
                             Win Probability
                         </h3>
@@ -1428,11 +1426,11 @@
                         </div>
                         <!-- Match Result (inline) -->
                         <div
-                            class="text-center mt-3 pt-3 border-t border-zinc-700 hidden"
+                            class="text-center mt-3 pt-3 border-t border-[#1e1e1e] hidden"
                         >
                             <span
                                 id="statbotics-match-result"
-                                class="text-sm md:text-base font-semibold text-zinc-300"
+                                class="text-sm md:text-base font-semibold text-[#999]"
                                 >Unknown</span
                             >
                         </div>
@@ -1440,53 +1438,53 @@
 
                     <!-- Red Alliance Section -->
                     <div
-                        class="bg-zinc-800 rounded-lg p-4 md:p-6 glass-card mb-4"
+                        class="bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-4 md:p-6 mb-4"
                     >
                         <h3
-                            class="text-xl md:text-2xl font-bold text-red-400 mb-3"
+                            class="text-xl md:text-2xl font-bold text-[#c97070] mb-3"
                         >
                             Red Alliance
                         </h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div
-                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                class="bg-[#111111] border border-[#1e1e1e] rounded-[6px] p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                                 data-team-index="red-1"
                             >
                                 <div
-                                    class="text-white text-base font-semibold mb-1"
+                                    class="text-[#e8e8e8] text-base font-semibold mb-1"
                                 >
                                     Team
                                     <span id="statbotics-red-1-team">----</span>
                                 </div>
-                                <div class="text-red-400 text-2xl font-bold">
+                                <div class="text-[#c97070] text-2xl font-bold">
                                     <span id="statbotics-red-1-epa">--</span>
                                 </div>
                             </div>
                             <div
-                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                class="bg-[#111111] border border-[#1e1e1e] rounded-[6px] p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                                 data-team-index="red-2"
                             >
                                 <div
-                                    class="text-white text-base font-semibold mb-1"
+                                    class="text-[#e8e8e8] text-base font-semibold mb-1"
                                 >
                                     Team
                                     <span id="statbotics-red-2-team">----</span>
                                 </div>
-                                <div class="text-red-400 text-2xl font-bold">
+                                <div class="text-[#c97070] text-2xl font-bold">
                                     <span id="statbotics-red-2-epa">--</span>
                                 </div>
                             </div>
                             <div
-                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                class="bg-[#111111] border border-[#1e1e1e] rounded-[6px] p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                                 data-team-index="red-3"
                             >
                                 <div
-                                    class="text-white text-base font-semibold mb-1"
+                                    class="text-[#e8e8e8] text-base font-semibold mb-1"
                                 >
                                     Team
                                     <span id="statbotics-red-3-team">----</span>
                                 </div>
-                                <div class="text-red-400 text-2xl font-bold">
+                                <div class="text-[#c97070] text-2xl font-bold">
                                     <span id="statbotics-red-3-epa">--</span>
                                 </div>
                             </div>
@@ -1495,59 +1493,59 @@
 
                     <!-- Blue Alliance Section -->
                     <div
-                        class="bg-zinc-800 rounded-lg p-4 md:p-6 glass-card mb-4"
+                        class="bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-4 md:p-6 mb-4"
                     >
                         <h3
-                            class="text-xl md:text-2xl font-bold text-blue-400 mb-3"
+                            class="text-xl md:text-2xl font-bold text-[#6090c9] mb-3"
                         >
                             Blue Alliance
                         </h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div
-                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                class="bg-[#111111] border border-[#1e1e1e] rounded-[6px] p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                                 data-team-index="blue-1"
                             >
                                 <div
-                                    class="text-white text-base font-semibold mb-1"
+                                    class="text-[#e8e8e8] text-base font-semibold mb-1"
                                 >
                                     Team
                                     <span id="statbotics-blue-1-team"
                                         >----</span
                                     >
                                 </div>
-                                <div class="text-blue-400 text-2xl font-bold">
+                                <div class="text-[#6090c9] text-2xl font-bold">
                                     <span id="statbotics-blue-1-epa">--</span>
                                 </div>
                             </div>
                             <div
-                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                class="bg-[#111111] border border-[#1e1e1e] rounded-[6px] p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                                 data-team-index="blue-2"
                             >
                                 <div
-                                    class="text-white text-base font-semibold mb-1"
+                                    class="text-[#e8e8e8] text-base font-semibold mb-1"
                                 >
                                     Team
                                     <span id="statbotics-blue-2-team"
                                         >----</span
                                     >
                                 </div>
-                                <div class="text-blue-400 text-2xl font-bold">
+                                <div class="text-[#6090c9] text-2xl font-bold">
                                     <span id="statbotics-blue-2-epa">--</span>
                                 </div>
                             </div>
                             <div
-                                class="bg-zinc-900 rounded p-3 cursor-pointer hover:bg-zinc-850 transition-colors"
+                                class="bg-[#111111] border border-[#1e1e1e] rounded-[6px] p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                                 data-team-index="blue-3"
                             >
                                 <div
-                                    class="text-white text-base font-semibold mb-1"
+                                    class="text-[#e8e8e8] text-base font-semibold mb-1"
                                 >
                                     Team
                                     <span id="statbotics-blue-3-team"
                                         >----</span
                                     >
                                 </div>
-                                <div class="text-blue-400 text-2xl font-bold">
+                                <div class="text-[#6090c9] text-2xl font-bold">
                                     <span id="statbotics-blue-3-epa">--</span>
                                 </div>
                             </div>
@@ -1560,23 +1558,23 @@
                         class="hidden fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
                     >
                         <div
-                            class="bg-zinc-800 rounded-lg p-6 glass-card max-w-md w-full border border-zinc-700 shadow-2xl"
+                            class="bg-[#141414] rounded-[6px] p-6 max-w-md w-full border border-[#1e1e1e]"
                         >
                             <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-xl font-bold text-white">
+                                <h3 class="text-xl font-bold text-[#e8e8e8]">
                                     Team
                                     <span id="epa-modal-team">----</span> Stats
                                 </h3>
                                 <button
                                     id="epa-modal-close"
-                                    class="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-all duration-200"
+                                    class="flex items-center justify-center w-8 h-8 rounded-[6px] bg-[#1e1e1e] hover:bg-[#2a2a2a] text-[#999] hover:text-[#e8e8e8] transition-colors"
                                 >
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
                             <div class="space-y-3">
                                 <div class="flex justify-between">
-                                    <span class="text-zinc-300"
+                                    <span class="text-[#999]"
                                         >Total EPA:</span
                                     >
                                     <span
@@ -1586,7 +1584,7 @@
                                     >
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-zinc-300"
+                                    <span class="text-[#999]"
                                         >Auto Points:</span
                                     >
                                     <span
@@ -1596,7 +1594,7 @@
                                     >
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-zinc-300"
+                                    <span class="text-[#999]"
                                         >Teleop Points:</span
                                     >
                                     <span
@@ -1606,7 +1604,7 @@
                                     >
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-zinc-300"
+                                    <span class="text-[#999]"
                                         >Endgame Points:</span
                                     >
                                     <span
@@ -1616,9 +1614,9 @@
                                     >
                                 </div>
                                 <div
-                                    class="flex justify-between pt-2 border-t border-zinc-700"
+                                    class="flex justify-between pt-2 border-t border-[#1e1e1e]"
                                 >
-                                    <span class="text-zinc-300">Rank:</span>
+                                    <span class="text-[#999]">Rank:</span>
                                     <span
                                         id="epa-modal-rank"
                                         class="text-white font-bold"
@@ -1626,7 +1624,7 @@
                                     >
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-zinc-300"
+                                    <span class="text-[#999]"
                                         >Percentile:</span
                                     >
                                     <span
@@ -1642,7 +1640,7 @@
             </div>
             <div
                 id="whiteboard-draw-config"
-                class="absolute flex flex-col justify-center items-center size-12 sm:size-14 md:size-16 lg:size-20 xl:size-24 bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-zinc-800 rounded-full glass-card"
+                class="absolute flex flex-col justify-center items-center size-12 sm:size-14 md:size-16 lg:size-20 xl:size-24 bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-[#1a1a1a] border border-[#2a2a2a] rounded-full glass-card"
             >
                 <i
                     id="whiteboard-draw-config-marker"
@@ -1661,7 +1659,7 @@
             </div>
             <div
                 id="whiteboard-color-config"
-                class="absolute flex flex-col justify-center items-center bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 bg-zinc-800 rounded-full glass-card p-1.5 sm:p-2"
+                class="absolute flex flex-col justify-center items-center bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 bg-[#1a1a1a] border border-[#2a2a2a] rounded-full glass-card p-1.5 sm:p-2"
             >
                 <div
                     id="whiteboard-color-yellow"
