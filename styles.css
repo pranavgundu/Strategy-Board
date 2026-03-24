@@ -1038,7 +1038,7 @@ body #whiteboard-statbotics-container {
 
 .tba-event-details {
     font-size: 0.75rem;
-    color: #666;
+    color: #888;
 }
 
 @media (min-width: 640px) {
@@ -1098,23 +1098,21 @@ body #whiteboard-statbotics-container {
     background: #444;
 }
 
-/* Glow effect for strategyboard.app and GitHub logo on hover */
 #home-bottom-bar {
     overflow: visible !important;
 }
 
 #home-bottom-bar a {
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s ease;
 }
 
 #home-bottom-bar a:hover {
-    text-shadow:
-        0 0 6px rgba(255, 255, 255, 0.4),
-        0 0 12px rgba(255, 255, 255, 0.2);
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
 #home-bottom-bar a:hover i {
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
 /* Ensure proper scrolling on all mobile devices */

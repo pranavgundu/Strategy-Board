@@ -313,11 +313,11 @@
         <div id="home-container" class="flex flex-col w-full h-full touch-none">
             <div
                 id="home-toolbar"
-                class="flex items-center justify-between w-full h-14 bg-[#111111] border-b border-[#1e1e1e] px-4 sm:px-6 md:px-8 pt-[env(safe-area-inset-top)]"
+                class="flex items-center justify-between w-full h-16 bg-[#111111] border-b border-[#1e1e1e] px-5 sm:px-8 md:px-10 pt-[env(safe-area-inset-top)]"
             >
                 <div
                     id="home-toolbar-logo"
-                    class="text-sm font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
+                    class="text-lg font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
                     onclick="location.reload()"
                 >
                     Strategy Board
@@ -327,13 +327,13 @@
                 >
                     <button
                         id="home-toolbar-new-btn"
-                        class="flex items-center justify-center px-4 h-8 btn-accent text-xs"
+                        class="flex items-center justify-center px-5 h-9 btn-accent text-sm"
                     >
                         New
                     </button>
                     <button
                         id="home-toolbar-tba-btn"
-                        class="flex items-center justify-center gap-1.5 px-4 h-8 btn-secondary text-xs"
+                        class="flex items-center justify-center gap-1.5 px-5 h-9 btn-secondary text-sm"
                     >
                         <span>TBA</span>
                         <img
@@ -344,21 +344,21 @@
                     </button>
                     <button
                         id="home-toolbar-import-btn"
-                        class="flex items-center justify-center px-4 h-8 btn-secondary text-xs"
+                        class="flex items-center justify-center px-5 h-9 btn-secondary text-sm"
                     >
                         <span class="hidden sm:inline">Import QR</span>
                         <span class="sm:hidden">Import</span>
                     </button>
                     <button
                         id="home-toolbar-import-link-btn"
-                        class="flex items-center justify-center gap-1.5 px-4 h-8 btn-secondary text-xs"
+                        class="flex items-center justify-center gap-1.5 px-5 h-9 btn-secondary text-sm"
                     >
                         <span>Import</span>
                         <i class="fas fa-link"></i>
                     </button>
                     <button
                         id="home-toolbar-clear-btn"
-                        class="flex items-center justify-center px-4 h-8 btn-danger text-xs"
+                        class="flex items-center justify-center px-5 h-9 btn-danger text-sm"
                     >
                         Clear
                     </button>
@@ -366,11 +366,11 @@
             </div>
             <div
                 id="home-match-list"
-                class="w-full p-3 flex-1 flex flex-col gap-1 items-stretch overflow-y-auto bg-[#0d0d0d]"
+                class="w-full p-4 flex-1 flex flex-col gap-2 items-stretch overflow-y-auto bg-[#0d0d0d]"
             >
                 <div
                     id="home-match-list-empty-placeholder"
-                    class="absolute top-1/2 text-[#3a3a3a] text-sm pointer-events-none"
+                    class="absolute top-1/2 text-[#555] text-sm pointer-events-none"
                 >
                     Click
                     <span
@@ -381,10 +381,10 @@
                 </div>
                 <div
                     id="home-match-list-item-template"
-                    class="hidden w-full bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-[6px] px-4 py-3"
+                    class="hidden w-full h-16 bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-[6px] px-5"
                 >
                     <div
-                        class="grow-1 basis-0 text-[#e8e8e8] font-semibold text-sm select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                        class="grow-1 basis-0 text-[#e8e8e8] font-semibold text-base select-none overflow-hidden text-ellipsis whitespace-nowrap"
                     >
                         Match Name
                     </div>
@@ -392,17 +392,17 @@
                         class="w-1/2 flex justify-center items-center gap-2 sm:gap-4 md:gap-6"
                     >
                         <div
-                            class="w-1/2 text-[#c97070] text-xs text-right select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                            class="w-1/2 text-[#c97070] text-sm text-right select-none overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                             000 000 000
                         </div>
                         <div
-                            class="text-[#3a3a3a] text-xs select-none"
+                            class="text-[#555] text-sm select-none"
                         >
                             VS
                         </div>
                         <div
-                            class="w-1/2 text-[#6090c9] text-xs select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                            class="w-1/2 text-[#6090c9] text-sm select-none overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                             000 000 000
                         </div>
@@ -414,13 +414,13 @@
                             class="flex flex-col w-8 sm:w-10 md:w-12 gap-1 items-center justify-center"
                         >
                             <div
-                                class="w-1 h-1 rounded-full bg-[#333]"
+                                class="w-1.5 h-1.5 rounded-full bg-[#555]"
                             ></div>
                             <div
-                                class="w-1 h-1 rounded-full bg-[#333]"
+                                class="w-1.5 h-1.5 rounded-full bg-[#555]"
                             ></div>
                             <div
-                                class="w-1 h-1 rounded-full bg-[#333]"
+                                class="w-1.5 h-1.5 rounded-full bg-[#555]"
                             ></div>
                         </button>
                         <div
@@ -473,20 +473,20 @@
                             href="https://github.com/pranavgundu/Strategy-Board"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="flex items-center justify-center text-[#383838] hover:text-[#666] transition-colors"
+                            class="flex items-center justify-center text-[#555] hover:text-[#999] transition-colors"
                         >
                             <i class="fab fa-github text-2xl leading-none"></i>
                         </a>
                         <a
                             href="mailto:pranav@strategyboard.app"
-                            class="flex items-center justify-center text-[#383838] hover:text-[#666] transition-colors"
+                            class="flex items-center justify-center text-[#555] hover:text-[#999] transition-colors"
                         >
                             <i class="fas fa-envelope text-2xl leading-none"></i>
                         </a>
                     </div>
                     <div
                         id="last-commit-info"
-                        class="absolute left-6 text-[#2d2d2d] text-xs hidden"
+                        class="absolute left-6 text-[#555] text-xs hidden"
                         style="top: 50%; transform: translateY(-50%);"
                     >
                         <span class="opacity-0">Loading...</span>
@@ -494,7 +494,7 @@
                     <a
                         id="contributors-link-btn"
                         href="#"
-                        class="absolute right-6 flex items-center text-[#383838] hover:text-[#666] transition-colors text-xs"
+                        class="absolute right-6 flex items-center text-[#555] hover:text-[#999] transition-colors text-xs"
                         style="top: 50%; transform: translateY(-50%);"
                     >
                         strategyboard.app
@@ -1341,7 +1341,7 @@
                     id="statbotics-empty-state"
                     class="flex flex-col items-center justify-center h-full p-4 md:p-8"
                 >
-                    <i class="fa fa-chart-line text-6xl text-[#333] mb-4"></i>
+                    <i class="fa fa-chart-line text-6xl text-[#555] mb-4"></i>
                     <h2 class="text-2xl font-bold text-[#e8e8e8] mb-2">
                         Stats Data Not Available
                     </h2>
