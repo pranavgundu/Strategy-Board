@@ -313,52 +313,52 @@
         <div id="home-container" class="flex flex-col w-full h-full touch-none">
             <div
                 id="home-toolbar"
-                class="flex items-center justify-between w-full h-16 bg-[#111111] border-b border-[#1e1e1e] px-5 sm:px-8 md:px-10 pt-[env(safe-area-inset-top)]"
+                class="flex items-center justify-between w-full h-24 bg-[#111111] border-b border-[#1e1e1e] px-10 sm:px-12 md:px-16 pt-[env(safe-area-inset-top)]"
             >
                 <div
                     id="home-toolbar-logo"
-                    class="text-lg font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
+                    class="text-3xl font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
                     onclick="location.reload()"
                 >
                     Strategy Board
                 </div>
                 <div
-                    class="flex gap-2 items-center"
+                    class="flex gap-4 items-center"
                 >
                     <button
                         id="home-toolbar-new-btn"
-                        class="flex items-center justify-center px-5 h-9 btn-accent text-sm"
+                        class="flex items-center justify-center px-10 h-14 btn-accent text-xl"
                     >
                         New
                     </button>
                     <button
                         id="home-toolbar-tba-btn"
-                        class="flex items-center justify-center gap-1.5 px-5 h-9 btn-secondary text-sm"
+                        class="flex items-center justify-center gap-2.5 px-10 h-14 btn-secondary text-xl"
                     >
                         <span>TBA</span>
                         <img
                             src="/tba.svg"
                             alt="TBA"
-                            class="h-5 sm:h-6 md:h-8 w-auto"
+                            class="h-6 sm:h-7 md:h-9 w-auto"
                         />
                     </button>
                     <button
                         id="home-toolbar-import-btn"
-                        class="flex items-center justify-center px-5 h-9 btn-secondary text-sm"
+                        class="flex items-center justify-center px-10 h-14 btn-secondary text-xl"
                     >
                         <span class="hidden sm:inline">Import QR</span>
                         <span class="sm:hidden">Import</span>
                     </button>
                     <button
                         id="home-toolbar-import-link-btn"
-                        class="flex items-center justify-center gap-1.5 px-5 h-9 btn-secondary text-sm"
+                        class="flex items-center justify-center gap-2.5 px-10 h-14 btn-secondary text-xl"
                     >
                         <span>Import</span>
                         <i class="fas fa-link"></i>
                     </button>
                     <button
                         id="home-toolbar-clear-btn"
-                        class="flex items-center justify-center px-5 h-9 btn-danger text-sm"
+                        class="flex items-center justify-center px-10 h-14 btn-danger text-xl"
                     >
                         Clear
                     </button>
@@ -366,43 +366,43 @@
             </div>
             <div
                 id="home-match-list"
-                class="w-full p-4 flex-1 flex flex-col gap-2 items-stretch overflow-y-auto bg-[#0d0d0d]"
+                class="w-full p-10 flex-1 flex flex-col gap-5 items-stretch overflow-y-auto bg-[#0d0d0d]"
             >
                 <div
                     id="home-match-list-empty-placeholder"
-                    class="absolute top-1/2 text-[#555] text-sm pointer-events-none"
+                    class="absolute top-1/2 text-[#555] text-xl pointer-events-none"
                 >
                     Click
                     <span
-                        class="not-italic text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-2 py-0.5 rounded"
+                        class="not-italic text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-3 py-1 rounded"
                         >New</span
                     >
                     to add matches
                 </div>
                 <div
                     id="home-match-list-item-template"
-                    class="hidden w-full h-16 bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-[6px] px-5"
+                    class="hidden w-full h-[5.5rem] bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-xl px-10"
                 >
                     <div
-                        class="grow-1 basis-0 text-[#e8e8e8] font-semibold text-base select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                        class="grow-1 basis-0 text-[#e8e8e8] font-semibold text-2xl select-none overflow-hidden text-ellipsis whitespace-nowrap"
                     >
                         Match Name
                     </div>
                     <div
-                        class="w-1/2 flex justify-center items-center gap-2 sm:gap-4 md:gap-6"
+                        class="w-1/2 flex justify-center items-center gap-3 sm:gap-5 md:gap-8"
                     >
                         <div
-                            class="w-1/2 text-[#c97070] text-sm text-right select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                            class="w-1/2 text-[#c97070] text-xl text-right select-none overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                             000 000 000
                         </div>
                         <div
-                            class="text-[#555] text-sm select-none"
+                            class="text-[#555] text-xl select-none"
                         >
                             VS
                         </div>
                         <div
-                            class="w-1/2 text-[#6090c9] text-sm select-none overflow-hidden text-ellipsis whitespace-nowrap"
+                            class="w-1/2 text-[#6090c9] text-xl select-none overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                             000 000 000
                         </div>
@@ -411,51 +411,51 @@
                         class="grow-1 basis-0 flex h-full justify-end items-center"
                     >
                         <button
-                            class="flex flex-col w-8 sm:w-10 md:w-12 gap-1 items-center justify-center"
+                            class="match-menu-btn flex flex-col w-14 sm:w-16 md:w-18 gap-2.5 items-center justify-center rounded"
                         >
                             <div
-                                class="w-1.5 h-1.5 rounded-full bg-[#555]"
+                                class="w-2.5 h-2.5 rounded-full bg-[#555]"
                             ></div>
                             <div
-                                class="w-1.5 h-1.5 rounded-full bg-[#555]"
+                                class="w-2.5 h-2.5 rounded-full bg-[#555]"
                             ></div>
                             <div
-                                class="w-1.5 h-1.5 rounded-full bg-[#555]"
+                                class="w-2.5 h-2.5 rounded-full bg-[#555]"
                             ></div>
                         </button>
                         <div
-                            class="hidden flex items-center justify-center gap-1 sm:gap-2"
+                            class="hidden flex items-center justify-center gap-3 sm:gap-4"
                         >
                             <button
-                                class="px-3 py-1.5 text-xs btn-secondary"
+                                class="px-5 py-2.5 text-base btn-secondary"
                             >
                                 Edit
                             </button>
                             <button
-                                class="px-3 py-1.5 text-xs btn-secondary"
+                                class="px-5 py-2.5 text-base btn-secondary"
                             >
                                 Duplicate
                             </button>
                             <button
-                                class="px-3 py-1.5 text-xs btn-secondary whitespace-nowrap"
+                                class="px-5 py-2.5 text-base btn-secondary whitespace-nowrap"
                             >
                                 Export PNG
                             </button>
                             <button
-                                class="px-3 py-1.5 text-xs btn-secondary whitespace-nowrap"
+                                class="px-5 py-2.5 text-base btn-secondary whitespace-nowrap"
                             >
                                 Export QR
                             </button>
                             <button
-                                class="px-3 py-1.5 text-xs btn-secondary whitespace-nowrap flex items-center gap-1"
+                                class="px-5 py-2.5 text-base btn-secondary whitespace-nowrap flex items-center gap-2"
                             >
                                 <span>Share</span>
                                 <i
-                                    class="fas fa-link text-sm"
+                                    class="fas fa-link text-lg"
                                 ></i>
                             </button>
                             <button
-                                class="px-3 py-1.5 text-xs btn-danger"
+                                class="px-5 py-2.5 text-base btn-danger"
                             >
                                 Delete
                             </button>
@@ -1244,19 +1244,19 @@
         >
             <div
                 id="whiteboard-toolbar"
-                class="relative items-center w-full h-12 md:h-16 bg-[#111111] border-b border-[#1e1e1e] glass-toolbar pt-[env(safe-area-inset-top)]"
+                class="relative items-center w-full h-16 md:h-24 bg-[#111111] border-b border-[#1e1e1e] pt-[env(safe-area-inset-top)]"
                 style="z-index: 999"
             >
-                <div class="toolbar-left flex items-center ml-6 md:ml-12 gap-3">
+                <div class="toolbar-left flex items-center ml-8 md:ml-14 gap-4">
                     <button
                         id="whiteboard-toolbar-back"
-                        class="text-sm md:text-base font-semibold select-none touch-none btn-danger px-4 py-2"
+                        class="text-base md:text-xl font-semibold select-none touch-none btn-danger px-6 py-3 md:px-8 md:py-3"
                     >
                         EXIT
                     </button>
                     <button
                         id="whiteboard-toolbar-undo"
-                        class="text-sm md:text-base font-semibold select-none touch-none btn-secondary px-4 py-2"
+                        class="text-base md:text-xl font-semibold select-none touch-none btn-secondary px-6 py-3 md:px-8 md:py-3"
                     >
                         UNDO
                     </button>
@@ -1264,46 +1264,46 @@
 
                 <div
                     id="whiteboard-toolbar-mode-select"
-                    class="toolbar-center flex justify-center items-center gap-6"
+                    class="toolbar-center flex justify-center items-center gap-3"
                 >
-                    <div
+                    <button
                         id="whiteboard-toolbar-mode-auto"
-                        class="text-xl md:text-3xl text-[#e8e8e8] font-extrabold select-none touch-none"
+                        class="mode-btn mode-btn-active select-none touch-none"
                     >
                         AUTO
-                    </div>
-                    <div
+                    </button>
+                    <button
                         id="whiteboard-toolbar-mode-teleop"
-                        class="text-xl md:text-3xl text-[#555] select-none touch-none"
+                        class="mode-btn select-none touch-none"
                     >
                         TELEOP
-                    </div>
-                    <div
+                    </button>
+                    <button
                         id="whiteboard-toolbar-mode-endgame"
-                        class="text-xl md:text-3xl text-[#555] select-none touch-none"
+                        class="mode-btn select-none touch-none"
                     >
                         ENDGAME
-                    </div>
-                    <div
+                    </button>
+                    <button
                         id="whiteboard-toolbar-mode-notes"
-                        class="text-xl md:text-3xl text-[#555] select-none touch-none"
+                        class="mode-btn select-none touch-none"
                     >
                         NOTES
-                    </div>
-                    <div
+                    </button>
+                    <button
                         id="whiteboard-toolbar-mode-statbotics"
-                        class="text-xl md:text-3xl text-[#555] select-none touch-none hidden"
+                        class="mode-btn select-none touch-none hidden"
                     >
                         STATS
-                    </div>
+                    </button>
                 </div>
 
                 <div
-                    class="toolbar-right flex items-center justify-end gap-3 mr-6 md:mr-12"
+                    class="toolbar-right flex items-center justify-end gap-4 mr-8 md:mr-14"
                 >
                     <button
                         id="whiteboard-toolbar-view-toggle"
-                        class="text-sm md:text-base font-semibold select-none touch-none btn-secondary px-4 py-2"
+                        class="text-base md:text-xl font-semibold select-none touch-none btn-secondary px-6 py-3 md:px-8 md:py-3"
                     >
                         TOGGLE VIEW
                     </button>
@@ -1640,53 +1640,53 @@
             </div>
             <div
                 id="whiteboard-draw-config"
-                class="absolute flex flex-col justify-center items-center size-12 sm:size-14 md:size-16 lg:size-20 xl:size-24 bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-[#1a1a1a] border border-[#2a2a2a] rounded-full glass-card"
+                class="absolute flex flex-col justify-center items-center size-16 sm:size-20 md:size-24 lg:size-28 xl:size-32 bottom-3 sm:bottom-4 md:bottom-6 right-3 sm:right-4 md:right-6 bg-[#1a1a1a] border border-[#3a3a3a] rounded-full cursor-pointer"
             >
                 <i
                     id="whiteboard-draw-config-marker"
-                    class="fa fa-pencil text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-white"
+                    class="fa fa-pencil text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white"
                 ></i>
                 <i
                     id="whiteboard-draw-config-eraser"
-                    class="fa fa-eraser text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-white"
+                    class="fa fa-eraser text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white"
                     style="display: none"
                 ></i>
                 <i
                     id="whiteboard-draw-config-checkbox"
-                    class="fa-regular fa-square-check text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-white"
+                    class="fa-regular fa-square-check text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white"
                     style="display: none"
                 ></i>
             </div>
             <div
                 id="whiteboard-color-config"
-                class="absolute flex flex-col justify-center items-center bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 bg-[#1a1a1a] border border-[#2a2a2a] rounded-full glass-card p-1.5 sm:p-2"
+                class="absolute flex flex-col justify-center items-center bottom-3 sm:bottom-4 md:bottom-6 left-3 sm:left-4 md:left-6 bg-[#1a1a1a] border border-[#3a3a3a] rounded-full p-2 sm:p-3"
             >
                 <div
                     id="whiteboard-color-yellow"
-                    class="size-6 sm:size-8 md:size-10 lg:size-12 xl:size-16 m-1 sm:m-1.5 md:m-2 bg-yellow-500 rounded-full border-amber-600"
+                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-yellow-500 rounded-full border-2 border-amber-600 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-green"
-                    class="size-6 sm:size-8 md:size-10 lg:size-12 xl:size-16 m-1 sm:m-1.5 md:m-2 bg-green-500 rounded-full border-amber-500"
+                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-green-500 rounded-full border-2 border-green-700 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-blue"
-                    class="size-6 sm:size-8 md:size-10 lg:size-12 xl:size-16 m-1 sm:m-1.5 md:m-2 bg-blue-500 rounded-full border-amber-500"
+                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-blue-500 rounded-full border-2 border-blue-700 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-red"
-                    class="size-6 sm:size-8 md:size-10 lg:size-12 xl:size-16 m-1 sm:m-1.5 md:m-2 bg-red-500 rounded-full border-amber-500"
+                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-red-500 rounded-full border-2 border-red-700 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-white"
-                    class="size-6 sm:size-8 md:size-10 lg:size-12 xl:size-16 m-1 sm:m-1.5 md:m-2 bg-white rounded-full border-amber-500"
+                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-white rounded-full border-2 border-gray-300 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-close"
-                    class="size-6 sm:size-8 md:size-10 lg:size-12 xl:size-16 m-1 sm:m-1.5 md:m-2 flex justify-center items-center text-center rounded-full"
+                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 flex justify-center items-center text-center rounded-full border-2 border-[#3a3a3a] bg-[#2a2a2a] cursor-pointer"
                 >
                     <i
-                        class="fa fa-close text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-red-500"
+                        class="fa fa-close text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-red-500"
                     ></i>
                 </div>
             </div>

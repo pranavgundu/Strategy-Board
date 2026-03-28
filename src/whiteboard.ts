@@ -206,7 +206,7 @@ export function updateCanvasSize() {
   const ratioWidth = fillWidth / background.width;
   const ratioHeight = fillHeight / background.height;
 
-  const baseScale = Math.min(ratioWidth, ratioHeight) * 0.95;
+  const baseScale = Math.min(ratioWidth, ratioHeight) * 1.0;
   const fieldYear = getYearFromFieldImage(currentFieldImageUrl);
   const yearZoomFactor = fieldYear === 2026 ? 1 : 1;
   scaling = baseScale * yearZoomFactor;
@@ -1265,7 +1265,7 @@ export class Whiteboard {
       return;
     }
 
-    BG.fillStyle = "#18181b";
+    BG.fillStyle = "#0d0d0d";
     BG.fillRect(0, 0, width, height);
     BG.translate(width / 2 - this.camera.x, height / 2 - this.camera.y);
     const fieldYear = getYearFromFieldImage(currentFieldImageUrl);
@@ -1617,22 +1617,10 @@ export class Whiteboard {
     this.selected = null;
     document
       .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
-      ?.classList.remove("font-extrabold");
-    document
-      .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
-      ?.classList.remove("text-[#e8e8e8]");
-    document
-      .getElementById(`whiteboard-toolbar-mode-${this.mode}`)
-      ?.classList.add("text-[#555]");
+      ?.classList.remove("mode-btn-active");
     document
       .getElementById(`whiteboard-toolbar-mode-${mode}`)
-      ?.classList.add("font-extrabold");
-    document
-      .getElementById(`whiteboard-toolbar-mode-${mode}`)
-      ?.classList.add("text-[#e8e8e8]");
-    document
-      .getElementById(`whiteboard-toolbar-mode-${mode}`)
-      ?.classList.remove("text-[#555]");
+      ?.classList.add("mode-btn-active");
     this.mode = mode;
 
     const whiteboardWrapper = document.getElementById("whiteboard-wrapper");

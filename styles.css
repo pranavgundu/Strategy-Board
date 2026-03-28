@@ -43,8 +43,12 @@ body {
     border-radius: 6px;
     cursor: pointer;
     font-family: inherit;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
 }
-.btn-accent:hover { background: #d4d4d4; }
+.btn-accent:hover {
+    background: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
 
 .btn-secondary {
     background: #181818;
@@ -53,8 +57,46 @@ body {
     border-radius: 6px;
     cursor: pointer;
     font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.btn-secondary:hover { background: #1e1e1e; color: #bbb; }
+.btn-secondary:hover {
+    background: #252525;
+    color: #e8e8e8;
+    border-color: #555;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+}
+
+.mode-btn {
+    background: #181818;
+    color: #888;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    padding: 0.6rem 1.4rem;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+}
+.mode-btn:hover {
+    background: #252525;
+    color: #e8e8e8;
+    border-color: #555;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+}
+.mode-btn.mode-btn-active {
+    background: #ebebeb;
+    color: #0d0d0d;
+    border-color: #ebebeb;
+    font-weight: 700;
+}
+.mode-btn.mode-btn-active:hover {
+    background: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
 
 .btn-danger {
     background: transparent;
@@ -63,8 +105,14 @@ body {
     border-radius: 6px;
     cursor: pointer;
     font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.btn-danger:hover { border-color: #7a3030; color: #d08080; }
+.btn-danger:hover {
+    background: #2a0f0f;
+    border-color: #8a3030;
+    color: #e89090;
+    box-shadow: 0 0 10px rgba(200, 80, 80, 0.2);
+}
 
 /* Early loading screen that shows before the app bundles finish loading */
 #app-loading {
@@ -237,19 +285,9 @@ body {
     white-space: nowrap;
 }
 
-/* Mode labels: text only, with glow matching GitHub and strategyboard.app */
-#whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
-    font-size: clamp(0.95rem, 2vw, 1.75rem);
-    line-height: 1.1;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    position: relative;
-    padding: 8px 16px;
-    will-change: color, text-shadow;
+/* Mode button sizing responsive overrides */
+#whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
     -webkit-font-smoothing: antialiased;
-    background: transparent;
-    border: none;
-    box-shadow: none;
 }
 
 /* For laptops - slightly reduce spacing but keep horizontal layout */
@@ -276,7 +314,7 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.75rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         font-size: 1.5rem !important;
     }
 }
@@ -349,7 +387,7 @@ body {
         white-space: nowrap;
         overflow: hidden;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         padding: 4px 8px !important; /* Reduce padding on mode labels */
         font-size: 0.875rem !important;
     }
@@ -382,7 +420,7 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.2rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         font-size: 0.875rem !important;
         padding: 3px 6px !important;
     }
@@ -416,7 +454,7 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.15rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         font-size: 0.875rem !important;
         padding: 2px 4px !important;
     }
@@ -751,7 +789,7 @@ body {
 /* Match item hover effect */
 #home-match-list > div:hover {
     background-color: #191919;
-    border-color: #282828;
+    border-color: #333;
     box-shadow: none;
     transform: none;
     cursor: pointer;
@@ -759,6 +797,48 @@ body {
 
 #home-match-list > div {
     transition: all 0.2s ease;
+}
+
+/* 3-dot menu button in match list items */
+.match-menu-btn {
+    transition: background 0.15s ease;
+    cursor: pointer;
+}
+.match-menu-btn:hover {
+    background: transparent;
+}
+
+.match-menu-btn:hover div {
+    background-color: #fff !important;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+/* Whiteboard corner buttons */
+#whiteboard-draw-config {
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#whiteboard-draw-config:hover {
+    background: #252525 !important;
+    border-color: #555 !important;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+    cursor: pointer;
+}
+
+/* Color swatches */
+#whiteboard-color-config > div {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+#whiteboard-color-config > div:hover {
+    transform: scale(1.12);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+
+/* Color panel close button hover */
+#whiteboard-color-close:hover {
+    border-color: #8a3030 !important;
+    background: #2a0f0f !important;
+    box-shadow: 0 0 10px rgba(200, 80, 80, 0.2);
 }
 
 .glass-modal {
@@ -959,33 +1039,6 @@ body #whiteboard-statbotics-container {
     }
 }
 
-/* Mode selector buttons hover glow effect - exact copy of #home-bottom-bar a:hover */
-#whiteboard-toolbar-mode-auto,
-#whiteboard-toolbar-mode-teleop,
-#whiteboard-toolbar-mode-endgame,
-#whiteboard-toolbar-mode-notes,
-#whiteboard-toolbar-mode-statbotics {
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    background: transparent !important;
-    padding: 0.5rem 1rem;
-}
-
-#whiteboard-toolbar-mode-auto:hover,
-#whiteboard-toolbar-mode-teleop:hover,
-#whiteboard-toolbar-mode-endgame:hover,
-#whiteboard-toolbar-mode-notes:hover,
-#whiteboard-toolbar-mode-statbotics:hover {
-    color: white !important;
-    text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(255, 255, 255, 0.6),
-        0 0 30px rgba(255, 255, 255, 0.4),
-        0 0 40px rgba(255, 255, 255, 0.2);
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
 
 .glossy-shine::before { display: none; }
 .glossy-shine:hover::before { display: none; }
