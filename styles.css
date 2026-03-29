@@ -897,9 +897,9 @@ body {
 
 #orientation-warning .dismiss-button {
     padding: 12px 24px;
-    background-color: rgba(100, 116, 139, 0.8);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: #181818;
+    color: #999;
+    border: 1px solid #2a2a2a;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
@@ -908,8 +908,9 @@ body {
 }
 
 #orientation-warning .dismiss-button:hover {
-    background-color: rgba(71, 85, 105, 0.9);
-    border-color: rgba(255, 255, 255, 0.3);
+    background-color: #252525;
+    color: #e8e8e8;
+    border-color: #555;
 }
 
 @keyframes rotateDevice {
