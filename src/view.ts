@@ -15,6 +15,7 @@ import {
   extractTeamItems,
 } from "./search.ts";
 import { StatboticsService, type StatboticsMatchData } from "./statbotics.ts";
+import { Config } from "./config.ts";
 
 /**
  * Creates a debounced version of a function that delays its execution.
@@ -67,6 +68,9 @@ let B: {
   ShareCodeCopy?: HTMLElement | null;
   ShareLinkCopy?: HTMLElement | null;
   TeamNumberSave?: HTMLElement | null;
+  ReleaseAnnouncementClose?: HTMLElement | null;
+  ReleaseAnnouncementDismiss?: HTMLElement | null;
+  ReleaseAnnouncementCta?: HTMLElement | null;
   EditMatch?: HTMLElement | null;
   CancelEdit?: HTMLElement | null;
 } | null = null;
@@ -122,6 +126,9 @@ let E: {
   LastCommitInfo?: HTMLElement | null;
   LinkImportPanel?: HTMLElement | null;
   LinkImportStatus?: HTMLElement | null;
+  ReleaseAnnouncementPanel?: HTMLElement | null;
+  ReleaseAnnouncementTitle?: HTMLElement | null;
+  ReleaseAnnouncementMessage?: HTMLElement | null;
   ShareSuccessPanel?: HTMLElement | null;
   ShareCodeDisplay?: HTMLElement | null;
   ShareLinkDisplay?: HTMLInputElement | null;
@@ -184,6 +191,15 @@ export class View {
         ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
         ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
         TeamNumberSave: get("team-number-save-btn") as HTMLElement | null,
+        ReleaseAnnouncementClose: get(
+          "release-announcement-close-btn",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementDismiss: get(
+          "release-announcement-dismiss-btn",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementCta: get(
+          "release-announcement-cta-btn",
+        ) as HTMLElement | null,
         EditMatch: get("edit-match-save-btn") as HTMLElement | null,
         CancelEdit: get("edit-match-cancel-btn") as HTMLElement | null,
       };
@@ -243,6 +259,15 @@ export class View {
         LastCommitInfo: get("last-commit-info") as HTMLElement | null,
         LinkImportPanel: get("link-import-container") as HTMLElement | null,
         LinkImportStatus: get("link-import-status") as HTMLElement | null,
+        ReleaseAnnouncementPanel: get(
+          "release-announcement-popup",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementTitle: get(
+          "release-announcement-title",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementMessage: get(
+          "release-announcement-message",
+        ) as HTMLElement | null,
         ShareSuccessPanel: get("share-success-container") as HTMLElement | null,
         ShareCodeDisplay: get("share-code-display") as HTMLElement | null,
         ShareLinkDisplay: get("share-link-display") as HTMLInputElement | null,
@@ -466,6 +491,38 @@ export class View {
           if (e.target === shareSuccessPanel) {
             this.hide(E.ShareSuccessPanel);
           }
+        });
+      }
+
+      const releaseAnnouncementPanel = E?.ReleaseAnnouncementPanel;
+      if (releaseAnnouncementPanel) {
+        releaseAnnouncementPanel.addEventListener("click", (e) => {
+          if (e.target === releaseAnnouncementPanel) {
+            this.dismissReleaseAnnouncement();
+          }
+        });
+      }
+
+      const releaseAnnouncementClose = B?.ReleaseAnnouncementClose;
+      if (releaseAnnouncementClose) {
+        releaseAnnouncementClose.addEventListener("click", () => {
+          this.dismissReleaseAnnouncement();
+        });
+      }
+
+      const releaseAnnouncementDismiss = B?.ReleaseAnnouncementDismiss;
+      if (releaseAnnouncementDismiss) {
+        releaseAnnouncementDismiss.addEventListener("click", () => {
+          this.dismissReleaseAnnouncement();
+        });
+      }
+
+      const releaseAnnouncementCta = B?.ReleaseAnnouncementCta;
+      if (releaseAnnouncementCta) {
+        releaseAnnouncementCta.addEventListener("click", () => {
+          const announcement = Config.releaseAnnouncement;
+          this.markReleaseAnnouncementSeen(announcement.id);
+          this.hide(E.ReleaseAnnouncementPanel);
         });
       }
 
@@ -817,7 +874,7 @@ export class View {
             const closeBtn = document.createElement("button");
             closeBtn.id = "qr-import-close-btn";
             closeBtn.className =
-              "flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-all duration-200";
+              "flex items-center justify-center w-8 h-8 rounded-[6px] bg-[#1e1e1e] hover:bg-[#2a2a2a] text-[#999] hover:text-[#e8e8e8] transition-colors";
             closeBtn.title = "Close import";
             closeBtn.setAttribute("aria-label", "Close import dialog");
             closeBtn.innerHTML = '<i class="fas fa-times"></i>';
@@ -850,7 +907,67 @@ export class View {
     this.initializeLastCommit();
     this.initializeContributorTeams();
     this.initializeTeamNumberPopup();
+    this.initializeReleaseAnnouncement();
+    window.addEventListener("app:update-available", () => {
+      this.initializeReleaseAnnouncement();
+    });
     this.checkShareCodeFromUrl();
+  }
+
+  private initializeReleaseAnnouncement(): void {
+    const announcement = Config.releaseAnnouncement;
+    if (!announcement.enabled) return;
+    if (!E?.ReleaseAnnouncementPanel) return;
+    if (!announcement.id?.trim()) {
+      console.error("Release announcement is enabled but missing id");
+      return;
+    }
+    if (announcement.showOnce && this.hasSeenReleaseAnnouncement(announcement.id)) {
+      return;
+    }
+
+    if (E.ReleaseAnnouncementTitle) {
+      E.ReleaseAnnouncementTitle.textContent = announcement.title;
+    }
+    if (E.ReleaseAnnouncementMessage) {
+      E.ReleaseAnnouncementMessage.textContent = announcement.message;
+    }
+    if (B?.ReleaseAnnouncementCta) {
+      B.ReleaseAnnouncementCta.textContent = announcement.ctaLabel;
+      if (announcement.ctaUrl) {
+        B.ReleaseAnnouncementCta.setAttribute("href", announcement.ctaUrl);
+        B.ReleaseAnnouncementCta.setAttribute("target", "_blank");
+        B.ReleaseAnnouncementCta.setAttribute("rel", "noopener noreferrer");
+      } else {
+        B.ReleaseAnnouncementCta.removeAttribute("href");
+        B.ReleaseAnnouncementCta.removeAttribute("target");
+      }
+    }
+
+    this.show(E.ReleaseAnnouncementPanel);
+  }
+
+  private dismissReleaseAnnouncement(): void {
+    const announcement = Config.releaseAnnouncement;
+    this.markReleaseAnnouncementSeen(announcement.id);
+    this.hide(E.ReleaseAnnouncementPanel);
+  }
+
+  private hasSeenReleaseAnnouncement(id: string): boolean {
+    try {
+      return localStorage.getItem("release-announcement-seen") === id;
+    } catch (error) {
+      console.error("Failed to read release announcement state:", error);
+      return false;
+    }
+  }
+
+  private markReleaseAnnouncementSeen(id: string): void {
+    try {
+      localStorage.setItem("release-announcement-seen", id);
+    } catch (error) {
+      console.error("Failed to save release announcement state:", error);
+    }
   }
 
   /**
@@ -923,7 +1040,7 @@ export class View {
 
         E.LastCommitInfo.innerHTML = `
           <a href="${commit.url}" target="_blank" rel="noopener noreferrer"
-             class="hover:text-slate-300 transition-colors flex items-center gap-2"
+             class="hover:text-[#999] transition-colors flex items-center gap-2"
              title="latest commit: ${commit.message}">
             <span class="font-mono">${commit.sha}</span>
             <span>•</span>
@@ -1182,11 +1299,11 @@ export class View {
           } else {
             resultText = `Tie (${matchData.redScore} - ${matchData.blueScore})`;
             matchResult.className =
-              "text-xl md:text-2xl font-bold text-zinc-300";
+              "text-xl md:text-2xl font-bold text-[#999]";
           }
         } else {
           resultText = "Match Complete";
-          matchResult.className = "text-xl md:text-2xl font-bold text-zinc-300";
+          matchResult.className = "text-xl md:text-2xl font-bold text-[#999]";
         }
         matchResult.textContent = resultText;
         matchResultContainer.classList.remove("hidden");
@@ -1248,10 +1365,10 @@ export class View {
         if (error instanceof Error && error.message.includes("500")) {
           emptyStateContent.innerHTML = `
             <i class="fa fa-exclamation-triangle text-6xl text-yellow-500 mb-4"></i>
-            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#e8e8e8] mb-2">
               Statbotics Temporarily Unavailable
             </h2>
-            <p class="text-zinc-400 text-center max-w-md text-base md:text-lg">
+            <p class="text-[#666] text-center max-w-md text-base md:text-lg">
               The Statbotics API is experiencing issues. Please try again later or check your internet connection.
             </p>
           `;
@@ -1260,21 +1377,21 @@ export class View {
           error.message.includes("not found")
         ) {
           emptyStateContent.innerHTML = `
-            <i class="fa fa-chart-line text-6xl text-zinc-600 mb-4"></i>
-            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+            <i class="fa fa-chart-line text-6xl text-[#333] mb-4"></i>
+            <h2 class="text-2xl md:text-3xl font-bold text-[#e8e8e8] mb-2">
               No Stats Data Available
             </h2>
-            <p class="text-zinc-400 text-center max-w-md text-base md:text-lg">
+            <p class="text-[#666] text-center max-w-md text-base md:text-lg">
               Statbotics data not found for this match. The match may be too recent or data is not yet available.
             </p>
           `;
         } else {
           emptyStateContent.innerHTML = `
             <i class="fa fa-wifi text-6xl text-red-500 mb-4"></i>
-            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#e8e8e8] mb-2">
               Unable to Load Stats
             </h2>
-            <p class="text-zinc-400 text-center max-w-md text-base md:text-lg">
+            <p class="text-[#666] text-center max-w-md text-base md:text-lg">
               Could not connect to Statbotics. Please check your internet connection and try again later.
             </p>
           `;
@@ -1296,7 +1413,7 @@ export class View {
       | { p99: number; p90: number; p75: number; p25: number }
       | undefined,
   ): string {
-    if (!percentiles) return "text-zinc-300";
+    if (!percentiles) return "text-[#e8e8e8]";
 
     if (value >= percentiles.p99) {
       return "text-blue-400";
@@ -1307,7 +1424,7 @@ export class View {
     } else if (value < percentiles.p25) {
       return "text-red-400";
     }
-    return "text-zinc-300";
+    return "text-[#e8e8e8]";
   }
 
   /**
@@ -1427,13 +1544,13 @@ export class View {
     }
     if (rankEl) {
       rankEl.textContent = teamData.rank ? `#${teamData.rank}` : "N/A";
-      rankEl.className = "text-zinc-300 font-bold";
+      rankEl.className = "text-[#e8e8e8] font-bold";
     }
     if (percentileEl) {
       percentileEl.textContent = teamData.percentile
         ? `${(teamData.percentile * 100).toFixed(1)}%`
         : "N/A";
-      percentileEl.className = "text-zinc-300 font-bold";
+      percentileEl.className = "text-[#e8e8e8] font-bold";
     }
 
     modal.classList.remove("hidden");
@@ -2385,8 +2502,8 @@ export class View {
 
     E.TBAStatusMessage.textContent = message;
     E.TBAStatusMessage.className = isError
-      ? "w-full px-8 pb-4 text-center text-red-400"
-      : "w-full px-8 pb-4 text-center text-slate-300";
+      ? "w-full px-8 pb-4 text-center text-[#b87070]"
+      : "w-full px-8 pb-4 text-center text-[#999]";
     this.show(E.TBAStatusMessage);
   }
 
@@ -2946,8 +3063,8 @@ export class View {
         contributorCard.target = "_blank";
         contributorCard.rel = "noopener noreferrer";
         contributorCard.className = `
-          flex items-center gap-4 p-4 bg-slate-700 rounded-xl
-          glass-card hover:bg-slate-600 hover:scale-105 transition-all duration-200
+          flex items-center gap-4 p-4 bg-[#141414] border border-[#1e1e1e] rounded-[6px]
+          hover:bg-[#1a1a1a] transition-colors duration-200
           cursor-pointer no-underline
         `;
 
@@ -2956,26 +3073,26 @@ export class View {
             <img
               src="${contributor.avatar_url}?s=128"
               alt="${contributor.login}"
-              class="w-16 h-16 rounded-full border-2 border-slate-500"
+              class="w-16 h-16 rounded-full border-2 border-[#2a2a2a]"
               style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; backface-visibility: hidden; transform: translateZ(0); will-change: transform;"
             />
           </div>
           <div class="grow min-w-0">
-            <div class="contributor-name text-lg font-bold text-white truncate">
+            <div class="contributor-name text-lg font-bold text-[#e8e8e8] truncate">
               ${contributor.name || contributor.login}
             </div>
-            <p class="text-sm text-slate-400 truncate">@${contributor.login}</p>
-            ${contributor.bio ? `<p class="text-sm text-slate-300 mt-1 line-clamp-2">${contributor.bio}</p>` : ""}
+            <p class="text-sm text-[#666] truncate">@${contributor.login}</p>
+            ${contributor.bio ? `<p class="text-sm text-[#999] mt-1 line-clamp-2">${contributor.bio}</p>` : ""}
           </div>
         `;
 
         contributorCard.addEventListener("mouseenter", () => {
           const nameEl = contributorCard.querySelector(".contributor-name");
-          if (nameEl) nameEl.classList.replace("text-white", "text-blue-400");
+          if (nameEl) nameEl.classList.replace("text-[#e8e8e8]", "text-[#aaa]");
         });
         contributorCard.addEventListener("mouseleave", () => {
           const nameEl = contributorCard.querySelector(".contributor-name");
-          if (nameEl) nameEl.classList.replace("text-blue-400", "text-white");
+          if (nameEl) nameEl.classList.replace("text-[#aaa]", "text-[#e8e8e8]");
         });
 
         E.ContributorsGrid?.appendChild(contributorCard);
@@ -2984,14 +3101,14 @@ export class View {
       teams.forEach((teamNumber) => {
         const teamCard = document.createElement("div");
         teamCard.className = `
-          flex items-center justify-center p-4 bg-slate-700 rounded-xl
-          glass-card hover:bg-slate-600 hover:scale-105 transition-all duration-200
+          flex items-center justify-center p-4 bg-[#141414] border border-[#1e1e1e] rounded-[6px]
+          hover:bg-[#1a1a1a] transition-colors duration-200
           cursor-default
         `;
 
         teamCard.innerHTML = `
           <div class="text-center">
-            <div class="text-lg font-bold text-white">
+            <div class="text-lg font-bold text-[#e8e8e8]">
               Team ${teamNumber}
             </div>
           </div>
@@ -3007,8 +3124,8 @@ export class View {
       donators.forEach((donator) => {
         const donatorCard = document.createElement("div");
         donatorCard.className = `
-          flex flex-col items-center justify-center p-6 rounded-xl
-          hover:scale-105 transition-all duration-300
+          flex flex-col items-center justify-center p-6 rounded-[6px]
+          transition-all duration-300
           cursor-default relative overflow-hidden
         `;
         donatorCard.style.cssText = `
@@ -3124,8 +3241,8 @@ export class View {
 
     E.LinkImportStatus.textContent = message;
     E.LinkImportStatus.className = isError
-      ? "mt-4 text-sm sm:text-base text-red-400"
-      : "mt-4 text-sm sm:text-base text-slate-300";
+      ? "mt-4 text-sm sm:text-base text-[#b87070]"
+      : "mt-4 text-sm sm:text-base text-[#999]";
     this.show(E.LinkImportStatus);
   }
 

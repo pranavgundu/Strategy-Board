@@ -49,6 +49,11 @@ registerSW({
    */
   onNeedRefresh() {
     console.log("PWA: New content available, please refresh.");
+    try {
+      window.dispatchEvent(new Event("app:update-available"));
+    } catch (error) {
+      console.error("Failed to dispatch app:update-available:", error);
+    }
   },
   /**
    * Callback invoked when service worker registration fails.

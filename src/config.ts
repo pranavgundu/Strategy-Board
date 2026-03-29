@@ -24,4 +24,13 @@ export const Config = {
   blueThreeStationY: 1155,
 
   sharedTBAApiKey: import.meta.env.VITE_TBA_API_KEY || "",
+  releaseAnnouncement: {
+    enabled: false,
+    id: "release-2026-2-0",
+    title: "New update available",
+    message: "We shipped a new release with fixes and improvements.",
+    ctaLabel: "View release notes",
+    ctaUrl: "https://github.com/pranavgundu/Strategy-Board/releases",
+    showOnce: true,
+  },
 };

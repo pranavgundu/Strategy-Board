@@ -34,6 +34,86 @@ body {
     text-size-adjust: 100%;
 }
 
+/* ── Minimalist button utilities ── */
+.btn-accent {
+    background: #ebebeb;
+    color: #0d0d0d;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-accent:hover {
+    background: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary {
+    background: #181818;
+    color: #999;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-secondary:hover {
+    background: #252525;
+    color: #e8e8e8;
+    border-color: #555;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+}
+
+.mode-btn {
+    background: #181818;
+    color: #888;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    padding: 0.6rem 1.4rem;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+}
+.mode-btn:hover {
+    background: #252525;
+    color: #e8e8e8;
+    border-color: #555;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+}
+.mode-btn.mode-btn-active {
+    background: #ebebeb;
+    color: #0d0d0d;
+    border-color: #ebebeb;
+    font-weight: 700;
+}
+.mode-btn.mode-btn-active:hover {
+    background: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+.btn-danger {
+    background: transparent;
+    color: #b87070;
+    border: 1px solid #4a2020;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-danger:hover {
+    background: #2a0f0f;
+    border-color: #8a3030;
+    color: #e89090;
+    box-shadow: 0 0 10px rgba(200, 80, 80, 0.2);
+}
+
 /* Early loading screen that shows before the app bundles finish loading */
 #app-loading {
     position: fixed;
@@ -41,19 +121,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-        radial-gradient(
-            circle at 20% 20%,
-            rgba(59, 130, 246, 0.22),
-            transparent 45%
-        ),
-        radial-gradient(
-            circle at 80% 0%,
-            rgba(16, 185, 129, 0.2),
-            transparent 40%
-        ),
-        #0f172a;
-    color: #e2e8f0;
+    background: #0d0d0d;
+    color: #e8e8e8;
     z-index: 99990;
     transition:
         opacity 220ms ease,
@@ -67,12 +136,10 @@ body {
 }
 
 #app-loading .loading-card {
-    background: rgba(15, 23, 42, 0.88);
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    box-shadow:
-        0 20px 80px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-    border-radius: 18px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    box-shadow: none;
+    border-radius: 6px;
     padding: 24px 28px;
     min-width: min(92vw, 420px);
     display: grid;
@@ -89,7 +156,7 @@ body {
 
 #app-loading .loading-subtitle {
     font-size: clamp(0.95rem, 2.4vw, 1.1rem);
-    color: #cbd5e1;
+    color: #999;
 }
 
 #app-loading .loading-spinner {
@@ -97,7 +164,7 @@ body {
     height: 48px;
     border-radius: 999px;
     border: 4px solid rgba(148, 163, 184, 0.25);
-    border-top-color: #38bdf8;
+    border-top-color: #888;
     animation: app-loading-spin 1s linear infinite;
 }
 
@@ -218,19 +285,9 @@ body {
     white-space: nowrap;
 }
 
-/* Mode labels: text only, with glow matching GitHub and strategyboard.app */
-#whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
-    font-size: clamp(0.95rem, 2vw, 1.75rem);
-    line-height: 1.1;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    position: relative;
-    padding: 8px 16px;
-    will-change: color, text-shadow;
+/* Mode button sizing responsive overrides */
+#whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
     -webkit-font-smoothing: antialiased;
-    background: transparent;
-    border: none;
-    box-shadow: none;
 }
 
 /* For laptops - slightly reduce spacing but keep horizontal layout */
@@ -257,7 +314,7 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.75rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         font-size: 1.5rem !important;
     }
 }
@@ -330,7 +387,7 @@ body {
         white-space: nowrap;
         overflow: hidden;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         padding: 4px 8px !important; /* Reduce padding on mode labels */
         font-size: 0.875rem !important;
     }
@@ -363,7 +420,7 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.2rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         font-size: 0.875rem !important;
         padding: 3px 6px !important;
     }
@@ -397,7 +454,7 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.15rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > div {
+    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         font-size: 0.875rem !important;
         padding: 2px 4px !important;
     }
@@ -696,44 +753,11 @@ body {
         inset 0 -2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Toolbar button enhancements */
+/* Toolbar button transitions */
 #whiteboard-toolbar-back,
 #whiteboard-toolbar-undo,
 #whiteboard-toolbar-view-toggle {
-    transition: all 0.3s ease;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        inset 0 1px 2px rgba(255, 255, 255, 0.2);
-}
-
-#whiteboard-toolbar-back:hover {
-    background-color: rgb(220 38 38) !important; /* red-600 */
-    transform: translateY(-2px);
-    box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-#whiteboard-toolbar-undo:hover {
-    background-color: rgb(249 115 22) !important; /* orange-600 */
-    transform: translateY(-2px);
-    box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-#whiteboard-toolbar-view-toggle:hover {
-    background-color: rgb(168 85 247) !important; /* purple-600 */
-    transform: translateY(-2px);
-    box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-#whiteboard-toolbar-back:active,
-#whiteboard-toolbar-undo:active,
-#whiteboard-toolbar-view-toggle:active {
-    transform: translateY(0);
+    transition: all 0.2s ease;
 }
 
 /* Undo button disabled state */
@@ -742,45 +766,32 @@ body {
     filter: grayscale(0.5);
 }
 
-/* Glassmorphism Effects */
+/* glass-button: stripped — kept for whiteboard compatibility but no longer decorative */
 .glass-button {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow:
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
-
 .glass-button:hover {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow:
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+    border: none;
+    box-shadow: none;
 }
 
 .glass-card {
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(51, 65, 85, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.125);
-    box-shadow:
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 /* Match item hover effect */
 #home-match-list > div:hover {
-    background-color: rgba(71, 85, 105, 0.85);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow:
-        0 12px 40px 0 rgba(0, 0, 0, 0.45),
-        inset 0 1px 2px 0 rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    transition: all 0.2s ease;
+    background-color: #191919;
+    border-color: #333;
+    box-shadow: none;
+    transform: none;
     cursor: pointer;
 }
 
@@ -788,25 +799,70 @@ body {
     transition: all 0.2s ease;
 }
 
+/* 3-dot menu button in match list items */
+.match-menu-btn {
+    transition: background 0.15s ease, filter 0.2s ease;
+    cursor: pointer;
+    color: #555;
+}
+.match-menu-btn:hover {
+    background: transparent;
+}
+
+.match-menu-btn .menu-dot {
+    display: block;
+    background-color: currentColor;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.match-menu-btn:hover .menu-dot {
+    background-color: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+/* Whiteboard corner buttons */
+#whiteboard-draw-config {
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+#whiteboard-draw-config:hover {
+    background: #252525 !important;
+    border-color: #555 !important;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+    cursor: pointer;
+}
+
+/* Color swatches */
+#whiteboard-color-config > div {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+#whiteboard-color-config > div:hover {
+    transform: scale(1.12);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+
+/* Color panel close button hover */
+#whiteboard-color-close:hover {
+    border-color: #8a3030 !important;
+    background: #2a0f0f !important;
+    box-shadow: 0 0 10px rgba(200, 80, 80, 0.2);
+}
+
 .glass-modal {
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    background-color: rgba(71, 85, 105, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow:
-        0 16px 48px 0 rgba(0, 0, 0, 0.5),
-        inset 0 2px 2px 0 rgba(255, 255, 255, 0.15),
-        inset 0 -2px 4px 0 rgba(0, 0, 0, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 .glass-toolbar {
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-    background-color: rgba(63, 63, 70, 0.85);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow:
-        0 4px 24px 0 rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: transparent;
+    border-bottom: none;
+    box-shadow: none;
 }
 
 /* Landscape orientation warning for mobile devices */
@@ -849,9 +905,9 @@ body {
 
 #orientation-warning .dismiss-button {
     padding: 12px 24px;
-    background-color: rgba(100, 116, 139, 0.8);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: #181818;
+    color: #999;
+    border: 1px solid #2a2a2a;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
@@ -860,8 +916,9 @@ body {
 }
 
 #orientation-warning .dismiss-button:hover {
-    background-color: rgba(71, 85, 105, 0.9);
-    border-color: rgba(255, 255, 255, 0.3);
+    background-color: #252525;
+    color: #e8e8e8;
+    border-color: #555;
 }
 
 @keyframes rotateDevice {
@@ -938,10 +995,8 @@ body {
     }
 }
 
-.glossy-shine {
-    position: relative;
-    overflow: hidden;
-}
+/* glossy-shine: stripped */
+.glossy-shine { }
 
 /* Statbotics container - ensure no scrolling and content fits */
 body #whiteboard-statbotics-container {
@@ -993,69 +1048,10 @@ body #whiteboard-statbotics-container {
     }
 }
 
-/* Mode selector buttons hover glow effect - exact copy of #home-bottom-bar a:hover */
-#whiteboard-toolbar-mode-auto,
-#whiteboard-toolbar-mode-teleop,
-#whiteboard-toolbar-mode-endgame,
-#whiteboard-toolbar-mode-notes,
-#whiteboard-toolbar-mode-statbotics {
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    background: transparent !important;
-    padding: 0.5rem 1rem;
-}
 
-#whiteboard-toolbar-mode-auto:hover,
-#whiteboard-toolbar-mode-teleop:hover,
-#whiteboard-toolbar-mode-endgame:hover,
-#whiteboard-toolbar-mode-notes:hover,
-#whiteboard-toolbar-mode-statbotics:hover {
-    color: white !important;
-    text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(255, 255, 255, 0.6),
-        0 0 30px rgba(255, 255, 255, 0.4),
-        0 0 40px rgba(255, 255, 255, 0.2);
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-.glossy-shine::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent
-    );
-    transition: left 0.5s ease;
-}
-
-.glossy-shine:hover::before {
-    left: 100%;
-}
-
-.glossy-shine::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.2) 0%,
-        rgba(255, 255, 255, 0.05) 50%,
-        transparent 100%
-    );
-    pointer-events: none;
-}
+.glossy-shine::before { display: none; }
+.glossy-shine:hover::before { display: none; }
+.glossy-shine::after { display: none; }
 
 /* Frosted glass effect for backdrops */
 .backdrop-blur-xs {
@@ -1067,7 +1063,7 @@ body #whiteboard-statbotics-container {
 .tba-dropdown-item {
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid #1e1e1e;
     transition: background-color 0.2s;
 }
 
@@ -1082,17 +1078,17 @@ body #whiteboard-statbotics-container {
 }
 
 .tba-dropdown-item:hover {
-    background-color: rgba(59, 130, 246, 0.3);
+    background-color: #1e1e1e;
 }
 
 .tba-dropdown-item.selected {
-    background-color: rgba(59, 130, 246, 0.5);
+    background-color: #242424;
 }
 
 .tba-event-name {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #e8e8e8;
     margin-bottom: 4px;
 }
 
@@ -1104,7 +1100,7 @@ body #whiteboard-statbotics-container {
 
 .tba-event-details {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: #888;
 }
 
 @media (min-width: 640px) {
@@ -1116,11 +1112,11 @@ body #whiteboard-statbotics-container {
 .tba-team-item {
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid #1e1e1e;
     transition: background-color 0.2s;
     text-align: center;
     font-size: 1rem;
-    color: #e2e8f0;
+    color: #e8e8e8;
 }
 
 @media (min-width: 640px) {
@@ -1135,11 +1131,11 @@ body #whiteboard-statbotics-container {
 }
 
 .tba-team-item:hover {
-    background-color: rgba(59, 130, 246, 0.3);
+    background-color: #1e1e1e;
 }
 
 .tba-team-item.selected {
-    background-color: rgba(59, 130, 246, 0.5);
+    background-color: #242424;
 }
 
 #tba-event-dropdown::-webkit-scrollbar,
@@ -1155,32 +1151,30 @@ body #whiteboard-statbotics-container {
 
 #tba-event-dropdown::-webkit-scrollbar-thumb,
 #tba-team-dropdown::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.5);
+    background: #333;
     border-radius: 4px;
 }
 
 #tba-event-dropdown::-webkit-scrollbar-thumb:hover,
 #tba-team-dropdown::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.7);
+    background: #444;
 }
 
-/* Glow effect for strategyboard.app and GitHub logo on hover */
 #home-bottom-bar {
     overflow: visible !important;
 }
 
 #home-bottom-bar a {
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s ease;
 }
 
 #home-bottom-bar a:hover {
-    text-shadow:
-        0 0 6px rgba(255, 255, 255, 0.4),
-        0 0 12px rgba(255, 255, 255, 0.2);
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
 #home-bottom-bar a:hover i {
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
 /* Ensure proper scrolling on all mobile devices */
@@ -1333,7 +1327,7 @@ body #whiteboard-statbotics-container {
 @media (max-width: 640px) {
     #home-match-list {
         padding: 0.75rem !important;
-        gap: 0.75rem !important;
+        gap: 0.5rem !important;
     }
 
     #home-match-list
@@ -1427,7 +1421,7 @@ body #whiteboard-statbotics-container {
 @media (max-width: 480px) {
     #home-match-list {
         padding: 0.5rem !important;
-        gap: 0.5rem !important;
+        gap: 0.35rem !important;
     }
 
     #home-match-list
@@ -1587,7 +1581,7 @@ a:active,
 
     /* Optimize match list for tablet screens */
     #home-match-list {
-        gap: 1rem;
+        gap: 0.75rem;
         padding: 1.5rem;
     }
 
@@ -1840,7 +1834,7 @@ a:active,
 /* Rainbow team digit animation (for teams 467 and 834) */
 .rainbow-team-digit {
     display: inline-block;
-    animation: rainbow-glow 3s ease-in-out infinite;
+    animation: rainbow-glow 2s ease-in-out infinite;
 }
 
 @keyframes rainbow-glow {
@@ -1873,5 +1867,36 @@ a:active,
     }
     100% {
         color: inherit;
+    }
+}
+
+/* 1.5x scale for import/export popup content (not homepage buttons) */
+#tba-import-container > div,
+#link-import-container > div,
+#share-success-container > div,
+#qr-import-inner-container,
+#qr-export-inner-container {
+    scale: 1.5;
+    transform-origin: center center;
+}
+
+/* Keep enlarged popups usable on smaller screens */
+@media (max-width: 1024px) {
+    #tba-import-container > div,
+    #link-import-container > div,
+    #share-success-container > div,
+    #qr-import-inner-container,
+    #qr-export-inner-container {
+        scale: 1.2;
+    }
+}
+
+@media (max-width: 640px) {
+    #tba-import-container > div,
+    #link-import-container > div,
+    #share-success-container > div,
+    #qr-import-inner-container,
+    #qr-export-inner-container {
+        scale: 1.05;
     }
 }

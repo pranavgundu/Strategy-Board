@@ -4,7 +4,6 @@
 
 ![Strategy Board](https://github.com/user-attachments/assets/37d76b6e-2494-43f5-9217-2c596a29f59a)
 
-
 ## The Digital Strategy Whiteboard for FRC
 
 </div>
