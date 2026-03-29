@@ -273,28 +273,28 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-[99999]"
         >
             <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-md bg-[#141414] border border-[#1e1e1e] rounded-[6px] overflow-hidden"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-[94%] sm:w-5/6 md:w-3/4 lg:w-2/3 max-w-2xl bg-[#141414] border border-[#1e1e1e] rounded-[10px] overflow-hidden"
             >
                 <div
-                    class="w-full pt-5 pb-4 px-6 bg-[#111111] border-b border-[#1e1e1e]"
+                    class="w-full pt-8 pb-6 px-8 sm:px-10 bg-[#111111] border-b border-[#1e1e1e]"
                 >
                     <h2
-                        class="text-base text-center text-[#e8e8e8] font-semibold"
+                        class="text-2xl sm:text-3xl text-center text-[#e8e8e8] font-semibold"
                     >
                         Welcome to Strategy Board!
                     </h2>
-                    <p class="text-center text-[#999] text-sm mt-1">
+                    <p class="text-center text-[#999] text-lg sm:text-xl mt-2">
                         What's your team number?
                     </p>
                 </div>
-                <div class="w-full p-6">
+                <div class="w-full p-8 sm:p-10">
                     <input
                         type="number"
                         id="team-number-input"
                         placeholder="Enter team number"
                         maxlength="5"
                         inputmode="numeric"
-                        class="w-full text-xl text-center text-[#e8e8e8] p-4 bg-[#0d0d0d] border border-[#2a2a2a] rounded-[6px] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="w-full text-3xl sm:text-4xl text-center text-[#e8e8e8] p-6 sm:p-7 bg-[#0d0d0d] border border-[#2a2a2a] rounded-[8px] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         autocomplete="off"
                         autocapitalize="off"
                         spellcheck="false"
@@ -303,7 +303,7 @@
                 <div class="flex w-full">
                     <button
                         id="team-number-save-btn"
-                        class="w-full text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none"
+                        class="w-full text-center text-lg sm:text-xl btn-accent p-5 sm:p-6 border-t border-[#1e1e1e] rounded-none"
                     >
                         Continue
                     </button>
