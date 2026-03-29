@@ -801,16 +801,24 @@ body {
 
 /* 3-dot menu button in match list items */
 .match-menu-btn {
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, filter 0.2s ease;
     cursor: pointer;
+    color: #555;
 }
 .match-menu-btn:hover {
     background: transparent;
 }
 
-.match-menu-btn:hover div {
-    background-color: #fff !important;
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+.match-menu-btn .menu-dot {
+    display: block;
+    background-color: currentColor;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.match-menu-btn:hover .menu-dot {
+    background-color: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
 /* Whiteboard corner buttons */
@@ -1319,7 +1327,7 @@ body #whiteboard-statbotics-container {
 @media (max-width: 640px) {
     #home-match-list {
         padding: 0.75rem !important;
-        gap: 0.75rem !important;
+        gap: 0.5rem !important;
     }
 
     #home-match-list
@@ -1413,7 +1421,7 @@ body #whiteboard-statbotics-container {
 @media (max-width: 480px) {
     #home-match-list {
         padding: 0.5rem !important;
-        gap: 0.5rem !important;
+        gap: 0.35rem !important;
     }
 
     #home-match-list
@@ -1573,7 +1581,7 @@ a:active,
 
     /* Optimize match list for tablet screens */
     #home-match-list {
-        gap: 1rem;
+        gap: 0.75rem;
         padding: 1.5rem;
     }
 
@@ -1826,7 +1834,7 @@ a:active,
 /* Rainbow team digit animation (for teams 467 and 834) */
 .rainbow-team-digit {
     display: inline-block;
-    animation: rainbow-glow 3s ease-in-out infinite;
+    animation: rainbow-glow 2s ease-in-out infinite;
 }
 
 @keyframes rainbow-glow {
@@ -1859,5 +1867,36 @@ a:active,
     }
     100% {
         color: inherit;
+    }
+}
+
+/* 1.5x scale for import/export popup content (not homepage buttons) */
+#tba-import-container > div,
+#link-import-container > div,
+#share-success-container > div,
+#qr-import-inner-container,
+#qr-export-inner-container {
+    scale: 1.5;
+    transform-origin: center center;
+}
+
+/* Keep enlarged popups usable on smaller screens */
+@media (max-width: 1024px) {
+    #tba-import-container > div,
+    #link-import-container > div,
+    #share-success-container > div,
+    #qr-import-inner-container,
+    #qr-export-inner-container {
+        scale: 1.2;
+    }
+}
+
+@media (max-width: 640px) {
+    #tba-import-container > div,
+    #link-import-container > div,
+    #share-success-container > div,
+    #qr-import-inner-container,
+    #qr-export-inner-container {
+        scale: 1.05;
     }
 }
