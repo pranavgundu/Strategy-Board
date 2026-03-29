@@ -317,7 +317,7 @@
             >
                 <div
                     id="home-toolbar-logo"
-                    class="text-3xl font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
+                    class="text-2xl font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
                     onclick="location.reload()"
                 >
                     Strategy Board
@@ -494,7 +494,7 @@
                     <a
                         id="contributors-link-btn"
                         href="#"
-                        class="absolute right-6 flex items-center text-[#555] hover:text-[#999] transition-colors text-xs"
+                        class="absolute right-6 flex items-center text-[#555] hover:text-[#999] transition-colors text-base"
                         style="top: 50%; transform: translateY(-50%);"
                     >
                         strategyboard.app
@@ -509,12 +509,12 @@
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-xl bg-[#141414] border border-[#1e1e1e] rounded-[6px] overflow-hidden"
             >
                 <div
-                    class="w-full pt-5 pb-4 text-center text-[#e8e8e8] text-base font-semibold border-b border-[#1e1e1e] bg-[#111111]"
+                    class="w-full pt-6 pb-5 text-center text-[#e8e8e8] text-xl font-semibold border-b border-[#1e1e1e] bg-[#111111]"
                 >
                     Clear All Data?
                 </div>
                 <div
-                    class="w-full px-6 py-5 text-sm text-center text-[#999]"
+                    class="w-full px-8 py-6 text-base text-center text-[#999]"
                 >
                     This will permanently delete all matches and data. This
                     action cannot be undone.
@@ -522,13 +522,13 @@
                 <div class="flex w-full">
                     <button
                         id="clear-confirm-cancel-btn"
-                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] rounded-none"
+                        class="w-1/2 text-center text-lg btn-secondary p-5 border-t border-[#1e1e1e] rounded-none"
                     >
                         Cancel
                     </button>
                     <button
                         id="clear-confirm-clear-btn"
-                        class="w-1/2 text-center text-sm btn-danger p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
+                        class="w-1/2 text-center text-lg btn-danger p-5 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
                     >
                         Clear All
                     </button>
@@ -546,7 +546,7 @@
                     id="create-match-name"
                     placeholder="Match Name"
                     maxlength="25"
-                    class="w-full py-4 px-6 text-base text-center text-[#e8e8e8] font-semibold bg-[#111111] border-b border-[#1e1e1e] outline-0 rounded-none"
+                    class="w-full py-5 px-8 text-xl text-center text-[#e8e8e8] font-semibold bg-[#111111] border-b border-[#1e1e1e] outline-0 rounded-none"
                     autocomplete="off"
                     autocapitalize="off"
                     spellcheck="false"
@@ -622,13 +622,13 @@
                 <div class="flex w-full">
                     <button
                         id="create-match-create-btn"
-                        class="w-1/2 text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none"
+                        class="w-1/2 text-center text-lg btn-accent p-5 border-t border-[#1e1e1e] rounded-none"
                     >
                         Create
                     </button>
                     <button
                         id="create-match-cancel-btn"
-                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
+                        class="w-1/2 text-center text-lg btn-secondary p-5 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
                     >
                         Cancel
                     </button>
@@ -647,7 +647,7 @@
                     id="edit-match-name"
                     placeholder="Match Name"
                     maxlength="25"
-                    class="w-full py-4 px-6 text-base text-center text-[#e8e8e8] font-semibold bg-[#111111] border-b border-[#1e1e1e] outline-0 rounded-none"
+                    class="w-full py-5 px-8 text-xl text-center text-[#e8e8e8] font-semibold bg-[#111111] border-b border-[#1e1e1e] outline-0 rounded-none"
                     autocomplete="off"
                     autocapitalize="off"
                     spellcheck="false"
@@ -723,13 +723,13 @@
                 <div class="flex w-full">
                     <button
                         id="edit-match-save-btn"
-                        class="w-1/2 text-center text-sm btn-accent p-4 border-t border-[#1e1e1e] rounded-none"
+                        class="w-1/2 text-center text-lg btn-accent p-5 border-t border-[#1e1e1e] rounded-none"
                     >
                         Save
                     </button>
                     <button
                         id="edit-match-cancel-btn"
-                        class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
+                        class="w-1/2 text-center text-lg btn-secondary p-5 border-t border-[#1e1e1e] border-l border-l-[#1e1e1e] rounded-none"
                     >
                         Cancel
                     </button>
@@ -1640,20 +1640,20 @@
             </div>
             <div
                 id="whiteboard-draw-config"
-                class="absolute flex flex-col justify-center items-center size-16 sm:size-20 md:size-24 lg:size-28 xl:size-32 bottom-3 sm:bottom-4 md:bottom-6 right-3 sm:right-4 md:right-6 bg-[#1a1a1a] border border-[#3a3a3a] rounded-full cursor-pointer"
+                class="absolute flex flex-col justify-center items-center size-10 sm:size-12 md:size-14 lg:size-16 xl:size-20 bottom-3 sm:bottom-4 md:bottom-6 right-3 sm:right-4 md:right-6 bg-[#1a1a1a] border border-[#3a3a3a] rounded-full cursor-pointer"
             >
                 <i
                     id="whiteboard-draw-config-marker"
-                    class="fa fa-pencil text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white"
+                    class="fa fa-pencil text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white"
                 ></i>
                 <i
                     id="whiteboard-draw-config-eraser"
-                    class="fa fa-eraser text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white"
+                    class="fa fa-eraser text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white"
                     style="display: none"
                 ></i>
                 <i
                     id="whiteboard-draw-config-checkbox"
-                    class="fa-regular fa-square-check text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white"
+                    class="fa-regular fa-square-check text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white"
                     style="display: none"
                 ></i>
             </div>
@@ -1663,30 +1663,30 @@
             >
                 <div
                     id="whiteboard-color-yellow"
-                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-yellow-500 rounded-full border-2 border-amber-600 cursor-pointer"
+                    class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 bg-yellow-500 rounded-full border-2 border-amber-600 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-green"
-                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-green-500 rounded-full border-2 border-green-700 cursor-pointer"
+                    class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 bg-green-500 rounded-full border-2 border-green-700 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-blue"
-                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-blue-500 rounded-full border-2 border-blue-700 cursor-pointer"
+                    class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 bg-blue-500 rounded-full border-2 border-blue-700 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-red"
-                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-red-500 rounded-full border-2 border-red-700 cursor-pointer"
+                    class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 bg-red-500 rounded-full border-2 border-red-700 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-white"
-                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 bg-white rounded-full border-2 border-gray-300 cursor-pointer"
+                    class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 bg-white rounded-full border-2 border-gray-300 cursor-pointer"
                 ></div>
                 <div
                     id="whiteboard-color-close"
-                    class="size-8 sm:size-10 md:size-14 lg:size-16 xl:size-20 m-1.5 sm:m-2 md:m-2.5 flex justify-center items-center text-center rounded-full border-2 border-[#3a3a3a] bg-[#2a2a2a] cursor-pointer"
+                    class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 flex justify-center items-center text-center rounded-full border-2 border-[#3a3a3a] bg-[#2a2a2a] cursor-pointer"
                 >
                     <i
-                        class="fa fa-close text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-red-500"
+                        class="fa fa-close text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-red-500"
                     ></i>
                 </div>
             </div>

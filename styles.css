@@ -815,7 +815,7 @@ body {
 
 /* Whiteboard corner buttons */
 #whiteboard-draw-config {
-    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 #whiteboard-draw-config:hover {
     background: #252525 !important;
