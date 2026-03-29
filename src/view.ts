@@ -15,6 +15,7 @@ import {
   extractTeamItems,
 } from "./search.ts";
 import { StatboticsService, type StatboticsMatchData } from "./statbotics.ts";
+import { Config } from "./config.ts";
 
 /**
  * Creates a debounced version of a function that delays its execution.
@@ -67,6 +68,9 @@ let B: {
   ShareCodeCopy?: HTMLElement | null;
   ShareLinkCopy?: HTMLElement | null;
   TeamNumberSave?: HTMLElement | null;
+  ReleaseAnnouncementClose?: HTMLElement | null;
+  ReleaseAnnouncementDismiss?: HTMLElement | null;
+  ReleaseAnnouncementCta?: HTMLElement | null;
   EditMatch?: HTMLElement | null;
   CancelEdit?: HTMLElement | null;
 } | null = null;
@@ -122,6 +126,9 @@ let E: {
   LastCommitInfo?: HTMLElement | null;
   LinkImportPanel?: HTMLElement | null;
   LinkImportStatus?: HTMLElement | null;
+  ReleaseAnnouncementPanel?: HTMLElement | null;
+  ReleaseAnnouncementTitle?: HTMLElement | null;
+  ReleaseAnnouncementMessage?: HTMLElement | null;
   ShareSuccessPanel?: HTMLElement | null;
   ShareCodeDisplay?: HTMLElement | null;
   ShareLinkDisplay?: HTMLInputElement | null;
@@ -184,6 +191,15 @@ export class View {
         ShareCodeCopy: get("share-code-copy-btn") as HTMLElement | null,
         ShareLinkCopy: get("share-link-copy-btn") as HTMLElement | null,
         TeamNumberSave: get("team-number-save-btn") as HTMLElement | null,
+        ReleaseAnnouncementClose: get(
+          "release-announcement-close-btn",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementDismiss: get(
+          "release-announcement-dismiss-btn",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementCta: get(
+          "release-announcement-cta-btn",
+        ) as HTMLElement | null,
         EditMatch: get("edit-match-save-btn") as HTMLElement | null,
         CancelEdit: get("edit-match-cancel-btn") as HTMLElement | null,
       };
@@ -243,6 +259,15 @@ export class View {
         LastCommitInfo: get("last-commit-info") as HTMLElement | null,
         LinkImportPanel: get("link-import-container") as HTMLElement | null,
         LinkImportStatus: get("link-import-status") as HTMLElement | null,
+        ReleaseAnnouncementPanel: get(
+          "release-announcement-popup",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementTitle: get(
+          "release-announcement-title",
+        ) as HTMLElement | null,
+        ReleaseAnnouncementMessage: get(
+          "release-announcement-message",
+        ) as HTMLElement | null,
         ShareSuccessPanel: get("share-success-container") as HTMLElement | null,
         ShareCodeDisplay: get("share-code-display") as HTMLElement | null,
         ShareLinkDisplay: get("share-link-display") as HTMLInputElement | null,
@@ -466,6 +491,38 @@ export class View {
           if (e.target === shareSuccessPanel) {
             this.hide(E.ShareSuccessPanel);
           }
+        });
+      }
+
+      const releaseAnnouncementPanel = E?.ReleaseAnnouncementPanel;
+      if (releaseAnnouncementPanel) {
+        releaseAnnouncementPanel.addEventListener("click", (e) => {
+          if (e.target === releaseAnnouncementPanel) {
+            this.dismissReleaseAnnouncement();
+          }
+        });
+      }
+
+      const releaseAnnouncementClose = B?.ReleaseAnnouncementClose;
+      if (releaseAnnouncementClose) {
+        releaseAnnouncementClose.addEventListener("click", () => {
+          this.dismissReleaseAnnouncement();
+        });
+      }
+
+      const releaseAnnouncementDismiss = B?.ReleaseAnnouncementDismiss;
+      if (releaseAnnouncementDismiss) {
+        releaseAnnouncementDismiss.addEventListener("click", () => {
+          this.dismissReleaseAnnouncement();
+        });
+      }
+
+      const releaseAnnouncementCta = B?.ReleaseAnnouncementCta;
+      if (releaseAnnouncementCta) {
+        releaseAnnouncementCta.addEventListener("click", () => {
+          const announcement = Config.releaseAnnouncement;
+          this.markReleaseAnnouncementSeen(announcement.id);
+          this.hide(E.ReleaseAnnouncementPanel);
         });
       }
 
@@ -850,7 +907,67 @@ export class View {
     this.initializeLastCommit();
     this.initializeContributorTeams();
     this.initializeTeamNumberPopup();
+    this.initializeReleaseAnnouncement();
+    window.addEventListener("app:update-available", () => {
+      this.initializeReleaseAnnouncement();
+    });
     this.checkShareCodeFromUrl();
+  }
+
+  private initializeReleaseAnnouncement(): void {
+    const announcement = Config.releaseAnnouncement;
+    if (!announcement.enabled) return;
+    if (!E?.ReleaseAnnouncementPanel) return;
+    if (!announcement.id?.trim()) {
+      console.error("Release announcement is enabled but missing id");
+      return;
+    }
+    if (announcement.showOnce && this.hasSeenReleaseAnnouncement(announcement.id)) {
+      return;
+    }
+
+    if (E.ReleaseAnnouncementTitle) {
+      E.ReleaseAnnouncementTitle.textContent = announcement.title;
+    }
+    if (E.ReleaseAnnouncementMessage) {
+      E.ReleaseAnnouncementMessage.textContent = announcement.message;
+    }
+    if (B?.ReleaseAnnouncementCta) {
+      B.ReleaseAnnouncementCta.textContent = announcement.ctaLabel;
+      if (announcement.ctaUrl) {
+        B.ReleaseAnnouncementCta.setAttribute("href", announcement.ctaUrl);
+        B.ReleaseAnnouncementCta.setAttribute("target", "_blank");
+        B.ReleaseAnnouncementCta.setAttribute("rel", "noopener noreferrer");
+      } else {
+        B.ReleaseAnnouncementCta.removeAttribute("href");
+        B.ReleaseAnnouncementCta.removeAttribute("target");
+      }
+    }
+
+    this.show(E.ReleaseAnnouncementPanel);
+  }
+
+  private dismissReleaseAnnouncement(): void {
+    const announcement = Config.releaseAnnouncement;
+    this.markReleaseAnnouncementSeen(announcement.id);
+    this.hide(E.ReleaseAnnouncementPanel);
+  }
+
+  private hasSeenReleaseAnnouncement(id: string): boolean {
+    try {
+      return localStorage.getItem("release-announcement-seen") === id;
+    } catch (error) {
+      console.error("Failed to read release announcement state:", error);
+      return false;
+    }
+  }
+
+  private markReleaseAnnouncementSeen(id: string): void {
+    try {
+      localStorage.setItem("release-announcement-seen", id);
+    } catch (error) {
+      console.error("Failed to save release announcement state:", error);
+    }
   }
 
   /**
