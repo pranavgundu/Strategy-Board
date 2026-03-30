@@ -2,12 +2,12 @@
   <title>Strategy Board Logo (No Robot)</title>
 
   <!-- Outer circle -->
-  <circle cx="60" cy="60" r="54" fill="#0f172a"/>
+  <circle cx="60" cy="60" r="54" fill="#141414"/>
 
   <!-- Dartboard rings -->
-  <circle cx="60" cy="60" r="42" fill="none" stroke="#334155" stroke-width="8"/>
-  <circle cx="60" cy="60" r="28" fill="none" stroke="#475569" stroke-width="8"/>
+  <circle cx="60" cy="60" r="42" fill="none" stroke="#2a2a2a" stroke-width="8"/>
+  <circle cx="60" cy="60" r="28" fill="none" stroke="#404040" stroke-width="8"/>
 
   <!-- Bullseye -->
-  <circle cx="60" cy="60" r="14" fill="#38bdf8"/>
+  <circle cx="60" cy="60" r="14" fill="#ebebeb"/>
 </svg>
