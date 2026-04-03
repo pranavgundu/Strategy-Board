@@ -898,7 +898,10 @@ export class Whiteboard {
       (match as any).fieldMetadata?.selectedFieldYear ?? match.tbaYear;
     this.loadFieldImage(selectedYear);
     this.updatePhaseLabels();
-    this.redrawAll();
+    // Defer the canvas redraw to the next animation frame so the click event
+    // handler can return quickly, allowing the browser to paint the panel
+    // transition before doing the (potentially expensive) stroke rendering.
+    requestAnimationFrame(() => this.redrawAll());
     this.updateUndoRedoButtons();
   }
 
@@ -1825,6 +1828,7 @@ export class Whiteboard {
         const data = this.getData();
         if (data == null) return;
         const bboxes = data.drawingBBox;
+        let erasedThisMove = false;
         for (let i = bboxes.length - 1; i >= 0; i--) {
           if (
             isSegmentInBound(
@@ -1880,9 +1884,9 @@ export class Whiteboard {
             if (shouldErase) {
               data.drawing.splice(i, 1);
               data.drawingBBox.splice(i, 1);
-              this.redrawDrawing();
               this.currentErasedStrokes.push(stroke);
               this.currentErasedStrokeIndexes.push(i);
+              erasedThisMove = true;
             }
           }
         }
@@ -1908,10 +1912,14 @@ export class Whiteboard {
                 ref: erasedCheckbox,
                 index: i,
               });
-              this.redrawDrawing();
+              erasedThisMove = true;
             }
           }
         }
+
+        // Redraw once after all erased items are removed, rather than once per
+        // erased item — avoids O(n) full redraws per pointer event.
+        if (erasedThisMove) this.redrawDrawing();
       }
     } else if (this.selected != null && this.isPointerDown) {
       if (this.selectedType === "robot") {

@@ -168,6 +168,11 @@ export class Model {
     const index = this.matches.findIndex((e) => e.id === id);
     if (index === -1) return;
 
+    // Yield to the browser before serializing all match data, so any pending
+    // paint (INP) can complete first. getAsPacket() over many matches with
+    // large stroke payloads can be hundreds of ms of synchronous CPU work.
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
     await SET(APP_DATA_KEY, this.matches.map((m) => m.getAsPacket()), (e) => {
       console.error("Failed to update match in IndexedDB:", e);
     });

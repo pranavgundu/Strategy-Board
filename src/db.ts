@@ -177,9 +177,6 @@ export async function GET_CACHED_STATBOTICS(
     return undefined;
   }
 
-  console.log(
-    `[Cache] Using cached Statbotics data for ${matchKey} (${Math.round(age / 1000 / 60)} minutes old)`,
-  );
   return cached.data;
 }
 
