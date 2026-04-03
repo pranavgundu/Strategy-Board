@@ -33,10 +33,6 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: "icons/*",
-          dest: "icons",
-        },
-        {
           src: "favicon/banner.png",
           dest: "favicon",
         },
@@ -105,56 +101,14 @@ export default defineConfig({
         scope: "./",
         icons: [
           {
-            src: "./icons/icon-48.webp",
-            type: "image/webp",
-            sizes: "48x48",
-            purpose: "any",
-          },
-          {
-            src: "./icons/icon-72.webp",
-            type: "image/webp",
-            sizes: "72x72",
-            purpose: "any",
-          },
-          {
-            src: "./icons/icon-96.webp",
-            type: "image/webp",
-            sizes: "96x96",
-            purpose: "any",
-          },
-          {
-            src: "./icons/icon-128.webp",
-            type: "image/webp",
-            sizes: "128x128",
-            purpose: "any",
-          },
-          {
-            src: "./icons/icon-192.webp",
-            type: "image/webp",
-            sizes: "192x192",
-            purpose: "any",
-          },
-          {
-            src: "./icons/icon-256.webp",
-            type: "image/webp",
-            sizes: "256x256",
-            purpose: "any",
-          },
-          {
-            src: "./icons/icon-512.webp",
-            type: "image/webp",
+            src: "./favicon/icon-512.png",
+            type: "image/png",
             sizes: "512x512",
             purpose: "any",
           },
           {
-            src: "./icons/icon-192.webp",
-            type: "image/webp",
-            sizes: "192x192",
-            purpose: "maskable",
-          },
-          {
-            src: "./icons/icon-512.webp",
-            type: "image/webp",
+            src: "./favicon/icon-512.png",
+            type: "image/png",
             sizes: "512x512",
             purpose: "maskable",
           },
