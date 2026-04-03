@@ -125,7 +125,7 @@
     "cspell": "^9.7.0",
     "electron": "^41.1.1",
     "electron-builder": "^26.8.1",
-    "eslint": "^10.1.0",
+    "eslint": "^10.2.0",
     "globals": "^17.4.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
