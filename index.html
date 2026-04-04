@@ -2,19 +2,29 @@
 <html style="background-color: #0d0d0d">
     <head>
         <script>
-            (function (w, d, s, l, i) {
-                w[l] = w[l] || [];
-                w[l].push({
-                    "gtm.start": new Date().getTime(),
-                    event: "gtm.js",
-                });
-                var f = d.getElementsByTagName(s)[0],
-                    j = d.createElement(s),
-                    dl = l != "dataLayer" ? "&l=" + l : "";
-                j.async = true;
-                j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-                f.parentNode.insertBefore(j, f);
-            })(window, document, "script", "dataLayer", "GTM-WJ4D4FGS");
+            // Defer GTM until after first user interaction to avoid INP penalty.
+            // Queued dataLayer pushes before load are replayed automatically by GTM.
+            window.dataLayer = window.dataLayer || [];
+            var gtmLoaded = false;
+            function loadGTM() {
+                if (gtmLoaded) return;
+                gtmLoaded = true;
+                (function (w, d, s, l, i) {
+                    w[l] = w[l] || [];
+                    w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+                    var f = d.getElementsByTagName(s)[0],
+                        j = d.createElement(s),
+                        dl = l != "dataLayer" ? "&l=" + l : "";
+                    j.async = true;
+                    j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+                    f.parentNode.insertBefore(j, f);
+                })(window, document, "script", "dataLayer", "GTM-WJ4D4FGS");
+            }
+            // Load on first interaction, or after 5s as a fallback
+            ["click", "touchstart", "keydown", "scroll"].forEach(function (e) {
+                window.addEventListener(e, loadGTM, { once: true, passive: true, capture: true });
+            });
+            setTimeout(loadGTM, 5000);
         </script>
 
         <link rel="stylesheet" href="./styles.css" fetchpriority="high" />
