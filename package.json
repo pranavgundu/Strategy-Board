@@ -17,7 +17,7 @@
     "spell": "cspell \"**/*.{ts,tsx,js,jsx,html,md}\"",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "assets": "cp favicon/icon-512.png assets/icon.png && cp favicon/icon-512.png assets/icon-only.png && bunx capacitor-assets generate --iconBackgroundColor '#18181b' --iconBackgroundColorDark '#18181b' --splashBackgroundColor '#18181b' --splashBackgroundColorDark '#18181b'",
+    "assets": "cp favicon/icon-512.png assets/icon.png && cp favicon/icon-512.png assets/icon-only.png && magick favicon/icon-512.png -define icon:auto-resize=256,48,32,16 favicon/favicon.ico && bunx capacitor-assets generate --iconBackgroundColor '#18181b' --iconBackgroundColorDark '#18181b' --splashBackgroundColor '#18181b' --splashBackgroundColorDark '#18181b'",
     "cap:sync": "bun run build && bunx cap sync",
     "cap:open:ios": "bunx cap open ios",
     "cap:open:android": "bunx cap open android",
