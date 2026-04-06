@@ -6,7 +6,7 @@ Digital strategy whiteboard for FIRST Robotics Competition (FRC). Cross-platform
 
 ```bash
 bun dev                # Vite dev server
-bun run build          # TypeScript check + Vite production build
+bun run build          # tsx scripts/git.ts + tsc + vite build
 bun run lint           # ESLint
 bun run lint:fix       # ESLint with auto-fix
 bun run spell          # cspell spell checker

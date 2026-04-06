@@ -12,7 +12,7 @@ Strategy Board is a digital strategy whiteboard for FIRST Robotics Competition (
 
 ```bash
 bun dev                  # Start Vite dev server
-bun run build            # tsx scripts/commit.ts + tsc + vite build
+bun run build            # tsx scripts/git.ts + tsc + vite build
 bun run spell            # cspell spell checker
 bun run electron:dev     # Run Electron in dev mode
 bun run electron:build   # Build Electron for current platform

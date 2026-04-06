@@ -12,7 +12,7 @@
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsx scripts/commit.ts && tsc && vite build",
+    "build": "tsx scripts/git.ts && tsc && vite build",
     "preview": "vite preview --host",
     "spell": "cspell \"**/*.{ts,tsx,js,jsx,html,md}\"",
     "lint": "eslint src",
@@ -126,6 +126,7 @@
     "electron": "^41.1.1",
     "electron-builder": "^26.8.1",
     "eslint": "^10.2.0",
+    "git-last-commit": "^1.0.1",
     "globals": "^17.4.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
