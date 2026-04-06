@@ -26,7 +26,7 @@ Always use `bun`.
 
 ### Core Commands:
 - `bun dev`: Start the Vite development server.
-- `bun run build`: Build the web application (runs `scripts/commit.ts`, `tsc`, and `vite build`).
+- `bun run build`: Build the web application (runs `scripts/git.ts`, `tsc`, and `vite build`).
 - `bun run lint`: Run ESLint on `src/`.
 - `bun run spell`: Run `cspell` for spell checking.
 
