@@ -3,7 +3,7 @@
   "version": "2026.5.0",
   "description": "The Digital Strategy Whiteboard for FRC",
   "packageManager": "bun@1.2.5",
-  "homepage": "https://github.com/pranavgundu/strategy-board",
+  "homepage": "https://github.com/pranavgundu/Strategy-Board",
   "author": {
     "name": "Pranav Gundu",
     "email": "pranav@strategyboard.app"
