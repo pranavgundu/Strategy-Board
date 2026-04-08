@@ -246,12 +246,12 @@ export class TBAService {
       "Dec",
     ];
 
-    const startMonth = monthNames[start.getMonth()];
-    const startDay = start.getDate();
-    const endMonth = monthNames[end.getMonth()];
-    const endDay = end.getDate();
+    const startMonth = monthNames[start.getUTCMonth()];
+    const startDay = start.getUTCDate();
+    const endMonth = monthNames[end.getUTCMonth()];
+    const endDay = end.getUTCDate();
 
-    if (start.getMonth() === end.getMonth()) {
+    if (start.getUTCMonth() === end.getUTCMonth()) {
       return `${startMonth} ${startDay}-${endDay}`;
     } else {
       return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
@@ -448,7 +448,7 @@ export class TBAService {
         return null;
       }
 
-      return new Date(event.year, monthIndex, day);
+      return new Date(Date.UTC(event.year, monthIndex, day));
     };
 
     const filteredEvents = events.filter((event) => {

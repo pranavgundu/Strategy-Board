@@ -46,7 +46,11 @@ describe("Model", () => {
     await model.loadPersistentData();
 
     expect(model.matches).toHaveLength(1);
-    expect(SET).toHaveBeenCalledWith("appData", [packet], expect.any(Function));
+    expect(SET).toHaveBeenCalledWith("appData", expect.any(Array), expect.any(Function));
+    const savedPackets = vi.mocked(SET).mock.calls[0][1] as any[][];
+    expect(savedPackets).toHaveLength(1);
+    expect(savedPackets[0][0]).toBe("Q2");
+    expect(savedPackets[0][7]).toBe("id-2");
   });
 
   it("creates, updates, deletes, and clears matches", async () => {

@@ -61,7 +61,7 @@ export class Model {
         }
       }
       // Migrate to new consolidated format
-      await SET(APP_DATA_KEY, packets, (e) => {
+      await SET(APP_DATA_KEY, this.matches.map((m) => m.getAsPacket()), (e) => {
         console.error("Failed to migrate match data to new format:", e);
       });
     }

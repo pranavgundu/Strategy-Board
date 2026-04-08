@@ -8,6 +8,16 @@ const srcPath = (() => {
 })();
 
 export default defineConfig({
+  define: {
+    __BUILD_COMMIT__: JSON.stringify({
+      sha: "test-sha",
+      fullSha: "test-full-sha",
+      message: "Test build",
+      author: "Test",
+      date: "2026-01-01T00:00:00.000Z",
+      url: "https://github.com/pranavgundu/Strategy-Board",
+    }),
+  },
   test: {
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
