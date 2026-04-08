@@ -10,6 +10,7 @@ const srcPath = (() => {
 export default defineConfig({
   test: {
     environment: "jsdom",
+    setupFiles: ["./vitest.setup.ts"],
     include: ["tests/**/*.test.ts"],
     coverage: {
       provider: "v8",
