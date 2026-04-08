@@ -173,7 +173,7 @@ export class StatboticsService {
         }
 
         const data = await response.json();
-        SET(cacheKey, { data, ts: Date.now() });
+        await SET(cacheKey, { data, ts: Date.now() });
         return data;
       } catch (error) {
         const isApiError = error instanceof Error && error.message.startsWith("Statbotics API error:");

@@ -1,7 +1,23 @@
+import { execSync } from "child_process";
 import { defineConfig, Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tailwindcss from "@tailwindcss/vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+
+function getGitCommitInfo() {
+  const REPO_URL = "https://github.com/pranavgundu/Strategy-Board";
+  try {
+    const git = (cmd: string) => execSync(`git ${cmd}`, { encoding: "utf-8" }).trim();
+    const fullSha = git("rev-parse HEAD");
+    const sha = git("rev-parse --short HEAD");
+    const message = git("log -1 --format=%s");
+    const author = git("log -1 --format=%an");
+    const date = new Date(Number(git("log -1 --format=%at")) * 1000).toISOString();
+    return { sha, fullSha, message, author, date, url: `${REPO_URL}/commit/${fullSha}` };
+  } catch {
+    return { sha: "dev", fullSha: "dev", message: "Development build", author: "Unknown", date: new Date().toISOString(), url: REPO_URL };
+  }
+}
 
 const stubCoreJs = (): Plugin => ({
   name: "stub-core-js",
@@ -27,6 +43,9 @@ const srcPath = (() => {
 })();
 
 export default defineConfig({
+  define: {
+    __BUILD_COMMIT__: JSON.stringify(getGitCommitInfo()),
+  },
   plugins: [
     stubCoreJs(),
     tailwindcss(),

@@ -1861,7 +1861,7 @@ export class Whiteboard {
 
               shouldErase = distToEraser <= eraserRadius + dotRadius;
             } else {
-              for (let j = 0; j < stroke.length - 2; j++) {
+              for (let j = 1; j < stroke.length - 1; j++) {
                 if (
                   isSegmentsIntersecting(
                     x,

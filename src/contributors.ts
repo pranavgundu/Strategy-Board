@@ -1,4 +1,11 @@
-import { BUILD_COMMIT } from "./build";
+declare const ____BUILD_COMMIT____: {
+  sha: string;
+  fullSha: string;
+  message: string;
+  author: string;
+  date: string;
+  url: string;
+};
 
 export interface Contributor {
   login: string;
@@ -165,11 +172,11 @@ export class ContributorsService {
 
     try {
       this.lastCommit = {
-        sha: BUILD_COMMIT.sha,
-        message: BUILD_COMMIT.message,
-        author: BUILD_COMMIT.author,
-        date: BUILD_COMMIT.date,
-        url: BUILD_COMMIT.url,
+        sha: __BUILD_COMMIT__.sha,
+        message: __BUILD_COMMIT__.message,
+        author: __BUILD_COMMIT__.author,
+        date: __BUILD_COMMIT__.date,
+        url: __BUILD_COMMIT__.url,
       };
       return this.lastCommit;
     } catch (error) {
