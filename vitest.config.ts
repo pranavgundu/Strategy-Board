@@ -13,9 +13,15 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text", "html", "json-summary"],
       include: ["src/**/*.ts"],
       exclude: ["src/index.d.ts", "src/app.ts", "src/view.ts", "src/whiteboard.ts"],
+      thresholds: {
+        lines: 20,
+        functions: 20,
+        statements: 20,
+        branches: 15,
+      },
     },
   },
   resolve: {

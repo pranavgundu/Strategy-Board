@@ -432,12 +432,19 @@ export class TBAService {
 
     const parseEventDate = (event: TBASimpleEvent): Date | null => {
       const parts = event.dateRange.split(" ");
+      if (parts.length < 2) {
+        return null;
+      }
       const month = parts[0];
-      const dayStr = parts[1].split("-")[0];
+      const dayPart = parts[1];
+      if (!dayPart) {
+        return null;
+      }
+      const dayStr = dayPart.split("-")[0];
       const day = parseInt(dayStr, 10);
       const monthIndex = monthNames.indexOf(month);
 
-      if (monthIndex === -1) {
+      if (monthIndex === -1 || Number.isNaN(day)) {
         return null;
       }
 
