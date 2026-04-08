@@ -1,4 +1,4 @@
-declare const ____BUILD_COMMIT____: {
+declare const __BUILD_COMMIT__: {
   sha: string;
   fullSha: string;
   message: string;
