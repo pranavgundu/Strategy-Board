@@ -160,7 +160,7 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "es-abstract": "^1.24.2",
-    "firebase": "^12.11.0",
+    "firebase": "^12.12.0",
     "idb-keyval": "^6.2.2",
     "jspdf": "^4.2.1",
     "marked": "^18.0.0",
