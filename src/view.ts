@@ -7,6 +7,7 @@ import {
   SET,
   CACHE_STATBOTICS,
   GET_CACHED_STATBOTICS,
+  GET_STATBOTICS_TIMESTAMP,
 } from "./db.ts";
 import { ContributorsService } from "./contributors.ts";
 import {
@@ -1229,37 +1230,35 @@ export class View {
       const year = match.tbaYear || new Date().getFullYear();
       const cacheKey = match.tbaMatchKey || `user_${match.id}`;
 
+      const fetchKey = match.isFromTBA() ? match.tbaMatchKey! : `user_${match.id}`;
+
+      const fetchFresh = async () => {
+        const data = await this.statboticsService.getMatchData(
+          fetchKey, redTeams, blueTeams, year,
+        );
+        if (!data.hadErrors) {
+          await CACHE_STATBOTICS(cacheKey, data);
+        }
+        return data;
+      };
+
       let matchData = await GET_CACHED_STATBOTICS(cacheKey);
 
       if (matchData) {
-        console.log(`[Statbotics] Using cached data for ${cacheKey}`);
+        // Show cached data immediately, then refresh in background if online
+        this.currentStatboticsData = matchData;
+        this.updateStatboticsTimestamp(cacheKey);
+
+        if (navigator.onLine) {
+          fetchFresh().then((fresh) => {
+            this.currentStatboticsData = fresh;
+            this.renderStatboticsData(fresh, match);
+            this.updateStatboticsTimestamp(cacheKey);
+          }).catch(() => {});
+        }
       } else {
-        console.log(
-          `[Statbotics] Cache miss for ${cacheKey}, fetching from API...`,
-        );
-
-        if (match.isFromTBA()) {
-          matchData = await this.statboticsService.getMatchData(
-            match.tbaMatchKey!,
-            redTeams,
-            blueTeams,
-            year,
-          );
-        } else {
-          matchData = await this.statboticsService.getMatchData(
-            `user_${match.id}`,
-            redTeams,
-            blueTeams,
-            year,
-          );
-        }
-
-        if (!matchData.hadErrors) {
-          await CACHE_STATBOTICS(cacheKey, matchData);
-          console.log(`[Statbotics] Cached data for ${cacheKey}`);
-        } else {
-          console.warn(`[Statbotics] Not caching ${cacheKey} due to fetch errors — will retry next load`);
-        }
+        matchData = await fetchFresh();
+        this.updateStatboticsTimestamp(cacheKey);
       }
 
       this.currentStatboticsData = matchData;
@@ -1268,90 +1267,7 @@ export class View {
       loadingState?.classList.remove("flex");
       dataContainer?.classList.remove("hidden");
 
-      const redWinProb = document.getElementById("statbotics-red-win-prob");
-      const blueWinProb = document.getElementById("statbotics-blue-win-prob");
-      const redBar = document.getElementById("statbotics-prob-bar-red");
-      const blueBar = document.getElementById("statbotics-prob-bar-blue");
-
-      if (redWinProb)
-        redWinProb.textContent = `${(matchData.redWinProbability * 100).toFixed(0)}%`;
-      if (blueWinProb)
-        blueWinProb.textContent = `${(matchData.blueWinProbability * 100).toFixed(0)}%`;
-      if (redBar)
-        redBar.style.width = `${(matchData.redWinProbability * 100).toFixed(1)}%`;
-      if (blueBar)
-        blueBar.style.width = `${(matchData.blueWinProbability * 100).toFixed(1)}%`;
-
-      const matchResult = document.getElementById("statbotics-match-result");
-      const matchResultContainer = matchResult?.parentElement;
-
-      if (matchData.hasScores && matchResult && matchResultContainer) {
-        let resultText = "";
-        if (matchData.redScore && matchData.blueScore) {
-          if (matchData.redScore > matchData.blueScore) {
-            resultText = `Red Wins (${matchData.redScore} - ${matchData.blueScore})`;
-            matchResult.className =
-              "text-xl md:text-2xl font-bold text-red-400";
-          } else if (matchData.blueScore > matchData.redScore) {
-            resultText = `Blue Wins (${matchData.redScore} - ${matchData.blueScore})`;
-            matchResult.className =
-              "text-xl md:text-2xl font-bold text-blue-400";
-          } else {
-            resultText = `Tie (${matchData.redScore} - ${matchData.blueScore})`;
-            matchResult.className =
-              "text-xl md:text-2xl font-bold text-[#999]";
-          }
-        } else {
-          resultText = "Match Complete";
-          matchResult.className = "text-xl md:text-2xl font-bold text-[#999]";
-        }
-        matchResult.textContent = resultText;
-        matchResultContainer.classList.remove("hidden");
-      } else if (matchResultContainer) {
-        matchResultContainer.classList.add("hidden");
-      }
-
-      const redTeamsDisplay = [
-        parseInt(match.redOne),
-        parseInt(match.redTwo),
-        parseInt(match.redThree),
-      ];
-      redTeamsDisplay.forEach((team, index) => {
-        const teamEl = document.getElementById(
-          `statbotics-red-${index + 1}-team`,
-        );
-        const epaEl = document.getElementById(
-          `statbotics-red-${index + 1}-epa`,
-        );
-
-        if (teamEl) teamEl.textContent = team.toString();
-        if (epaEl) {
-          const epa = matchData.redTeamEPAs.get(team);
-          epaEl.textContent = epa !== undefined ? epa.toFixed(1) : "--";
-        }
-      });
-
-      const blueTeamsDisplay = [
-        parseInt(match.blueOne),
-        parseInt(match.blueTwo),
-        parseInt(match.blueThree),
-      ];
-      blueTeamsDisplay.forEach((team, index) => {
-        const teamEl = document.getElementById(
-          `statbotics-blue-${index + 1}-team`,
-        );
-        const epaEl = document.getElementById(
-          `statbotics-blue-${index + 1}-epa`,
-        );
-
-        if (teamEl) teamEl.textContent = team.toString();
-        if (epaEl) {
-          const epa = matchData.blueTeamEPAs.get(team);
-          epaEl.textContent = epa !== undefined ? epa.toFixed(1) : "--";
-        }
-      });
-
-      this.setupEPACardClickHandlers(matchData.teamDetails, matchData.yearData);
+      this.renderStatboticsData(matchData, match);
     } catch (error) {
       console.error("Failed to load Statbotics data:", error);
 
@@ -1397,6 +1313,111 @@ export class View {
           `;
         }
       }
+    }
+  }
+
+  private renderStatboticsData(matchData: StatboticsMatchData, match: Match): void {
+    const redWinProb = document.getElementById("statbotics-red-win-prob");
+    const blueWinProb = document.getElementById("statbotics-blue-win-prob");
+    const redBar = document.getElementById("statbotics-prob-bar-red");
+    const blueBar = document.getElementById("statbotics-prob-bar-blue");
+
+    if (redWinProb)
+      redWinProb.textContent = `${(matchData.redWinProbability * 100).toFixed(0)}%`;
+    if (blueWinProb)
+      blueWinProb.textContent = `${(matchData.blueWinProbability * 100).toFixed(0)}%`;
+    if (redBar)
+      redBar.style.width = `${(matchData.redWinProbability * 100).toFixed(1)}%`;
+    if (blueBar)
+      blueBar.style.width = `${(matchData.blueWinProbability * 100).toFixed(1)}%`;
+
+    const matchResult = document.getElementById("statbotics-match-result");
+    const matchResultContainer = matchResult?.parentElement;
+
+    if (matchData.hasScores && matchResult && matchResultContainer) {
+      let resultText: string;
+      if (matchData.redScore && matchData.blueScore) {
+        if (matchData.redScore > matchData.blueScore) {
+          resultText = `Red Wins (${matchData.redScore} - ${matchData.blueScore})`;
+          matchResult.className =
+            "text-xl md:text-2xl font-bold text-red-400";
+        } else if (matchData.blueScore > matchData.redScore) {
+          resultText = `Blue Wins (${matchData.redScore} - ${matchData.blueScore})`;
+          matchResult.className =
+            "text-xl md:text-2xl font-bold text-blue-400";
+        } else {
+          resultText = `Tie (${matchData.redScore} - ${matchData.blueScore})`;
+          matchResult.className =
+            "text-xl md:text-2xl font-bold text-[#999]";
+        }
+      } else {
+        resultText = "Match Complete";
+        matchResult.className = "text-xl md:text-2xl font-bold text-[#999]";
+      }
+      matchResult.textContent = resultText;
+      matchResultContainer.classList.remove("hidden");
+    } else if (matchResultContainer) {
+      matchResultContainer.classList.add("hidden");
+    }
+
+    const redTeamsDisplay = [
+      parseInt(match.redOne),
+      parseInt(match.redTwo),
+      parseInt(match.redThree),
+    ];
+    redTeamsDisplay.forEach((team, index) => {
+      const teamEl = document.getElementById(
+        `statbotics-red-${index + 1}-team`,
+      );
+      const epaEl = document.getElementById(
+        `statbotics-red-${index + 1}-epa`,
+      );
+
+      if (teamEl) teamEl.textContent = team.toString();
+      if (epaEl) {
+        const epa = matchData.redTeamEPAs.get(team);
+        epaEl.textContent = epa !== undefined ? epa.toFixed(1) : "--";
+      }
+    });
+
+    const blueTeamsDisplay = [
+      parseInt(match.blueOne),
+      parseInt(match.blueTwo),
+      parseInt(match.blueThree),
+    ];
+    blueTeamsDisplay.forEach((team, index) => {
+      const teamEl = document.getElementById(
+        `statbotics-blue-${index + 1}-team`,
+      );
+      const epaEl = document.getElementById(
+        `statbotics-blue-${index + 1}-epa`,
+      );
+
+      if (teamEl) teamEl.textContent = team.toString();
+      if (epaEl) {
+        const epa = matchData.blueTeamEPAs.get(team);
+        epaEl.textContent = epa !== undefined ? epa.toFixed(1) : "--";
+      }
+    });
+
+    this.setupEPACardClickHandlers(matchData.teamDetails, matchData.yearData);
+  }
+
+  private async updateStatboticsTimestamp(cacheKey: string): Promise<void> {
+    const el = document.getElementById("statbotics-last-updated");
+    if (!el) return;
+    const ts = await GET_STATBOTICS_TIMESTAMP(cacheKey);
+    if (!ts) {
+      el.textContent = "Updated just now";
+      return;
+    }
+    const ago = Date.now() - ts;
+    const mins = Math.floor(ago / 60000);
+    if (mins < 1) el.textContent = "Updated just now";
+    else if (mins < 60) el.textContent = `Updated ${mins}m ago`;
+    else {
+      const hrs = Math.floor(mins / 60);
+      el.textContent = `Updated ${hrs}h ago`;
     }
   }
 

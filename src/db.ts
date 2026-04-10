@@ -181,6 +181,17 @@ export async function GET_CACHED_STATBOTICS(
 }
 
 /**
+ * Retrieves the timestamp of cached Statbotics data.
+ */
+export async function GET_STATBOTICS_TIMESTAMP(
+  matchKey: string,
+): Promise<number | undefined> {
+  const cacheKey = `statbotics_${matchKey}`;
+  const cached = await GET<CachedStatboticsData>(cacheKey);
+  return cached?.timestamp;
+}
+
+/**
  * Clears all cached Statbotics data from IndexedDB.
  *
  * @returns A promise that resolves when all Statbotics caches are cleared
