@@ -269,11 +269,13 @@ export class Whiteboard {
 
   private autoActionHistory: Array<any> = [];
   private teleopActionHistory: Array<any> = [];
+  private transitionActionHistory: Array<any> = [];
   private endgameActionHistory: Array<any> = [];
   private notesActionHistory: Array<any> = [];
 
   private autoRedoHistory: Array<any> = [];
   private teleopRedoHistory: Array<any> = [];
+  private transitionRedoHistory: Array<any> = [];
   private endgameRedoHistory: Array<any> = [];
   private notesRedoHistory: Array<any> = [];
 
@@ -365,6 +367,9 @@ export class Whiteboard {
     document
       .getElementById("whiteboard-toolbar-mode-teleop")
       ?.addEventListener("click", (_e) => this.toggleMode("teleop"));
+    document
+      .getElementById("whiteboard-toolbar-mode-transition")
+      ?.addEventListener("click", (_e) => this.toggleMode("transition"));
     document
       .getElementById("whiteboard-toolbar-mode-endgame")
       ?.addEventListener("click", (_e) => this.toggleMode("endgame"));
@@ -872,10 +877,12 @@ export class Whiteboard {
 
       this.autoActionHistory = [];
       this.teleopActionHistory = [];
+      this.transitionActionHistory = [];
       this.endgameActionHistory = [];
       this.notesActionHistory = [];
       this.autoRedoHistory = [];
       this.teleopRedoHistory = [];
+      this.transitionRedoHistory = [];
       this.endgameRedoHistory = [];
       this.notesRedoHistory = [];
 
@@ -918,12 +925,20 @@ export class Whiteboard {
     const endgameTab = document.getElementById(
       "whiteboard-toolbar-mode-endgame",
     );
+    const transitionTab = document.getElementById(
+      "whiteboard-toolbar-mode-transition",
+    );
     if (fieldYear === 2026) {
       if (teleopTab) teleopTab.textContent = "ACTIVE";
       if (endgameTab) endgameTab.textContent = "INACTIVE";
+      transitionTab?.classList.remove("hidden");
     } else {
       if (teleopTab) teleopTab.textContent = "TELEOP";
       if (endgameTab) endgameTab.textContent = "ENDGAME";
+      transitionTab?.classList.add("hidden");
+      if (this.mode === "transition") {
+        this.toggleMode("auto");
+      }
     }
   }
 
@@ -955,6 +970,8 @@ export class Whiteboard {
       history = this.autoActionHistory;
     } else if (this.mode === "teleop") {
       history = this.teleopActionHistory;
+    } else if (this.mode === "transition") {
+      history = this.transitionActionHistory;
     } else if (this.mode === "endgame") {
       history = this.endgameActionHistory;
     } else if (this.mode === "notes") {
@@ -982,6 +999,9 @@ export class Whiteboard {
     if (this.mode === "teleop") {
       this.teleopRedoHistory = [];
     }
+    if (this.mode === "transition") {
+      this.transitionRedoHistory = [];
+    }
     if (this.mode === "endgame") {
       this.endgameRedoHistory = [];
     }
@@ -1001,6 +1021,9 @@ export class Whiteboard {
     }
     if (this.mode === "teleop") {
       return this.teleopRedoHistory;
+    }
+    if (this.mode === "transition") {
+      return this.transitionRedoHistory;
     }
     if (this.mode === "endgame") {
       return this.endgameRedoHistory;
@@ -1053,6 +1076,9 @@ export class Whiteboard {
     }
     if (this.mode === "teleop") {
       return this.teleopActionHistory;
+    }
+    if (this.mode === "transition") {
+      return this.transitionActionHistory;
     }
     if (this.mode === "endgame") {
       return this.endgameActionHistory;
@@ -1435,6 +1461,9 @@ export class Whiteboard {
     }
     if (this.mode === "teleop") {
       return this.match.teleop;
+    }
+    if (this.mode === "transition") {
+      return this.match.transition;
     }
     if (this.mode === "endgame") {
       return this.match.endgame;
