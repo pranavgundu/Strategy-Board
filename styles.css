@@ -518,12 +518,12 @@ body {
     display: none !important;
 }
 
-/* Scale QR code canvases to fill the screen without clipping */
+/* Scale QR code canvases to fit within the modal */
 #qr-export-code-worker-0 canvas,
 #qr-export-code-worker-1 canvas,
 #qr-export-code-worker-2 canvas {
-    max-width: 85vw;
-    max-height: 65vh;
+    max-width: 100%;
+    max-height: 200px;
     width: auto !important;
     height: auto !important;
     object-fit: contain;
@@ -531,27 +531,17 @@ body {
     margin: 0 auto;
 }
 
-/* Small adjustments to ensure the export overlay scales on mobile/ipad */
-#qr-export-inner-container,
+/* Small adjustments to ensure the import overlay scales on mobile/ipad */
 #qr-import-inner-container {
     max-width: min(92vw, 820px);
     width: 92vw;
 }
 
-/* Better QR overlay sizing for small devices */
 @media (max-width: 640px) {
-    #qr-export-inner-container,
     #qr-import-inner-container {
         max-width: 95vw;
         width: 95vw;
         padding: 1rem;
-    }
-
-    #qr-export-code-worker-0 canvas,
-    #qr-export-code-worker-1 canvas,
-    #qr-export-code-worker-2 canvas {
-        max-width: 90vw;
-        max-height: 60vh;
     }
 }
 

@@ -121,8 +121,8 @@ export class QRExport {
       (chunks[index] || "");
 
     const qrCanvasPixelSize = Math.max(
-      512,
-      Math.floor(Math.min(window.innerWidth * 0.8, window.innerHeight * 0.65)),
+      200,
+      Math.floor(Math.min(window.innerWidth * 0.4, window.innerHeight * 0.3)),
     );
 
     const shown = new Set<number>();
