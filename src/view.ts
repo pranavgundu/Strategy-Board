@@ -1335,7 +1335,7 @@ export class View {
     const matchResultContainer = matchResult?.parentElement;
 
     if (matchData.hasScores && matchResult && matchResultContainer) {
-      let resultText = "";
+      let resultText: string;
       if (matchData.redScore && matchData.blueScore) {
         if (matchData.redScore > matchData.blueScore) {
           resultText = `Red Wins (${matchData.redScore} - ${matchData.blueScore})`;
