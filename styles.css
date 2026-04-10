@@ -248,7 +248,8 @@ body {
     align-self: center;
     white-space: nowrap;
     min-width: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
     text-overflow: ellipsis;
     display: flex;
     align-items: center;
@@ -337,7 +338,8 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.5rem;
         white-space: nowrap;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: visible;
         padding: 0 4px;
     }
     #whiteboard-toolbar .toolbar-right button,
@@ -363,7 +365,8 @@ body {
         gap: 0.45rem;
         font-size: 0.9rem;
         white-space: nowrap;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: visible;
     }
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
@@ -385,7 +388,8 @@ body {
         gap: 0.3rem;
         font-size: 0.875rem;
         white-space: nowrap;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: visible;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
         padding: 4px 8px !important; /* Reduce padding on mode labels */
