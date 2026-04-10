@@ -716,8 +716,8 @@ export class View {
                 "qr-import-inner-container",
               ) as HTMLElement | null;
               if (exportInner) {
-                exportInner.style.maxWidth = isTablet ? "92vw" : "820px";
-                exportInner.style.width = isTablet ? "92vw" : "";
+                exportInner.style.maxWidth = "";
+                exportInner.style.width = "";
               }
               if (importInner) {
                 importInner.style.maxWidth = isTablet ? "92vw" : "820px";
