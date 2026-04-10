@@ -38,6 +38,7 @@ interface MatchOptions {
   t: PhaseOptions;
   e: PhaseOptions;
   n?: PhaseOptions;
+  tr?: PhaseOptions;
 }
 
 interface PhaseOptions {
@@ -73,6 +74,7 @@ export class Match {
 
   public auto: PhaseData;
   public teleop: PhaseData;
+  public transition: PhaseData;
   public endgame: PhaseData;
   public notes: PhaseData;
 
@@ -122,6 +124,7 @@ export class Match {
 
     this.auto = this.createDefaultPhaseData(positions);
     this.teleop = this.createDefaultPhaseData(positions);
+    this.transition = this.createDefaultPhaseData(positions);
     this.endgame = this.createDefaultPhaseData(positions);
     this.notes = this.createDefaultPhaseData(positions);
 
@@ -198,6 +201,9 @@ export class Match {
     this.applyPhaseOptions(this.endgame, options.e, options.dim);
     if (options.n) {
       this.applyPhaseOptions(this.notes, options.n, options.dim);
+    }
+    if (options.tr) {
+      this.applyPhaseOptions(this.transition, options.tr, options.dim);
     }
   }
 
@@ -359,6 +365,19 @@ export class Match {
               d: packet[8][4][6],
               dx: packet[8][4][7],
               cb: packet[8][4][8] || [],
+            }
+          : undefined,
+        tr: packet[8][5]
+          ? {
+              r1: Match.robotFromArrayPacket(packet[8][5][0]),
+              r2: Match.robotFromArrayPacket(packet[8][5][1]),
+              r3: Match.robotFromArrayPacket(packet[8][5][2]),
+              b1: Match.robotFromArrayPacket(packet[8][5][3]),
+              b2: Match.robotFromArrayPacket(packet[8][5][4]),
+              b3: Match.robotFromArrayPacket(packet[8][5][5]),
+              d: packet[8][5][6],
+              dx: packet[8][5][7],
+              cb: packet[8][5][8] || [],
             }
           : undefined,
       },
@@ -571,6 +590,41 @@ export class Match {
           this.notes.drawing,
           this.notes.drawingBBox,
           this.notes.checkboxes,
+        ],
+        [
+          [
+            this.transition.redOneRobot.x,
+            this.transition.redOneRobot.y,
+            Number(this.transition.redOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.transition.redTwoRobot.x,
+            this.transition.redTwoRobot.y,
+            Number(this.transition.redTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.transition.redThreeRobot.x,
+            this.transition.redThreeRobot.y,
+            Number(this.transition.redThreeRobot.r.toFixed(2)),
+          ],
+          [
+            this.transition.blueOneRobot.x,
+            this.transition.blueOneRobot.y,
+            Number(this.transition.blueOneRobot.r.toFixed(2)),
+          ],
+          [
+            this.transition.blueTwoRobot.x,
+            this.transition.blueTwoRobot.y,
+            Number(this.transition.blueTwoRobot.r.toFixed(2)),
+          ],
+          [
+            this.transition.blueThreeRobot.x,
+            this.transition.blueThreeRobot.y,
+            Number(this.transition.blueThreeRobot.r.toFixed(2)),
+          ],
+          this.transition.drawing,
+          this.transition.drawingBBox,
+          this.transition.checkboxes,
         ],
       ],
       this.tbaEventKey,
