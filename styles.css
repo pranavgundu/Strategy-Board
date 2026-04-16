@@ -74,9 +74,9 @@ body {
     cursor: pointer;
     font-family: inherit;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: clamp(0.65rem, 1.1vw, 1.1rem);
     letter-spacing: 0.06em;
-    padding: 0.6rem 1.4rem;
+    padding: clamp(0.25rem, 0.5vw, 0.6rem) clamp(0.5rem, 1.1vw, 1.4rem);
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     white-space: nowrap;
 }
@@ -224,60 +224,45 @@ body {
 }
 
 #whiteboard-toolbar {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
     align-items: center;
     position: relative;
-    gap: 0.5rem;
 }
 #whiteboard-toolbar .toolbar-left {
-    justify-self: start;
-    min-width: 0;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 #whiteboard-toolbar .toolbar-right {
-    justify-self: end;
-    min-width: 0;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    z-index: 1;
 }
 #whiteboard-toolbar #whiteboard-toolbar-mode-select {
-    justify-self: center;
-    align-self: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     white-space: nowrap;
-    min-width: 0;
-    overflow-x: hidden;
-    overflow-y: visible;
-    text-overflow: ellipsis;
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    pointer-events: auto;
 }
 
-/* Condensed/ultra variants shrink content but keep a single toolbar row. */
-#whiteboard-toolbar.toolbar-collapsed {
-    /* No-op now: keep single-row layout to prevent height growth */
-    grid-template-columns: 1fr auto 1fr;
-    grid-template-rows: none;
-    gap: 0.5rem;
-}
-#whiteboard-toolbar.toolbar-condensed {
-    gap: 0.4rem;
-    padding: 0 8px;
-}
-#whiteboard-toolbar.toolbar-ultra {
-    gap: 0.25rem;
-    padding: 0 6px;
-}
+/* Condensed/ultra variants shrink mode buttons — left/right buttons are unaffected. */
 #whiteboard-toolbar.toolbar-condensed #whiteboard-toolbar-mode-select {
-    transform: scale(0.92);
-    transform-origin: center;
+    transform: translate(-50%, -50%) scale(0.92);
 }
 #whiteboard-toolbar.toolbar-ultra #whiteboard-toolbar-mode-select {
-    transform: scale(0.85);
-    transform-origin: center;
+    transform: translate(-50%, -50%) scale(0.85);
 }
 
 /* Ensure right-side buttons don't wrap and avoid overlap */
@@ -315,18 +300,13 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.75rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
-        font-size: 1.5rem !important;
-    }
 }
+
 
 /* For standard tablets and landscape iPads */
 @media (max-width: 1024px) {
     /* Keep single-row toolbar; just reduce spacing and sizes */
     #whiteboard-toolbar {
-        grid-template-columns: 1fr auto 1fr;
-        align-items: center;
-        gap: 0.5rem;
         padding: 0 10px;
     }
     #whiteboard-toolbar .toolbar-left,
@@ -338,8 +318,7 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.5rem;
         white-space: nowrap;
-        overflow-x: hidden;
-        overflow-y: visible;
+        overflow: hidden;
         padding: 0 4px;
     }
     #whiteboard-toolbar .toolbar-right button,
@@ -354,19 +333,16 @@ body {
     }
 }
 
-/* Portrait tablets and landscape phones - stack into two rows */
+/* Portrait tablets and landscape phones */
 @media (max-width: 834px) {
     #whiteboard-toolbar {
-        grid-template-columns: 1fr auto 1fr;
-        gap: 0.4rem;
         padding: 0 8px;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.45rem;
         font-size: 0.9rem;
         white-space: nowrap;
-        overflow-x: hidden;
-        overflow-y: visible;
+        overflow: hidden;
     }
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
@@ -376,24 +352,17 @@ body {
     }
 }
 
-/* On narrower phones, stack into three rows (left, mode, right) so items never overlap. */
+/* Phones */
 @media (max-width: 640px) {
     #whiteboard-toolbar {
-        grid-template-columns: 1fr auto 1fr;
-        gap: 0.25rem;
         padding: 0 4px;
-        height: 3rem !important; /* Reduce height on mobile */
+        height: 3rem !important;
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.3rem;
         font-size: 0.875rem;
         white-space: nowrap;
-        overflow-x: hidden;
-        overflow-y: visible;
-    }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
-        padding: 4px 8px !important; /* Reduce padding on mode labels */
-        font-size: 0.875rem !important;
+        overflow: hidden;
     }
     #whiteboard-toolbar .toolbar-left,
     #whiteboard-toolbar .toolbar-right {
@@ -424,10 +393,6 @@ body {
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.2rem;
     }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
-        font-size: 0.875rem !important;
-        padding: 3px 6px !important;
-    }
     #whiteboard-toolbar .toolbar-left,
     #whiteboard-toolbar .toolbar-right {
         gap: 0.2rem;
@@ -457,10 +422,6 @@ body {
     }
     #whiteboard-toolbar #whiteboard-toolbar-mode-select {
         gap: 0.15rem;
-    }
-    #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
-        font-size: 0.875rem !important;
-        padding: 2px 4px !important;
     }
     #whiteboard-toolbar .toolbar-left,
     #whiteboard-toolbar .toolbar-right {
