@@ -2003,6 +2003,12 @@ export class Whiteboard {
   }
 
   private onPointerDown(e: PointerEvent) {
+    // Apple Pencil squeeze (Pencil Pro / 2nd gen barrel button) → toggle marker/eraser
+    if (e.pointerType === "pen" && e.button === 1) {
+      this.toggleMarkerEraser();
+      return;
+    }
+
     this.isPointerDown = true;
 
     this.cachedDrawingRect = drawing.getBoundingClientRect();
@@ -2202,6 +2208,22 @@ export class Whiteboard {
       );
     }
     this.currentStrokePoints = [];
+  }
+
+  private toggleMarkerEraser() {
+    if (this.currentTool === "marker") {
+      this.currentTool = "eraser";
+      this.cachedElements.drawConfigMarker?.style.setProperty("display", "none");
+      this.cachedElements.drawConfigEraser?.style.setProperty("display", "inline");
+      this.cachedElements.drawConfigCheckbox?.style.setProperty("display", "none");
+      this.cachedElements.colorConfig?.classList.add("hidden");
+    } else if (this.currentTool === "eraser") {
+      this.currentTool = "marker";
+      this.cachedElements.drawConfigMarker?.style.setProperty("display", "inline");
+      this.cachedElements.drawConfigEraser?.style.setProperty("display", "none");
+      this.cachedElements.drawConfigCheckbox?.style.setProperty("display", "none");
+      this.cachedElements.colorConfig?.classList.remove("hidden");
+    }
   }
 
   private main() {
