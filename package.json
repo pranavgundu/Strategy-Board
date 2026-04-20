@@ -134,7 +134,7 @@
     "jsdom": "^29.0.2",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.8",
+    "vite": "^8.0.9",
     "vitest": "^4.1.4",
     "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-static-copy": "^4.1.0",
