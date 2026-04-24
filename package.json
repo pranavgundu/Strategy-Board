@@ -119,7 +119,7 @@
     }
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/coverage-v8": "^4.1.5",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.3.1",
     "@eslint/js": "^10.0.1",
@@ -127,15 +127,15 @@
     "@types/node": "^25.6.0",
     "concurrently": "^9.2.1",
     "cspell": "^10.0.0",
-    "electron": "^41.2.1",
+    "electron": "^41.3.0",
     "electron-builder": "^26.8.1",
     "eslint": "^10.2.1",
     "globals": "^17.5.0",
     "jsdom": "^29.0.2",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.0",
-    "vite": "^8.0.9",
-    "vitest": "^4.1.4",
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5",
     "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-static-copy": "^4.1.0",
     "wait-on": "^9.0.5",
@@ -156,7 +156,7 @@
     "@capacitor/android": "^8.3.1",
     "@capacitor/core": "^8.3.1",
     "@capacitor/ios": "^8.3.1",
-    "@tailwindcss/vite": "^4.2.3",
+    "@tailwindcss/vite": "^4.2.4",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "es-abstract": "^1.24.2",
@@ -166,7 +166,7 @@
     "marked": "^18.0.2",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
-    "tailwindcss": "^4.2.3",
+    "tailwindcss": "^4.2.4",
     "uuid": "^14.0.0"
   }
 }
