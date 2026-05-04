@@ -3089,23 +3089,39 @@ export class View {
           cursor-pointer no-underline
         `;
 
-        contributorCard.innerHTML = `
-          <div class="shrink-0 relative">
-            <img
-              src="${contributor.avatar_url}?s=128"
-              alt="${contributor.login}"
-              class="w-16 h-16 rounded-full border-2 border-[#2a2a2a]"
-              style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; backface-visibility: hidden; transform: translateZ(0); will-change: transform;"
-            />
-          </div>
-          <div class="grow min-w-0">
-            <div class="contributor-name text-lg font-bold text-[#e8e8e8] truncate">
-              ${contributor.name || contributor.login}
-            </div>
-            <p class="text-sm text-[#666] truncate">@${contributor.login}</p>
-            ${contributor.bio ? `<p class="text-sm text-[#999] mt-1 line-clamp-2">${contributor.bio}</p>` : ""}
-          </div>
-        `;
+        const avatarWrapper = document.createElement("div");
+        avatarWrapper.className = "shrink-0 relative";
+        const img = document.createElement("img");
+        img.src = `${contributor.avatar_url}?s=128`;
+        img.alt = contributor.login;
+        img.className = "w-16 h-16 rounded-full border-2 border-[#2a2a2a]";
+        img.style.cssText =
+          "image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; backface-visibility: hidden; transform: translateZ(0); will-change: transform;";
+        avatarWrapper.appendChild(img);
+
+        const infoWrapper = document.createElement("div");
+        infoWrapper.className = "grow min-w-0";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "contributor-name text-lg font-bold text-[#e8e8e8] truncate";
+        nameEl.textContent = contributor.name || contributor.login;
+
+        const handleEl = document.createElement("p");
+        handleEl.className = "text-sm text-[#666] truncate";
+        handleEl.textContent = `@${contributor.login}`;
+
+        infoWrapper.appendChild(nameEl);
+        infoWrapper.appendChild(handleEl);
+
+        if (contributor.bio) {
+          const bioEl = document.createElement("p");
+          bioEl.className = "text-sm text-[#999] mt-1 line-clamp-2";
+          bioEl.textContent = contributor.bio;
+          infoWrapper.appendChild(bioEl);
+        }
+
+        contributorCard.appendChild(avatarWrapper);
+        contributorCard.appendChild(infoWrapper);
 
         contributorCard.addEventListener("mouseenter", () => {
           const nameEl = contributorCard.querySelector(".contributor-name");
