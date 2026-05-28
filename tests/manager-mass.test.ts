@@ -115,6 +115,9 @@ describe("preloadFieldImages", () => {
       public onload: (() => void) | null = null;
       public onerror: (() => void) | null = null;
       public _src = "";
+      constructor() {
+        created.push(this);
+      }
       set src(value: string) {
         this._src = value;
         queueMicrotask(() => this.onload?.());
@@ -122,15 +125,14 @@ describe("preloadFieldImages", () => {
     }
 
     const originalImage = globalThis.Image;
-    const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     vi.stubGlobal("Image", ImageOk as unknown as typeof Image);
 
-    await preloadFieldImages();
+    await expect(preloadFieldImages()).resolves.toBeUndefined();
 
-    expect(consoleLogSpy).toHaveBeenCalled();
+    expect(created.length).toBeGreaterThan(0);
+    expect(created.every((img) => img._src !== "")).toBe(true);
 
     vi.stubGlobal("Image", originalImage);
-    void created;
   });
 
   it("warns when one image fails", async () => {

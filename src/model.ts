@@ -55,7 +55,7 @@ export class Model {
       for (const packet of packets) {
         try {
           this.matches.push(Match.fromPacket(packet));
-          this.matchIds.push(packet[7]);
+          this.matchIds.push((packet as any[])[7]);
         } catch (error) {
           console.error("Failed to parse match data:", error);
         }

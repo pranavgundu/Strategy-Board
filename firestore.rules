@@ -1,0 +1,64 @@
+rules_version = '2';
+
+// Strategy Board - Firestore security rules.
+//
+// Sharing model: anonymous users upload a Match under a random 6-char code and
+// other anonymous users read it back. Share docs are immutable, size-bounded,
+// and expire after 7 days.
+//
+// Deploy:
+//   bunx firebase deploy --only firestore:rules
+// or paste this file into the Firebase console (Firestore > Rules).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // /matches/{code}: anonymous share documents.
+    //
+    // Schema (enforced on create):
+    //   data        string  - JSON-encoded match packet (≤ 900 KB)
+    //   createdAt   number  - client clock, must be close to server time
+    //   expiresAt   number  - must be > createdAt and within 8 days
+    //   version     number  - currently 1
+    //
+    // Documents are immutable once written and auto-expire via TTL on the
+    // `expiresAt` field. Configure TTL on `expiresAt` in the Firebase console
+    // (Firestore > TTL) for automatic deletion.
+    match /matches/{code} {
+
+      // Reads are public but only for non-expired documents - defense in
+      // depth against a stale client missing the expiry check.
+      allow read: if resource.data.expiresAt is number
+                  && resource.data.expiresAt > request.time.toMillis();
+
+      // Anyone can create a new share doc, but the payload must match the
+      // expected schema. `create` only matches when no doc exists at this
+      // path, so the rule naturally prevents overwriting an existing code.
+      allow create: if request.resource.data.keys().hasOnly(
+                         ['data', 'createdAt', 'expiresAt', 'version'])
+                    && request.resource.data.data is string
+                    && request.resource.data.data.size() < 900000
+                    && request.resource.data.version == 1
+                    && request.resource.data.createdAt is number
+                    && request.resource.data.expiresAt is number
+                    && request.resource.data.expiresAt > request.resource.data.createdAt
+                    && request.resource.data.expiresAt <=
+                         request.resource.data.createdAt + 8 * 24 * 60 * 60 * 1000
+                    // Client clock must be within 10 min of server time -
+                    // bounds replay/forgery of `createdAt`.
+                    && request.resource.data.createdAt >
+                         request.time.toMillis() - 10 * 60 * 1000
+                    && request.resource.data.createdAt <
+                         request.time.toMillis() + 10 * 60 * 1000;
+
+      // Shares are immutable.
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1183,7 +1183,7 @@ export class View {
             await CACHE_STATBOTICS(item.matchKey, matchData);
           }
         } catch {
-          // silently skip — will retry when user opens the match
+          // silently skip - will retry when user opens the match
         }
 
         await new Promise((r) => setTimeout(r, 150));
@@ -2400,8 +2400,8 @@ export class View {
 
         prefetchQueue.push({
           matchKey: match.matchKey,
-          redTeams: [...match.redTeams].reverse().map(Number).filter((t) => !isNaN(t)),
-          blueTeams: match.blueTeams.map(Number).filter((t) => !isNaN(t)),
+          redTeams: [...match.redTeams].reverse().map(Number).filter((t: number) => !isNaN(t)),
+          blueTeams: match.blueTeams.map(Number).filter((t: number) => !isNaN(t)),
           year,
         });
       }
@@ -2495,8 +2495,8 @@ export class View {
 
         prefetchQueue.push({
           matchKey: match.matchKey,
-          redTeams: [...match.redTeams].reverse().map(Number).filter((t) => !isNaN(t)),
-          blueTeams: match.blueTeams.map(Number).filter((t) => !isNaN(t)),
+          redTeams: [...match.redTeams].reverse().map(Number).filter((t: number) => !isNaN(t)),
+          blueTeams: match.blueTeams.map(Number).filter((t: number) => !isNaN(t)),
           year,
         });
       }
@@ -2592,7 +2592,6 @@ export class View {
     eventKey: string,
     eventName: string,
   ): Promise<void> {
-    console.log("Event selected:", eventKey, eventName);
 
     if (!I?.TBAEventKey || !I?.TBAEventSearch || !I?.TBATeamSearch) {
       console.error("Missing input elements");
@@ -2609,19 +2608,15 @@ export class View {
     I.TBATeamSearch.disabled = false;
     I.TBATeamSearch.placeholder = "Search teams...";
 
-    console.log("Loading teams for event:", eventKey);
 
     await this.loadTBATeamsForEvent(eventKey);
   }
 
   private async loadTBATeamsForEvent(eventKey: string): Promise<void> {
-    console.log("loadTBATeamsForEvent called with:", eventKey);
     this.showTBAStatus("Loading teams...", false);
 
     try {
-      console.log("Fetching teams from TBA...");
       const teams = await this.tbaService.fetchTeamsAtEvent(eventKey);
-      console.log("Teams loaded:", teams.length, teams);
 
       if (!E?.TBATeamList) {
         console.error("TBATeamList element not found");
@@ -2630,8 +2625,7 @@ export class View {
 
       E.TBATeamList.innerHTML = "";
 
-      const sortedTeams = teams.sort((a, b) => parseInt(a) - parseInt(b));
-      console.log("Sorted teams:", sortedTeams);
+      const sortedTeams = teams.sort((a: string, b: string) => parseInt(a) - parseInt(b));
 
       for (const team of sortedTeams) {
         const item = document.createElement("div");
@@ -2644,7 +2638,6 @@ export class View {
         E.TBATeamList.appendChild(item);
       }
 
-      console.log("Team items added to dropdown");
       this.hide(E.TBAStatusMessage);
 
       if (sortedTeams.length > 0) {
@@ -2855,7 +2848,7 @@ export class View {
       }
 
       const allTeamEventsPromises = yearsToFetch.map((year) =>
-        this.tbaService.getTeamEvents(teamNumber, year).catch(() => []),
+        this.tbaService.getTeamEvents(teamNumber, year).catch(() => [] as any[]),
       );
 
       const allTeamEventsArrays = await Promise.all(allTeamEventsPromises);
@@ -3293,7 +3286,6 @@ export class View {
       const cleanUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
 
-      console.log("Found share code in URL:", shareCode);
 
       const waitForDOM = () => {
         return new Promise<void>((resolve) => {
@@ -3454,7 +3446,6 @@ export class View {
           event: "team_number",
           number: teamNumber,
         });
-        console.log(`Team number saved and sent to GA: ${teamNumber}`);
         popup?.classList.add("hidden");
       } else {
         alert("Please enter a valid team number (up to 5 digits) to continue.");

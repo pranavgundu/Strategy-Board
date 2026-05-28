@@ -182,7 +182,6 @@ export async function preloadFieldImages(): Promise<void> {
 
   try {
     await Promise.all(loadPromises);
-    console.log(`[FieldManager] Preloaded ${loadPromises.length} field images`);
   } catch (error) {
     console.warn("[FieldManager] Some field images failed to preload:", error);
   }

@@ -105,11 +105,25 @@ export class TBAService {
     }
 
     const url = `${TBA_API_BASE}${endpoint}`;
-    const response = await fetch(url, {
-      headers: {
-        "X-TBA-Auth-Key": apiKey,
-      },
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        headers: {
+          "X-TBA-Auth-Key": apiKey,
+        },
+        signal: controller.signal,
+      });
+    } catch (err) {
+      if ((err as Error).name === "AbortError") {
+        throw new Error(`TBA API request timed out after 15s: ${endpoint}`);
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       throw new Error(

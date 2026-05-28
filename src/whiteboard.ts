@@ -1,4 +1,4 @@
-import { Match } from "./match.ts";
+import { Match, RobotPosition } from "./match.ts";
 import { Model } from "./model.ts";
 import { Config } from "./config.ts";
 import { getFieldImageForYear, getYearFromFieldImage } from "./manager.ts";
@@ -324,8 +324,16 @@ export class Whiteboard {
 
     fieldImage.onload = () => this.drawBackground();
 
-    window.addEventListener("resize", this.redrawAll.bind(this));
-    window.addEventListener("orientationchange", this.redrawAll.bind(this));
+    let resizeRedrawTimer: number | null = null;
+    const debouncedRedraw = () => {
+      if (resizeRedrawTimer !== null) clearTimeout(resizeRedrawTimer);
+      resizeRedrawTimer = window.setTimeout(() => {
+        resizeRedrawTimer = null;
+        this.redrawAll();
+      }, 100);
+    };
+    window.addEventListener("resize", debouncedRedraw);
+    window.addEventListener("orientationchange", debouncedRedraw);
     window.addEventListener("keydown", (e) => {
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const modifier = isMac ? e.metaKey : e.ctrlKey;
@@ -812,8 +820,6 @@ export class Whiteboard {
       "whiteboard-toolbar-redo",
     );
 
-    requestAnimationFrame(this.main.bind(this));
-
     this.updateInterval = window.setInterval(() => {
       if (this.match !== null) {
         this.model.updateMatch(this.match.id);
@@ -1115,7 +1121,7 @@ export class Whiteboard {
     } else if (action.type == "transform") {
       const data = this.getData();
       if (data !== null) {
-        const robot = data[`${action.slot}Robot`];
+        const robot = (data as any)[`${action.slot}Robot`] as RobotPosition;
         if (action.prev.x != undefined) robot.x = action.prev.x;
         if (action.prev.y != undefined) robot.y = action.prev.y;
         if (action.prev.r != undefined) robot.r = action.prev.r;
@@ -1200,7 +1206,7 @@ export class Whiteboard {
     } else if (action.type == "transform") {
       const data = this.getData();
       if (data !== null) {
-        const robot = data[`${action.slot}Robot`];
+        const robot = (data as any)[`${action.slot}Robot`] as RobotPosition;
         if (action.new.x != undefined) robot.x = action.new.x;
         if (action.new.y != undefined) robot.y = action.new.y;
         if (action.new.r != undefined) robot.r = action.new.r;
@@ -1551,7 +1557,8 @@ export class Whiteboard {
         DR.moveTo(stroke[1][0] - offsetX, stroke[1][1] - offsetY);
 
         for (let i = 2; i < stroke.length; i++) {
-          DR.lineTo(stroke[i][0] - offsetX, stroke[i][1] - offsetY);
+          const pt = stroke[i] as [number, number];
+          DR.lineTo(pt[0] - offsetX, pt[1] - offsetY);
         }
 
         DR.stroke();
@@ -1616,7 +1623,7 @@ export class Whiteboard {
    * @param id - The color identifier (0-4)
    * @returns The hex color string
    */
-  private getStrokeColor(id) {
+  private getStrokeColor(id: number) {
     switch (id) {
       case 0: {
         return "white";
@@ -1891,16 +1898,18 @@ export class Whiteboard {
               shouldErase = distToEraser <= eraserRadius + dotRadius;
             } else {
               for (let j = 1; j < stroke.length - 1; j++) {
+                const segA = stroke[j] as [number, number];
+                const segB = stroke[j + 1] as [number, number];
                 if (
                   isSegmentsIntersecting(
                     x,
                     y,
                     this.lastErasePoint.x,
                     this.lastErasePoint.y,
-                    stroke[j][0],
-                    stroke[j][1],
-                    stroke[j + 1][0],
-                    stroke[j + 1][1],
+                    segA[0],
+                    segA[1],
+                    segB[0],
+                    segB[1],
                     eraserRadius,
                   )
                 ) {
@@ -1947,7 +1956,7 @@ export class Whiteboard {
         }
 
         // Redraw once after all erased items are removed, rather than once per
-        // erased item — avoids O(n) full redraws per pointer event.
+        // erased item - avoids O(n) full redraws per pointer event.
         if (erasedThisMove) this.redrawDrawing();
       }
     } else if (this.selected != null && this.isPointerDown) {
@@ -2226,9 +2235,6 @@ export class Whiteboard {
     }
   }
 
-  private main() {
-    if (!this.active) return;
-  }
 }
 
 function isPointInRotRect(
@@ -2263,7 +2269,16 @@ function isPointInBound(
   return !(px < minx || py < miny || px > maxx || py > maxy);
 }
 
-function isSegmentInBound(x1, y1, x2, y2, minx, miny, maxx, maxy) {
+function isSegmentInBound(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  minx: number,
+  miny: number,
+  maxx: number,
+  maxy: number,
+) {
   if (
     isPointInBound(x1, y1, minx, miny, maxx, maxy) ||
     isPointInBound(x2, y2, minx, miny, maxx, maxy)
@@ -2284,14 +2299,14 @@ function isSegmentInBound(x1, y1, x2, y2, minx, miny, maxx, maxy) {
 }
 
 function isSegmentsIntersecting(
-  ax1,
-  ay1,
-  ax2,
-  ay2,
-  bx1,
-  by1,
-  bx2,
-  by2,
+  ax1: number,
+  ay1: number,
+  ax2: number,
+  ay2: number,
+  bx1: number,
+  by1: number,
+  bx2: number,
+  by2: number,
   tolerance = 0,
 ) {
   const sx = ax2 - ax1;

@@ -8,11 +8,13 @@ Strategy Board is a digital strategy whiteboard for FIRST Robotics Competition (
 
 ## Commands
 
-**Use `bun` — not npm, yarn, or pnpm.**
+**Use `bun` - not npm, yarn, or pnpm.**
 
 ```bash
 bun dev                  # Start Vite dev server
-bun run build            # tsx scripts/git.ts + tsc + vite build
+bun run build            # tsc + vite build (git commit info injected via vite.config.ts)
+bun run test             # vitest run (Vitest test suite)
+bun run lint             # eslint src
 bun run spell            # cspell spell checker
 bun run electron:dev     # Run Electron in dev mode
 bun run electron:build   # Build Electron for current platform
@@ -26,7 +28,7 @@ bun run cap:open:ios     # Open in Xcode
 bun run cap:open:android # Open in Android Studio
 ```
 
-There are **no automated tests**. Manual testing across platforms is required.
+Automated tests live in `tests/` (Vitest, ~336 tests) - run with `bun run test`. Manual testing across platforms (web, Electron, iOS, Android) is still required for UI/canvas behavior.
 
 ## Architecture
 
@@ -42,23 +44,23 @@ User Action → view.ts → model.ts → db.ts (IndexedDB)
 
 | Module | Purpose |
 |--------|---------|
-| **app.ts** | Entry point — parallelizes module imports with IndexedDB load, registers PWA service worker |
-| **model.ts** | Match state — persists to IndexedDB under single `"appData"` key |
-| **view.ts** | All DOM manipulation (~3200 lines) — event wiring, UI updates, panel management |
-| **whiteboard.ts** | Canvas renderer (~2400 lines) — three layers: background, items, drawing |
+| **app.ts** | Entry point - parallelizes module imports with IndexedDB load, registers PWA service worker |
+| **model.ts** | Match state - persists to IndexedDB under single `"appData"` key |
+| **view.ts** | All DOM manipulation (~3200 lines) - event wiring, UI updates, panel management |
+| **whiteboard.ts** | Canvas renderer (~2400 lines) - three layers: background, items, drawing |
 | **match.ts** | Match data model and packet serialization/deserialization |
-| **db.ts** | IndexedDB wrapper (idb-keyval) — `GET`, `SET`, `GETMANY`, `CLEAR` helpers |
-| **cloud.ts** | Firebase/Firestore — upload/download matches via 6-char share codes |
+| **db.ts** | IndexedDB wrapper (idb-keyval) - `GET`, `SET`, `GETMANY`, `CLEAR` helpers |
+| **cloud.ts** | Firebase/Firestore - upload/download matches via 6-char share codes |
 | **qr.ts** | QR code export (generation) and import (camera scanning) |
-| **tba.ts** | The Blue Alliance API client — match schedules, team info |
-| **statbotics.ts** | Statbotics API client — team analytics and EPA predictions |
-| **manager.ts** | Field image assets — `getFieldImageForYear()`, `preloadFieldImages()` |
+| **tba.ts** | The Blue Alliance API client - match schedules, team info |
+| **statbotics.ts** | Statbotics API client - team analytics and EPA predictions |
+| **manager.ts** | Field image assets - `getFieldImageForYear()`, `preloadFieldImages()` |
 | **search.ts** | Fuzzy search helpers for TBA events/teams |
 | **pdf.ts** | PDF export of whiteboard snapshots |
 
 ### Important Patterns
 
-**Lazy loading:** `cloud.ts` (Firebase), `tba.ts`, and `pdf.ts` are dynamically imported at their call sites in `view.ts` — they are **not** statically imported. Do not add static imports for them.
+**Lazy loading:** `cloud.ts` (Firebase), `tba.ts`, and `pdf.ts` are dynamically imported at their call sites in `view.ts` - they are **not** statically imported. Do not add static imports for them.
 
 **IndexedDB storage:** All matches are stored under a single `"appData"` key as an array of packets. The legacy format (per-match keys + `"matchIds"`) is automatically migrated on first load. `db.ts` also caches Statbotics data under `"statbotics_<matchKey>"` keys.
 
@@ -68,10 +70,10 @@ User Action → view.ts → model.ts → db.ts (IndexedDB)
 
 ### Configuration
 
-- **vite.config.ts** — Vite + PWA (Workbox) + Tailwind; path alias `@/` → `src/`; Firebase is in a separate `firebase` chunk via `manualChunks`
-- **capacitor.config.ts** — App ID: `com.strategyboard.app`
-- **electron/main.cjs** — Electron main process
-- **tsconfig.json** — `strict: false`, target ES2022
+- **vite.config.ts** - Vite + PWA (Workbox) + Tailwind; path alias `@/` → `src/`; Firebase is in a separate `firebase` chunk via `manualChunks`
+- **capacitor.config.ts** - App ID: `com.strategyboard.app`
+- **electron/main.cjs** - Electron main process
+- **tsconfig.json** - `strict: false`, target ES2022
 
 ### Environment Variables
 

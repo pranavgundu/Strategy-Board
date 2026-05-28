@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { getRobotPositionsForYear } from "./manager.ts";
 
-interface RobotPosition {
+export interface RobotPosition {
   x: number;
   y: number;
   w: number;

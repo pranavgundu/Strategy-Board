@@ -550,7 +550,7 @@ export class QRImport {
         this.expectedLength = -1;
         if (statusEl)
           statusEl.textContent =
-            "New QR stream detected — resetting progress...";
+            "New QR stream detected - resetting progress...";
       }
 
       if (this.expectedLength === -1) this.expectedLength = total;
@@ -609,7 +609,7 @@ export class QRImport {
         this.receivedIds.length === this.expectedLength
       ) {
         if (statusEl)
-          statusEl.textContent = "All chunks received — reconstructing data...";
+          statusEl.textContent = "All chunks received - reconstructing data...";
         try {
           const dots = document.getElementById(
             "qr-import-dots",
@@ -653,7 +653,7 @@ export class QRImport {
 
       parsedData.splice(7, 0, null);
 
-      if (statusEl) statusEl.textContent = "Import complete — applying data...";
+      if (statusEl) statusEl.textContent = "Import complete - applying data...";
       this.callback(parsedData);
 
       if (statusEl) {

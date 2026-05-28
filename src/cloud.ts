@@ -29,7 +29,7 @@ function getDb(): Firestore {
   if (!db) {
     if (!firebaseConfig.apiKey) {
       console.warn(
-        "[Cloud] VITE_FIREBASE_API_KEY is not set. Firebase may not initialize correctly — check your .env or CI settings.",
+        "[Cloud] VITE_FIREBASE_API_KEY is not set. Firebase may not initialize correctly - check your .env or CI settings.",
       );
     }
     const app = initializeApp(firebaseConfig);
@@ -61,7 +61,6 @@ function generateShareCode(): string {
  */
 export async function uploadMatch(match: Match): Promise<string> {
   const firestore = getDb();
-  const shareCode = generateShareCode();
   const packet = match.getAsPacket();
 
   const packetWithoutId = [...packet];
@@ -69,14 +68,39 @@ export async function uploadMatch(match: Match): Promise<string> {
 
   const dataString = JSON.stringify(packetWithoutId);
 
-  await setDoc(doc(firestore, "matches", shareCode), {
-    data: dataString,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    version: 1,
-  });
+  // 32^6 ≈ 1B addresses, but the create-only Firestore rule still rejects
+  // collisions - retry with a fresh code on permission-denied so concurrent
+  // uploads can't clobber an existing share.
+  const MAX_ATTEMPTS = 5;
+  let lastErr: unknown = null;
 
-  return shareCode;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const shareCode = generateShareCode();
+    const createdAt = Date.now();
+
+    try {
+      await setDoc(doc(firestore, "matches", shareCode), {
+        data: dataString,
+        createdAt,
+        expiresAt: createdAt + 7 * 24 * 60 * 60 * 1000,
+        version: 1,
+      });
+      return shareCode;
+    } catch (err) {
+      lastErr = err;
+      const code = (err as { code?: string })?.code;
+      // permission-denied here is expected on a code collision (rule forbids
+      // overwriting an existing doc) - retry. Anything else, bail.
+      if (code === "permission-denied") continue;
+      throw err;
+    }
+  }
+
+  throw new Error(
+    `Failed to allocate a unique share code after ${MAX_ATTEMPTS} attempts: ${
+      (lastErr as Error)?.message ?? lastErr
+    }`,
+  );
 }
 
 /**

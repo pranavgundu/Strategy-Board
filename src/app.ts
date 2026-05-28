@@ -2,7 +2,7 @@ import { Model } from "./model.ts";
 import { preloadFieldImages } from "./manager.ts";
 import { registerSW } from "virtual:pwa-register";
 
-// Polyfill for CanvasRenderingContext2D.roundRect — not available in Safari < 16 (iOS 15 and earlier)
+// Polyfill for CanvasRenderingContext2D.roundRect - not available in Safari < 16 (iOS 15 and earlier)
 if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D.prototype.roundRect) {
   (CanvasRenderingContext2D.prototype as any).roundRect = function (
     x: number,
@@ -41,14 +41,11 @@ registerSW({
   /**
    * Callback invoked when the PWA is ready for offline use.
    */
-  onOfflineReady() {
-    console.log("PWA: Offline mode is now available!");
-  },
+  onOfflineReady() {},
   /**
    * Callback invoked when new content is available and a refresh is needed.
    */
   onNeedRefresh() {
-    console.log("PWA: New content available, please refresh.");
     try {
       window.dispatchEvent(new Event("app:update-available"));
     } catch (error) {
@@ -71,14 +68,10 @@ registerSW({
  * @throws Error if application initialization fails.
  */
 async function initializeApp(): Promise<void> {
-  console.log(
-    "Application startup: initializing model and deferring UI until DOM is ready...",
-  );
-
   try {
     const model = new Model();
 
-    // Start fetching modules and waiting for DOM immediately — parallel with DB load
+    // Start fetching modules and waiting for DOM immediately - parallel with DB load
     const moduleImports = Promise.all([
       import("./whiteboard.ts"),
       import("./qr.ts"),
@@ -93,22 +86,17 @@ async function initializeApp(): Promise<void> {
           })
         : Promise.resolve();
 
-    console.log("Loading persistent data...");
     await model.loadPersistentData();
-    console.log("Persistent data loaded");
 
     await domReady;
 
-    console.log("UI and QR modules imported");
     const [whiteboardModule, qrModule, viewModule] = await moduleImports;
 
-    console.log("Creating UI instances...");
     const whiteboard = new whiteboardModule.Whiteboard(model);
     const qrimport = new qrModule.QRImport();
     const qrexport = new qrModule.QRExport();
 
     const _app = new viewModule.View(model, whiteboard, qrimport, qrexport);
-    console.log("Application initialized successfully");
     try {
       document.documentElement.setAttribute("data-app-ready", "true");
     } catch (err) {
