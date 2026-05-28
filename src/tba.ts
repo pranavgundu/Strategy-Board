@@ -118,7 +118,9 @@ export class TBAService {
       });
     } catch (err) {
       if ((err as Error).name === "AbortError") {
-        throw new Error(`TBA API request timed out after 15s: ${endpoint}`);
+        throw new Error(`TBA API request timed out after 15s: ${endpoint}`, {
+          cause: err,
+        });
       }
       throw err;
     } finally {
