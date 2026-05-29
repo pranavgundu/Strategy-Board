@@ -1714,7 +1714,12 @@ export class View {
       e.stopPropagation();
       this.hide(kebab);
       this.show(options);
+      item.classList.add("match-actions-open");
+      E.MatchList?.classList.add("match-list-actions-open");
       item.focus();
+      window.setTimeout(() => {
+        item.scrollIntoView({ block: "center", inline: "nearest" });
+      }, 0);
     });
 
     item.addEventListener("focusout", (e) => {
@@ -1722,6 +1727,8 @@ export class View {
 
       this.hide(options);
       this.show(kebab);
+      item.classList.remove("match-actions-open");
+      E.MatchList?.classList.remove("match-list-actions-open");
     });
 
     deleteOption.addEventListener("click", (e) => {

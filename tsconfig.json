@@ -23,9 +23,7 @@
     "noImplicitReturns": false,
     "noImplicitAny": true,
     "strictNullChecks": false,
-    "skipLibCheck": true,
-
-    "types": ["vite-plugin-pwa/client"]
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "build", "android", "ios"]

@@ -829,7 +829,7 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.95);
-    z-index: 99999;
+    z-index: 100000;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -898,6 +898,42 @@ body {
 }
 
 /* Mobile-friendly home screen buttons */
+@media (max-width: 834px) {
+    #home-toolbar {
+        gap: 0.5rem;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    #home-toolbar-logo {
+        flex: 0 1 auto;
+        min-width: 0;
+        font-size: 1.15rem !important;
+        line-height: 1.1;
+    }
+    #home-toolbar > div:last-child {
+        flex: 1 1 auto;
+        min-width: 0;
+        justify-content: flex-end;
+        gap: 0.35rem !important;
+    }
+    #home-toolbar-new-btn,
+    #home-toolbar-tba-btn,
+    #home-toolbar-import-btn,
+    #home-toolbar-import-link-btn,
+    #home-toolbar-clear-btn {
+        min-width: 0;
+        padding: 0.45rem 0.65rem !important;
+        font-size: 0.95rem !important;
+        white-space: nowrap;
+    }
+    #home-toolbar-tba-btn {
+        gap: 0.4rem !important;
+    }
+    #home-toolbar-tba-btn img {
+        height: 1.25rem !important;
+    }
+}
+
 @media (max-width: 640px) {
     #home-toolbar {
         gap: 0.5rem;
@@ -947,6 +983,97 @@ body {
     /* Make better use of screen space in landscape */
     #home-match-list {
         padding: 0.75rem;
+    }
+}
+
+@media (max-width: 834px) and (orientation: landscape) {
+    #home-toolbar-logo {
+        max-width: 6.5rem;
+    }
+    #home-toolbar-new-btn,
+    #home-toolbar-tba-btn,
+    #home-toolbar-import-btn,
+    #home-toolbar-import-link-btn,
+    #home-toolbar-clear-btn {
+        height: 2.5rem !important;
+    }
+    #tba-import-container > div,
+    #create-match-container > div,
+    #edit-match-container > div,
+    #link-import-container > div,
+    #clear-confirm-container > div,
+    #team-number-popup > div {
+        max-height: calc(100dvh - 1rem) !important;
+    }
+    #tba-import-container > div,
+    #create-match-container > div,
+    #edit-match-container > div {
+        top: 0.5rem !important;
+        translate: -50% 0 !important;
+        transform: none !important;
+    }
+    #tba-import-container input {
+        min-height: 2.25rem !important;
+        padding-top: 0.45rem !important;
+        padding-bottom: 0.45rem !important;
+    }
+    #tba-import-container > div > div:nth-child(2) > div {
+        padding-bottom: 0.5rem !important;
+    }
+    #tba-import-container > div > div:nth-child(2) > div:first-child {
+        padding-top: 0.75rem !important;
+    }
+    #tba-import-container .text-xs {
+        margin-top: 0.35rem !important;
+        line-height: 1.2;
+    }
+    #tba-import-container > div > div:first-child,
+    #link-import-container > div > div:first-child,
+    #clear-confirm-container > div > div:first-child {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+    #tba-import-btn,
+    #tba-cancel-btn,
+    #link-import-import-btn,
+    #link-import-cancel-btn {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+    #home-match-list > div:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        ) {
+        position: relative;
+    }
+    #home-match-list.match-list-actions-open {
+        padding-bottom: 5rem !important;
+    }
+    #home-match-list > div.match-actions-open:not(
+            #home-match-list-empty-placeholder
+        ):not(#home-match-list-item-template) {
+        min-height: 8.75rem !important;
+        align-items: flex-start !important;
+        padding-bottom: 4.5rem !important;
+    }
+    #home-match-list > div.match-actions-open:not(
+            #home-match-list-empty-placeholder
+        ):not(#home-match-list-item-template) > div:last-child > div:not(.hidden) {
+        position: absolute;
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: 0.5rem;
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.35rem;
+    }
+    #home-match-list > div.match-actions-open:not(
+            #home-match-list-empty-placeholder
+        ):not(#home-match-list-item-template) > div:last-child > div > button {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
+        white-space: nowrap;
     }
 }
 
@@ -1285,6 +1412,10 @@ body #whiteboard-statbotics-container {
         gap: 0.5rem !important;
     }
 
+    #home-match-list.match-list-actions-open {
+        padding-bottom: 5rem !important;
+    }
+
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1294,6 +1425,7 @@ body #whiteboard-statbotics-container {
         display: flex !important;
         flex-direction: row !important;
         gap: 0.5rem !important;
+        position: relative;
     }
 
     /* Make name take more space on mobile */
@@ -1370,6 +1502,42 @@ body #whiteboard-statbotics-container {
         font-size: 0.875rem !important;
         width: auto !important;
         min-width: 60px !important;
+    }
+
+    #home-match-list
+        > div.match-actions-open:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        ) {
+        min-height: 8.75rem !important;
+        align-items: flex-start !important;
+        padding-bottom: 4.5rem !important;
+    }
+
+    #home-match-list
+        > div.match-actions-open:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:last-child
+        > div:not(.hidden) {
+        position: absolute;
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: 0.5rem;
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.35rem;
+    }
+
+    #home-match-list
+        > div.match-actions-open:not(#home-match-list-empty-placeholder):not(
+            #home-match-list-item-template
+        )
+        > div:last-child
+        > div
+        > button {
+        width: 100% !important;
+        min-width: 0 !important;
+        white-space: nowrap;
     }
 }
 
@@ -1853,5 +2021,15 @@ a:active,
     #qr-import-inner-container,
     #qr-export-inner-container {
         scale: 1.05;
+    }
+}
+
+@media (max-width: 834px) and (orientation: landscape) {
+    #tba-import-container > div,
+    #link-import-container > div,
+    #share-success-container > div,
+    #qr-import-inner-container,
+    #qr-export-inner-container {
+        scale: 1;
     }
 }
