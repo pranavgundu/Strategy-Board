@@ -164,7 +164,7 @@
     "firebase": "^12.14.0",
     "idb-keyval": "^6.2.5",
     "jspdf": "^4.2.1",
-    "marked": "^18.0.4",
+    "marked": "^18.0.5",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
     "tailwindcss": "^4.3.0",
