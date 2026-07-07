@@ -74,7 +74,7 @@ You can access the website through any of these following domains; they are auto
 
 - https://strategyboard.app/
 - https://strategyboard.vercel.app/
-- https://pranavgundu.me/Strategy-Board/
+- https://pranavgundu.github.io/Strategy-Board/
 
 <a href="https://www.star-history.com/#pranavgundu/Strategy-Board&type=date&legend=top-left">
  <picture>
