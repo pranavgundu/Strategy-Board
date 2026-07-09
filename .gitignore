@@ -27,9 +27,6 @@ coverage
 
 src/build.ts
 
-android/
-ios/
-
 analytics/
 
 references/
@@ -40,3 +37,5 @@ build-release.sh
 *.keystore
 *.jks
 keystore.properties
+
+crates/**/target/

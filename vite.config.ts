@@ -65,7 +65,7 @@ export default defineConfig({
       injectRegister: "auto",
       registerType: "autoUpdate",
       workbox: {
-        globPatterns: ["**/*.{js,css,html,png,svg,webp,ico,txt,webmanifest}"],
+        globPatterns: ["**/*.{js,css,html,png,svg,webp,ico,txt,webmanifest,wasm}"],
         cleanupOutdatedCaches: true,
         navigateFallback: null,
         runtimeCaching: [

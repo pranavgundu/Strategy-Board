@@ -67,34 +67,17 @@ const FALLBACK_POSITIONS: RobotPositions = {
   },
 };
 
-/**
- * Gets all available field years sorted in ascending order.
- *
- * @returns An array of years (as numbers) sorted from earliest to latest
- */
 function getAvailableYears(): number[] {
   return Object.keys(FIELD_IMAGES)
     .map(Number)
     .sort((a, b) => a - b);
 }
 
-/**
- * Gets the latest (most recent) available field year.
- *
- * @returns The most recent year for which a field image is available
- */
 export function getLatestFieldYear(): number {
   const years = getAvailableYears();
   return years[years.length - 1];
 }
 
-/**
- * Gets the field image URL for a specific year.
- * Falls back to the closest available year if exact match not found.
- *
- * @param year - The year to get the field image for. If not provided, uses the latest available year.
- * @returns The field image URL for the requested or closest available year
- */
 export function getFieldImageForYear(year?: number): string {
   if (!year) {
     const latestYear = getLatestFieldYear();
@@ -127,12 +110,6 @@ export function getFieldImageForYear(year?: number): string {
   return FIELD_IMAGES[closestYear];
 }
 
-/**
- * Gets the year associated with a field image URL.
- *
- * @param imageUrl - The field image URL to look up
- * @returns The year associated with the image URL, or undefined if not found
- */
 export function getYearFromFieldImage(imageUrl: string): number | undefined {
   for (const [year, url] of Object.entries(FIELD_IMAGES)) {
     if (url === imageUrl) {
@@ -142,33 +119,14 @@ export function getYearFromFieldImage(imageUrl: string): number | undefined {
   return undefined;
 }
 
-/**
- * Checks if a field image exists for a specific year.
- *
- * @param year - The year to check for field image availability
- * @returns True if a field image exists for that year, false otherwise
- */
 export function hasFieldForYear(year: number): boolean {
   return FIELD_IMAGES[year] !== undefined;
 }
 
-/**
- * Gets all available field years as a formatted list.
- * Useful for UI display.
- *
- * @returns Array of year strings sorted from earliest to latest
- */
 export function getAvailableFieldYears(): string[] {
   return getAvailableYears().map(String);
 }
 
-/**
- * Preloads field images to ensure they're cached.
- * Call this during app initialization for better performance.
- *
- * @returns A Promise that resolves when all images are loaded successfully
- * @throws Logs a warning if some images fail to preload, but does not reject
- */
 export async function preloadFieldImages(): Promise<void> {
   const loadPromises = Object.values(FIELD_IMAGES).map((url) => {
     return new Promise<void>((resolve, reject) => {
@@ -187,13 +145,6 @@ export async function preloadFieldImages(): Promise<void> {
   }
 }
 
-/**
- * Gets the default robot starting positions for a specific year.
- * Falls back to the closest available year's positions if exact match not found.
- *
- * @param year - The year to get positions for. If not provided, uses the latest available year.
- * @returns Robot starting positions for red and blue alliances with x, y coordinates for all six robots
- */
 export function getRobotPositionsForYear(year?: number): RobotPositions {
   if (!year) {
     const latestYear = getLatestFieldYear();

@@ -169,7 +169,6 @@ describe("Match with custom options", () => {
     expect(m.auto.blueThreeRobot.w).toBe(150);
     expect(m.auto.drawing).toEqual([[1, [5, 5]]]);
     expect(m.auto.checkboxes).toEqual([[10, 20, 0, true]]);
-    // teleop should have empty checkboxes since cb not provided
     expect(m.teleop.checkboxes).toEqual([]);
   });
 });

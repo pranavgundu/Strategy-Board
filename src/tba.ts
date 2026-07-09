@@ -51,11 +51,6 @@ export class TBAService {
 
   constructor() {}
 
-  /**
-   * Loads the TBA API key from storage.
-   *
-   * @returns The loaded API key, or null if not found.
-   */
   public async loadApiKey(): Promise<string | null> {
     const key = await GET("tbaApiKey", (e) => {
       console.error("Failed to load TBA API key:", e);
@@ -69,20 +64,10 @@ export class TBAService {
     return this.apiKey;
   }
 
-  /**
-   * Sets the TBA API key for making authenticated requests.
-   *
-   * @param key - The Blue Alliance API key.
-   */
   public setApiKey(key: string): void {
     this.apiKey = key;
   }
 
-  /**
-   * Checks if an API key has been set.
-   *
-   * @returns True if API key exists, false otherwise.
-   */
   public hasApiKey(): boolean {
     return (
       (this.apiKey !== null && this.apiKey.length > 0) ||
@@ -90,13 +75,6 @@ export class TBAService {
     );
   }
 
-  /**
-   * Makes an authenticated HTTP request to The Blue Alliance API.
-   *
-   * @param endpoint - The API endpoint to request (e.g., "/event/2024ncwak/matches")
-   * @returns A promise that resolves to the JSON response data
-   * @throws Will throw an error if no API key is set or if the request fails
-   */
   private async makeRequest(endpoint: string): Promise<any> {
     const apiKey = this.apiKey || Config.sharedTBAApiKey;
 
@@ -136,23 +114,11 @@ export class TBAService {
     return await response.json();
   }
 
-  /**
-   * Fetches all events for a given year from The Blue Alliance.
-   *
-   * @param year - The year to fetch events for.
-   * @returns Array of TBA event data.
-   */
   public async getEvents(year: number): Promise<TBAEvent[]> {
     const endpoint = `/events/${year}`;
     return await this.makeRequest(endpoint);
   }
 
-  /**
-   * Fetches all team keys participating at an event.
-   *
-   * @param eventKey - The event key to fetch teams for.
-   * @returns Array of team keys (e.g., "frc467").
-   */
   public async getTeamsAtEvent(eventKey: string): Promise<string[]> {
     try {
       const endpoint = `/event/${eventKey}/teams/keys`;
@@ -166,13 +132,6 @@ export class TBAService {
     }
   }
 
-  /**
-   * Retrieves all matches for a specific event from TBA.
-   *
-   * @param eventKey - The TBA event key (e.g., "2024ncwak")
-   * @returns A promise that resolves to an array of match data
-   * @throws Will throw an error if the API request fails
-   */
   public async getMatchesAtEvent(eventKey: string): Promise<TBAMatch[]> {
     const endpoint = `/event/${eventKey}/matches`;
     return await this.makeRequest(endpoint);
@@ -194,13 +153,6 @@ export class TBAService {
     return Array.from(teamSet);
   }
 
-  /**
-   * Fetches all events a team participated in for a given year.
-   *
-   * @param teamKey - The team key or number.
-   * @param year - The year to fetch events for.
-   * @returns Array of TBA event data.
-   */
   public async getTeamEvents(
     teamKey: string,
     year: number,
@@ -212,12 +164,6 @@ export class TBAService {
     return await this.makeRequest(endpoint);
   }
 
-  /**
-   * Formats TBA event data into a simplified format for dropdown display.
-   *
-   * @param events - Array of TBA event objects
-   * @returns An array of simplified event objects with formatted names and dates
-   */
   public parseEventsToSimple(events: TBAEvent[]): TBASimpleEvent[] {
     return events.map((event) => {
       let location = "";
@@ -274,13 +220,6 @@ export class TBAService {
     }
   }
 
-  /**
-   * Fetches all matches for a specific team at an event.
-   *
-   * @param teamKey - The team key or number.
-   * @param eventKey - The event key.
-   * @returns Array of TBA match data.
-   */
   public async getTeamMatchesAtEvent(
     teamKey: string,
     eventKey: string,
@@ -293,12 +232,6 @@ export class TBAService {
     return await this.makeRequest(endpoint);
   }
 
-  /**
-   * Converts TBA match data to simplified format.
-   *
-   * @param matches - Array of TBA match data.
-   * @returns Array of simplified match information sorted by match order.
-   */
   public parseMatchesToSimple(matches: TBAMatch[]): TBASimpleMatch[] {
     const sortedMatches = matches.sort((a, b) => {
       const levelOrder: { [key: string]: number } = {
@@ -372,13 +305,6 @@ export class TBAService {
     return `${levelName} ${setNumber}-${matchNumber}`;
   }
 
-  /**
-   * Fetches and parses all matches for a team at an event.
-   *
-   * @param teamKey - The team key or number.
-   * @param eventKey - The event key.
-   * @returns Array of simplified match information.
-   */
   public async fetchAndParseTeamMatches(
     teamKey: string,
     eventKey: string,
@@ -387,34 +313,16 @@ export class TBAService {
     return this.parseMatchesToSimple(matches);
   }
 
-  /**
-   * Fetches and parses all events for a given year.
-   *
-   * @param year - The year to fetch events for.
-   * @returns Array of simplified event information.
-   */
   public async fetchAndParseEvents(year: number): Promise<TBASimpleEvent[]> {
     const events = await this.getEvents(year);
     return this.parseEventsToSimple(events);
   }
 
-  /**
-   * Fetches all team numbers at an event.
-   *
-   * @param eventKey - The event key.
-   * @returns Array of team numbers as strings.
-   */
   public async fetchTeamsAtEvent(eventKey: string): Promise<string[]> {
     const teamKeys = await this.getTeamsAtEvent(eventKey);
     return teamKeys.map((key) => key.replace("frc", ""));
   }
 
-  /**
-   * Fetches and parses all qualification matches at an event.
-   *
-   * @param eventKey - The event key.
-   * @returns Array of simplified match information.
-   */
   public async fetchAndParseAllMatches(
     eventKey: string,
   ): Promise<TBASimpleMatch[]> {
@@ -422,12 +330,6 @@ export class TBAService {
     return this.parseMatchesToSimple(matches);
   }
 
-  /**
-   * Filters and sorts events from newest to latest, including only events on or after January 1, 2025.
-   *
-   * @param events - Array of TBA simple events.
-   * @returns Array of filtered and sorted events.
-   */
   public filterAndSortEvents(events: TBASimpleEvent[]): TBASimpleEvent[] {
     const minDate = new Date("2025-01-01T00:00:00Z");
 

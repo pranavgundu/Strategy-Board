@@ -192,10 +192,6 @@ let scaling = 1;
 const fieldImage = new Image();
 let currentFieldImageUrl: string = "";
 
-/**
- * Updates the canvas size to fit the whiteboard wrapper while maintaining aspect ratio.
- * Applies zoom factor for padding and updates all three canvas layers (background, items, drawing).
- */
 export function updateCanvasSize() {
   const wrapper = <HTMLElement>document.getElementById("whiteboard-wrapper");
   if (!wrapper) return;
@@ -827,11 +823,6 @@ export class Whiteboard {
     }, 3000);
   }
 
-  /**
-   * Sets whether the whiteboard is currently active.
-   *
-   * @param active - True to activate the whiteboard, false to deactivate
-   */
   public setActive(active: boolean) {
     this.active = active;
 
@@ -899,28 +890,16 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Sets the match to be displayed and edited on the whiteboard.
-   * Loads the appropriate field image based on the match's field metadata or match year.
-   *
-   * @param match - The match object to display
-   */
   public setMatch(match: Match) {
     this.match = match;
     const selectedYear =
       (match as any).fieldMetadata?.selectedFieldYear ?? match.tbaYear;
     this.loadFieldImage(selectedYear);
     this.updatePhaseLabels();
-    // Defer the canvas redraw to the next animation frame so the click event
-    // handler can return quickly, allowing the browser to paint the panel
-    // transition before doing the (potentially expensive) stroke rendering.
     requestAnimationFrame(() => this.redrawAll());
     this.updateUndoRedoButtons();
   }
 
-  /**
-   * Returns the year of the currently loaded field image (if any).
-   */
   public getCurrentFieldYear(): number | undefined {
     return getYearFromFieldImage(currentFieldImageUrl);
   }
@@ -948,9 +927,6 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Toggles between different field view modes (full, red-only, blue-only).
-   */
   public toggleView() {
     if (this.currentView == "full") {
       this.currentView = "red";
@@ -963,11 +939,6 @@ export class Whiteboard {
     this.redrawAll();
   }
 
-  /**
-   * Adds an action to the undo history for the current mode.
-   *
-   * @param action - The action to record in history
-   */
   private addUndoHistory(action: any) {
     this.clearCurrentRedoHistory();
 
@@ -995,9 +966,6 @@ export class Whiteboard {
     this.updateUndoRedoButtons();
   }
 
-  /**
-   * Clears the redo history for the current mode.
-   */
   private clearCurrentRedoHistory() {
     if (this.mode === "auto") {
       this.autoRedoHistory = [];
@@ -1016,11 +984,6 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Retrieves the redo history for the current mode.
-   *
-   * @returns The redo history array for the active mode
-   */
   private getCurrentRedoHistory() {
     if (this.mode === "auto") {
       return this.autoRedoHistory;
@@ -1041,9 +1004,6 @@ export class Whiteboard {
     return [];
   }
 
-  /**
-   * Updates the visual state of undo and redo buttons based on history availability.
-   */
   private updateUndoRedoButtons() {
     const undoHistory = this.getCurrentUndoHistory();
     const redoHistory = this.getCurrentRedoHistory();
@@ -1071,11 +1031,6 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Retrieves the undo history for the current mode.
-   *
-   * @returns The undo history array for the active mode
-   */
   private getCurrentUndoHistory() {
     if (this.mode === "auto") {
       return this.autoActionHistory;
@@ -1096,9 +1051,6 @@ export class Whiteboard {
     return [];
   }
 
-  /**
-   * Undoes the last action in the current mode by reverting changes.
-   */
   private undo() {
     const history = this.getCurrentUndoHistory();
     if (history.length < 1) return;
@@ -1184,9 +1136,6 @@ export class Whiteboard {
     this.updateUndoRedoButtons();
   }
 
-  /**
-   * Redoes the last undone action in the current mode.
-   */
   private redo() {
     const redoHistory = this.getCurrentRedoHistory();
     if (redoHistory.length < 1) return;
@@ -1253,11 +1202,6 @@ export class Whiteboard {
     this.updateUndoRedoButtons();
   }
 
-  /**
-   * Loads the appropriate field image for the specified year.
-   *
-   * @param year - Optional year to load field image for. Uses latest if not specified.
-   */
   private loadFieldImage(year?: number): void {
     const newUrl = getFieldImageForYear(year);
     if (newUrl !== currentFieldImageUrl) {
@@ -1266,9 +1210,6 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Draws the field background image on the background canvas layer.
-   */
   private drawBackground(): void {
     BG.save();
     BG.clearRect(0, 0, width, height);
@@ -1392,14 +1333,6 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Draws a robot on the canvas with its team number and selection state.
-   *
-   * @param name - Display name of the robot
-   * @param robot - Robot position and dimensions data
-   * @param team - Team number
-   * @param slot - Robot slot identifier (e.g., "r1", "b2")
-   */
   private drawRobot(name: string, robot: any, team: string, slot: string) {
     const isSelected = this.selected !== null && this.selected[0] == slot;
 
@@ -1455,11 +1388,6 @@ export class Whiteboard {
     IT.restore();
   }
 
-  /**
-   * Retrieves the phase data for the current mode.
-   *
-   * @returns The phase data object or null if no match is loaded
-   */
   private getData() {
     if (this.match === null) return null;
     if (this.mode === "auto") {
@@ -1480,9 +1408,6 @@ export class Whiteboard {
     return null;
   }
 
-  /**
-   * Draws all robots on the items canvas layer.
-   */
   private drawRobots() {
     const data = this.getData();
 
@@ -1507,9 +1432,6 @@ export class Whiteboard {
     );
   }
 
-  /**
-   * Redraws all drawing strokes and checkboxes on the drawing canvas layer.
-   */
   private redrawDrawing() {
     const data = this.getData();
 
@@ -1601,28 +1523,16 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Redraws all canvas layers (background, robots, and drawings).
-   */
   private redrawAll() {
     this.drawBackground();
     this.drawRobots();
     this.redrawDrawing();
   }
 
-  /**
-   * Forces a complete redraw of all canvas layers.
-   */
   public forceRedraw() {
     this.redrawAll();
   }
 
-  /**
-   * Gets the stroke color for a given color ID.
-   *
-   * @param id - The color identifier (0-4)
-   * @returns The hex color string
-   */
   private getStrokeColor(id: number) {
     switch (id) {
       case 0: {
@@ -1645,11 +1555,6 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Switches the whiteboard to a different phase mode (auto, teleop, endgame, notes, statbotics).
-   *
-   * @param mode - The mode to switch to
-   */
   private toggleMode(mode: string) {
     if (this.mode === mode) return;
     this.lastSelected = null;
@@ -1720,35 +1625,16 @@ export class Whiteboard {
     }
   }
 
-  /**
-   * Resets the whiteboard mode to the default "auto" mode.
-   * Should be called when loading a new match to clear previous state.
-   */
   public resetMode() {
     if (this.mode !== "auto") {
       this.toggleMode("auto");
     }
   }
 
-  /**
-   * Checks if a point is within a robot's rotated rectangle bounds.
-   *
-   * @param robot - The robot with position and dimensions
-   * @param x - The x-coordinate to check
-   * @param y - The y-coordinate to check
-   * @returns True if the point is within the robot bounds
-   */
   private isRobotAtPoint(robot: any, x: number, y: number) {
     return isPointInRotRect(x, y, robot.x, robot.y, robot.w, robot.h, robot.r);
   }
 
-  /**
-   * Finds which robot is at the specified point.
-   *
-   * @param x - The x-coordinate to check
-   * @param y - The y-coordinate to check
-   * @returns A tuple of [slot, robot] if found, or null if no robot at point
-   */
   private getRobotAtPoint(
     x: number,
     y: number,
@@ -1955,8 +1841,6 @@ export class Whiteboard {
           }
         }
 
-        // Redraw once after all erased items are removed, rather than once per
-        // erased item - avoids O(n) full redraws per pointer event.
         if (erasedThisMove) this.redrawDrawing();
       }
     } else if (this.selected != null && this.isPointerDown) {
@@ -2012,7 +1896,6 @@ export class Whiteboard {
   }
 
   private onPointerDown(e: PointerEvent) {
-    // Apple Pencil squeeze (Pencil Pro / 2nd gen barrel button) → toggle marker/eraser
     if (e.pointerType === "pen" && e.button === 1) {
       this.toggleMarkerEraser();
       return;

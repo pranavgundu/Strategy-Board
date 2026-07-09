@@ -1,0 +1,29 @@
+[package]
+name = "strategy-board"
+version = "2026.6.0"
+description = "The Digital Strategy Whiteboard for FRC"
+authors = ["Pranav Gundu <pranav@strategyboard.app>"]
+license = "MIT"
+repository = "https://github.com/pranavgundu/Strategy-Board"
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "strategy_board_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.11.3", features = [] }
+tauri-plugin-log = "2"
+tauri-plugin-opener = "2"
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

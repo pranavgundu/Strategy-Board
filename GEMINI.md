@@ -7,7 +7,7 @@ This file provides essential context for Gemini CLI when working in this reposit
 **Strategy Board** is a digital strategy whiteboard specifically designed for FIRST Robotics Competition (FRC) teams. It allows users to plan and visualize match strategies (Auto, Teleop, Endgame) using virtual field images and robot representations.
 
 ### Key Features:
-- **Multi-Platform:** Ships as a Web app (PWA), Desktop app (Electron for Mac/Win/Linux), and Mobile app (Capacitor for iOS/Android).
+- **Multi-Platform:** Ships as a Web app (PWA) and a Tauri 2 native app for Desktop (Mac/Win/Linux) and Mobile (iOS/Android).
 - **Real-time Collaboration:** Share matches via 6-character cloud codes or QR codes.
 - **Data Integration:** Pulls team and match data from **The Blue Alliance (TBA)** and analytics from **Statbotics**.
 - **Offline First:** Uses IndexedDB for local persistence, ensuring reliability at competitions.
@@ -18,7 +18,7 @@ This file provides essential context for Gemini CLI when working in this reposit
 - **Styling:** Tailwind CSS.
 - **Persistence:** IndexedDB (via `idb-keyval`).
 - **Backend/Cloud:** Firebase Firestore (for sharing).
-- **Platforms:** Electron (Desktop), Capacitor (Mobile).
+- **Platforms:** Tauri 2 (Desktop + Mobile, Rust shell in `src-tauri/`).
 
 ## Building and Running
 
@@ -30,15 +30,15 @@ Always use `bun`.
 - `bun run lint`: Run ESLint on `src/`.
 - `bun run spell`: Run `cspell` for spell checking.
 
-### Desktop (Electron):
-- `bun run electron:dev`: Run Electron in development mode.
-- `bun run electron:build`: Build Electron for the current platform.
-- `bun run electron:build:mac | :win | :linux`: Targeted builds.
+### Desktop (Tauri):
+- `bun run tauri:dev`: Run the desktop app in development mode.
+- `bun run tauri:build`: Build the desktop app for the current platform (no cross-compiling).
+- `bun run tauri:build:mac`: macOS universal binary.
 
-### Mobile (Capacitor):
-- `bun run cap:sync`: Build web assets and sync with native projects.
-- `bun run cap:run:ios | :android`: Build and run on a connected device/emulator.
-- `bun run cap:open:ios | :android`: Open the project in Xcode or Android Studio.
+### Mobile (Tauri):
+- `bun run ios:init | android:init`: Generate the native project under `src-tauri/gen/` (once per machine).
+- `bun run ios:dev | android:dev`: Build and run on a connected device/emulator.
+- `bun run ios:open | android:open`: Open the project in Xcode or Android Studio.
 
 ## Architecture & Modules
 
@@ -64,7 +64,7 @@ The application follows a custom MVC-like architecture focused on direct DOM man
 
 1. **Vanilla TS & DOM:** Avoid adding external UI frameworks. Use direct DOM manipulation in `view.ts`.
 2. **Lazy Loading:** Heavy modules (`cloud.ts`, `tba.ts`, `pdf.ts`) must be dynamically imported at call sites to keep initial bundle size small.
-3. **Cross-Platform Compatibility:** Ensure all changes work across Web, Electron, iOS, and Android. Avoid Node-only or Browser-only APIs without appropriate guards.
+3. **Cross-Platform Compatibility:** Ensure all changes work across Web, Tauri desktop, iOS, and Android. Avoid Node-only or Browser-only APIs without appropriate guards.
 4. **Persistence:** Use the single `"appData"` key in IndexedDB for match storage. Statbotics data is cached under `"statbotics_<matchKey>"`.
 5. **Canvas Layers:** `whiteboard.ts` uses three overlapping `<canvas>` elements for optimized rendering (Background, Items, Drawing).
 6. **No Automated Tests:** Changes require manual verification on targeted platforms.

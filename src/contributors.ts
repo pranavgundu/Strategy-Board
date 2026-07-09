@@ -31,11 +31,6 @@ export class ContributorsService {
   private lastCommit: LastCommit | null = null;
   private teams: string[] = [];
 
-  /**
-   * Fetches team numbers from contributors.txt file.
-   *
-   * @returns Array of team numbers.
-   */
   async fetchTeams(): Promise<string[]> {
     if (this.teams.length > 0) {
       return this.teams;
@@ -58,12 +53,6 @@ export class ContributorsService {
     }
   }
 
-  /**
-   * Fetches contributors from GitHub repository and caches the results.
-   *
-   * @returns Array of contributor information with details.
-   * @throws Error if the GitHub API request fails.
-   */
   async fetchContributors(): Promise<Contributor[]> {
     if (this.contributors.length > 0) {
       return this.contributors;
@@ -132,39 +121,18 @@ export class ContributorsService {
     }
   }
 
-  /**
-   * Gets the most recent contributors from the cached list.
-   *
-   * @param count - Number of contributors to return. Defaults to 4.
-   * @returns Array of the most recent contributors.
-   */
   getRecentContributors(count: number = 4): Contributor[] {
     return this.contributors.slice(0, count);
   }
 
-  /**
-   * Checks if contributors are currently being loaded.
-   *
-   * @returns True if loading, false otherwise.
-   */
   isLoadingContributors(): boolean {
     return this.isLoading;
   }
 
-  /**
-   * Checks if an error occurred during the last load attempt.
-   *
-   * @returns True if there was an error, false otherwise.
-   */
   hasLoadError(): boolean {
     return this.hasError;
   }
 
-  /**
-   * Fetches the last commit information from build metadata.
-   *
-   * @returns The last commit information, or null if unavailable.
-   */
   async fetchLastCommit(): Promise<LastCommit | null> {
     if (this.lastCommit) {
       return this.lastCommit;

@@ -17,7 +17,6 @@ export default tseslint.config(
             },
         },
         rules: {
-            // Relaxed rules to match the existing tsconfig (strict: false)
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-unused-vars": [
                 "warn",
@@ -37,10 +36,8 @@ export default tseslint.config(
         ignores: [
             "dist/**",
             "node_modules/**",
-            "android/**",
-            "ios/**",
-            "electron/**",
             "references/**",
+            "src/wasm/pkg/**",
             "*.cjs",
             "*.mjs",
         ],
