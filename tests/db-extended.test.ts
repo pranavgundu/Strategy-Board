@@ -106,7 +106,6 @@ describe("Statbotics cache edge cases", () => {
   it("uses default 24h TTL", async () => {
     vi.spyOn(Date, "now").mockReturnValue(100_000_000);
 
-    // Within 24h
     vi.mocked(get).mockResolvedValueOnce({
       data: { ok: true },
       timestamp: 100_000_000 - 1000,

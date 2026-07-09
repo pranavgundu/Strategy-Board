@@ -1,8 +1,11 @@
 import { Model } from "./model.ts";
 import { preloadFieldImages } from "./manager.ts";
+import { setupTauri } from "./tauri.ts";
+import { initCore } from "./wasm/index.ts";
 import { registerSW } from "virtual:pwa-register";
 
-// Polyfill for CanvasRenderingContext2D.roundRect - not available in Safari < 16 (iOS 15 and earlier)
+setupTauri();
+
 if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D.prototype.roundRect) {
   (CanvasRenderingContext2D.prototype as any).roundRect = function (
     x: number,
@@ -38,13 +41,7 @@ injectSpeedInsights();
 
 registerSW({
   immediate: true,
-  /**
-   * Callback invoked when the PWA is ready for offline use.
-   */
   onOfflineReady() {},
-  /**
-   * Callback invoked when new content is available and a refresh is needed.
-   */
   onNeedRefresh() {
     try {
       window.dispatchEvent(new Event("app:update-available"));
@@ -52,26 +49,16 @@ registerSW({
       console.error("Failed to dispatch app:update-available:", error);
     }
   },
-  /**
-   * Callback invoked when service worker registration fails.
-   *
-   * @param error - The error that occurred during registration
-   */
   onRegisterError(error) {
     console.error("PWA: Service worker registration failed:", error);
   },
 });
 
-/**
- * Initializes the application by loading data and setting up UI components.
- *
- * @throws Error if application initialization fails.
- */
 async function initializeApp(): Promise<void> {
   try {
     const model = new Model();
 
-    // Start fetching modules and waiting for DOM immediately - parallel with DB load
+    const coreReady = initCore();
     const moduleImports = Promise.all([
       import("./whiteboard.ts"),
       import("./qr.ts"),
@@ -86,6 +73,7 @@ async function initializeApp(): Promise<void> {
           })
         : Promise.resolve();
 
+    await coreReady;
     await model.loadPersistentData();
 
     await domReady;
@@ -107,7 +95,6 @@ async function initializeApp(): Promise<void> {
     } catch (err) {
       console.warn("Failed to dispatch app:initialized event:", err);
     }
-    // Warm up the field image cache in the background so the first whiteboard open is instant
     preloadFieldImages();
   } catch (error) {
     console.error("Failed to initialize application:", error);

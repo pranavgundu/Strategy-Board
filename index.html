@@ -2,8 +2,6 @@
 <html style="background-color: #0d0d0d">
     <head>
         <script>
-            // Defer GTM until after first user interaction to avoid INP penalty.
-            // Queued dataLayer pushes before load are replayed automatically by GTM.
             window.dataLayer = window.dataLayer || [];
             var gtmLoaded = false;
             function loadGTM() {
@@ -20,7 +18,6 @@
                     f.parentNode.insertBefore(j, f);
                 })(window, document, "script", "dataLayer", "GTM-WJ4D4FGS");
             }
-            // Load on first interaction, or after 5s as a fallback
             ["click", "touchstart", "keydown", "scroll"].forEach(function (e) {
                 window.addEventListener(e, loadGTM, { once: true, passive: true, capture: true });
             });
@@ -70,7 +67,6 @@
         </noscript>
     </head>
     <body class="overflow-hidden">
-        <!-- Google Tag Manager (noscript) -->
         <noscript
             ><iframe
                 src="https://www.googletagmanager.com/ns.html?id=GTM-WJ4D4FGS"
@@ -79,7 +75,6 @@
                 style="display: none; visibility: hidden"
             ></iframe
         ></noscript>
-        <!-- End Google Tag Manager (noscript) -->
         <div id="app-loading" role="status" aria-live="polite">
             <div class="loading-card">
                 <div class="loading-spinner" aria-hidden="true"></div>
@@ -128,7 +123,6 @@
             </div>
             <pre id="app-debug-log"></pre>
         </div>
-        <!-- Team Number Welcome Popup -->
         <div
             id="team-number-popup"
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-[99999]"
@@ -543,7 +537,6 @@
                 </div>
             </div>
         </div>
-        <!-- Edit Match Overlay -->
         <div
             id="edit-match-container"
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none"
@@ -775,7 +768,6 @@
                     </div>
                 </div>
 
-                <!-- Import progress bar (top, visible on iPad and mobile) -->
                 <div
                     id="qr-import-progress-wrap"
                     class="w-full flex justify-center"
@@ -941,9 +933,6 @@
             class="hidden absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none z-50"
             style="touch-action: auto"
         >
-            <!-- Inner container: clicking inside should NOT close the overlay.
-                 We use an inline stopPropagation handler so the View's click-on-overlay
-                 handler only runs when the backdrop itself is clicked. -->
             <div
                 id="qr-export-inner-container"
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-2xl max-h-96 bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-6 overflow-hidden"
@@ -951,9 +940,6 @@
                 role="dialog"
                 aria-modal="true"
             >
-                <!-- Close control (explicit close button so users don't have to tap backdrop).
-                     The button triggers a programmatic click on the overlay container so the
-                     existing View handler handles the hide/cleanup logic. -->
                 <div class="w-full flex justify-end">
                     <button
                         id="qr-export-close-btn"
@@ -969,7 +955,6 @@
                     </button>
                 </div>
 
-                <!-- Start button to begin QR code display (will be replaced by progress indicators) -->
                 <div
                     class="w-full flex flex-col items-center min-h-[60px] gap-3"
                 >
@@ -988,7 +973,6 @@
                         </button>
                     </div>
 
-                    <!-- Status area updated by the QR export code (e.g. "Page 1 / 3"). -->
                     <div
                         id="qr-export-status"
                         class="text-[#e8e8e8] font-semibold select-none"
@@ -999,8 +983,6 @@
                             id="qr-export-status-text"
                             aria-hidden="false"
                         ></span>
-                        <!-- Hiddenprepared flag for automation / accessibility: the app can reveal this
-                             when the export is fully prepared (useful for keyboard users / AT). -->
                         <span
                             id="qr-export-prepared"
                             class="hidden"
@@ -1019,7 +1001,6 @@
                         </div>
                     </div>
 
-                    <!-- Top progress bar: the single authoritative visual for export progress -->
                     <div
                         id="qr-export-progress-wrap"
                         class="w-full flex justify-center"
@@ -1039,9 +1020,6 @@
                     </div>
                 </div>
 
-                <!-- QR worker slots (kept as separate elements so the QR export code can
-                     rotate canvases into them). The per-canvas numeric labels are hidden
-                     via CSS so the top progress is the only textual indicator. -->
                 <div
                     class="w-full flex items-center justify-center overflow-hidden flex-1"
                 >
@@ -1122,13 +1100,11 @@
                             id="contributors-grid"
                             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                         >
-                            <!-- Contributors will be dynamically inserted here -->
                         </div>
                         <div
                             id="teams-grid"
                             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                         >
-                            <!-- Teams will be dynamically inserted here -->
                         </div>
 
                         <h3 class="text-base text-[#e8e8e8] font-semibold pt-4">
@@ -1138,7 +1114,6 @@
                             id="donators-grid"
                             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                         >
-                            <!-- Donators will be dynamically inserted here -->
                         </div>
                     </div>
                 </div>
@@ -1248,7 +1223,6 @@
                 id="whiteboard-statbotics-container"
                 class="w-full flex-1 min-h-0 m-0 p-0 bg-[#0d0d0d] hidden flex-col overflow-y-auto"
             >
-                <!-- Empty State (shown when no match key) -->
                 <div
                     id="statbotics-empty-state"
                     class="flex flex-col items-center justify-center h-full p-4 md:p-8"
@@ -1264,7 +1238,6 @@
                     </p>
                 </div>
 
-                <!-- Loading State -->
                 <div
                     id="statbotics-loading-state"
                     class="hidden flex-col items-center justify-center h-full p-4 md:p-8"
@@ -1287,13 +1260,11 @@
                     </div>
                 </div>
 
-                <!-- Data Container (shown when match key exists) -->
                 <div
                     id="statbotics-data-container"
                     class="hidden flex-col p-4 md:p-8"
                 >
                     <p id="statbotics-last-updated" class="text-xs text-[#666] text-right mb-2"></p>
-                    <!-- Win Probability Section -->
                     <div
                         class="bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-4 md:p-6 mb-4"
                     >
@@ -1337,7 +1308,6 @@
                                 >--%</span
                             >
                         </div>
-                        <!-- Match Result (inline) -->
                         <div
                             class="text-center mt-3 pt-3 border-t border-[#1e1e1e] hidden"
                         >
@@ -1349,7 +1319,6 @@
                         </div>
                     </div>
 
-                    <!-- Red Alliance Section -->
                     <div
                         class="bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-4 md:p-6 mb-4"
                     >
@@ -1404,7 +1373,6 @@
                         </div>
                     </div>
 
-                    <!-- Blue Alliance Section -->
                     <div
                         class="bg-[#141414] border border-[#1e1e1e] rounded-[6px] p-4 md:p-6 mb-4"
                     >
@@ -1465,7 +1433,6 @@
                         </div>
                     </div>
 
-                    <!-- EPA Details Modal -->
                     <div
                         id="epa-details-modal"
                         class="hidden fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"

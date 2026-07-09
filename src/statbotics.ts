@@ -135,18 +135,11 @@ export interface StatboticsMatchData {
 import { GET, SET } from "./db.ts";
 
 const STATBOTICS_API_BASE = "https://api.statbotics.io/v3";
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export class StatboticsService {
   constructor() {}
 
-  /**
-   * Makes an HTTP request to the Statbotics API, with IndexedDB caching.
-   *
-   * @param endpoint - The API endpoint to request (e.g., "/match/2024ncwak_qm1")
-   * @returns A promise that resolves to the JSON response data
-   * @throws Will throw an error if the API request fails
-   */
   private async makeRequest(endpoint: string, retries = 2): Promise<any> {
     const cacheKey = `sb_${endpoint}`;
     const cached = await GET<{ data: any; ts: number }>(cacheKey);
@@ -177,7 +170,6 @@ export class StatboticsService {
         return data;
       } catch (error) {
         const isApiError = error instanceof Error && error.message.startsWith("Statbotics API error:");
-        // Don't retry 404s or other definitive API errors
         if (isApiError) throw error;
 
         if (attempt < retries) {
@@ -192,24 +184,11 @@ export class StatboticsService {
     }
   }
 
-  /**
-   * Fetches a single match from Statbotics by match key.
-   *
-   * @param matchKey - The match key (e.g., "2024ncwak_qm1").
-   * @returns The match data.
-   */
   public async getMatch(matchKey: string): Promise<StatboticsMatch> {
     const endpoint = `/match/${matchKey}`;
     return await this.makeRequest(endpoint);
   }
 
-  /**
-   * Fetches team match data for a specific team and match.
-   *
-   * @param team - The team number.
-   * @param matchKey - The match key.
-   * @returns The team match data.
-   */
   public async getTeamMatch(
     team: number,
     matchKey: string,
@@ -218,13 +197,6 @@ export class StatboticsService {
     return await this.makeRequest(endpoint);
   }
 
-  /**
-   * Fetches team year data for a specific team and year.
-   *
-   * @param team - The team number.
-   * @param year - The year.
-   * @returns The team year data.
-   */
   public async getTeamYear(
     team: number,
     year: number,
@@ -233,28 +205,11 @@ export class StatboticsService {
     return await this.makeRequest(endpoint);
   }
 
-  /**
-   * Fetches year data including global EPA percentiles.
-   *
-   * @param year - The year.
-   * @returns The year data with percentiles.
-   */
   public async getYear(year: number): Promise<StatboticsYear> {
     const endpoint = `/year/${year}`;
     return await this.makeRequest(endpoint);
   }
 
-  /**
-   * Retrieves comprehensive match data including EPA ratings, win probabilities, and team details.
-   * Aggregates data from multiple Statbotics API endpoints.
-   *
-   * @param matchKey - The TBA match key in format "yearEventKey_compLevel#"
-   * @param redTeams - Array of three red alliance team numbers
-   * @param blueTeams - Array of three blue alliance team numbers
-   * @param year - The competition year (e.g., 2024)
-   * @returns A promise that resolves to comprehensive match data with EPA ratings, win probabilities, and team statistics
-   * @throws Will log warnings if some data cannot be fetched, but returns partial data when possible
-   */
   public async getMatchData(
     matchKey: string,
     redTeams: number[],
@@ -395,13 +350,6 @@ export class StatboticsService {
     }
   }
 
-  /**
-   * Constructs a match key from TBA event key and match name.
-   *
-   * @param eventKey - The TBA event key (e.g., "2024ncwak").
-   * @param matchName - The match name (e.g., "Quals 1" or "Semis 1-2").
-   * @returns The Statbotics match key (e.g., "2024ncwak_qm1").
-   */
   public constructMatchKey(eventKey: string, matchName: string): string {
     const matchPart = matchName.split(" @ ")[0].trim();
 

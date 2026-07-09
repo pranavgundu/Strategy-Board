@@ -34,7 +34,6 @@ body {
     text-size-adjust: 100%;
 }
 
-/* ── Minimalist button utilities ── */
 .btn-accent {
     background: #ebebeb;
     color: #0d0d0d;
@@ -114,7 +113,6 @@ body {
     box-shadow: 0 0 10px rgba(200, 80, 80, 0.2);
 }
 
-/* Early loading screen that shows before the app bundles finish loading */
 #app-loading {
     position: fixed;
     inset: 0;
@@ -257,7 +255,6 @@ body {
     pointer-events: auto;
 }
 
-/* Condensed/ultra variants shrink mode buttons — left/right buttons are unaffected. */
 #whiteboard-toolbar.toolbar-condensed #whiteboard-toolbar-mode-select {
     transform: translate(-50%, -50%) scale(0.92);
 }
@@ -265,18 +262,15 @@ body {
     transform: translate(-50%, -50%) scale(0.85);
 }
 
-/* Ensure right-side buttons don't wrap and avoid overlap */
 #whiteboard-toolbar .toolbar-right button {
     flex-shrink: 0;
     white-space: nowrap;
 }
 
-/* Mode button sizing responsive overrides */
 #whiteboard-toolbar #whiteboard-toolbar-mode-select > button {
     -webkit-font-smoothing: antialiased;
 }
 
-/* For laptops - slightly reduce spacing but keep horizontal layout */
 @media (max-width: 1440px) and (min-width: 1025px) {
     #whiteboard-toolbar {
         gap: 0.5rem;
@@ -302,10 +296,7 @@ body {
     }
 }
 
-
-/* For standard tablets and landscape iPads */
 @media (max-width: 1024px) {
-    /* Keep single-row toolbar; just reduce spacing and sizes */
     #whiteboard-toolbar {
         padding: 0 10px;
     }
@@ -333,7 +324,6 @@ body {
     }
 }
 
-/* Portrait tablets and landscape phones */
 @media (max-width: 834px) {
     #whiteboard-toolbar {
         padding: 0 8px;
@@ -352,7 +342,6 @@ body {
     }
 }
 
-/* Phones */
 @media (max-width: 640px) {
     #whiteboard-toolbar {
         padding: 0 4px;
@@ -378,11 +367,9 @@ body {
     }
 }
 
-/* Extra small phones - improve touch targets and readability */
 @media (max-width: 480px) {
     #whiteboard-toolbar {
-        height: 2.5rem !important; /* Even smaller on very small screens */
-        padding: 0 2px;
+        height: 2.5rem !important;        padding: 0 2px;
     }
     #whiteboard-toolbar .toolbar-right button,
     #whiteboard-toolbar .toolbar-left button {
@@ -400,7 +387,6 @@ body {
     }
 }
 
-/* Very small screens - ensure all content fits */
 @media (max-width: 375px) {
     #home-toolbar {
         padding: 0.5rem;
@@ -409,7 +395,6 @@ body {
         font-size: 1rem !important;
     }
 
-    /* Ultra compact whiteboard toolbar for very small screens */
     #whiteboard-toolbar {
         height: 2.25rem !important;
         padding: 0 1px;
@@ -430,7 +415,6 @@ body {
     }
 }
 
-/* Progress bar / QR overlay animations */
 .qr-progress-wrap {
     width: 90%;
     height: 10px;
@@ -450,10 +434,7 @@ body {
     overflow: hidden;
     will-change: width;
 }
-/* subtle sheen overlay on top of bar */
 .qr-progress-bar::after {
-    /* Single subtle sheen overlay for a continuous, fluid bar appearance.
-       No stripes or animations to avoid visual segmentation on iPads. */
     content: "";
     position: absolute;
     left: 0;
@@ -468,22 +449,18 @@ body {
     opacity: 0.15;
     pointer-events: none;
 }
-/* completed state for a neat glow */
 .qr-progress-bar.complete {
     box-shadow:
         0 0 18px rgba(34, 197, 94, 0.25),
         inset 0 -1px 4px rgba(0, 0, 0, 0.12);
 }
 
-/* Hide the per-worker textual labels that were previously appended next to each canvas;
-           keep the top status/progress bar as the single authoritative progress indicator. */
 #qr-export-code-worker-0 > div,
 #qr-export-code-worker-1 > div,
 #qr-export-code-worker-2 > div {
     display: none !important;
 }
 
-/* Scale QR code canvases to fit within the modal */
 #qr-export-code-worker-0 canvas,
 #qr-export-code-worker-1 canvas,
 #qr-export-code-worker-2 canvas {
@@ -496,7 +473,6 @@ body {
     margin: 0 auto;
 }
 
-/* Small adjustments to ensure the import overlay scales on mobile/ipad */
 #qr-import-inner-container {
     max-width: min(92vw, 820px);
     width: 92vw;
@@ -510,14 +486,12 @@ body {
     }
 }
 
-/* Improve video sizing for QR import on mobile */
 @media (max-width: 640px) {
     #qr-import-video {
         max-height: 40vh !important;
     }
 }
 
-/* Ensure canvas wrapper fills available space */
 #whiteboard-wrapper {
     position: relative;
     overflow: hidden;
@@ -534,13 +508,11 @@ body {
     touch-action: none;
     -webkit-user-select: none;
     user-select: none;
-    /* Hardware acceleration for better mobile performance */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     will-change: transform;
 }
 
-/* Draw config morphing animation */
 #whiteboard-draw-config {
     transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
@@ -564,7 +536,6 @@ body {
     transform: scale(1) rotate(0deg);
 }
 
-/* Color picker glossy effects */
 #whiteboard-color-config {
     transform-origin: bottom center;
     animation: colorPickerSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -613,7 +584,6 @@ body {
         forwards;
 }
 
-/* Yellow appears first (at bottom of container) */
 #whiteboard-color-yellow {
     animation-delay: 0s;
 }
@@ -621,7 +591,6 @@ body {
     animation-delay: 0.2s;
 }
 
-/* Green appears second */
 #whiteboard-color-green {
     animation-delay: 0.05s;
 }
@@ -629,7 +598,6 @@ body {
     animation-delay: 0.15s;
 }
 
-/* Blue appears third */
 #whiteboard-color-blue {
     animation-delay: 0.1s;
 }
@@ -637,7 +605,6 @@ body {
     animation-delay: 0.1s;
 }
 
-/* Red appears fourth */
 #whiteboard-color-red {
     animation-delay: 0.15s;
 }
@@ -645,7 +612,6 @@ body {
     animation-delay: 0.05s;
 }
 
-/* White appears fifth (at top) */
 #whiteboard-color-white {
     animation-delay: 0.2s;
 }
@@ -653,7 +619,6 @@ body {
     animation-delay: 0s;
 }
 
-/* Close button appears with white */
 #whiteboard-color-close {
     animation-delay: 0.2s;
 }
@@ -708,20 +673,17 @@ body {
         inset 0 -2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Toolbar button transitions */
 #whiteboard-toolbar-back,
 #whiteboard-toolbar-undo,
 #whiteboard-toolbar-view-toggle {
     transition: all 0.2s ease;
 }
 
-/* Undo button disabled state */
 #whiteboard-toolbar-undo[style*="opacity: 0.5"] {
     pointer-events: none;
     filter: grayscale(0.5);
 }
 
-/* glass-button: stripped — kept for whiteboard compatibility but no longer decorative */
 .glass-button {
     border: none;
     box-shadow: none;
@@ -741,7 +703,6 @@ body {
     box-shadow: none;
 }
 
-/* Match item hover effect */
 #home-match-list > div:hover {
     background-color: #191919;
     border-color: #333;
@@ -754,7 +715,6 @@ body {
     transition: all 0.2s ease;
 }
 
-/* 3-dot menu button in match list items */
 .match-menu-btn {
     transition: background 0.15s ease, filter 0.2s ease;
     cursor: pointer;
@@ -776,7 +736,6 @@ body {
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
-/* Whiteboard corner buttons */
 #whiteboard-draw-config {
     transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
@@ -787,7 +746,6 @@ body {
     cursor: pointer;
 }
 
-/* Color swatches */
 #whiteboard-color-config > div {
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
@@ -797,7 +755,6 @@ body {
     cursor: pointer;
 }
 
-/* Color panel close button hover */
 #whiteboard-color-close:hover {
     border-color: #8a3030 !important;
     background: #2a0f0f !important;
@@ -820,7 +777,6 @@ body {
     box-shadow: none;
 }
 
-/* Landscape orientation warning for mobile devices */
 #orientation-warning {
     display: none;
     position: fixed;
@@ -890,14 +846,12 @@ body {
     display: none !important;
 }
 
-/* Show warning only on mobile devices in portrait mode */
 @media (max-width: 1024px) and (orientation: portrait) {
     #orientation-warning:not(.dismissed) {
         display: flex !important;
     }
 }
 
-/* Mobile-friendly home screen buttons */
 @media (max-width: 834px) {
     #home-toolbar {
         gap: 0.5rem;
@@ -969,7 +923,6 @@ body {
     }
 }
 
-/* Landscape optimizations for mobile */
 @media (max-width: 1024px) and (orientation: landscape) {
     #home-toolbar {
         height: 3.5rem !important;
@@ -980,7 +933,6 @@ body {
         min-height: 3rem !important;
     }
 
-    /* Make better use of screen space in landscape */
     #home-match-list {
         padding: 0.75rem;
     }
@@ -1077,10 +1029,8 @@ body {
     }
 }
 
-/* glossy-shine: stripped */
 .glossy-shine { }
 
-/* Statbotics container - ensure no scrolling and content fits */
 body #whiteboard-statbotics-container {
     overflow: hidden;
 }
@@ -1089,7 +1039,6 @@ body #whiteboard-statbotics-container {
     overflow: hidden;
 }
 
-/* Statbotics container - allow scrolling for overflow content */
 body #whiteboard-statbotics-container {
     overflow-y: auto;
     overflow-x: hidden;
@@ -1099,7 +1048,6 @@ body #whiteboard-statbotics-container {
     overflow: visible;
 }
 
-/* EPA card hover effect */
 [data-team-index] {
     transition: all 0.2s ease;
 }
@@ -1109,7 +1057,6 @@ body #whiteboard-statbotics-container {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* EPA Details Modal */
 #epa-details-modal {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -1130,18 +1077,15 @@ body #whiteboard-statbotics-container {
     }
 }
 
-
 .glossy-shine::before { display: none; }
 .glossy-shine:hover::before { display: none; }
 .glossy-shine::after { display: none; }
 
-/* Frosted glass effect for backdrops */
 .backdrop-blur-xs {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* TBA dropdown styles */
 .tba-dropdown-item {
     padding: 10px 12px;
     cursor: pointer;
@@ -1259,22 +1203,18 @@ body #whiteboard-statbotics-container {
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
-/* Ensure proper scrolling on all mobile devices */
 .overflow-y-auto {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
 }
 
-/* Fix for iOS Safari address bar hiding */
 @supports (-webkit-touch-callout: none) {
-    /* Use 100dvh which handles dynamic viewport correctly on modern iOS/iPadOS */
     html,
     body {
         height: 100dvh;
         min-height: 100dvh;
     }
 
-    /* Ensure containers fill the viewport without gaps on iOS/iPadOS */
     #home-container,
     #whiteboard-container {
         height: 100%;
@@ -1282,15 +1222,12 @@ body #whiteboard-statbotics-container {
     }
 }
 
-/* iOS PWA safe area improvements */
 @media (max-width: 640px) {
-    /* Ensure modals don't go under notches */
     .glass-modal {
         margin-top: env(safe-area-inset-top);
         margin-bottom: env(safe-area-inset-bottom);
     }
 
-    /* Ensure whiteboard controls respect safe areas */
     #whiteboard-draw-config {
         right: max(0.75rem, env(safe-area-inset-right)) !important;
         bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
@@ -1310,21 +1247,18 @@ body #whiteboard-statbotics-container {
     }
 }
 
-/* Improve modal responsiveness on very small screens */
 @media (max-height: 600px) {
     .glass-modal {
         max-height: 95vh !important;
     }
 }
 
-/* Better modal sizing and spacing on mobile */
 @media (max-width: 640px) {
     .glass-modal {
         max-height: 92vh !important;
         width: 95vw !important;
     }
 
-    /* Create match panel mobile optimization */
     #create-match-container .glass-modal {
         padding: 0.5rem !important;
     }
@@ -1350,7 +1284,6 @@ body #whiteboard-statbotics-container {
         font-size: 1rem !important;
     }
 
-    /* TBA import panel mobile optimization */
     #tba-import-container .glass-modal {
         width: 96vw !important;
     }
@@ -1366,7 +1299,6 @@ body #whiteboard-statbotics-container {
         font-size: 1rem !important;
     }
 
-    /* Clear confirm dialog mobile optimization */
     #clear-confirm-container .glass-modal {
         width: 90vw !important;
     }
@@ -1405,7 +1337,6 @@ body #whiteboard-statbotics-container {
     }
 }
 
-/* Match list items mobile optimization */
 @media (max-width: 640px) {
     #home-match-list {
         padding: 0.75rem !important;
@@ -1428,7 +1359,6 @@ body #whiteboard-statbotics-container {
         position: relative;
     }
 
-    /* Make name take more space on mobile */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1440,7 +1370,6 @@ body #whiteboard-statbotics-container {
         max-width: none !important;
     }
 
-    /* Make team numbers section narrower on mobile */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1451,7 +1380,6 @@ body #whiteboard-statbotics-container {
         max-width: 200px !important;
     }
 
-    /* Better spacing for VS display */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1469,7 +1397,6 @@ body #whiteboard-statbotics-container {
         font-size: 0.875rem !important;
     }
 
-    /* Action buttons container */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1478,7 +1405,6 @@ body #whiteboard-statbotics-container {
         flex: 0 0 auto !important;
     }
 
-    /* Larger touch target for kebab menu */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1489,7 +1415,6 @@ body #whiteboard-statbotics-container {
         min-height: 2.5rem !important;
     }
 
-    /* Better action button sizing - override template font sizes */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1596,13 +1521,11 @@ body #whiteboard-statbotics-container {
     }
 }
 
-/* Fix for horizontal overflow on mobile */
 @media (max-width: 640px) {
     * {
         max-width: 100vw;
     }
 
-    /* Allow specific elements to have full width */
     canvas,
     img,
     video {
@@ -1610,22 +1533,18 @@ body #whiteboard-statbotics-container {
     }
 }
 
-/* Better touch interaction for buttons */
 button,
 a,
 [role="button"] {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
     touch-action: manipulation;
-    /* Ensure minimum touch target size */
     min-height: 44px;
     min-width: 44px;
-    /* Improve performance on mobile */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     will-change: transform;
 }
 
-/* Improve touch scrolling on mobile */
 #home-match-list,
 #tba-event-list,
 #tba-team-list,
@@ -1635,7 +1554,6 @@ a,
     scroll-behavior: smooth;
 }
 
-/* Prevent text selection during touch interactions */
 .touch-none,
 .select-none {
     -webkit-user-select: none;
@@ -1643,7 +1561,6 @@ a,
     -webkit-touch-callout: none;
 }
 
-/* Better active state for touch */
 button:active,
 a:active,
 [role="button"]:active {
@@ -1651,7 +1568,6 @@ a:active,
     transform: scale(0.98);
 }
 
-/* Ensure clickable areas are large enough on mobile */
 @media (max-width: 640px) {
     button,
     a,
@@ -1661,7 +1577,6 @@ a:active,
         padding: 0.5rem 0.75rem;
     }
 
-    /* Even larger for primary actions */
     #create-match-create-btn,
     #create-match-cancel-btn,
     #tba-import-btn,
@@ -1676,7 +1591,6 @@ a:active,
         min-height: 48px !important;
     }
 
-    /* Better tap feedback for cards */
     #home-match-list
         > div:not(#home-match-list-empty-placeholder):not(
             #home-match-list-item-template
@@ -1686,7 +1600,6 @@ a:active,
     }
 }
 
-/* Prevent zoom on input focus for iOS */
 @media screen and (max-width: 768px) {
     input,
     select,
@@ -1695,42 +1608,34 @@ a:active,
     }
 }
 
-/* Tablet-specific optimizations */
 @media (min-width: 768px) and (max-width: 1024px) {
-    /* Better toolbar spacing on tablets */
     #home-toolbar {
         padding: 1rem 1.5rem;
     }
 
-    /* Optimize match list for tablet screens */
     #home-match-list {
         gap: 0.75rem;
         padding: 1.5rem;
     }
 
-    /* Better modal sizing on tablets */
     .glass-modal {
         max-width: 85vw !important;
     }
 }
 
-/* Whiteboard canvas responsive improvements */
 @media (max-width: 1024px) {
     #whiteboard-draw-config,
     #whiteboard-color-config {
-        /* Make controls slightly larger on touch devices */
         transform: scale(1.15);
     }
 
     #whiteboard-number-pad {
-        /* Better positioning on small screens */
         bottom: 4rem;
         right: 0.5rem;
     }
 }
 
 @media (max-width: 640px) {
-    /* Larger, more touch-friendly whiteboard controls */
     #whiteboard-draw-config {
         width: 3.5rem !important;
         height: 3.5rem !important;
@@ -1765,7 +1670,6 @@ a:active,
         font-size: 1.25rem !important;
     }
 
-    /* Number pad mobile optimization */
     #whiteboard-number-pad {
         bottom: 4.5rem !important;
         right: 0.75rem !important;
@@ -1814,16 +1718,13 @@ a:active,
     }
 }
 
-/* High-DPI display improvements */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    /* Ensure crisp rendering on retina displays */
     canvas {
         image-rendering: -webkit-optimize-contrast;
         image-rendering: crisp-edges;
     }
 }
 
-/* Improve text readability on all devices */
 @media screen {
     html {
         -webkit-text-size-adjust: 100%;
@@ -1832,7 +1733,6 @@ a:active,
     }
 }
 
-/* Better dropdown sizing on mobile */
 @media (max-width: 640px) {
     #tba-event-dropdown,
     #tba-team-dropdown {
@@ -1847,7 +1747,6 @@ a:active,
     }
 }
 
-/* Contributors modal responsive improvements */
 @media (max-width: 768px) {
     #contributors-inner-container {
         width: 95vw !important;
@@ -1863,7 +1762,6 @@ a:active,
     }
 }
 
-/* Ultra-small landscape screens (small phones in landscape) */
 @media (max-width: 653px) and (max-height: 280px) {
     #home-toolbar {
         height: 2.5rem !important;
@@ -1894,7 +1792,6 @@ a:active,
     }
 }
 
-/* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
@@ -1917,7 +1814,6 @@ a:active,
     text-rendering: optimizeLegibility;
 }
 
-/* Strategy Board logo hover glow effect */
 #home-toolbar-logo {
     transition: all 0.3s ease-in-out;
 }
@@ -1930,7 +1826,6 @@ a:active,
         0 0 40px rgba(255, 255, 255, 0.2);
 }
 
-/* Special team digit animation */
 .special-team-digit {
     display: inline-block;
     animation: gold-glow 2s ease-in-out infinite;
@@ -1954,7 +1849,6 @@ a:active,
     }
 }
 
-/* Rainbow team digit animation (for teams 467 and 834) */
 .rainbow-team-digit {
     display: inline-block;
     animation: rainbow-glow 2s ease-in-out infinite;
@@ -1965,26 +1859,19 @@ a:active,
         color: inherit;
     }
     10% {
-        color: #ef4444; /* red */
-    }
+        color: #ef4444;    }
     20% {
-        color: #f97316; /* orange */
-    }
+        color: #f97316;    }
     30% {
-        color: #eab308; /* yellow */
-    }
+        color: #eab308;    }
     40% {
-        color: #22c55e; /* green */
-    }
+        color: #22c55e;    }
     50% {
-        color: #3b82f6; /* blue */
-    }
+        color: #3b82f6;    }
     60% {
-        color: #8b5cf6; /* purple */
-    }
+        color: #8b5cf6;    }
     70% {
-        color: #ec4899; /* pink */
-    }
+        color: #ec4899;    }
     80% {
         color: inherit;
     }
@@ -1993,7 +1880,6 @@ a:active,
     }
 }
 
-/* 1.5x scale for import/export popup content (not homepage buttons) */
 #tba-import-container > div,
 #link-import-container > div,
 #share-success-container > div,
@@ -2003,7 +1889,6 @@ a:active,
     transform-origin: center center;
 }
 
-/* Keep enlarged popups usable on smaller screens */
 @media (max-width: 1024px) {
     #tba-import-container > div,
     #link-import-container > div,
