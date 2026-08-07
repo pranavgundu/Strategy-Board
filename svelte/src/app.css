@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/*
+ * Breakpoints: intentionally NOT overriding --breakpoint-md/--breakpoint-lg.
+ * The old stylesheet set them to 60rem/80rem (960px/1280px), but nearly
+ * every `sm:`/`md:`/`lg:` class in the markup (modal widths, toolbar
+ * paddings, etc.) was written assuming Tailwind's *default* scale
+ * (sm:640, md:768, lg:1024, xl:1280, 2xl:1536) - the override silently
+ * shifted those breakpoints out from under the markup. Dropping it lets
+ * the default scale apply, and the handful of breakpoints from the old
+ * hand-written media queries that don't land on a named step (834px,
+ * 480px, 375px) are expressed as Tailwind arbitrary variants
+ * (`max-[834px]:...`) directly in component markup instead of new raw
+ * `@media` blocks - one system, defined in one place, instead of ~40
+ * scattered rules disagreeing with @theme.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  font-size: 16px;
+  -webkit-overflow-scrolling: touch;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@supports (-webkit-touch-callout: none) {
+  html,
+  body {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+
+  #home-container,
+  #whiteboard-container {
+    height: 100%;
+    min-height: 100%;
+  }
+}
+
+/* Shared button styles used across many components. */
+.btn-accent {
+  background: #ebebeb;
+  color: #0d0d0d;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.btn-accent:hover {
+  background: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary {
+  background: #181818;
+  color: #999;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.btn-secondary:hover {
+  background: #252525;
+  color: #e8e8e8;
+  border-color: #555;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+}
+
+.btn-danger {
+  background: transparent;
+  color: #b87070;
+  border: 1px solid #4a2020;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.btn-danger:hover {
+  background: #2a0f0f;
+  border-color: #8a3030;
+  color: #e89090;
+  box-shadow: 0 0 10px rgba(200, 80, 80, 0.2);
+}
+
+.mode-btn {
+  background: #181818;
+  color: #888;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: clamp(0.65rem, 1.1vw, 1.1rem);
+  letter-spacing: 0.06em;
+  padding: clamp(0.25rem, 0.5vw, 0.6rem) clamp(0.5rem, 1.1vw, 1.4rem);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+  white-space: nowrap;
+}
+.mode-btn:hover {
+  background: #252525;
+  color: #e8e8e8;
+  border-color: #555;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
+}
+.mode-btn.mode-btn-active {
+  background: #ebebeb;
+  color: #0d0d0d;
+  border-color: #ebebeb;
+  font-weight: 700;
+}
+.mode-btn.mode-btn-active:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+/* Touch-target sizing. Fixed defect: this used to apply unconditionally,
+   which made desktop footer text links render as 44x44 boxes. Now gated
+   to coarse pointers (touch devices) only. */
+@media (pointer: coarse) {
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+  touch-action: manipulation;
+  transform: translateZ(0);
+}
+
+button:active,
+a:active,
+[role="button"]:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.touch-none,
+.select-none {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Supplemental momentum/overscroll behavior for scroll containers.
+   Deliberately a *different* class name from Tailwind's `overflow-y-auto`
+   utility (which the old sheet redefined in place, silently beating
+   Tailwind's own rule) - apply both classes together in markup instead:
+   class="overflow-y-auto scroll-momentum" */
+.scroll-momentum {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  input,
+  select,
+  textarea {
+    color-scheme: dark;
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
