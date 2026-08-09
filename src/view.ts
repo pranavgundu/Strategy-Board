@@ -1849,6 +1849,7 @@ export class View {
 
     newMatch.auto = JSON.parse(JSON.stringify(match.auto));
     newMatch.teleop = JSON.parse(JSON.stringify(match.teleop));
+    newMatch.transition = JSON.parse(JSON.stringify(match.transition));
     newMatch.endgame = JSON.parse(JSON.stringify(match.endgame));
 
     await this.model.updateMatch(newId);

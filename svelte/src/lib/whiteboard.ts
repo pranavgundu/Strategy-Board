@@ -244,9 +244,15 @@ export type WhiteboardMode =
 export type WhiteboardTool = "marker" | "eraser";
 
 export interface WhiteboardOptions {
+  /**
+   * When false, the renderer does not attach listeners to the legacy
+   * fixed-ID toolbar markup. Defaults to true so existing callers are
+   * unaffected. Pass false when rendering your own toolbar.
+   */
   bindLegacyDOM?: boolean;
 }
 
+/** Snapshot of the renderer's UI-facing state, delivered to onChange listeners. */
 export interface WhiteboardState {
   mode: WhiteboardMode;
   tool: WhiteboardTool;
@@ -385,6 +391,16 @@ export class Whiteboard {
     }
   }
 
+  /**
+   * Binds this renderer to the legacy fixed-ID toolbar markup
+   * (#whiteboard-toolbar-*, #whiteboard-color-*, #whiteboard-draw-config*,
+   * #whiteboard-number-pad).
+   *
+   * Called automatically by the constructor unless `bindLegacyDOM: false` is
+   * passed. Consumers that render their own toolbar (e.g. the Svelte port)
+   * should opt out and drive the renderer through the public API
+   * (setMode/setTool/setColor/undo/redo/onChange) instead.
+   */
   public bindLegacyDOM(): void {
     this.domBound = true;
 
@@ -854,10 +870,20 @@ export class Whiteboard {
     );
   }
 
+  // ---------------------------------------------------------------------
+  // Public API
+  //
+  // Lets a consumer that renders its own toolbar drive the renderer without
+  // the legacy fixed-ID markup. Pair with `new Whiteboard(model, {
+  // bindLegacyDOM: false })`.
+  // ---------------------------------------------------------------------
+
+  /** Current phase, or "statbotics" for the analytics view. */
   public getMode(): WhiteboardMode {
     return this.mode as WhiteboardMode;
   }
 
+  /** Select a phase (or the statbotics view). Mirrors a toolbar mode click. */
   public setMode(mode: WhiteboardMode): void {
     if (this.mode === mode) return;
     this.toggleMode(mode);
@@ -868,12 +894,14 @@ export class Whiteboard {
     return this.currentTool as WhiteboardTool;
   }
 
+  /** Switch between marker and eraser. */
   public setTool(tool: WhiteboardTool): void {
     if (this.currentTool === tool) return;
     this.toggleMarkerEraser();
     this.notifyChange();
   }
 
+  /** Stroke color index: 0 white, 1 red, 2 blue, 3 green, 4 yellow. */
   public getColor(): number {
     return this.currentColor;
   }
@@ -892,6 +920,7 @@ export class Whiteboard {
     return this.getCurrentRedoHistory().length > 0;
   }
 
+  /** Snapshot of everything a toolbar needs to render itself. */
   public getState(): WhiteboardState {
     return {
       mode: this.getMode(),
@@ -902,6 +931,10 @@ export class Whiteboard {
     };
   }
 
+  /**
+   * Subscribe to state changes (mode/tool/color/undo/redo availability).
+   * Returns an unsubscribe function.
+   */
   public onChange(listener: (state: WhiteboardState) => void): () => void {
     this.changeListeners.push(listener);
     this.emitTo(listener, this.getState());
@@ -918,6 +951,8 @@ export class Whiteboard {
     try {
       listener(state);
     } catch (err) {
+      // A misbehaving consumer must not break rendering or starve the other
+      // listeners, including on the initial snapshot delivered by onChange.
       console.error("Whiteboard onChange listener threw:", err);
     }
   }
@@ -925,6 +960,7 @@ export class Whiteboard {
   private notifyChange(): void {
     if (this.changeListeners.length === 0) return;
     const state = this.getState();
+    // Copy: a listener may unsubscribe itself during iteration.
     for (const listener of [...this.changeListeners]) {
       this.emitTo(listener, state);
     }

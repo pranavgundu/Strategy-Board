@@ -33,7 +33,10 @@
         if (l) l.classList.remove("is-hidden");
         if (text) setLoadingMessage(text);
     }
+    var debugEnabled = /[?&]debug\b/.test(location.search);
+
     function showOverlay() {
+        if (!debugEnabled) return;
         var o = qs("app-debug-overlay");
         if (o) o.classList.remove("hidden");
     }
@@ -240,58 +243,6 @@
         downloadDataUrl(dataUrl, filename || "strategy-board.png");
     }
 
-    function exportPDF() {
-        var c = compositeCanvases();
-        if (!c) {
-            alert("Export failed: canvases not available");
-            return;
-        }
-        var dataUrl = c.toDataURL("image/png");
-
-        var w = window.open("", "_blank");
-        if (!w) {
-            alert(
-                "Popup blocked. Please allow popups to export as PDF.",
-            );
-            return;
-        }
-        w.document.write(
-            "<!doctype html><html><head><title>Strategy Board Export</title>",
-        );
-        w.document.write('</head><body style="margin:0">');
-        w.document.write(
-            '<img src="' +
-                dataUrl +
-                '" style="width:100%;height:auto;display:block" />',
-        );
-        w.document.write("</body></html>");
-        w.document.close();
-        w.focus();
-
-        var img = w.document.querySelector("img");
-        if (img) {
-            img.onload = function () {
-                setTimeout(function () {
-                    try {
-                        w.print();
-                    } catch (err) {}
-                    try {
-                        w.close();
-                    } catch (err) {}
-                }, 250);
-            };
-        } else {
-            setTimeout(function () {
-                try {
-                    w.print();
-                } catch (err) {}
-                try {
-                    w.close();
-                } catch (err) {}
-            }, 500);
-        }
-    }
-
     function attachHandlers() {
         var exportOverlay = document.getElementById(
             "qr-export-container",
@@ -324,7 +275,6 @@
     }
 
     window.exportPNG = exportPNG;
-    window.exportPDF = exportPDF;
 
     if (document.readyState === "loading") {
         document.addEventListener(
