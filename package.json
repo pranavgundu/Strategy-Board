@@ -40,7 +40,7 @@
     "@eslint/js": "^10.0.1",
     "@tauri-apps/cli": "^2.11.4",
     "@types/marked": "^6.0.0",
-    "@types/node": "^25.9.1",
+    "@types/node": "^26.1.1",
     "@types/qrcode": "^1.5.6",
     "@typescript/typescript6": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.7",
@@ -52,8 +52,8 @@
     "typescript-eslint": "^8.60.0",
     "vite": "^8.0.14",
     "vite-plugin-pwa": "^1.3.0",
-    "vite-plugin-static-copy": "^4.1.0",
-    "vitest": "^4.1.7",
+    "vite-plugin-static-copy": "^4.1.1",
+    "vitest": "^4.1.10",
     "workbox-window": "^7.4.1"
   },
   "ignoredBuiltDependencies": [
@@ -68,17 +68,17 @@
     "serialize-javascript": ">=7.0.3"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "es-abstract": "^1.24.2",
-    "firebase": "^12.14.0",
-    "idb-keyval": "^6.2.4",
+    "firebase": "^12.16.0",
+    "idb-keyval": "^6.3.0",
     "jspdf": "^4.2.1",
-    "marked": "^18.0.4",
+    "marked": "^18.0.7",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
-    "tailwindcss": "^4.3.0",
-    "uuid": "^14.0.0"
+    "tailwindcss": "^4.3.3",
+    "uuid": "^14.0.1"
   }
 }
