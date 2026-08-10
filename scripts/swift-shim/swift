@@ -1,0 +1,25 @@
+#!/bin/sh
+# Forces SwiftPM's legacy "native" build system for `swift build`.
+#
+# Why: tauri's build script links its Swift package via swift-rs, which passes
+# the iOS SDK and target triple through `-Xswiftc -sdk/-target`. Swift 6.2+
+# defaults to the `swiftbuild` engine, which appends its own
+# `-sdk <MacOSX.sdk> -target arm64-apple-macos*` *after* those flags, so the
+# macOS SDK wins and the iOS build dies compiling WebKit/CoreImage
+# ("'OpenGLES/EAGL.h' file not found"). The native build system honours the
+# overrides, so iOS links correctly.
+#
+# Used by the ios:* scripts in package.json, which prepend this directory to
+# PATH. Drop it once swift-rs supports the swiftbuild engine.
+
+case " $* " in
+  *" --build-system "*) ;;
+  *)
+    if [ "$1" = "build" ]; then
+      shift
+      exec /usr/bin/swift build --build-system native "$@"
+    fi
+    ;;
+esac
+
+exec /usr/bin/swift "$@"

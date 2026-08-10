@@ -3,7 +3,7 @@
   import "../app.css";
   import { app } from "$lib/stores/app.svelte";
   import { native } from "$lib/native/api";
-  import { dismissRelease, isNativeRuntime, isReleaseDismissed, loadTeamNumber, parseShareCode, removeShareCodeFromUrl, saveTeamNumber } from "$lib/features";
+  import { buildCommit, dismissRelease, isNativeRuntime, isReleaseDismissed, loadTeamNumber, parseShareCode, removeShareCodeFromUrl, saveTeamNumber, timeAgo } from "$lib/features";
   import AppLoading from "$lib/components/AppLoading.svelte";
   import ConfirmModal from "$lib/components/ConfirmModal.svelte";
   import ContributorsModal from "$lib/components/ContributorsModal.svelte";
@@ -180,17 +180,61 @@
 <OrientationWarning />
 
 {#if app.screen === "home"}
-  <div class="app-shell">
+  <div id="home-container" class="flex flex-col w-full h-full touch-none">
     <HomeToolbar onNew={() => createOpen = true} onTba={() => tbaOpen = true} onImportQr={() => qrImportOpen = true} onImportLink={() => linkOpen = true} onClear={() => clearOpen = true} />
     <MatchList {matches} onOpen={(match) => app.openMatch(match.id)} onEdit={(match) => editing = match} onDuplicate={(match) => app.duplicateMatch(match.id)} onExportPng={(match) => { app.openMatch(match.id); pngRequest += 1; }} onExportQr={(match) => qrMatch = match} onShare={share} onDelete={(match) => app.deleteMatch(match.id)} />
-    <footer class="app-footer"><div class="footer-links"><a href="https://github.com/pranavgundu/Strategy-Board" target="_blank" rel="noreferrer">GitHub</a><a href="mailto:pranav@strategyboard.app">Contact</a></div><button class="footer-community" onclick={() => contributorsOpen = true}><span class="status-dot" aria-hidden="true"></span>Built with the FRC community</button></footer>
+    <div
+      id="home-bottom-bar"
+      class="w-full bg-[#0d0d0d] flex items-center justify-center border-t border-[#1a1a1a] relative"
+      style="min-height: 4rem; padding-top: env(safe-area-inset-bottom, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);"
+    >
+      <div class="flex items-center justify-center gap-4">
+        <a
+          href="https://github.com/pranavgundu/Strategy-Board"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center text-[#999] hover:text-[#ccc] transition-colors"
+          aria-label="GitHub"
+        >
+          <i class="fab fa-github text-2xl leading-none"></i>
+        </a>
+        <a
+          href="mailto:pranav@strategyboard.app"
+          class="flex items-center justify-center text-[#999] hover:text-[#ccc] transition-colors"
+          aria-label="Contact"
+        >
+          <i class="fas fa-envelope text-2xl leading-none"></i>
+        </a>
+      </div>
+      <div id="last-commit-info" class="absolute left-6 text-[#999] text-xs" style="top: 50%; transform: translateY(-50%);">
+        <a
+          href={buildCommit.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-[#999] transition-colors flex items-center gap-2"
+          title="latest commit: {buildCommit.message}"
+        >
+          <span class="font-mono">{buildCommit.sha}</span>
+          <span>•</span>
+          <span>{timeAgo(new Date(buildCommit.date))}</span>
+        </a>
+      </div>
+      <button
+        id="contributors-link-btn"
+        class="absolute right-6 flex items-center text-[#999] hover:text-[#ccc] transition-colors text-base"
+        style="top: 50%; transform: translateY(-50%);"
+        onclick={() => contributorsOpen = true}
+      >
+        strategyboard.app
+      </button>
+    </div>
   </div>
 {/if}
 
 <WhiteboardScreen {pngRequest} onNotice={notice} />
 <MatchEditorModal open={createOpen} onSave={create} onClose={() => createOpen = false} />
 <MatchEditorModal open={editing !== null} match={editing} onSave={save} onClose={() => editing = null} />
-<ConfirmModal open={clearOpen} title="Clear all matches?" message="This permanently deletes every saved match and its whiteboard data." confirmLabel="Clear all" destructive onConfirm={async () => { await app.clearAll(); clearOpen = false; }} onClose={() => clearOpen = false} />
+<ConfirmModal open={clearOpen} title="Clear All Data?" message="This will permanently delete all matches and data. This action cannot be undone." confirmLabel="Clear All" destructive onConfirm={async () => { await app.clearAll(); clearOpen = false; }} onClose={() => clearOpen = false} />
 <TbaImportModal open={tbaOpen} onImport={importTba} onClose={() => tbaOpen = false} />
 <LinkImportModal open={linkOpen} onClose={() => linkOpen = false} onImport={importLink} />
 <QrImportModal open={qrImportOpen} onImport={importQr} onNotice={notice} onClose={() => qrImportOpen = false} />
@@ -200,3 +244,23 @@
 <ReleaseAnnouncementModal open={releaseOpen} announcement={releaseAnnouncement} onDismiss={dismissAnnouncement} onClose={() => releaseOpen = false} />
 <TeamNumberModal open={teamOpen} onSave={saveTeam} />
 {#if toast}<button class="toast" onclick={() => toast = ""} aria-live="polite">{toast}</button>{/if}
+
+<style>
+  /* Transient status messages have no pre-rewrite counterpart; styled to match
+     the surrounding surfaces rather than introduce a new palette. */
+  .toast {
+    position: fixed;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    left: 50%;
+    z-index: 99998;
+    max-width: calc(100vw - 2rem);
+    padding: 0.75rem 1.25rem;
+    transform: translateX(-50%);
+    color: #e8e8e8;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    background: #141414;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+</style>

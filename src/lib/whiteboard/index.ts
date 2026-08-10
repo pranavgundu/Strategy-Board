@@ -111,6 +111,8 @@ export class WhiteboardController {
     this.redrawAll(); this.emitState();
   }
   getMatch(): WhiteboardMatch | null { return this.match; }
+  /** Field artwork year in use; phase labels differ from 2026 onward. */
+  getCurrentFieldYear(): number | undefined { return this.fieldYear(); }
   getState(): WhiteboardState { return { mode: this.mode, tool: this.tool, color: this.color, view: this.view, canUndo: this.canUndo(), canRedo: this.canRedo(), isCanvasVisible: this.mode !== "statbotics" }; }
   setMode(mode: WhiteboardMode): void {
     if (this.mode === mode) return;
