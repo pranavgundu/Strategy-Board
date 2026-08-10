@@ -1,1 +1,7 @@
-<div class="app-loading" role="status" aria-label="Loading Strategy Board"><img src="/icon-512.png" alt="" /><div class="loading-copy"><strong>Strategy Board</strong><span>Preparing your workspace…</span></div><div class="loading-track" aria-hidden="true"><span></span></div></div>
+<div id="app-loading" role="status" aria-live="polite">
+  <div class="loading-card">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <div class="loading-title">Strategy Board</div>
+    <div id="app-loading-message" class="loading-subtitle">Loading the playbook...</div>
+  </div>
+</div>

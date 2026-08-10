@@ -1,55 +1,103 @@
 <script lang="ts">
+  import { loadContributorTeams } from "$lib/features";
   import type { Match } from "./types";
+
   let { matches, onOpen, onEdit, onDuplicate, onExportPng, onExportQr, onShare, onDelete }: { matches: Match[]; onOpen: (match: Match) => void; onEdit: (match: Match) => void; onDuplicate: (match: Match) => void; onExportPng: (match: Match) => void; onExportQr: (match: Match) => void; onShare: (match: Match) => void; onDelete: (match: Match) => void } = $props();
-  let menuId = $state<string | null>(null);
-  const alliance = (match: Match, colour: "red" | "blue") => colour === "red" ? [match.redOne, match.redTwo, match.redThree] : [match.blueOne, match.blueTwo, match.blueThree];
+
+  const GOLD_TEAM = "834";
+  let openId = $state<string | null>(null);
+  let contributorTeams = $state<string[]>([]);
+
+  $effect(() => { void loadContributorTeams().then((teams) => (contributorTeams = teams), () => {}); });
+
+  /** Matches the original: team 834 pulses gold, contributor teams cycle rainbow. */
+  function animationOf(team: string): "rainbow" | "gold" | "none" {
+    if (team === GOLD_TEAM) return "gold";
+    if (contributorTeams.includes(team)) return "rainbow";
+    return "none";
+  }
+
+  // Red is listed right-to-left so the alliances mirror across the "VS" divider.
+  const redTeams = (match: Match) => [match.redThree, match.redTwo, match.redOne];
+  const blueTeams = (match: Match) => [match.blueOne, match.blueTwo, match.blueThree];
+
+  function open(match: Match) { if (openId !== match.id) onOpen(match); }
+  function closeActions(event: FocusEvent) {
+    const item = event.currentTarget as HTMLElement;
+    if (item.contains(event.relatedTarget as Node)) return;
+    openId = null;
+  }
+  function run(action: (match: Match) => void, match: Match) { openId = null; action(match); }
 </script>
 
-<main class="match-list" aria-label="Saved matches">
+{#snippet teamList(teams: string[], baseColor: string)}
+  {#each teams as team, teamIndex}{#if teamIndex > 0}{" "}{/if}<span class={baseColor}
+    >{#if animationOf(team) === "none"}{team}{:else}{#each team.split("") as digit, digitIndex}<span
+          class={animationOf(team) === "rainbow" ? "rainbow-team-digit" : "special-team-digit"}
+          style="animation-delay: {digitIndex * 0.3}s;">{digit}</span
+        >{/each}{/if}</span
+  >{/each}
+{/snippet}
+
+<div
+  id="home-match-list"
+  class="w-full p-10 flex-1 flex flex-col gap-3 items-stretch overflow-y-auto bg-[#0d0d0d]"
+  class:match-list-actions-open={openId !== null}
+>
   {#if matches.length === 0}
-    <section class="empty-state">
-      <div class="empty-illustration" aria-hidden="true"><span></span><span></span><span></span></div>
-      <p class="eyebrow">Your strategy starts here</p>
-      <h1>Plan your next match</h1>
-      <p>Create a match or import a schedule from The Blue Alliance, then map every phase on the field.</p>
-    </section>
-  {:else}
-    <header class="match-list-header">
-      <div><p class="eyebrow">Saved workspace</p><h1>Match plans</h1></div>
-      <span class="match-count">{matches.length} {matches.length === 1 ? "match" : "matches"}</span>
-    </header>
-    {#each matches as match (match.id)}
-      <article class="match-card">
-        <button class="match-summary" onclick={() => onOpen(match)} aria-label={`Open ${match.matchName || "untitled match"}`}>
-          <span class="match-identity">
-            <span class="match-source">{match.tbaMatchKey ? "TBA match" : "Strategy plan"}</span>
-            <strong>{match.matchName || "Untitled match"}</strong>
-            {#if match.tbaMatchKey}<small>{match.tbaMatchKey}</small>{/if}
-          </span>
-          <span class="alliance-matchup">
-            <span class="alliance-block red-alliance">
-              <span class="alliance-label">Red</span>
-              <span class="team-row">{#each alliance(match, "red") as team}<span class:team-empty={!team} class="team-number">{team || "—"}</span>{/each}</span>
-            </span>
-            <span class="versus">vs</span>
-            <span class="alliance-block blue-alliance">
-              <span class="alliance-label">Blue</span>
-              <span class="team-row">{#each alliance(match, "blue") as team}<span class:team-empty={!team} class="team-number">{team || "—"}</span>{/each}</span>
-            </span>
-          </span>
-          <span class="open-match" aria-hidden="true">Open <span>→</span></span>
-        </button>
-        <div class="match-menu">
-          <button class="button icon-button" onclick={() => menuId = menuId === match.id ? null : match.id} aria-expanded={menuId === match.id} aria-label={`Actions for ${match.matchName || "match"}`}>⋯</button>
-          {#if menuId === match.id}
-            <div class="action-menu" role="menu">
-              <button onclick={() => { menuId = null; onEdit(match); }}>Edit</button><button onclick={() => { menuId = null; onDuplicate(match); }}>Duplicate</button>
-              <button onclick={() => { menuId = null; onExportPng(match); }}>Export PNG</button><button onclick={() => { menuId = null; onExportQr(match); }}>Export QR</button>
-              <button onclick={() => { menuId = null; onShare(match); }}>Share</button><button class="danger-action" onclick={() => { menuId = null; onDelete(match); }}>Delete</button>
-            </div>
-          {/if}
-        </div>
-      </article>
-    {/each}
+    <div id="home-match-list-empty-placeholder" class="absolute top-1/2 text-[#999] text-xl pointer-events-none">
+      Click
+      <span class="not-italic text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-3 py-1 rounded">New</span>
+      to add matches
+    </div>
   {/if}
-</main>
+  {#each matches as match (match.id)}
+    <div
+      class="w-full h-[5.5rem] bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-xl px-10"
+      class:match-actions-open={openId === match.id}
+      tabindex="0"
+      role="button"
+      onclick={() => open(match)}
+      onkeydown={(event) => { if (event.key === "Enter") open(match); }}
+      onfocusout={closeActions}
+    >
+      <div class="grow-1 basis-0 text-[#e8e8e8] font-semibold text-2xl select-none overflow-hidden text-ellipsis whitespace-nowrap">
+        {match.matchName}
+      </div>
+      <div class="w-1/2 flex justify-center items-center gap-3 sm:gap-5 md:gap-8">
+        <div class="w-1/2 text-[#c97070] text-xl text-right select-none overflow-hidden text-ellipsis whitespace-nowrap">
+          {@render teamList(redTeams(match), "text-red-400")}
+        </div>
+        <div class="text-[#999] text-xl select-none">VS</div>
+        <div class="w-1/2 text-[#6090c9] text-xl select-none overflow-hidden text-ellipsis whitespace-nowrap">
+          {@render teamList(blueTeams(match), "text-blue-400")}
+        </div>
+      </div>
+      <div class="grow-1 basis-0 flex h-full justify-end items-center">
+        {#if openId !== match.id}
+          <button
+            class="match-menu-btn flex flex-col w-14 sm:w-16 md:w-18 gap-2.5 items-center justify-center rounded"
+            onclick={(event) => { event.stopPropagation(); openId = match.id; }}
+            aria-label={`Actions for ${match.matchName}`}
+          >
+            <div class="menu-dot w-2.5 h-2.5 rounded-full bg-[#555]"></div>
+            <div class="menu-dot w-2.5 h-2.5 rounded-full bg-[#555]"></div>
+            <div class="menu-dot w-2.5 h-2.5 rounded-full bg-[#555]"></div>
+          </button>
+        {:else}
+          <div class="flex items-center justify-center gap-3 sm:gap-4" onclick={(event) => event.stopPropagation()} role="presentation">
+            <button class="px-5 py-2.5 text-base btn-secondary" onclick={() => run(onEdit, match)}>Edit</button>
+            <button class="px-5 py-2.5 text-base btn-secondary" onclick={() => run(onDuplicate, match)}>Duplicate</button>
+            <button class="px-5 py-2.5 text-base btn-secondary whitespace-nowrap" onclick={() => run(onExportPng, match)}>Export PNG</button>
+            <button class="px-5 py-2.5 text-base btn-secondary whitespace-nowrap" onclick={() => run(onExportQr, match)}>Export QR</button>
+            <button class="px-5 py-2.5 text-base btn-secondary whitespace-nowrap flex items-center gap-2" onclick={() => run(onShare, match)}>
+              <span>Share</span>
+              <i class="fas fa-link text-lg"></i>
+            </button>
+            <button class="px-5 py-2.5 text-base btn-danger" onclick={() => run(onDelete, match)}>Delete</button>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/each}
+</div>
