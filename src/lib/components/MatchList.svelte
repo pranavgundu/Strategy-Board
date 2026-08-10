@@ -41,11 +41,11 @@
 
 <div
   id="home-match-list"
-  class="w-full p-10 flex-1 flex flex-col gap-3 items-stretch overflow-y-auto bg-[#0d0d0d]"
+  class="relative w-full p-10 flex-1 flex flex-col gap-3 items-stretch overflow-y-auto bg-[#0d0d0d]"
   class:match-list-actions-open={openId !== null}
 >
   {#if matches.length === 0}
-    <div id="home-match-list-empty-placeholder" class="absolute top-1/2 text-[#999] text-xl pointer-events-none">
+    <div id="home-match-list-empty-placeholder" class="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 text-center text-[#999] text-xl pointer-events-none">
       Click
       <span class="not-italic text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-3 py-1 rounded">New</span>
       to add matches

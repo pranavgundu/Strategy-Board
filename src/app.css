@@ -901,9 +901,6 @@ body {
 }
 
 @media (max-width: 834px) and (orientation: landscape) {
-    #home-toolbar-logo {
-        max-width: 6.5rem;
-    }
     #home-toolbar-new-btn,
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
@@ -1452,6 +1449,15 @@ a,
     min-width: 44px;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
+}
+
+/* The palette swatches are `role="button"` divs, so the 44px tap-target floor
+   above would otherwise beat every one of their explicit sizes (min-width wins
+   over width) and stretch the collapsed column past the height of a landscape
+   phone. They carry their own sizing, so opt them out. */
+#whiteboard-color-config > [role="button"] {
+    min-height: 0;
+    min-width: 0;
 }
 
 #home-match-list,

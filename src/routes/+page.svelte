@@ -186,7 +186,7 @@
     <div
       id="home-bottom-bar"
       class="w-full bg-[#0d0d0d] flex items-center justify-center border-t border-[#1a1a1a] relative"
-      style="min-height: 4rem; padding-top: env(safe-area-inset-bottom, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);"
+      style="min-height: 4rem; padding-bottom: env(safe-area-inset-bottom, 0px);"
     >
       <div class="flex items-center justify-center gap-4">
         <a
