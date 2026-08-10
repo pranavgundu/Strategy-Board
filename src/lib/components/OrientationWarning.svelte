@@ -1,0 +1,2 @@
+<script lang="ts">let dismissed = $state(false);</script>
+{#if !dismissed}<aside class="orientation-warning"><div><div class="orientation-device" aria-hidden="true"><span></span></div><p class="eyebrow">More room to strategize</p><h2>Rotate your device</h2><p>The field and tool controls work best in landscape mode.</p><button class="button primary" onclick={() => dismissed = true}>Continue in portrait</button></div></aside>{/if}

@@ -1,0 +1,13 @@
+<script lang="ts">
+  import Modal from "./Modal.svelte";
+  import { invalidateContributorsCache, loadContributors, loadContributorTeams } from "$lib/features";
+  import type { Contributor } from "$lib/native/types";
+  let { open, onClose }: { open: boolean; onClose: () => void } = $props();
+  let contributors = $state<Contributor[]>([]); let teams = $state<string[]>([]); let loading = $state(false); let error = $state(""); let revision = $state(0);
+  $effect(() => { if (!open) return; const current = revision; loading = true; error = ""; void Promise.all([loadContributors(), loadContributorTeams()]).then(([people, listedTeams]) => { if (current === revision) { contributors = people; teams = listedTeams; loading = false; } }, () => { if (current === revision) { error = "Could not load contributors."; loading = false; } }); });
+  function retry() { invalidateContributorsCache(); revision += 1; }
+</script>
+<Modal {open} title="Contributors" {onClose}><header class="modal-header"><h2>Contributors</h2></header><div class="modal-content contributor-content">
+  {#if loading}<p class="muted" role="status">Loading contributors…</p>{:else if error}<p class="form-error" role="alert">{error}</p><button class="button" onclick={retry}>Try again</button>{:else}<p class="muted">Strategy Board is built with the FRC community.</p><div class="contributor-grid">{#each contributors as person (person.login)}<a class="contributor" href={person.html_url} target="_blank" rel="noreferrer"><img src={person.avatar_url} alt="" /><span><strong>{person.name || person.login}</strong><small>{person.contributions} contributions</small></span></a>{/each}</div>{#if teams.length}<p class="muted">Contributing teams: {teams.map((team) => `#${team}`).join(", ")}</p>{/if}{/if}
+</div><footer class="modal-actions"><a class="button" href="https://github.com/pranavgundu/Strategy-Board" target="_blank" rel="noreferrer">GitHub</a><button class="button primary" onclick={onClose}>Done</button></footer></Modal>
+<style>.contributor-content{display:grid;gap:.8rem}.contributor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.6rem}.contributor{display:flex;gap:.65rem;align-items:center;padding:.55rem;border:1px solid #343b45;border-radius:.55rem;color:#e8edf3;text-decoration:none;background:#101216}.contributor:hover{background:#20252c}.contributor img{width:2.35rem;height:2.35rem;border-radius:50%}.contributor span{min-width:0;display:grid;gap:.1rem}.contributor strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.contributor small{color:#98a4b2}.form-error{color:#ffaaaa}</style>

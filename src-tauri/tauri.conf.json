@@ -1,16 +1,15 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "$schema": "https://schema.tauri.app/config/2",
   "productName": "Strategy Board",
-  "version": "../package.json",
-  "identifier": "com.strategyboard.app",
+  "version": "2026.6.0",
+  "identifier": "app.strategyboard",
   "build": {
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:5173",
     "beforeDevCommand": "bun run dev",
-    "beforeBuildCommand": "bun run build"
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "bun run build",
+    "frontendDist": "../build"
   },
   "app": {
-    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
@@ -25,7 +24,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost data: blob: https://avatars.githubusercontent.com; media-src 'self' blob:; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'"
     }
   },
   "bundle": {
@@ -38,9 +37,6 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ],
-    "android": {
-      "debugApplicationIdSuffix": ".debug"
-    }
+    ]
   }
 }
