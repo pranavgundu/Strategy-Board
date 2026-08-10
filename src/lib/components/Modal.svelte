@@ -1,7 +1,30 @@
 <script lang="ts">
   import { tick, type Snippet } from "svelte";
 
-  let { open, title, dismissible = true, onClose, children }: { open: boolean; title?: string; dismissible?: boolean; onClose: () => void; children: Snippet } = $props();
+  let {
+    open,
+    id,
+    panelId,
+    panelClass,
+    layer = "z-50",
+    title,
+    dismissible = true,
+    onClose,
+    children,
+  }: {
+    open: boolean;
+    /** Backdrop id — several backdrops are targeted by id in app.css. */
+    id?: string;
+    /** Panel id — `#*-inner-container` rules in app.css scale these panels up. */
+    panelId?: string;
+    panelClass: string;
+    layer?: string;
+    title?: string;
+    dismissible?: boolean;
+    onClose: () => void;
+    children: Snippet;
+  } = $props();
+
   let panel = $state<HTMLDivElement>();
 
   $effect(() => {
@@ -9,14 +32,28 @@
   });
 
   function keydown(event: KeyboardEvent) {
-    if (dismissible && event.key === "Escape") onClose();
+    if (open && dismissible && event.key === "Escape") onClose();
   }
 </script>
 
+<svelte:window onkeydown={keydown} />
+
 {#if open}
-  <div class="modal-backdrop" role="presentation" onclick={(event) => dismissible && event.target === event.currentTarget && onClose()} onkeydown={keydown}>
-    <div bind:this={panel} class="modal-panel" role="dialog" aria-modal="true" aria-label={title} tabindex="-1">
-      {#if dismissible}<button class="modal-close" type="button" onclick={onClose} aria-label={`Close ${title || "dialog"}`}>×</button>{/if}
+  <div
+    {id}
+    class="absolute top-0 left-0 w-dvw h-dvh backdrop-blur-xs touch-none {layer}"
+    role="presentation"
+    onclick={(event) => dismissible && event.target === event.currentTarget && onClose()}
+  >
+    <div
+      bind:this={panel}
+      id={panelId}
+      class={panelClass}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      tabindex="-1"
+    >
       {@render children()}
     </div>
   </div>

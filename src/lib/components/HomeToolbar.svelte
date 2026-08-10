@@ -2,16 +2,58 @@
   let { onNew, onTba, onImportQr, onImportLink, onClear }: { onNew: () => void; onTba: () => void; onImportQr: () => void; onImportLink: () => void; onClear: () => void } = $props();
 </script>
 
-<header class="home-toolbar">
-  <button class="brand" onclick={() => location.reload()} aria-label="Reload Strategy Board">
-    <img class="brand-mark" src="/icon-512.png" alt="" />
-    <span class="brand-copy"><strong>Strategy Board</strong><small>FRC strategy workspace</small></span>
-  </button>
-  <nav aria-label="Match actions" class="toolbar-actions">
-    <button class="button primary" onclick={onNew}><span class="button-glyph" aria-hidden="true">＋</span>New match</button>
-    <button class="button" onclick={onTba}><span class="button-glyph tba-glyph" aria-hidden="true">TBA</span>Import</button>
-    <button class="button compact-label" onclick={onImportQr}><span class="button-glyph" aria-hidden="true">⌗</span><span>Scan QR</span></button>
-    <button class="button compact-label" onclick={onImportLink}><span class="button-glyph" aria-hidden="true">↗</span><span>Open link</span></button>
-    <button class="button danger subtle-danger" onclick={onClear} title="Clear all saved matches"><span class="button-glyph" aria-hidden="true">⌫</span><span class="clear-label">Clear</span></button>
-  </nav>
-</header>
+<div
+  id="home-toolbar"
+  class="flex items-center justify-between w-full h-24 bg-[#111111] border-b border-[#1e1e1e] px-10 sm:px-12 md:px-16 pt-[env(safe-area-inset-top)]"
+>
+  <div
+    id="home-toolbar-logo"
+    class="text-2xl font-bold text-[#e8e8e8] select-none cursor-pointer tracking-tight"
+    onclick={() => location.reload()}
+    role="button"
+    tabindex="0"
+    onkeydown={(event) => { if (event.key === "Enter" || event.key === " ") location.reload(); }}
+  >
+    Strategy Board
+  </div>
+  <div class="flex gap-4 items-center">
+    <button
+      id="home-toolbar-new-btn"
+      class="flex items-center justify-center px-10 h-14 btn-secondary text-xl"
+      onclick={onNew}
+    >
+      New
+    </button>
+    <button
+      id="home-toolbar-tba-btn"
+      class="flex items-center justify-center gap-2.5 px-10 h-14 btn-secondary text-xl"
+      onclick={onTba}
+    >
+      <span>TBA</span>
+      <img src="/tba.svg" alt="TBA" class="h-6 sm:h-7 md:h-9 w-auto" />
+    </button>
+    <button
+      id="home-toolbar-import-btn"
+      class="flex items-center justify-center px-10 h-14 btn-secondary text-xl"
+      onclick={onImportQr}
+    >
+      <span class="hidden sm:inline">Import QR</span>
+      <span class="sm:hidden">Import</span>
+    </button>
+    <button
+      id="home-toolbar-import-link-btn"
+      class="flex items-center justify-center gap-2.5 px-10 h-14 btn-secondary text-xl"
+      onclick={onImportLink}
+    >
+      <span>Import</span>
+      <i class="fas fa-link"></i>
+    </button>
+    <button
+      id="home-toolbar-clear-btn"
+      class="flex items-center justify-center px-10 h-14 btn-danger text-xl"
+      onclick={onClear}
+    >
+      Clear
+    </button>
+  </div>
+</div>

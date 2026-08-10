@@ -1,20 +1,56 @@
 <script lang="ts">
   import Modal from "./Modal.svelte";
-  let { open, onSave }: { open: boolean; onSave: (teamNumber: string) => Promise<void> | void } = $props(); let teamNumber = $state(""); let error = $state(""); let saving = $state(false);
-  async function save() { saving = true; error = ""; try { await onSave(teamNumber); } catch (reason) { error = reason instanceof Error ? reason.message : "Could not save your team number."; } finally { saving = false; } }
+
+  let { open, onSave }: { open: boolean; onSave: (teamNumber: string) => Promise<void> | void } = $props();
+  let teamNumber = $state("");
+  let saving = $state(false);
+
+  async function save() {
+    if (!teamNumber.trim() || saving) return;
+    saving = true;
+    try {
+      await onSave(teamNumber);
+    } finally {
+      saving = false;
+    }
+  }
 </script>
-<Modal {open} title="Welcome to Strategy Board" dismissible={false} onClose={() => {}}>
-  <form onsubmit={(event) => { event.preventDefault(); void save(); }}>
-    <header class="modal-header welcome-header">
-      <img src="/icon-512.png" alt="" />
-      <div><p class="eyebrow">Welcome to</p><h2>Strategy Board</h2></div>
-    </header>
-    <div class="modal-content stack">
-      <p class="muted">Add your FRC team number to personalize imports and your workspace.</p>
-      <label class="form-label" for="welcome-team-number">Team number</label>
-      <input id="welcome-team-number" class="input input-large" bind:value={teamNumber} inputmode="numeric" maxlength="5" placeholder="e.g. 834" />
-      {#if error}<p class="form-error" role="alert">{error}</p>{/if}
-    </div>
-    <footer class="modal-actions"><button class="button primary" type="submit" disabled={!teamNumber.trim() || saving}>{saving ? "Saving…" : "Enter Strategy Board"}</button></footer>
-  </form>
+
+<Modal
+  {open}
+  id="team-number-popup"
+  layer="z-[99999]"
+  title="Welcome to Strategy Board"
+  dismissible={false}
+  panelClass="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-between w-[94%] sm:w-5/6 md:w-3/4 lg:w-2/3 max-w-2xl bg-[#141414] border border-[#1e1e1e] rounded-[10px] overflow-hidden"
+  onClose={() => {}}
+>
+  <div class="w-full pt-8 pb-6 px-8 sm:px-10 bg-[#111111] border-b border-[#1e1e1e]">
+    <h2 class="text-2xl sm:text-3xl text-center text-[#e8e8e8] font-semibold">Welcome to Strategy Board!</h2>
+    <p class="text-center text-[#999] text-lg sm:text-xl mt-2">What's your team number?</p>
+  </div>
+  <div class="w-full p-8 sm:p-10">
+    <input
+      type="number"
+      id="team-number-input"
+      placeholder="Enter team number"
+      maxlength="5"
+      inputmode="numeric"
+      class="w-full text-3xl sm:text-4xl text-center text-[#e8e8e8] p-6 sm:p-7 bg-[#0d0d0d] border border-[#2a2a2a] rounded-[8px] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      bind:value={teamNumber}
+      onkeydown={(event) => { if (event.key === "Enter") void save(); }}
+    />
+  </div>
+  <div class="flex w-full">
+    <button
+      id="team-number-save-btn"
+      class="w-full text-center text-lg sm:text-xl btn-secondary p-5 sm:p-6 border-t border-[#1e1e1e] rounded-none"
+      onclick={() => void save()}
+    >
+      Continue
+    </button>
+  </div>
 </Modal>
