@@ -205,6 +205,12 @@
         >
           <i class="fas fa-envelope text-2xl leading-none"></i>
         </a>
+        <a
+          href="/privacy"
+          class="text-xs text-[#999] hover:text-[#ccc] transition-colors"
+        >
+          Privacy
+        </a>
       </div>
       <div id="last-commit-info" class="absolute left-6 text-[#999] text-xs" style="top: 50%; transform: translateY(-50%);">
         <a
