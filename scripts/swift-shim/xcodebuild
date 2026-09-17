@@ -1,0 +1,4 @@
+#!/bin/sh
+# Use the full Xcode installation even when the Mac's global xcode-select
+# setting still points at the standalone Command Line Tools package.
+exec env DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/xcodebuild "$@"

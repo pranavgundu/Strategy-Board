@@ -1,0 +1,4 @@
+#!/bin/sh
+# Use the full Xcode installation even when xcode-select points at the
+# standalone Command Line Tools package.
+exec env DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/xcrun "$@"

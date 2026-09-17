@@ -51,8 +51,9 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        CFBundleShortVersionString: 2026.6.0
-        CFBundleVersion: "2026.6.0"
+        CFBundleShortVersionString: 26.6.0
+        CFBundleVersion: "26.6.1"
+        ITSAppUsesNonExemptEncryption: false
     entitlements:
       path: strategy-board_iOS/strategy-board_iOS.entitlements
     scheme:

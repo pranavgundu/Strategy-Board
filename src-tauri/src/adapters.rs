@@ -100,7 +100,7 @@ impl storage::KeyValueStore for JsonFileStore {
     }
 }
 
-/// Shared Rustls-only client. Commands use its async methods; implementations
+/// Shared native-TLS client. Commands use its async methods; implementations
 /// of legacy synchronous helper traits are retained for non-runtime callers.
 #[derive(Clone)]
 pub struct HttpAdapter {
@@ -111,14 +111,14 @@ pub struct HttpAdapter {
 impl HttpAdapter {
     pub fn new() -> Result<Self, String> {
         let client = reqwest::Client::builder()
-            .use_rustls_tls()
+            .use_native_tls()
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(15))
             .user_agent("strategy-board/0.1")
             .build()
             .map_err(|error| error.to_string())?;
         let blocking = reqwest::blocking::Client::builder()
-            .use_rustls_tls()
+            .use_native_tls()
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(15))
             .user_agent("strategy-board/0.1")
