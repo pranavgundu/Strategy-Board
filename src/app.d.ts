@@ -17,6 +17,10 @@ declare global {
     date: string;
     url: string;
   };
+
+  /** Build-time public client keys used by the browser service adapter. */
+  const __FIREBASE_API_KEY__: string;
+  const __TBA_API_KEY__: string;
 }
 
 export {};

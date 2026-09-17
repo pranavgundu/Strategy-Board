@@ -18,6 +18,10 @@
 
   const numberField =
     "text-lg sm:text-xl md:text-2xl lg:text-3xl text-center p-2 sm:p-3 md:p-4 bg-[#0d0d0d] border-r border-[#2a2a2a] outline-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+
+  function updateTeam(key: keyof MatchFormValues, event: Event) {
+    values[key] = (event.currentTarget as HTMLInputElement).value.replace(/\D/g, "").slice(0, 5);
+  }
 </script>
 
 <input
@@ -33,30 +37,34 @@
 <div class="grid grid-cols-3 w-full">
   {#each redFields as field}
     <input
-      type="number"
+      type="text"
       id="{idPrefix}-red-{field.slot}"
       placeholder={field.label}
       maxlength="5"
       inputmode="numeric"
+      pattern="[0-9]*"
       class="{numberField} text-[#c97070] border-b"
       autocomplete="off"
       autocapitalize="off"
       spellcheck="false"
-      bind:value={values[field.key]}
+      value={values[field.key]}
+      oninput={(event) => updateTeam(field.key, event)}
     />
   {/each}
   {#each blueFields as field}
     <input
-      type="number"
+      type="text"
       id="{idPrefix}-blue-{field.slot}"
       placeholder={field.label}
       maxlength="5"
       inputmode="numeric"
+      pattern="[0-9]*"
       class="{numberField} text-[#6090c9]"
       autocomplete="off"
       autocapitalize="off"
       spellcheck="false"
-      bind:value={values[field.key]}
+      value={values[field.key]}
+      oninput={(event) => updateTeam(field.key, event)}
     />
   {/each}
 </div>

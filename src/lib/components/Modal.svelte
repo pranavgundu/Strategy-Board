@@ -28,7 +28,12 @@
   let panel = $state<HTMLDivElement>();
 
   $effect(() => {
-    if (open) tick().then(() => panel?.focus());
+    if (open) tick().then(() => {
+      const firstControl = panel?.querySelector<HTMLElement>(
+        "[autofocus], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])",
+      );
+      (firstControl ?? panel)?.focus();
+    });
   });
 
   function keydown(event: KeyboardEvent) {

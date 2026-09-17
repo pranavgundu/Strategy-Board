@@ -102,8 +102,8 @@
   }
 
   async function importLink(code: string): Promise<boolean> {
-    const shareCode = parseShareCode(code) ?? code.trim().split(/[/?#]/).filter(Boolean).at(-1) ?? "";
-    if (!shareCode) { notice("Enter a valid Strategy Board share link or code."); return false; }
+    const shareCode = parseShareCode(code);
+    if (!shareCode) { notice("Enter a valid 6-character Strategy Board share link or code."); return false; }
     try {
       const packet = await native.cloud.download(shareCode);
       if (!packet) {
@@ -163,9 +163,9 @@
   }
 
   async function saveTeam(team: string) {
-    await saveTeamNumber(team);
+    const normalized = await saveTeamNumber(team);
     teamOpen = false;
-    notice(`Team ${team} saved.`);
+    notice(`Team ${normalized} saved.`);
   }
 
   async function dismissAnnouncement() {

@@ -399,7 +399,7 @@ impl GithubAdapter {
     pub fn new(http: HttpAdapter) -> Self {
         Self {
             http,
-            raw_base: "https://raw.githubusercontent.com/pranavgundu/Strategy-Board/main/public"
+            raw_base: "https://raw.githubusercontent.com/pranavgundu/Strategy-Board/main/static"
                 .into(),
         }
     }

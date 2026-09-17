@@ -18,9 +18,8 @@
   <div class="w-full px-6 py-6 text-base text-center text-[#a0a0a0]">
     <input
       id="link-import-code"
-      placeholder="Enter 6-character share code"
-      maxlength="6"
-      class="w-full p-3 text-base text-center text-[#e8e8e8] rounded-[6px] bg-[#0d0d0d] border border-[#2a2a2a] outline-0 uppercase tracking-wider font-mono"
+      placeholder="Paste a share link or enter its 6-character code"
+      class="w-full p-3 text-base text-center text-[#e8e8e8] rounded-[6px] bg-[#0d0d0d] border border-[#2a2a2a] outline-0 tracking-wider font-mono"
       autocomplete="off"
       autocapitalize="off"
       spellcheck="false"

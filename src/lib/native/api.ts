@@ -1,4 +1,6 @@
-import { invoke, type InvokeArgs } from "@tauri-apps/api/core";
+import { invoke, isTauri, type InvokeArgs } from "@tauri-apps/api/core";
+
+import { browserInvoke } from "./web";
 
 import type {
   BoardMode, BoardState, BoardTool, Contributor, CreateMatchInput, FieldRobotPositions,
@@ -21,6 +23,12 @@ export class NativeCommandError extends Error {
 /** One typed boundary for all Tauri calls. Do not use it from pointer-move paths. */
 async function call<TResult>(command: string, args?: InvokeArgs): Promise<TResult> {
   try {
+    // The same Svelte build is deployed as a static website and embedded by
+    // Tauri. Calling `invoke` in a normal browser fails because there is no
+    // Tauri IPC bridge, so route web requests to the browser implementation.
+    if (typeof window !== "undefined" && !isTauri()) {
+      return await browserInvoke<TResult>(command, (args ?? {}) as Record<string, unknown>);
+    }
     return await invoke<TResult>(command, args);
   } catch (error) {
     throw new NativeCommandError(command, error);
