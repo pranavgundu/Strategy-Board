@@ -21,6 +21,7 @@
   import QrExportModal from "$lib/components/QrExportModal.svelte";
   import QrImportModal from "$lib/components/QrImportModal.svelte";
   import SettingsScreen from "$lib/components/SettingsScreen.svelte";
+  import SyncStatusLine from "$lib/components/SyncStatusLine.svelte";
   import TbaImportModal from "$lib/components/TbaImportModal.svelte";
   import WhiteboardScreen from "$lib/components/WhiteboardScreen.svelte";
   import type { Match, MatchFormValues } from "$lib/components/types";
@@ -59,9 +60,9 @@
     };
     window.addEventListener("click", openExternal);
     void boardConfig.init();
-    void scheduleSync.init();
     void app.init();
-    return () => window.removeEventListener("click", openExternal);
+    const stopSync = scheduleSync.start();
+    return () => { stopSync(); window.removeEventListener("click", openExternal); };
   });
 
   function notice(message: string) {
@@ -171,6 +172,9 @@
           <span>•</span>
           <span>{timeAgo(new Date(buildCommit.date))}</span>
         </a>
+      </div>
+      <div class="absolute right-6 max-w-[60%]" style="top: 50%; transform: translateY(-50%);">
+        <SyncStatusLine />
       </div>
     </div>
   </div>
