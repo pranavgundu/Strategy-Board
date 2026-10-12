@@ -9,8 +9,8 @@
   import { scheduleSync } from "$lib/stores/sync.svelte";
   import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
-  import { buildCommit, isNativeRuntime, safeFilename, shareBoardFile, timeAgo } from "$lib/features";
-  import { BoardFileError, encodeMatchFile, groupMatchesByEvent, identityKey, readBoardFile, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
+  import { buildCommit, isNativeRuntime, newId, safeFilename, shareBoardFile, timeAgo } from "$lib/features";
+  import { BoardFileError, encodeMatchFile, groupMatchesByEvent, identityKey, planTbaImport, readBoardFile, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
   import { queueBadge } from "$lib/features/queue";
   import { registerServiceWorker, requestPersistentStorage } from "$lib/features/offline";
   import AppLoading from "$lib/components/AppLoading.svelte";
@@ -156,20 +156,11 @@
 
   async function importTba(eventKey: string, teamNumber: string) {
     try {
-      const rawMatches = await native.tba.matchesAtEvent(eventKey);
-      const teamKey = teamNumber ? `frc${teamNumber.replace(/^frc/i, "")}` : "";
-      const chosen = teamKey ? rawMatches.filter((match) => [...match.alliances.red.team_keys, ...match.alliances.blue.team_keys].includes(teamKey)) : rawMatches;
-      const simple = await native.tba.simpleMatches(chosen);
-      const packets = await Promise.all(simple.map((match) => native.matches.createPacket({
-        matchName: match.match_name,
-        redTeams: [match.red_teams[0] ?? "", match.red_teams[1] ?? "", match.red_teams[2] ?? ""],
-        blueTeams: [match.blue_teams[0] ?? "", match.blue_teams[1] ?? "", match.blue_teams[2] ?? ""],
-        tbaEventKey: eventKey,
-        tbaMatchKey: match.match_key,
-        tbaYear: Number(eventKey.slice(0, 4)) || undefined,
-      })));
+      const matches = await native.tba.matchesAtEvent(eventKey);
+      const team = teamNumber.replace(/^frc/i, "") || null;
+      const packets = planTbaImport({ packets: app.packets, matches, eventKey, team, currentEventKey: scheduleSync.currentEvent?.eventKey ?? null, newId });
       if (!packets.length) {
-        notice("No matches were found for that event and team.");
+        notice(matches.length ? "Those matches are already on the board." : "No matches were found for that event and team.");
         return;
       }
       await app.importPackets(packets);

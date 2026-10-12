@@ -58,6 +58,17 @@ export function scheduledTbaMatchKey({ eventKey, level, number }: ScheduleIdenti
   return null;
 }
 
+/** The schedule identity behind a TBA match key like 2026isde1_qm13, 2026isde1_sf7m1, or 2026isde1_f1m2. */
+export function identityFromTbaKey(key: string): ScheduleIdentity | null {
+  const quals = /^(\w+)_qm(\d+)$/.exec(key);
+  if (quals) return { eventKey: quals[1], level: "qual", number: Number(quals[2]) };
+  const playoff = /^(\w+)_(sf|f)(\d+)m(\d+)$/.exec(key);
+  if (!playoff) return null;
+  return playoff[2] === "sf"
+    ? { eventKey: playoff[1], level: "playoff", number: Number(playoff[3]) }
+    : { eventKey: playoff[1], level: "final", number: Number(playoff[4]) };
+}
+
 export function eventFieldYear(eventKey: string): number | undefined {
   const year = /^(\d{4})/.exec(eventKey)?.[1];
   return year ? Number(year) : undefined;
@@ -112,4 +123,48 @@ export function parseNexusEvent(json: unknown): EventSchedule | null {
     });
   });
   return entries.length ? { eventKey, source: "nexus", entries } : null;
+}
+
+const TBA_LEVEL_RANK: Readonly<Record<string, number>> = { qm: 0, sf: 1, f: 2 };
+
+/** Playoff N is TBA's sfNm1 and any later sfN match replays it; Final N is f1mN. */
+function tbaIdentity(eventKey: string, compLevel: string, setNumber: number, matchNumber: number): { identity: ScheduleIdentity; replay: boolean } | null {
+  if (compLevel === "qm") return { identity: { eventKey, level: "qual", number: matchNumber }, replay: false };
+  if (compLevel === "sf") return { identity: { eventKey, level: "playoff", number: setNumber }, replay: matchNumber > 1 };
+  if (compLevel === "f") return { identity: { eventKey, level: "final", number: matchNumber }, replay: false };
+  return null;
+}
+
+function tbaAlliance(value: unknown): { teams: string[] | null; score: number } {
+  if (!isObject(value)) return { teams: null, score: -1 };
+  const teams = teamList(Array.isArray(value.team_keys) ? value.team_keys.map((key) => (typeof key === "string" ? key.replace(/^frc/, "") : key)) : null);
+  return { teams, score: typeof value.score === "number" ? value.score : -1 };
+}
+
+/** Reads TBA's match list for an event. TBA has no Queue Status, and a match counts as played once it has a result. */
+export function parseTbaMatches(json: unknown, eventKey: string): EventSchedule | null {
+  if (!Array.isArray(json)) return null;
+  const matches = json
+    .filter(isObject)
+    .filter((match) => typeof match.comp_level === "string" && match.comp_level in TBA_LEVEL_RANK && typeof match.set_number === "number" && typeof match.match_number === "number")
+    .sort((a, b) => TBA_LEVEL_RANK[a.comp_level as string] - TBA_LEVEL_RANK[b.comp_level as string] || (a.set_number as number) - (b.set_number as number) || (a.match_number as number) - (b.match_number as number));
+  const entries: ScheduleEntry[] = [];
+  matches.forEach((match, order) => {
+    const parsed = tbaIdentity(eventKey, match.comp_level as string, match.set_number as number, match.match_number as number);
+    const alliances = isObject(match.alliances) ? match.alliances : {};
+    const red = tbaAlliance(alliances.red);
+    const blue = tbaAlliance(alliances.blue);
+    if (!parsed || !red.teams || !blue.teams) return;
+    entries.push({
+      identity: parsed.identity,
+      red: red.teams,
+      blue: blue.teams,
+      order,
+      status: null,
+      times: typeof match.time === "number" ? { scheduledStartTime: match.time * 1000 } : {},
+      played: red.score >= 0 && blue.score >= 0,
+      replay: parsed.replay,
+    });
+  });
+  return entries.length ? { eventKey, source: "tba", entries } : null;
 }

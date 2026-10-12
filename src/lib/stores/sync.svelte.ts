@@ -1,4 +1,4 @@
-import { dismissMatches, OUR_TEAM, parseNexusEvent, pickCurrentEvent, planSync, restoreDismissed, runningNexusEvents, type CurrentEvent, type DismissedMatches, type ScheduleInfo } from "$lib/domain";
+import { dismissMatches, OUR_TEAM, parseNexusEvent, parseTbaMatches, pickCurrentEvent, planSync, restoreDismissed, runningNexusEvents, type CurrentEvent, type DismissedMatches, type EventSchedule, type ScheduleInfo } from "$lib/domain";
 import { newId } from "$lib/features/runtime";
 import { native } from "$lib/native/api";
 import type { JsonValue, MatchPacket, SourceResponse } from "$lib/native/types";
@@ -11,6 +11,8 @@ const QUEUE_KEY = "queueStatus";
 const DISMISSED_KEY = "dismissedMatches";
 const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 const NEXUS_INTERVAL_MS = 30_000;
+// tba caches responses for 61 seconds, so asking more often only repeats the same answer
+const TBA_INTERVAL_MS = 60_000;
 const DETECTION_RETRY_MS = 5 * 60_000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -52,13 +54,19 @@ let running: Promise<void> | null = null;
 let polling = false;
 let timer: number | null = null;
 
-function failureMessage(response: SourceResponse, eventKey: string): string {
+const SOURCE_NAMES: Record<SyncSource, { name: string; key: string }> = {
+  nexus: { name: "Nexus", key: "NEXUS_API_KEY" },
+  tba: { name: "TBA", key: "TBA_API_KEY" },
+};
+
+function failureMessage(response: SourceResponse, eventKey: string, source: SyncSource = "nexus"): string {
+  const { name, key } = SOURCE_NAMES[source];
   switch (response.kind) {
-    case "not-found": return `Nexus has no event called ${eventKey}.`;
-    case "missing-key": return "This build has no Nexus API key. Add NEXUS_API_KEY to orbit-strategy-board.env and rebuild.";
-    case "rejected-key": return "Nexus rejected this build's API key.";
+    case "not-found": return `${name} has no event called ${eventKey}.`;
+    case "missing-key": return `This build has no ${name} API key. Add ${key} to orbit-strategy-board.env and rebuild.`;
+    case "rejected-key": return `${name} rejected this build's API key.`;
     case "offline": return "You're offline. Sync resumes when the connection returns.";
-    case "unreachable": return `Couldn't reach Nexus (${response.detail}).`;
+    case "unreachable": return `Couldn't reach ${name} (${response.detail}).`;
     default: return "Sync failed.";
   }
 }
@@ -135,23 +143,45 @@ async function run(): Promise<void> {
     report("synced", "Up to date with Nexus.", eventKey);
     return;
   }
+  const schedule = response.kind === "ok" ? parseNexusEvent(response.data) : null;
+  if (schedule) await applySchedule(schedule, etagKey, response.kind === "ok" ? response.etag : null);
+  else if (response.kind === "ok" || response.kind === "not-found") await syncFromTba(eventKey);
+  else report(response.kind === "offline" ? "offline" : "error", failureMessage(response, eventKey), eventKey);
+}
+
+/** Used while Nexus has no schedule for the event; TBA has no Queue Status and no practice matches. */
+async function syncFromTba(eventKey: string): Promise<void> {
+  if (bookkeeping.source === "tba" && bookkeeping.eventKey === eventKey && bookkeeping.at !== null && Date.now() - bookkeeping.at < TBA_INTERVAL_MS) {
+    report("synced", "Up to date with TBA.", eventKey);
+    return;
+  }
+  const etagKey = `tba:matches:${eventKey}`;
+  const response = await native.tba.teamMatchesStatus(OUR_TEAM, eventKey, bookkeeping.etags[etagKey]);
+  if (response.kind === "not-modified") {
+    await remember("tba", eventKey, etagKey, response.etag);
+    report("synced", "Up to date with TBA.", eventKey);
+    return;
+  }
   if (response.kind !== "ok") {
-    report(response.kind === "offline" ? "offline" : "error", failureMessage(response, eventKey), eventKey);
+    report(response.kind === "offline" ? "offline" : "error", failureMessage(response, eventKey, "tba"), eventKey);
     return;
   }
-  const schedule = parseNexusEvent(response.data);
-  if (!schedule) {
-    report("waiting", `Waiting for the ${eventKey} schedule on Nexus.`, eventKey);
-    return;
-  }
+  const schedule = parseTbaMatches(response.data, eventKey);
+  if (schedule) await applySchedule(schedule, etagKey, response.etag);
+  else report("waiting", `Waiting for the ${eventKey} schedule.`, eventKey);
+}
+
+async function applySchedule(schedule: EventSchedule, etagKey: string, etag: string | null): Promise<void> {
+  const { eventKey, source } = schedule;
   await app.init();
   const plan = await app.applySync((packets) => planSync({ packets, schedule, dismissed, newId }));
   if (plan.update.length) lastChange = { revision: lastChange.revision + 1, ids: plan.update.map((packet) => packet[7]) };
   queue = { eventKey, schedule: plan.schedule, nextMatch: plan.nextMatch };
   await native.storage.set(QUEUE_KEY, queue as unknown as JsonValue).catch(() => undefined);
-  await remember("nexus", eventKey, etagKey, response.etag);
+  await remember(source, eventKey, etagKey, etag);
+  const { name } = SOURCE_NAMES[source];
   const changes = [plan.add.length && `added ${plan.add.length} match${plan.add.length === 1 ? "" : "es"}`, plan.update.length && `updated ${plan.update.length}`].filter(Boolean).join(" and ");
-  report("synced", changes ? `Nexus sync ${changes}.` : "Up to date with Nexus.", eventKey);
+  report("synced", changes ? `${name} sync ${changes}.` : `Up to date with ${name}.`, eventKey);
 }
 
 function canPoll(): boolean {

@@ -1,10 +1,10 @@
 import type { MatchPacket } from "$lib/native/types";
 
-import { readExtras, withExtras, type BenchTeams, type SyncMarker } from "./extras";
+import { readExtras, toWhatIfMatch, withExtras, type BenchTeams, type SyncMarker } from "./extras";
 import type { Lineup } from "./ink";
 import { newMatchPacket } from "./packets";
 import { packetLineup, reassignStations } from "./reassign";
-import { eventFieldYear, identityKey, scheduledMatchName, scheduledTbaMatchKey, type EventSchedule, type QueueTimes, type ScheduleEntry } from "./schedule";
+import { eventFieldYear, identityFromTbaKey, identityKey, parseTbaMatches, scheduledMatchName, scheduledTbaMatchKey, type EventSchedule, type QueueTimes, type ScheduleEntry } from "./schedule";
 import { OUR_TEAM, stationAlliance, type StationKey } from "./stations";
 
 /** Deleted Synced Matches as identity keys by event key; Schedule Sync never adds them again. */
@@ -199,4 +199,38 @@ export function swapBenchTeam(packet: MatchPacket, station: StationKey): MatchPa
   const lineup = packetLineup(packet);
   const displaced = lineup[station].trim();
   return withExtras(reassignStations(packet, { ...lineup, [station]: incoming }), { bench: { ...bench, [alliance]: displaced || undefined } });
+}
+
+/** A Match's schedule identity from its sync marker, or else from its TBA match key. */
+function packetIdentityKey(packet: MatchPacket): string | null {
+  const marker = readExtras(packet).sync;
+  const identity = marker ?? (typeof packet[10] === "string" ? identityFromTbaKey(packet[10]) : null);
+  return identity ? identityKey(identity) : null;
+}
+
+export interface TbaImportInput {
+  packets: readonly MatchPacket[];
+  /** TBA's match list for the event. */
+  matches: unknown;
+  eventKey: string;
+  /** Only this team's matches, or every match when null. */
+  team: string | null;
+  currentEventKey: string | null;
+  newId: () => string;
+}
+
+/** The Matches a manual TBA import adds: none already on the board, and Synced Matches for the Current Event. */
+export function planTbaImport({ packets, matches, eventKey, team, currentEventKey, newId }: TbaImportInput): MatchPacket[] {
+  const schedule = parseTbaMatches(matches, eventKey);
+  if (!schedule) return [];
+  const onBoard = new Set(packets.map(packetIdentityKey).filter((key): key is string => key !== null));
+  const imported: MatchPacket[] = [];
+  for (const entry of schedule.entries) {
+    const key = identityKey(entry.identity);
+    if ((team && ![...entry.red, ...entry.blue].includes(team)) || onBoard.has(key)) continue;
+    onBoard.add(key);
+    const packet = syncedMatch(entry, newId());
+    imported.push(eventKey === currentEventKey ? packet : toWhatIfMatch(packet));
+  }
+  return imported;
 }

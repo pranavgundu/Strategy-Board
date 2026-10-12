@@ -178,11 +178,23 @@ function nexusRequest(path: string, etag?: string | null): Promise<SourceRespons
   return sourceRequest(`${NEXUS_BASE}${path}`, { "Nexus-Api-Key": __NEXUS_API_KEY__ }, etag);
 }
 
-async function tbaRequest<T>(endpoint: string): Promise<T> {
+async function tbaKey(): Promise<string> {
   const saved = await storageGet("tbaApiKey");
-  const key = typeof saved === "string" && saved ? saved : __TBA_API_KEY__;
+  return typeof saved === "string" && saved ? saved : __TBA_API_KEY__;
+}
+
+async function tbaRequest<T>(endpoint: string): Promise<T> {
+  const key = await tbaKey();
   if (!key) throw new Error("A The Blue Alliance API key is required");
   return requestJson<T>(`${TBA_BASE}${endpoint}`, { "X-TBA-Auth-Key": key });
+}
+
+async function tbaSourceRequest(endpoint: string, etag?: string | null): Promise<SourceResponse> {
+  const key = await tbaKey();
+  if (!key) return { kind: "missing-key" };
+  const response = await sourceRequest(`${TBA_BASE}${endpoint}`, { "X-TBA-Auth-Key": key }, etag);
+  // tba answers 401 for a key it doesn't accept, and one was sent
+  return response.kind === "missing-key" ? { kind: "rejected-key" } : response;
 }
 
 function simpleEvents(events: TbaEvent[]): TbaSimpleEvent[] {
@@ -331,6 +343,7 @@ export async function browserInvoke<TResult>(command: string, args: Record<strin
     case "tba_events": result = await tbaRequest<TbaEvent[]>(`/events/${args.year}`); break;
     case "tba_matches_at_event": result = await tbaRequest<TbaMatch[]>(`/event/${encodeURIComponent(String(args.eventKey))}/matches`); break;
     case "tba_team_matches": result = await tbaRequest<TbaMatch[]>(`/team/frc${String(args.teamKey).replace(/^frc/i, "")}/event/${encodeURIComponent(String(args.eventKey))}/matches`); break;
+    case "tba_team_matches_status": result = await tbaSourceRequest(`/team/frc${String(args.teamKey).replace(/^frc/i, "")}/event/${encodeURIComponent(String(args.eventKey))}/matches`, typeof args.etag === "string" ? args.etag : null); break;
     case "tba_team_events": result = await tbaRequest<TbaEvent[]>(`/team/frc${String(args.teamKey).replace(/^frc/i, "")}/events/${args.year}`); break;
     case "tba_teams_at_event": result = (await tbaRequest<string[]>(`/event/${encodeURIComponent(String(args.eventKey))}/teams/keys`)).map((team) => team.replace(/^frc/, "")); break;
     case "tba_simple_events": result = simpleEvents(args.events as TbaEvent[]); break;
