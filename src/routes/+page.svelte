@@ -10,7 +10,8 @@
   import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, isNativeRuntime, safeFilename, shareBoardFile, timeAgo } from "$lib/features";
-  import { BoardFileError, encodeMatchFile, readBoardFile, toWhatIfMatch } from "$lib/domain";
+  import { BoardFileError, encodeMatchFile, identityKey, readBoardFile, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
+  import { queueBadge } from "$lib/features/queue";
   import { registerServiceWorker, requestPersistentStorage } from "$lib/features/offline";
   import AppLoading from "$lib/components/AppLoading.svelte";
   import ConfirmModal from "$lib/components/ConfirmModal.svelte";
@@ -46,7 +47,24 @@
       tbaMatchKey: match.tbaMatchKey,
     };
   }
-  const matches = $derived(app.matches.map(asMatch));
+  // the Current Event's Synced Matches come first in schedule order, led by the Next Match
+  const matches = $derived.by(() => {
+    const queue = scheduleSync.queue;
+    if (!queue) return app.matches.map(asMatch);
+    const keyOf = (match: StrategyMatch) => {
+      const marker = readExtras(match.packet).sync;
+      return marker?.eventKey === queue.eventKey ? identityKey(marker) : null;
+    };
+    const synced = app.matches.filter((match) => keyOf(match));
+    const order = new Map(scheduleSort(synced.map((match) => match.packet), queue.schedule).map((packet, index) => [packet[7], index]));
+    synced.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+    const next = synced.find((match) => keyOf(match) === queue.nextMatch);
+    const ordered = [...(next ? [next] : []), ...synced.filter((match) => match !== next), ...app.matches.filter((match) => !keyOf(match))];
+    return ordered.map((match) => {
+      const key = keyOf(match);
+      return { ...asMatch(match), next: match === next, queue: key ? queueBadge(queue.schedule[key]) : null };
+    });
+  });
 
   onMount(() => {
     registerServiceWorker();

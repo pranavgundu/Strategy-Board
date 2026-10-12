@@ -1,4 +1,4 @@
-import { OUR_TEAM, parseNexusEvent, pickCurrentEvent, planSync, runningNexusEvents, type CurrentEvent } from "$lib/domain";
+import { OUR_TEAM, parseNexusEvent, pickCurrentEvent, planSync, runningNexusEvents, type CurrentEvent, type ScheduleInfo } from "$lib/domain";
 import { newId } from "$lib/features/runtime";
 import { native } from "$lib/native/api";
 import type { JsonValue, SourceResponse } from "$lib/native/types";
@@ -7,6 +7,7 @@ import { app } from "./app.svelte";
 
 const MANUAL_EVENT_KEY = "manualEventKey";
 const BOOKKEEPING_KEY = "syncBookkeeping";
+const QUEUE_KEY = "queueStatus";
 const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 const NEXUS_INTERVAL_MS = 30_000;
 const DETECTION_RETRY_MS = 5 * 60_000;
@@ -23,6 +24,12 @@ export interface SyncStatus {
   /** When the schedule was last read successfully, in ms. */
   at: number | null;
 }
+/** Queue Status and the Next Match for the event last synced. */
+export interface EventQueue {
+  eventKey: string;
+  schedule: Record<string, ScheduleInfo>;
+  nextMatch: string | null;
+}
 interface Bookkeeping {
   etags: Record<string, string>;
   source: SyncSource | null;
@@ -32,6 +39,7 @@ interface Bookkeeping {
 
 let manualEventKey = $state<string | null>(null);
 let currentEvent = $state<CurrentEvent | null>(null);
+let queue = $state.raw<EventQueue | null>(null);
 let detectedAt = 0;
 let status = $state<SyncStatus>({ state: "idle", message: "", eventKey: null, source: null, at: null });
 let bookkeeping: Bookkeeping = { etags: {}, source: null, eventKey: null, at: null };
@@ -130,6 +138,8 @@ async function run(): Promise<void> {
   await app.init();
   const plan = planSync({ packets: app.packets, schedule, newId });
   await app.applySyncPlan(plan);
+  queue = { eventKey, schedule: plan.schedule, nextMatch: plan.nextMatch };
+  await native.storage.set(QUEUE_KEY, queue as unknown as JsonValue).catch(() => undefined);
   await remember("nexus", eventKey, etagKey, response.etag);
   const added = plan.add.length;
   report("synced", added ? `Added ${added} match${added === 1 ? "" : "es"} from Nexus.` : "Up to date with Nexus.", eventKey);
@@ -154,13 +164,15 @@ export const scheduleSync = {
   get manualEventKey(): string | null { return manualEventKey; },
   /** The event Schedule Sync follows: hand-entered, or detected from Nexus or TBA. */
   get currentEvent(): CurrentEvent | null { return currentEvent; },
+  get queue(): EventQueue | null { return queue; },
   get status(): SyncStatus { return status; },
 
   init(): Promise<void> {
-    loading ??= Promise.all([native.storage.get(MANUAL_EVENT_KEY), native.storage.get(BOOKKEEPING_KEY)]).then(
-      ([stored, kept]) => {
+    loading ??= Promise.all([native.storage.get(MANUAL_EVENT_KEY), native.storage.get(BOOKKEEPING_KEY), native.storage.get(QUEUE_KEY)]).then(
+      ([stored, kept, queued]) => {
         manualEventKey = typeof stored === "string" && EVENT_KEY.test(stored) ? stored : null;
         bookkeeping = readBookkeeping(kept);
+        queue = queued && typeof queued === "object" && !Array.isArray(queued) && typeof queued.eventKey === "string" ? queued as unknown as EventQueue : null;
         status = { ...status, eventKey: bookkeeping.eventKey, source: bookkeeping.source, at: bookkeeping.at };
       },
       () => undefined,

@@ -40,14 +40,21 @@
     <div
       class="w-full h-[5.5rem] bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-xl px-10"
       class:match-actions-open={openId === match.id}
+      class:match-next={match.next}
       tabindex="0"
       role="button"
       onclick={() => open(match)}
       onkeydown={(event) => { if (event.key === "Enter") open(match); }}
       onfocusout={closeActions}
     >
-      <div class="grow-1 basis-0 text-[#e8e8e8] font-semibold text-2xl select-none overflow-hidden text-ellipsis whitespace-nowrap">
-        {match.matchName}
+      <div class="grow-1 basis-0 min-w-0 select-none">
+        <div class="flex items-center gap-3 min-w-0">
+          {#if match.next}<span class="next-pill">NEXT</span>{/if}
+          <span class="text-[#e8e8e8] font-semibold text-2xl overflow-hidden text-ellipsis whitespace-nowrap">{match.matchName}</span>
+        </div>
+        {#if match.queue}
+          <div class="queue-line tone-{match.queue.tone}">{match.queue.label}{#if match.queue.detail}<span class="text-[#999]">&nbsp;· {match.queue.detail}</span>{/if}</div>
+        {/if}
       </div>
       <div class="w-1/2 flex justify-center items-center gap-3 sm:gap-5 md:gap-8">
         <div class="w-1/2 text-[#c97070] text-xl text-right select-none overflow-hidden text-ellipsis whitespace-nowrap">
@@ -86,3 +93,30 @@
     </div>
   {/each}
 </div>
+
+<style>
+  .match-next { border-color: #4a4a4a; background: #181818; }
+  .next-pill {
+    flex-shrink: 0;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: #ebebeb;
+    color: #0d0d0d;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+  .queue-line {
+    margin-top: 0.15rem;
+    overflow: hidden;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tone-soon { color: #999; }
+  .tone-queuing { color: #eab308; }
+  .tone-deck { color: #f97316; }
+  .tone-field { color: #22c55e; }
+  .tone-played { color: #555; }
+</style>

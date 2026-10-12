@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseNexusEvent, planSync, readExtras, toWhatIfMatch, type EventSchedule } from "$lib/domain";
+import { parseNexusEvent, planSync, readExtras, scheduleSort, toWhatIfMatch, type EventSchedule } from "$lib/domain";
 import type { MatchPacket } from "$lib/native/types";
 import { normalizeBrowserMatchPacket } from "$lib/native/web";
 import { whiteboardMatchFromPacket } from "$lib/whiteboard/packet";
@@ -23,7 +23,7 @@ function sync(json: unknown, packets: readonly MatchPacket[] = []) {
   return planSync({ packets, schedule: schedule(json), newId: idGenerator() });
 }
 
-type NexusMatch = { label: string; status: string; redTeams: string[] | null; blueTeams: string[] | null; times: object };
+type NexusMatch = { label: string; status: string; redTeams: string[] | null; blueTeams: string[] | null; times: object; replayOf?: string };
 
 function edited(json: { matches: NexusMatch[] } & object, edit: (matches: NexusMatch[]) => void): unknown {
   const copy = structuredClone(json);
@@ -69,7 +69,10 @@ describe("Schedule Sync from Nexus", () => {
     const edited = structuredClone(first);
     edited[0][1] = "254";
 
-    expect(sync(isde1, edited)).toEqual({ add: [], update: [] });
+    const second = sync(isde1, edited);
+
+    expect(second.add).toEqual([]);
+    expect(second.update).toEqual([]);
   });
 
   it("follows the championship schedule, including practice matches played out of label order", () => {
@@ -130,5 +133,50 @@ describe("Schedule Sync from Nexus", () => {
       eventKey: "2026isde1", level: "qual", number: 2,
       red: ["9740", "9738", "1574"], blue: ["1690", "7039", "2231"],
     });
+  });
+});
+
+describe("Queue Status and the Next Match", () => {
+  const championshipOrder = [
+    "Practice 3", "Practice 15", "Practice 9",
+    "Quals 2", "Quals 11", "Quals 18", "Quals 22", "Quals 26", "Quals 35", "Quals 42", "Quals 46", "Quals 53", "Quals 59",
+    "Playoff 1", "Playoff 7", "Playoff 11",
+    "Final 1", "Final 2", "Final 3",
+  ];
+
+  it("sorts Synced Matches into schedule order", () => {
+    const plan = sync(iscmp);
+
+    expect(scheduleSort([...plan.add].reverse(), plan.schedule).map((packet) => packet[0])).toEqual(championshipOrder);
+  });
+
+  it("gives each Synced Match its Nexus Queue Status and estimated times", () => {
+    expect(sync(iscmp).schedule["2026iscmp:final:2"]).toMatchObject({
+      status: "On deck",
+      times: { estimatedOnFieldTime: 1791817121021, actualOnDeckTime: 1783510839150 },
+      played: false,
+    });
+  });
+
+  it("counts a match as played once a later match reached On field, and makes the earliest unplayed one the Next Match", () => {
+    const plan = sync(iscmp);
+
+    expect(plan.schedule["2026iscmp:playoff:11"].played).toBe(true);
+    expect(plan.schedule["2026iscmp:final:1"].played).toBe(false);
+    expect(plan.nextMatch).toBe("2026iscmp:final:1");
+  });
+
+  it("maps a replay onto its original Synced Match, updating its Queue Status instead of adding a Match", () => {
+    const replayed = edited(iscmp, (matches) => {
+      const original = byLabel(matches, "Qualification 46");
+      matches.push({ ...original, label: "Qualification 46 Replay", replayOf: "Qualification 46", status: "Now queuing", times: { estimatedOnDeckTime: 1791818900000 } });
+    });
+
+    const plan = sync(replayed);
+
+    expect(plan.add.map((packet) => packet[0])).toEqual(championshipOrder);
+    expect(plan.schedule["2026iscmp:qual:46"]).toMatchObject({ status: "Now queuing", times: { estimatedOnDeckTime: 1791818900000 }, played: false });
+    expect(plan.schedule["2026iscmp:qual:46"].order).toBeLessThan(plan.schedule["2026iscmp:qual:53"].order);
+    expect(plan.nextMatch).toBe("2026iscmp:qual:46");
   });
 });

@@ -1,3 +1,5 @@
+import type { QueueBadge } from "$lib/features/queue";
+
 export type Match = {
   id: string;
   matchName: string;
@@ -8,9 +10,12 @@ export type Match = {
   blueTwo: string;
   blueThree: string;
   tbaMatchKey?: string | null;
+  /** Pinned at the top as Our Team's Next Match. */
+  next?: boolean;
+  queue?: QueueBadge | null;
 };
 
-export type MatchFormValues = Omit<Match, "id" | "tbaMatchKey">;
+export type MatchFormValues = Omit<Match, "id" | "tbaMatchKey" | "next" | "queue">;
 
 export const emptyMatchForm = (): MatchFormValues => ({
   matchName: "",
