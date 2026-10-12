@@ -2,7 +2,7 @@ import field2025 from "../images/2025.png";
 import field2026 from "../images/2026.png";
 import { fieldLayout } from "$lib/domain/field-layout";
 import { commonPathPaste, type CommonPath } from "$lib/domain/common-paths";
-import { defaultInk, inkColor, inkStation, isStrokeErasable, isStrokeVisible, NEUTRAL_INK, officialInkColor, type Lineup } from "$lib/domain/ink";
+import { defaultInk, inkColor, inkStation, isStrokeErasable, isStrokeVisible, NEUTRAL_INK, officialInkColor, teamInk, type Lineup } from "$lib/domain/ink";
 import { resolveTeamColor, type TeamColorOverrides } from "$lib/domain/team-colors";
 import { canvasLayout, distanceToSegment, pointInRotatedRect, segmentTouchesBounds, segmentsIntersect, strokeBounds, type Point } from "./geometry";
 import { FIELD_HEIGHT, FIELD_WIDTH, MAX_HISTORY, type BoardPhaseName, type CheckboxAnnotation, type RobotPosition, type Stroke, type WhiteboardCommit, type WhiteboardControllerOptions, type WhiteboardMatch, type WhiteboardMode, type WhiteboardPhase, type WhiteboardRefs, type WhiteboardState, type WhiteboardTool } from "./types";
@@ -121,9 +121,13 @@ export class WhiteboardController {
   getMatch(): WhiteboardMatch | null { return this.match; }
   /** Takes in the open Match after it changed outside the canvas, like a sync or a Bench swap; its undo history no longer applies. */
   reloadMatch(match: WhiteboardMatch): void {
+    const inkTeam = this.inkTeam(this.ink);
     this.undoHistory.clear(); this.redoHistory.clear();
     this.match = match; this.selected = null; this.pointer = null;
-    if (this.ink !== NEUTRAL_INK && !this.inkTeam(this.ink)) this.ink = defaultInk(lineupOf(match));
+    if (this.ink !== NEUTRAL_INK) {
+      const station = slots.find((slot) => inkTeam !== null && match[slot].trim() === inkTeam);
+      this.ink = station ? teamInk(station) : defaultInk(lineupOf(match));
+    }
     this.loadFieldImage(); this.redrawAll(); this.emitState();
   }
   /** Field artwork year in use; phase labels differ from 2026 onward. */

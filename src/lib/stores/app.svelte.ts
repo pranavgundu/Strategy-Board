@@ -248,9 +248,18 @@ export const app = {
   /** Replaces every Match on the device, as restoring a Backup does. */
   async replaceAll(next: readonly MatchPacket[]): Promise<void> {
     await queueWrite(async () => {
+      // every packet is checked before anything is cleared - the old matches come back if the write fails
+      const restored = await Promise.all(next.map((packet) => native.matches.normalizePacket(packet)));
+      const previous = packets;
       await native.model.clearMatches();
-      if (next.length) await native.model.addPackets([...next]);
-      setPackets(await native.model.loadPackets());
+      try {
+        if (restored.length) await native.model.addPackets(restored);
+      } catch (error) {
+        if (previous.length) await native.model.addPackets([...previous]);
+        throw error;
+      } finally {
+        setPackets(await native.model.loadPackets());
+      }
       this.closeMatch();
     });
   },

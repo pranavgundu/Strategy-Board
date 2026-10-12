@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { inkStation, NEUTRAL_INK, newMatchPacket, reassignStations, STATIONS, teamInk, type Lineup, type StationKey } from "$lib/domain";
+import { carryOverToLineup, inkStation, NEUTRAL_INK, newMatchPacket, reassignStations, STATIONS, teamInk, withExtras, type Lineup, type StationKey } from "$lib/domain";
 import type { MatchPacket } from "$lib/native/types";
 import { strokeBounds } from "$lib/whiteboard/geometry";
 
@@ -111,5 +111,22 @@ describe("Station reassignment", () => {
     contentOf(before, "1690").strokes.forEach((strokes, phase) => expect(neutralPoints[phase]).toEqual(expect.arrayContaining(strokes)));
     expect(contentOf(after, "254").strokes).toEqual(PHASES.map(() => []));
     expect(contentOf(after, "254").poses).toEqual(PHASES.map(() => [830, 205, 0]));
+  });
+});
+
+describe("Canvas edits made before a lineup change", () => {
+  it("carry over to the current lineup so a new Stroke stays with its team", () => {
+    const before = plannedMatch(["1690", "2231", "11480"], ["4590", "1577", "2679"]);
+    const stored = withExtras(reassignStations(before, lineup(["2231", "1690", "11480"], ["4590", "1577", "2679"])), { ticks: ["item-1"] });
+    const scene = structuredClone(before);
+    ((scene[8] as unknown[][])[1][6] as unknown[][]).push([teamInk("redOne"), [7, 7], [8, 8]]);
+    ((scene[8] as unknown[][])[1][7] as unknown[][]).push([7, 7, 8, 8]);
+
+    const saved = carryOverToLineup(scene, stored);
+
+    expect(saved.slice(1, 7)).toEqual(stored.slice(1, 7));
+    expect(saved[12]).toEqual(stored[12]);
+    expect(contentOf(saved, "1690").strokes[0]).toEqual([...contentOf(stored, "1690").strokes[0], [[7, 7], [8, 8]]]);
+    expect(contentOf(saved, "2231")).toEqual(contentOf(stored, "2231"));
   });
 });

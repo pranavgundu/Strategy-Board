@@ -50,11 +50,12 @@ function benchOf(entry: ScheduleEntry): BenchTeams | undefined {
   return bench.red || bench.blue ? bench : undefined;
 }
 
-function markerOf(entry: ScheduleEntry): SyncMarker {
-  return { ...entry.identity, red: [...entry.red], blue: [...entry.blue] };
+function markerOf(entry: ScheduleEntry, source: EventSchedule["source"]): SyncMarker {
+  return { ...entry.identity, red: [...entry.red], blue: [...entry.blue], source };
 }
 
 const sameTeams = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((team, index) => team === b[index]);
+const sameStationTeams = (a: readonly string[], b: readonly string[]) => sameTeams([...a.slice(0, 3)].sort(), [...b.slice(0, 3)].sort());
 
 const ALLIANCE_STATIONS: Record<"red" | "blue", readonly StationKey[]> = { red: ["redOne", "redTwo", "redThree"], blue: ["blueOne", "blueTwo", "blueThree"] };
 
@@ -76,11 +77,19 @@ function scheduledLineup(current: Lineup, entry: ScheduleEntry): Lineup {
 }
 
 /** Applies a team change the schedule reports to a Synced Match's current state, hand edits included. */
-function applyScheduleChange(packet: MatchPacket, entry: ScheduleEntry): MatchPacket {
-  return withExtras(reassignStations(packet, scheduledLineup(packetLineup(packet), entry)), { sync: markerOf(entry), bench: benchOf(entry) });
+function applyScheduleChange(packet: MatchPacket, entry: ScheduleEntry, source: EventSchedule["source"]): MatchPacket {
+  return withExtras(reassignStations(packet, scheduledLineup(packetLineup(packet), entry)), { sync: markerOf(entry, source), bench: benchOf(entry) });
 }
 
-function syncedMatch(entry: ScheduleEntry, id: string): MatchPacket {
+function followSchedule(packet: MatchPacket, marker: SyncMarker, entry: ScheduleEntry, source: EventSchedule["source"]): MatchPacket | null {
+  if (sameTeams(marker.red, entry.red) && sameTeams(marker.blue, entry.blue)) return null;
+  const otherSourceOrder = marker.source !== undefined && marker.source !== source && sameStationTeams(marker.red, entry.red) && sameStationTeams(marker.blue, entry.blue);
+  if (!otherSourceOrder) return applyScheduleChange(packet, entry, source);
+  // tba never lists a bench team - keep the one already known
+  return withExtras(packet, { sync: markerOf(entry, source), bench: benchOf(entry) ?? readExtras(packet).bench });
+}
+
+function syncedMatch(entry: ScheduleEntry, id: string, source: EventSchedule["source"]): MatchPacket {
   const { identity } = entry;
   const packet = newMatchPacket({
     matchName: scheduledMatchName(identity),
@@ -90,7 +99,7 @@ function syncedMatch(entry: ScheduleEntry, id: string): MatchPacket {
     tbaMatchKey: scheduledTbaMatchKey(identity) ?? undefined,
     tbaYear: eventFieldYear(identity.eventKey),
   }, id);
-  return withExtras(packet, { sync: markerOf(entry), bench: benchOf(entry) });
+  return withExtras(packet, { sync: markerOf(entry, source), bench: benchOf(entry) });
 }
 
 /** Works out how the board should change to follow the schedule. It never touches storage. */
@@ -112,20 +121,22 @@ export function planSync({ packets, schedule, dismissed = {}, newId }: SyncInput
   const update: MatchPacket[] = [];
   const info: Record<string, ScheduleInfo> = {};
   const onBoard = new Set(board.keys());
+  const ours = new Set<string>();
   for (const [key, { first, last }] of entries) {
     info[key] = { order: first.order, status: last.status, times: { ...last.times }, played: last.played };
+    if (includesOurTeam(last)) ours.add(key);
     const existing = board.get(key);
     if (existing) {
-      const marker = readExtras(existing).sync!;
-      if (!sameTeams(marker.red, last.red) || !sameTeams(marker.blue, last.blue)) update.push(applyScheduleChange(existing, last));
+      const changed = followSchedule(existing, readExtras(existing).sync!, last, schedule.source);
+      if (changed) update.push(changed);
       continue;
     }
     if (skipped.has(key)) continue;
     onBoard.add(key);
-    add.push(syncedMatch(last, newId()));
+    add.push(syncedMatch(last, newId(), schedule.source));
   }
   const nextMatch = Object.entries(info)
-    .filter(([key, { played }]) => !played && onBoard.has(key))
+    .filter(([key, { played }]) => !played && onBoard.has(key) && ours.has(key))
     .sort(([, a], [, b]) => a.order - b.order)[0]?.[0] ?? null;
   return { add, update, schedule: info, nextMatch };
 }
@@ -190,7 +201,7 @@ export function groupMatchesByEvent<T extends MatchPacket>(packets: readonly T[]
     group.last = index;
     groups.set(eventKey, group);
   });
-  const rank = (eventKey: string | null) => (eventKey === currentEventKey ? 0 : eventKey === null ? 2 : 1);
+  const rank = (eventKey: string | null) => (eventKey === null ? 2 : eventKey === currentEventKey ? 0 : 1);
   return [...groups.entries()]
     .sort(([a, first], [b, second]) => rank(a) - rank(b) || second.last - first.last)
     .map(([eventKey, group]) => ({ eventKey, current: eventKey !== null && eventKey === currentEventKey, packets: group.packets }));
@@ -235,7 +246,7 @@ export function planTbaImport({ packets, matches, eventKey, team, currentEventKe
     const key = identityKey(entry.identity);
     if ((team && ![...entry.red, ...entry.blue].includes(team)) || onBoard.has(key)) continue;
     onBoard.add(key);
-    const packet = syncedMatch(entry, newId());
+    const packet = syncedMatch(entry, newId(), schedule.source);
     imported.push(eventKey === currentEventKey ? packet : toWhatIfMatch(packet));
   }
   return imported;

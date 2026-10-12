@@ -70,3 +70,10 @@ export function reassignStations(packet: MatchPacket, next: Lineup): MatchPacket
   return copy;
 }
 
+
+// strokes drawn on an older lineup move with their teams - everything outside the drawing comes from the stored match
+export function carryOverToLineup(scene: MatchPacket, stored: MatchPacket): MatchPacket {
+  const carried = reassignStations(scene, packetLineup(stored));
+  for (const index of [0, 9, 10, 11, 12] as const) carried[index] = structuredClone(stored[index]) as never;
+  return carried;
+}

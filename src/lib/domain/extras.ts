@@ -12,6 +12,8 @@ export interface SyncMarker {
   number: number;
   red: string[];
   blue: string[];
+  // nexus and tba order playoff teams differently - a reorder from the other source is not a team change
+  source?: "nexus" | "tba";
 }
 export interface BenchTeams { red?: string; blue?: string }
 export interface MatchExtras {
@@ -34,7 +36,8 @@ function syncMarker(value: unknown): SyncMarker | undefined {
   const blue = strings(value.blue);
   const { eventKey, level, number } = value;
   if (typeof eventKey !== "string" || !MATCH_LEVELS.includes(level as MatchLevel) || typeof number !== "number" || !Number.isFinite(number) || !red || !blue) return undefined;
-  return { eventKey, level: level as MatchLevel, number, red, blue };
+  const source = value.source === "nexus" || value.source === "tba" ? value.source : undefined;
+  return { eventKey, level: level as MatchLevel, number, red, blue, ...(source ? { source } : {}) };
 }
 function benchTeams(value: unknown): BenchTeams | undefined {
   if (!isObject(value)) return undefined;

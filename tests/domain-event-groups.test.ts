@@ -70,3 +70,14 @@ describe("Home event groups", () => {
     ]);
   });
 });
+
+describe("Home event groups without a Current Event", () => {
+  it("still put What-if Matches made with New after every event", () => {
+    const district = sync([]).add.slice(0, 1);
+    const scrimmage = newMatchPacket({ matchName: "Scrimmage", redTeams: ["1690", "", ""], blueTeams: ["", "", ""] }, "scrimmage");
+
+    const groups = groupMatchesByEvent([scrimmage, ...district], null);
+
+    expect(groups.map((group) => [group.eventKey, group.current])).toEqual([["2026isde1", false], [null, false]]);
+  });
+});

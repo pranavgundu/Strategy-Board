@@ -86,10 +86,11 @@ function queueTimes(value: unknown): QueueTimes {
 
 const NEXUS_LABEL = /^(Practice|Qualification|Playoff|Final) (\d+)( Replay)?$/;
 
+// a gap stays an empty station so the teams after it keep theirs - null while the alliance is undecided
 function teamList(value: unknown): string[] | null {
   if (!Array.isArray(value)) return null;
-  const teams = value.filter((team): team is string => typeof team === "string" && team.trim() !== "").map((team) => team.trim());
-  return teams.length ? teams : null;
+  const teams = value.map((team) => (typeof team === "string" ? team.trim() : ""));
+  return teams.some(Boolean) ? teams : null;
 }
 
 /** Reads a Nexus live event status. Null means Nexus has no schedule for the event yet. */

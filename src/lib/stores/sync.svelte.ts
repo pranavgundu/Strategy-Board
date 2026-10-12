@@ -38,6 +38,8 @@ interface Bookkeeping {
   source: SyncSource | null;
   eventKey: string | null;
   at: number | null;
+  // kept so a launch without network still knows the current event
+  detected: CurrentEvent | null;
 }
 
 let manualEventKey = $state<string | null>(null);
@@ -48,7 +50,7 @@ let dismissed = $state.raw<DismissedMatches>({});
 let lastChange = $state.raw<{ revision: number; ids: readonly string[] }>({ revision: 0, ids: [] });
 let detectedAt = 0;
 let status = $state<SyncStatus>({ state: "idle", message: "", eventKey: null, source: null, at: null });
-let bookkeeping: Bookkeeping = { etags: {}, source: null, eventKey: null, at: null };
+let bookkeeping: Bookkeeping = { etags: {}, source: null, eventKey: null, at: null, detected: null };
 let loading: Promise<void> | null = null;
 let running: Promise<void> | null = null;
 let polling = false;
@@ -75,12 +77,20 @@ function report(state: SyncState, message: string, eventKey: string | null): voi
   status = { state, message, eventKey, source: bookkeeping.source, at: bookkeeping.at };
 }
 
+async function saveBookkeeping(): Promise<void> {
+  await native.storage.set(BOOKKEEPING_KEY, bookkeeping as unknown as JsonValue).catch(() => undefined);
+}
+
 async function remember(source: SyncSource, eventKey: string, etagKey: string, etag: string | null): Promise<void> {
   const etags = { ...bookkeeping.etags };
   if (etag) etags[etagKey] = etag;
   else delete etags[etagKey];
-  bookkeeping = { etags, source, eventKey, at: Date.now() };
-  await native.storage.set(BOOKKEEPING_KEY, bookkeeping as unknown as JsonValue).catch(() => undefined);
+  bookkeeping = { ...bookkeeping, etags, source, eventKey, at: Date.now() };
+  await saveBookkeeping();
+}
+
+function stillRunning(event: CurrentEvent | null, now: number): event is CurrentEvent {
+  return event !== null && event.source !== "manual" && event.end !== null && now <= event.end + DAY_MS;
 }
 
 function readBookkeeping(value: unknown): Bookkeeping {
@@ -90,18 +100,19 @@ function readBookkeeping(value: unknown): Bookkeeping {
     source: stored.source === "nexus" || stored.source === "tba" ? stored.source : null,
     eventKey: typeof stored.eventKey === "string" ? stored.eventKey : null,
     at: typeof stored.at === "number" ? stored.at : null,
+    detected: typeof stored.detected === "object" && stored.detected !== null && typeof stored.detected.eventKey === "string" ? stored.detected : null,
   };
 }
 
 /** The hand-entered event, a detected event that hasn't ended yet, or a fresh detection. */
-async function resolveCurrentEvent(): Promise<{ event: CurrentEvent | null; problem: string | null }> {
+async function resolveCurrentEvent(): Promise<{ event: CurrentEvent | null; failure: SourceResponse | null }> {
   const now = Date.now();
-  if (manualEventKey) return { event: pickCurrentEvent({ manualEventKey, nexusEvents: null, nexusSchedules: {}, tbaEvents: null, now }), problem: null };
-  if (currentEvent?.source !== "manual" && currentEvent?.end != null && now <= currentEvent.end + DAY_MS) return { event: currentEvent, problem: null };
-  if (now - detectedAt < DETECTION_RETRY_MS) return { event: null, problem: null };
-  detectedAt = now;
+  if (manualEventKey) return { event: pickCurrentEvent({ manualEventKey, nexusEvents: null, nexusSchedules: {}, tbaEvents: null, now }), failure: null };
+  if (stillRunning(currentEvent, now)) return { event: currentEvent, failure: null };
+  if (now - detectedAt < DETECTION_RETRY_MS) return { event: null, failure: null };
   const list = await native.nexus.events();
-  if (list.kind === "missing-key" || list.kind === "rejected-key" || list.kind === "offline") return { event: null, problem: failureMessage(list, "") };
+  if (list.kind !== "ok" && list.kind !== "not-modified" && list.kind !== "not-found") return { event: null, failure: list };
+  detectedAt = now;
   const nexusEvents = list.kind === "ok" ? list.data : null;
   const nexusSchedules: Record<string, unknown> = {};
   for (const candidate of runningNexusEvents(nexusEvents, now)) {
@@ -113,14 +124,17 @@ async function resolveCurrentEvent(): Promise<{ event: CurrentEvent | null; prob
     const tbaEvents = await native.tba.teamEvents(OUR_TEAM, new Date(now).getUTCFullYear()).catch(() => null);
     event = pickCurrentEvent({ manualEventKey: null, nexusEvents, nexusSchedules, tbaEvents, now });
   }
-  return { event, problem: null };
+  bookkeeping = { ...bookkeeping, detected: event };
+  await saveBookkeeping();
+  return { event, failure: null };
 }
 
 async function run(): Promise<void> {
   const resolved = await resolveCurrentEvent();
   currentEvent = resolved.event;
   if (!resolved.event) {
-    report(resolved.problem ? "error" : "waiting", resolved.problem ?? "Waiting for schedule.", null);
+    if (resolved.failure) report(resolved.failure.kind === "offline" ? "offline" : "error", failureMessage(resolved.failure, ""), null);
+    else report("waiting", "Waiting for schedule.", null);
     return;
   }
   const eventKey = resolved.event.eventKey;
@@ -231,6 +245,7 @@ export const scheduleSync = {
         dismissed = readDismissedMatches(deleted);
         manualEventKey = typeof stored === "string" && EVENT_KEY.test(stored) ? stored : null;
         bookkeeping = readBookkeeping(kept);
+        if (stillRunning(bookkeeping.detected, Date.now())) currentEvent = bookkeeping.detected;
         queue = queued && typeof queued === "object" && !Array.isArray(queued) && typeof queued.eventKey === "string" ? queued as unknown as EventQueue : null;
         status = { ...status, eventKey: bookkeeping.eventKey, source: bookkeeping.source, at: bookkeeping.at };
       },

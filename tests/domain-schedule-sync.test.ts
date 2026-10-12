@@ -93,6 +93,12 @@ describe("Schedule Sync from Nexus", () => {
     expect(readExtras(playoff7).sync?.red).toEqual(["1690", "2231", "11480", "9740"]);
   });
 
+  it("keeps each listed team in its own Station when the schedule leaves a gap", () => {
+    const gap = edited(isde1, (matches) => { byLabel(matches, "Playoff 7").redTeams = ["1690", "" as string, "11480"]; });
+
+    expect(sync(gap).add.find((packet) => packet[0] === "Playoff 7")!.slice(1, 4)).toEqual(["1690", "", "11480"]);
+  });
+
   it("waits for both alliances before adding a match, and ignores labels it can't read", () => {
     const pending = edited(isde1, (matches) => {
       matches.push({ label: "Playoff 14", status: "Queuing soon", redTeams: ["1690", "2231", "11480"], blueTeams: null, times: {} });
@@ -131,7 +137,7 @@ describe("Schedule Sync from Nexus", () => {
 
     expect(readExtras(quals2).sync).toEqual({
       eventKey: "2026isde1", level: "qual", number: 2,
-      red: ["9740", "9738", "1574"], blue: ["1690", "7039", "2231"],
+      red: ["9740", "9738", "1574"], blue: ["1690", "7039", "2231"], source: "nexus",
     });
   });
 });

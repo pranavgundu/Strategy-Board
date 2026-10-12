@@ -38,10 +38,11 @@
   <div id="sync-status-line" class="flex items-center gap-2 min-w-0 text-xs text-[#999]" role="status" aria-live="polite">
     <span class="size-2 shrink-0 rounded-full state-{status.state}"></span>
     <span class="truncate">{text}</span>
-    {#if source}
-      <span class="shrink-0">·</span>
-      <a class="flex items-center shrink-0 underline hover:text-[#e8e8e8]" href={source.href} target="_blank" rel="noopener noreferrer">Data from {source.site}</a>
-    {/if}
+    <span class="shrink-0">· Data from</span>
+    {#each Object.values(SOURCES) as credit, index (credit.href)}
+      {#if index > 0}<span class="shrink-0">and</span>{/if}
+      <a class="flex items-center shrink-0 underline hover:text-[#e8e8e8]" href={credit.href} target="_blank" rel="noopener noreferrer">{credit.site}</a>
+    {/each}
   </div>
 {/if}
 

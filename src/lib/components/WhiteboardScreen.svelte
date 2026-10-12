@@ -5,7 +5,7 @@
   import { scheduleSync } from "$lib/stores/sync.svelte";
   import { createWhiteboardController, whiteboardMatchFromPacket, writeWhiteboardPacket, type WhiteboardController, type WhiteboardMatch, type WhiteboardMode, type WhiteboardState } from "$lib/whiteboard";
   import { newId, safeFilename, savePng } from "$lib/features";
-  import { addCommonPath, commonPathChoices, matchFieldYear, readExtras, readTicks, saveCommonPath, STATIONS, swapBenchTeam, toggleTick, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
+  import { addCommonPath, carryOverToLineup, commonPathChoices, matchFieldYear, packetLineup, readExtras, readTicks, saveCommonPath, STATIONS, swapBenchTeam, toggleTick, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
   import { native } from "$lib/native/api";
   import type { MatchPacket } from "$lib/native/types";
   import ApplyCommonPathModal from "./ApplyCommonPathModal.svelte";
@@ -69,9 +69,13 @@
     const { id } = match;
     commitQueue = commitQueue.then(() => {
       const source = app.packets.find((packet) => packet[7] === id);
-      // sync just moved this match's teams and the canvas reloads next, so its scene is out of date
-      if (!source || STATIONS.some((station, index) => source[index + 1] !== match[station])) return;
-      return app.commitPacket(writeWhiteboardPacket(source, match));
+      if (!source) return;
+      const scene = writeWhiteboardPacket(source, match);
+      if (STATIONS.every((station, index) => source[index + 1] === match[station])) return app.commitPacket(scene);
+      // sync moved the teams after these edits were drawn - carry them over so every stroke stays with its team
+      STATIONS.forEach((station, index) => { scene[index + 1] = match[station]; });
+      scene[8][0] = STATIONS.map((station) => [match.auto[`${station}Robot`].w, match.auto[`${station}Robot`].h]);
+      return app.commitPacket(carryOverToLineup(scene, source));
     }).catch(() => onNotice("Could not save the latest whiteboard change."));
   }
 
@@ -119,9 +123,11 @@
     handledSyncChange = change.revision;
     untrack(() => {
       const active = app.activeMatch;
-      if (!controller || !active || !change.ids.includes(active.id)) return;
+      const shown = controller?.getMatch();
+      if (!controller || !active || !shown || !change.ids.includes(active.id)) return;
+      const next = packetLineup(active.packet);
       controller.reloadMatch(whiteboardMatchFromPacket(active.packet));
-      onNotice("The schedule changed this match's teams. Each plan moved with its team.");
+      if (STATIONS.some((station) => next[station] !== shown[station])) onNotice("The schedule changed this match's teams. Each plan moved with its team.");
     });
   });
 
