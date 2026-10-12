@@ -324,6 +324,7 @@ export async function browserInvoke<TResult>(command: string, args: Record<strin
     case "model_clear_matches": await storageSet(APP_DATA_KEY, []); break;
     case "match_create_packet": result = createBrowserMatchPacket({ matchName: args.matchName, redTeams: args.redTeams, blueTeams: args.blueTeams, tbaEventKey: args.tbaEventKey, tbaMatchKey: args.tbaMatchKey, tbaYear: args.tbaYear } as CreateMatchInput); break;
     case "match_normalize_packet": result = normalizeBrowserMatchPacket(args.packet); break;
+    case "nexus_events": result = await nexusRequest("/events", typeof args.etag === "string" ? args.etag : null); break;
     case "nexus_event_status": result = await nexusRequest(`/event/${encodeURIComponent(String(args.eventKey))}`, typeof args.etag === "string" ? args.etag : null); break;
     case "tba_set_api_key": await storageSet("tbaApiKey", String(args.apiKey)); break;
     case "tba_has_api_key": result = Boolean((await storageGet("tbaApiKey")) || __TBA_API_KEY__); break;

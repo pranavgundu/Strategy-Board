@@ -4,6 +4,8 @@
   let draft = $state(scheduleSync.manualEventKey ?? "");
   let error = $state("");
   const status = $derived(scheduleSync.status);
+  const event = $derived(scheduleSync.currentEvent);
+  const SOURCE_NAMES = { nexus: "Nexus", tba: "The Blue Alliance", manual: "" } as const;
 
   async function save(event: SubmitEvent) {
     event.preventDefault();
@@ -21,10 +23,20 @@
     await scheduleSync.setManualEventKey(null);
     draft = "";
     error = "";
+    void scheduleSync.syncNow();
   }
 </script>
 
 <div class="flex flex-col gap-5">
+  <p id="current-event-detected" class="text-base text-[#e8e8e8]">
+    {#if scheduleSync.manualEventKey}
+      Following <span class="font-mono">{scheduleSync.manualEventKey}</span>, entered by hand. Clear it to let the board detect the event.
+    {:else if event}
+      Detected {event.name ?? event.eventKey} (<span class="font-mono">{event.eventKey}</span>) from {SOURCE_NAMES[event.source]}.
+    {:else}
+      No event detected yet. The board looks for a Nexus event running today with 1690 on its schedule, then for 1690's events on The Blue Alliance.
+    {/if}
+  </p>
   <form class="flex flex-wrap items-center gap-3" onsubmit={save}>
     <input
       id="current-event-key-input"
@@ -58,6 +70,6 @@
   </div>
 
   <p class="text-xs text-[#666]">
-    Schedules come from <a href="https://frc.nexus" target="_blank" rel="noopener noreferrer" class="text-[#60a5fa] underline">frc.nexus</a>.
+    Schedules come from <a href="https://frc.nexus" target="_blank" rel="noopener noreferrer" class="text-[#60a5fa] underline">frc.nexus</a> and <a href="https://www.thebluealliance.com" target="_blank" rel="noopener noreferrer" class="text-[#60a5fa] underline">The Blue Alliance</a>.
   </p>
 </div>

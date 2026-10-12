@@ -1,4 +1,4 @@
-import { parseNexusEvent, planSync } from "$lib/domain";
+import { OUR_TEAM, parseNexusEvent, pickCurrentEvent, planSync, runningNexusEvents, type CurrentEvent } from "$lib/domain";
 import { newId } from "$lib/features/runtime";
 import { native } from "$lib/native/api";
 import type { JsonValue, SourceResponse } from "$lib/native/types";
@@ -9,6 +9,8 @@ const MANUAL_EVENT_KEY = "manualEventKey";
 const BOOKKEEPING_KEY = "syncBookkeeping";
 const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 const NEXUS_INTERVAL_MS = 30_000;
+const DETECTION_RETRY_MS = 5 * 60_000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type SyncSource = "nexus" | "tba";
 export type SyncState = "idle" | "syncing" | "synced" | "waiting" | "offline" | "error";
@@ -29,6 +31,8 @@ interface Bookkeeping {
 }
 
 let manualEventKey = $state<string | null>(null);
+let currentEvent = $state<CurrentEvent | null>(null);
+let detectedAt = 0;
 let status = $state<SyncStatus>({ state: "idle", message: "", eventKey: null, source: null, at: null });
 let bookkeeping: Bookkeeping = { etags: {}, source: null, eventKey: null, at: null };
 let loading: Promise<void> | null = null;
@@ -69,12 +73,37 @@ function readBookkeeping(value: unknown): Bookkeeping {
   };
 }
 
+/** The hand-entered event, a detected event that hasn't ended yet, or a fresh detection. */
+async function resolveCurrentEvent(): Promise<{ event: CurrentEvent | null; problem: string | null }> {
+  const now = Date.now();
+  if (manualEventKey) return { event: pickCurrentEvent({ manualEventKey, nexusEvents: null, nexusSchedules: {}, tbaEvents: null, now }), problem: null };
+  if (currentEvent?.source !== "manual" && currentEvent?.end != null && now <= currentEvent.end + DAY_MS) return { event: currentEvent, problem: null };
+  if (now - detectedAt < DETECTION_RETRY_MS) return { event: null, problem: null };
+  detectedAt = now;
+  const list = await native.nexus.events();
+  if (list.kind === "missing-key" || list.kind === "rejected-key" || list.kind === "offline") return { event: null, problem: failureMessage(list, "") };
+  const nexusEvents = list.kind === "ok" ? list.data : null;
+  const nexusSchedules: Record<string, unknown> = {};
+  for (const candidate of runningNexusEvents(nexusEvents, now)) {
+    const response = await native.nexus.eventStatus(candidate.eventKey);
+    if (response.kind === "ok") nexusSchedules[candidate.eventKey] = response.data;
+  }
+  let event = pickCurrentEvent({ manualEventKey: null, nexusEvents, nexusSchedules, tbaEvents: null, now });
+  if (!event) {
+    const tbaEvents = await native.tba.teamEvents(OUR_TEAM, new Date(now).getUTCFullYear()).catch(() => null);
+    event = pickCurrentEvent({ manualEventKey: null, nexusEvents, nexusSchedules, tbaEvents, now });
+  }
+  return { event, problem: null };
+}
+
 async function run(): Promise<void> {
-  const eventKey = manualEventKey;
-  if (!eventKey) {
-    report("waiting", "Enter the event key in Settings to sync its schedule.", null);
+  const resolved = await resolveCurrentEvent();
+  currentEvent = resolved.event;
+  if (!resolved.event) {
+    report(resolved.problem ? "error" : "waiting", resolved.problem ?? "Waiting for schedule.", null);
     return;
   }
+  const eventKey = resolved.event.eventKey;
   report("syncing", status.message, eventKey);
   const etagKey = `nexus:event:${eventKey}`;
   let response: SourceResponse;
@@ -123,6 +152,8 @@ async function syncAndContinue(): Promise<void> {
 /** Keeps Our Team's Matches at the Current Event in step with its schedule. */
 export const scheduleSync = {
   get manualEventKey(): string | null { return manualEventKey; },
+  /** The event Schedule Sync follows: hand-entered, or detected from Nexus or TBA. */
+  get currentEvent(): CurrentEvent | null { return currentEvent; },
   get status(): SyncStatus { return status; },
 
   init(): Promise<void> {
@@ -142,6 +173,8 @@ export const scheduleSync = {
     const key = input?.trim().toLowerCase() || null;
     if (key && !EVENT_KEY.test(key)) throw new Error("An event key looks like 2026isde1.");
     manualEventKey = key;
+    currentEvent = null;
+    detectedAt = 0;
     if (key) await native.storage.set(MANUAL_EVENT_KEY, key);
     else await native.storage.delete(MANUAL_EVENT_KEY);
   },

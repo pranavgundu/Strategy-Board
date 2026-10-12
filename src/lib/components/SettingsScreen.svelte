@@ -18,7 +18,7 @@
     { id: "checklist", title: "Checklist", description: "What every strategy meeting covers. Items can be ticked per Match; Headings group them.", component: ChecklistSection },
     { id: "team-colors", title: "Team Colors", description: "Recolor a team on this device when its scouting app color is hard to see or clashes.", component: TeamColorsSection },
     { id: "common-paths", title: "Common Paths", description: "Saved robot plans you can paste into any Match from the whiteboard's PATHS button.", component: CommonPathsSection },
-    { id: "current-event", title: "Current Event", description: "Schedule Sync adds every match with 1690 at this event, with each team in its schedule Station.", component: CurrentEventSection },
+    { id: "current-event", title: "Current Event", description: "Schedule Sync follows this event and adds every match with 1690, with each team in its schedule Station.", component: CurrentEventSection },
   ];
 
   let body = $state<HTMLDivElement>();

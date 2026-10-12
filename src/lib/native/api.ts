@@ -84,6 +84,8 @@ export const native = {
     simpleMatches: (matches: TbaMatch[]) => call<TbaSimpleMatch[]>("tba_simple_matches", { matches }),
   },
   nexus: {
+    /** Every event registered with Nexus, with its start and end times. */
+    events: (etag?: string | null) => call<SourceResponse>("nexus_events", { etag: etag ?? null }),
     /** Live status of one event. Pass the last ETag so an unchanged schedule answers "not-modified". */
     eventStatus: (eventKey: string, etag?: string | null) => call<SourceResponse>("nexus_event_status", { eventKey, etag: etag ?? null }),
   },
