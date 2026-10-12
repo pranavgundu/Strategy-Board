@@ -107,7 +107,7 @@ describe("The manual TBA import", () => {
     expect(importFor([...board, ...imported], null)).toEqual([]);
   });
 
-  it("makes imports for the Current Event Synced Matches that sync then follows, and plain matches for other events", () => {
+  it("makes imports for the Current Event Synced Matches that sync then follows, and What-if Matches for other events", () => {
     const current = importFor([], "2026isde1");
     const elsewhere = importFor([], "2026iscmp");
 

@@ -1,9 +1,10 @@
-import { encodeBackup, encodeBoardConfigFile, readBoardFile, type BoardFile } from "$lib/domain";
+import { BoardFileError, encodeBackup, encodeBoardConfigFile, readBoardFile, type BoardFile } from "$lib/domain";
 import { shareBoardFile, type SaveFileResult } from "$lib/features/files";
 
 import { app } from "./app.svelte";
 import { boardConfig } from "./config.svelte";
 import { scheduleSync } from "./sync.svelte";
+import { toast } from "./toast.svelte";
 
 export type ReplacingFile = Exclude<BoardFile, { kind: "match" }>;
 
@@ -14,13 +15,25 @@ export const boardFiles = {
 
   // a match file is added at once - a file that would replace data waits for confirm()
   async open(file: File): Promise<string | null> {
-    const read = readBoardFile(await file.text());
-    if (read.kind !== "match") {
-      pending = read;
+    const boardFile = readBoardFile(await file.text());
+    if (boardFile.kind !== "match") {
+      pending = boardFile;
       return null;
     }
-    await app.importPackets([read.packet]);
-    return `Imported "${read.packet[0] || "Untitled match"}" as a what-if match.`;
+    await app.importPackets([boardFile.packet]);
+    return `Imported "${boardFile.packet[0] || "Untitled match"}" as a what-if match.`;
+  },
+
+  async openPicked(input: HTMLInputElement): Promise<void> {
+    const chosen = input.files?.[0];
+    input.value = "";
+    if (!chosen) return;
+    try {
+      const message = await this.open(chosen);
+      if (message) toast.show(message, "info", 3500);
+    } catch (error) {
+      toast.show(error instanceof BoardFileError ? error.message : "Could not open that file.", "error");
+    }
   },
 
   cancel(): void {

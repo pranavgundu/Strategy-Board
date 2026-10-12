@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { inkColor, NEUTRAL_INK, resolveTeamColor, STATIONS, stationAlliance, teamInk, type AllianceColor, type BenchTeams, type Lineup, type StationKey, type TeamColorOverrides } from "$lib/domain";
+  import { inkColor, NEUTRAL_INK, resolveTeamColor, STATION_NAMES, STATIONS, stationAlliance, teamInk, type AllianceColor, type BenchTeams, type Lineup, type StationKey, type TeamColorOverrides } from "$lib/domain";
 
   let { lineup, ink, overrides, hiddenTeams, bench, onPick, onToggleHidden, onSavePath, onSwapBench }: {
     lineup: Lineup;
@@ -13,7 +13,6 @@
     onSwapBench: (station: StationKey) => void;
   } = $props();
 
-  const STATION_NAMES: Record<StationKey, string> = { redOne: "Red 1", redTwo: "Red 2", redThree: "Red 3", blueOne: "Blue 1", blueTwo: "Blue 2", blueThree: "Blue 3" };
   const LAST_STATION: Partial<Record<StationKey, AllianceColor>> = { redThree: "red", blueThree: "blue" };
 
   type Menu = { kind: "team"; station: StationKey; team: string; top: number } | { kind: "bench"; alliance: AllianceColor; team: string; top: number };
@@ -28,7 +27,7 @@
       const team = lineup[station].trim();
       return {
         ink: teamInk(station), station, team, label: team || "Empty", color: inkColor(teamInk(station), lineup, overrides),
-        alliance: station.startsWith("red") ? "red" : "blue", empty: !team, hidden: Boolean(team) && hiddenTeams.includes(team),
+        alliance: stationAlliance(station), empty: !team, hidden: Boolean(team) && hiddenTeams.includes(team),
       };
     }),
   ]);
@@ -51,7 +50,7 @@
 <div
   id="whiteboard-ink-picker"
   class="absolute flex flex-col gap-1.5 bottom-3 sm:bottom-4 md:bottom-6 left-3 sm:left-4 md:left-6 p-2 bg-[#1a1a1a] border border-[#3a3a3a] rounded-[1.6rem]"
-  class:color-picker-hidden={closing}
+  class:ink-picker-hidden={closing}
   role="toolbar"
   aria-label="Ink"
 >
@@ -232,7 +231,7 @@
     cursor: pointer;
   }
   .ink-menu button:hover { background: #252525; }
-  #whiteboard-ink-picker.color-picker-hidden .ink-chip {
+  #whiteboard-ink-picker.ink-picker-hidden .ink-chip {
     animation: colorItemSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 </style>

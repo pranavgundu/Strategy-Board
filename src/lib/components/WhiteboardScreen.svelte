@@ -5,7 +5,7 @@
   import { scheduleSync } from "$lib/stores/sync.svelte";
   import { createWhiteboardController, whiteboardMatchFromPacket, writeWhiteboardPacket, type WhiteboardController, type WhiteboardMatch, type WhiteboardMode, type WhiteboardState } from "$lib/whiteboard";
   import { newId, safeFilename, savePng } from "$lib/features";
-  import { addCommonPath, carryOverToLineup, commonPathChoices, matchFieldYear, packetLineup, readExtras, readTicks, saveCommonPath, STATIONS, swapBenchTeam, toggleTick, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
+  import { addCommonPath, carryOverToLineup, commonPathChoices, matchFieldYear, packetLineup, phaseName, readExtras, readTicks, saveCommonPath, STATIONS, swapBenchTeam, toggleTick, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
   import { native } from "$lib/native/api";
   import type { MatchPacket } from "$lib/native/types";
   import ApplyCommonPathModal from "./ApplyCommonPathModal.svelte";
@@ -39,15 +39,11 @@
   let commitQueue: Promise<void> = Promise.resolve();
   let handledPngRequest = 0;
 
-  const lineup = $derived<Lineup | null>(app.activeMatch && {
-    redOne: app.activeMatch.redOne, redTwo: app.activeMatch.redTwo, redThree: app.activeMatch.redThree,
-    blueOne: app.activeMatch.blueOne, blueTwo: app.activeMatch.blueTwo, blueThree: app.activeMatch.blueThree,
-  });
+  const lineup = $derived<Lineup | null>(app.activeMatch && packetLineup(app.activeMatch.packet));
   const bench = $derived(app.activeMatch ? readExtras(app.activeMatch.packet).bench ?? {} : {});
   const ticks = $derived(app.activeMatch ? readTicks(app.activeMatch.packet, boardConfig.current.checklist) : []);
   const teleopLabel = $derived(fieldYear === 2026 ? "ACTIVE" : "TELEOP");
   const endgameLabel = $derived(fieldYear === 2026 ? "INACTIVE" : "ENDGAME");
-  const phaseLabels = $derived<Record<MatchPhase, string>>({ auto: "AUTO", transition: "TRANSITION", teleop: teleopLabel, endgame: endgameLabel, notes: "NOTES" });
   const phaseOnScreen = $derived<MatchPhase | null>(ui.mode === "statbotics" ? null : ui.mode);
   const pathFieldYear = $derived(app.activeMatch ? matchFieldYear(app.activeMatch.packet) : 2026);
   const pathChoices = $derived(applyOpen && lineup && phaseOnScreen
@@ -71,7 +67,8 @@
       const source = app.packets.find((packet) => packet[7] === id);
       if (!source) return;
       const scene = writeWhiteboardPacket(source, match);
-      if (STATIONS.every((station, index) => source[index + 1] === match[station])) return app.commitPacket(scene);
+      const stored = packetLineup(source);
+      if (STATIONS.every((station) => stored[station] === match[station])) return app.commitPacket(scene);
       // sync moved the teams after these edits were drawn - carry them over so every stroke stays with its team
       STATIONS.forEach((station, index) => { scene[index + 1] = match[station]; });
       scene[8][0] = STATIONS.map((station) => [match.auto[`${station}Robot`].w, match.auto[`${station}Robot`].h]);
@@ -312,11 +309,11 @@
     <SaveCommonPathModal
       open={savePathFor !== null}
       team={savePathFor ? lineup[savePathFor] : ""}
-      phaseLabel={phaseOnScreen ? phaseLabels[phaseOnScreen] : ""}
+      phaseLabel={phaseOnScreen ? phaseName(phaseOnScreen, pathFieldYear) : ""}
       strokeCount={savePreview?.strokes.length ?? 0}
       onSave={savePath}
       onClose={() => (savePathFor = null)}
     />
-    <ApplyCommonPathModal open={applyOpen} choices={pathChoices} {lineup} fieldYear={pathFieldYear} {phaseLabels} onApply={applyPath} onClose={() => (applyOpen = false)} />
+    <ApplyCommonPathModal open={applyOpen} choices={pathChoices} {lineup} fieldYear={pathFieldYear} onApply={applyPath} onClose={() => (applyOpen = false)} />
   {/if}
 {/if}

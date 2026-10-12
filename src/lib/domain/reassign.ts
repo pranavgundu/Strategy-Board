@@ -2,10 +2,8 @@ import type { MatchPacket } from "$lib/native/types";
 
 import { fieldLayout } from "./field-layout";
 import { inkStation, NEUTRAL_INK, teamInk, type Lineup } from "./ink";
-import { STATIONS, type StationKey } from "./stations";
-
-const ALLIANCES: readonly (readonly StationKey[])[] = [["redOne", "redTwo", "redThree"], ["blueOne", "blueTwo", "blueThree"]];
-const ROBOT_SIZE = 152.4;
+import { ROBOT_SIZE } from "./packets";
+import { ALLIANCE_STATIONS, STATIONS, type StationKey } from "./stations";
 
 export function packetLineup(packet: MatchPacket): Lineup {
   return Object.fromEntries(STATIONS.map((station, index) => [station, typeof packet[index + 1] === "string" ? packet[index + 1] : ""])) as unknown as Lineup;
@@ -23,7 +21,7 @@ function contentSources(current: Lineup, next: Lineup): Record<StationKey, Stati
       claimed.add(from);
     }
   }
-  for (const alliance of ALLIANCES) {
+  for (const alliance of Object.values(ALLIANCE_STATIONS)) {
     const open = alliance.filter((station) => !(station in sources));
     const unclaimed = alliance.filter((station) => !claimed.has(station));
     open.forEach((target, index) => { sources[target] = unclaimed[index] ?? null; });

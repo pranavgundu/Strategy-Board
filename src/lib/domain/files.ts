@@ -1,6 +1,7 @@
 import type { MatchPacket } from "$lib/native/types";
 
 import { readBoardConfig, type BoardConfig } from "./board-config";
+import { isEventKey } from "./current-event";
 import { toWhatIfMatch } from "./extras";
 import { isObject } from "./json";
 import { readDismissedMatches, type DismissedMatches } from "./sync";
@@ -9,7 +10,6 @@ const MATCH_FILE = "orbit-strategy-board/match";
 const BOARD_CONFIG_FILE = "orbit-strategy-board/board-config";
 const BACKUP_FILE = "orbit-strategy-board/backup";
 const FILE_VERSION = 1;
-const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 
 export interface Backup {
   packets: MatchPacket[];
@@ -49,7 +49,7 @@ function backupFrom(file: Record<string, unknown>): Backup {
   return {
     packets: structuredClone(packets) as unknown as MatchPacket[],
     config: readBoardConfig(config),
-    manualEventKey: typeof manualEventKey === "string" && EVENT_KEY.test(manualEventKey) ? manualEventKey : null,
+    manualEventKey: isEventKey(manualEventKey) ? manualEventKey : null,
     dismissed: readDismissedMatches(dismissed),
   };
 }

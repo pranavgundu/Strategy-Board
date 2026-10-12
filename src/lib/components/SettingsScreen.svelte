@@ -49,15 +49,13 @@
     </div>
 
     <div class="flex flex-1 min-h-0">
-      {#if sections.length > 1}
-        <nav id="settings-nav" class="hidden md:flex flex-col gap-1 w-56 lg:w-64 shrink-0 p-4 lg:p-6 border-r border-[#1e1e1e] bg-[#0f0f0f] overflow-y-auto touch-pan-y">
-          {#each sections as section (section.id)}
-            <button class="text-left px-4 py-3 rounded-[6px] text-[#999] hover:text-[#e8e8e8] hover:bg-[#1a1a1a] transition-colors" onclick={() => jumpTo(section.id)}>
-              {section.title}
-            </button>
-          {/each}
-        </nav>
-      {/if}
+      <nav id="settings-nav" class="hidden md:flex flex-col gap-1 w-56 lg:w-64 shrink-0 p-4 lg:p-6 border-r border-[#1e1e1e] bg-[#0f0f0f] overflow-y-auto touch-pan-y">
+        {#each sections as section (section.id)}
+          <button class="text-left px-4 py-3 rounded-[6px] text-[#999] hover:text-[#e8e8e8] hover:bg-[#1a1a1a] transition-colors" onclick={() => jumpTo(section.id)}>
+            {section.title}
+          </button>
+        {/each}
+      </nav>
 
       <div bind:this={body} id="settings-body" class="flex-1 min-w-0 overflow-y-auto touch-pan-y p-4 sm:p-6 md:p-10">
         <div class="flex flex-col gap-6 md:gap-8 w-full max-w-4xl mx-auto">
@@ -72,8 +70,6 @@
                 <Section />
               </div>
             </section>
-          {:else}
-            <p id="settings-empty" class="py-16 text-center text-lg text-[#999]">Nothing to set up yet.</p>
           {/each}
         </div>
       </div>

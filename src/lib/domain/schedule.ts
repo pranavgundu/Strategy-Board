@@ -1,5 +1,9 @@
-import type { MatchLevel } from "./extras";
 import { isObject } from "./json";
+
+export type MatchLevel = "practice" | "qual" | "playoff" | "final";
+export const MATCH_LEVELS: readonly MatchLevel[] = ["practice", "qual", "playoff", "final"];
+export type ScheduleSource = "nexus" | "tba";
+export const SCHEDULE_SOURCE_NAMES: Readonly<Record<ScheduleSource, string>> = { nexus: "Nexus", tba: "TBA" };
 
 // the same identity whichever source reports the match
 export interface ScheduleIdentity {
@@ -32,19 +36,19 @@ export interface ScheduleEntry {
 }
 export interface EventSchedule {
   eventKey: string;
-  source: "nexus" | "tba";
+  source: ScheduleSource;
   entries: ScheduleEntry[];
 }
 
 const NEXUS_LEVELS: Record<string, MatchLevel> = { Practice: "practice", Qualification: "qual", Playoff: "playoff", Final: "final" };
-const NAMES: Record<MatchLevel, string> = { practice: "Practice", qual: "Quals", playoff: "Playoff", final: "Final" };
+const LEVEL_NAMES: Record<MatchLevel, string> = { practice: "Practice", qual: "Quals", playoff: "Playoff", final: "Final" };
 
 export function identityKey({ eventKey, level, number }: ScheduleIdentity): string {
   return `${eventKey}:${level}:${number}`;
 }
 
 export function scheduledMatchName({ level, number }: ScheduleIdentity): string {
-  return `${NAMES[level]} ${number}`;
+  return `${LEVEL_NAMES[level]} ${number}`;
 }
 
 export function scheduledTbaMatchKey({ eventKey, level, number }: ScheduleIdentity): string | null {

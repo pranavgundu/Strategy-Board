@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { SCHEDULE_SOURCE_NAMES } from "$lib/domain";
   import { scheduleSync } from "$lib/stores/sync.svelte";
 
   let draft = $state(scheduleSync.manualEventKey ?? "");
   let error = $state("");
   const status = $derived(scheduleSync.status);
   const event = $derived(scheduleSync.currentEvent);
-  const SOURCE_NAMES = { nexus: "Nexus", tba: "The Blue Alliance", manual: "" } as const;
 
   async function save(event: SubmitEvent) {
     event.preventDefault();
@@ -31,8 +31,8 @@
   <p id="current-event-detected" class="text-base text-[#e8e8e8]">
     {#if scheduleSync.manualEventKey}
       Following <span class="font-mono">{scheduleSync.manualEventKey}</span>, entered by hand. Clear it to let the board detect the event.
-    {:else if event}
-      Detected {event.name ?? event.eventKey} (<span class="font-mono">{event.eventKey}</span>) from {SOURCE_NAMES[event.source]}.
+    {:else if event && event.source !== "manual"}
+      Detected {event.name ?? event.eventKey} (<span class="font-mono">{event.eventKey}</span>) from {SCHEDULE_SOURCE_NAMES[event.source]}.
     {:else}
       No event detected yet. The board looks for a Nexus event running today with 1690 on its schedule, then for 1690's events on The Blue Alliance.
     {/if}

@@ -1,5 +1,5 @@
 import { isObject } from "./json";
-import { parseNexusEvent } from "./schedule";
+import { parseNexusEvent, type ScheduleSource } from "./schedule";
 import { OUR_TEAM } from "./stations";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -10,13 +10,21 @@ export interface EventCandidate {
   start: number;
   end: number;
 }
-export type CurrentEventSource = "manual" | "nexus" | "tba";
+export type CurrentEventSource = "manual" | ScheduleSource;
 export interface CurrentEvent {
   eventKey: string;
   name: string | null;
   source: CurrentEventSource;
   // a detected event is kept until it ends - null for a hand-entered key
   end: number | null;
+}
+
+export function isEventKey(value: unknown): value is string {
+  return typeof value === "string" && /^\d{4}[a-z0-9]+$/.test(value);
+}
+
+export function isStillRunning(event: CurrentEvent | null, now: number): event is CurrentEvent {
+  return event !== null && event.end !== null && now <= event.end + DAY_MS;
 }
 
 function running(candidates: EventCandidate[], now: number): EventCandidate[] {

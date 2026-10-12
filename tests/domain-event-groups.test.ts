@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dismissMatches, groupMatchesByEvent, newMatchPacket, parseNexusEvent, planSync, restoreDismissed, toWhatIfMatch, type DismissedMatches } from "$lib/domain";
+import { dismissMatches, groupMatchesByEvent, homeEventGroups, newMatchPacket, parseNexusEvent, planSync, restoreDismissed, toWhatIfMatch, type DismissedMatches } from "$lib/domain";
 import type { MatchPacket } from "$lib/native/types";
 
 import iscmp from "./fixtures/nexus-2026iscmp.json";
@@ -79,5 +79,38 @@ describe("Home event groups without a Current Event", () => {
     const groups = groupMatchesByEvent([scrimmage, ...district], null);
 
     expect(groups.map((group) => [group.eventKey, group.current])).toEqual([["2026isde1", false], [null, false]]);
+  });
+});
+
+describe("Home event groups with Queue Status", () => {
+  it("pin Our Team's Next Match first in schedule order and give each match its Queue Status", () => {
+    const board = sync([]).add;
+    const plan = sync(board);
+    const championship = planSync({ packets: [], schedule: parseNexusEvent(iscmp)!, newId }).add.slice(0, 1);
+
+    const groups = homeEventGroups([...championship, ...[...board].reverse()], {
+      currentEventKey: "2026isde1",
+      queue: { eventKey: "2026isde1", schedule: plan.schedule, nextMatch: plan.nextMatch },
+      dismissed: {},
+    });
+
+    const [current, other] = groups;
+    expect(current.matches.map((match) => match.packet[0])).toEqual([
+      "Final 2", "Practice 3", "Practice 9", "Quals 2", "Quals 9", "Quals 13", "Quals 16", "Quals 19", "Quals 27", "Quals 32",
+      "Quals 36", "Quals 41", "Quals 45", "Quals 50", "Quals 53", "Playoff 1", "Playoff 7", "Playoff 11", "Final 1", "Final 3",
+    ]);
+    expect(current.matches.filter((match) => match.next).map((match) => match.packet[0])).toEqual(["Final 2"]);
+    expect(current.matches.at(-1)?.info?.status).toBe("Queuing soon");
+    expect(other.matches.map((match) => [match.next, match.info])).toEqual([[false, null]]);
+  });
+
+  it("keep the Current Event when every match in it was deleted, so they can be restored", () => {
+    const groups = homeEventGroups([], {
+      currentEventKey: "2026isde1",
+      queue: null,
+      dismissed: { "2026isde1": ["2026isde1:qual:2", "2026isde1:qual:9"] },
+    });
+
+    expect(groups).toEqual([{ eventKey: "2026isde1", current: true, dismissedCount: 2, matches: [] }]);
   });
 });

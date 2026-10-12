@@ -1,4 +1,4 @@
-import { dismissMatches, OUR_TEAM, parseNexusEvent, parseTbaMatches, pickCurrentEvent, planSync, readDismissedMatches, restoreDismissed, runningNexusEvents, type CurrentEvent, type DismissedMatches, type EventSchedule, type ScheduleInfo } from "$lib/domain";
+import { dismissMatches, isEventKey, isObject, isStillRunning, OUR_TEAM, parseNexusEvent, parseTbaMatches, pickCurrentEvent, planSync, readDismissedMatches, restoreDismissed, runningNexusEvents, SCHEDULE_SOURCE_NAMES, type CurrentEvent, type DismissedMatches, type EventQueue, type EventSchedule, type ScheduleSource } from "$lib/domain";
 import { newId } from "$lib/features/runtime";
 import { native } from "$lib/native/api";
 import type { JsonValue, MatchPacket, SourceResponse } from "$lib/native/types";
@@ -9,31 +9,23 @@ const MANUAL_EVENT_KEY = "manualEventKey";
 const BOOKKEEPING_KEY = "syncBookkeeping";
 const QUEUE_KEY = "queueStatus";
 const DISMISSED_KEY = "dismissedMatches";
-const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 const NEXUS_INTERVAL_MS = 30_000;
 // tba caches responses for 61 seconds - asking more often only repeats the same answer
 const TBA_INTERVAL_MS = 60_000;
 const DETECTION_RETRY_MS = 5 * 60_000;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type SyncSource = "nexus" | "tba";
 export type SyncState = "idle" | "syncing" | "synced" | "waiting" | "offline" | "error";
 export interface SyncStatus {
   state: SyncState;
   message: string;
   eventKey: string | null;
-  source: SyncSource | null;
+  source: ScheduleSource | null;
   // last successful schedule read
   at: number | null;
 }
-export interface EventQueue {
-  eventKey: string;
-  schedule: Record<string, ScheduleInfo>;
-  nextMatch: string | null;
-}
 interface Bookkeeping {
   etags: Record<string, string>;
-  source: SyncSource | null;
+  source: ScheduleSource | null;
   eventKey: string | null;
   at: number | null;
   // kept so a launch without network still knows the current event
@@ -54,13 +46,11 @@ let running: Promise<void> | null = null;
 let polling = false;
 let timer: number | null = null;
 
-const SOURCE_NAMES: Record<SyncSource, { name: string; key: string }> = {
-  nexus: { name: "Nexus", key: "NEXUS_API_KEY" },
-  tba: { name: "TBA", key: "TBA_API_KEY" },
-};
+const API_KEY_NAMES: Record<ScheduleSource, string> = { nexus: "NEXUS_API_KEY", tba: "TBA_API_KEY" };
 
-function failureMessage(response: SourceResponse, eventKey: string, source: SyncSource = "nexus"): string {
-  const { name, key } = SOURCE_NAMES[source];
+function failureMessage(response: SourceResponse, eventKey: string, source: ScheduleSource = "nexus"): string {
+  const name = SCHEDULE_SOURCE_NAMES[source];
+  const key = API_KEY_NAMES[source];
   switch (response.kind) {
     case "not-found": return `${name} has no event called ${eventKey}.`;
     case "missing-key": return `This build has no ${name} API key. Add ${key} to orbit-strategy-board.env and rebuild.`;
@@ -79,7 +69,7 @@ async function saveBookkeeping(): Promise<void> {
   await native.storage.set(BOOKKEEPING_KEY, bookkeeping as unknown as JsonValue).catch(() => undefined);
 }
 
-async function remember(source: SyncSource, eventKey: string, etagKey: string, etag: string | null): Promise<void> {
+async function recordRead(source: ScheduleSource, eventKey: string, etagKey: string, etag: string | null): Promise<void> {
   const etags = { ...bookkeeping.etags };
   if (etag) etags[etagKey] = etag;
   else delete etags[etagKey];
@@ -87,14 +77,10 @@ async function remember(source: SyncSource, eventKey: string, etagKey: string, e
   await saveBookkeeping();
 }
 
-function stillRunning(event: CurrentEvent | null, now: number): event is CurrentEvent {
-  return event !== null && event.source !== "manual" && event.end !== null && now <= event.end + DAY_MS;
-}
-
 function readBookkeeping(value: unknown): Bookkeeping {
-  const stored = typeof value === "object" && value !== null && !Array.isArray(value) ? value as Partial<Bookkeeping> : {};
+  const stored: Partial<Bookkeeping> = isObject(value) ? value : {};
   return {
-    etags: typeof stored.etags === "object" && stored.etags !== null ? stored.etags : {},
+    etags: isObject(stored.etags) ? stored.etags : {},
     source: stored.source === "nexus" || stored.source === "tba" ? stored.source : null,
     eventKey: typeof stored.eventKey === "string" ? stored.eventKey : null,
     at: typeof stored.at === "number" ? stored.at : null,
@@ -105,7 +91,7 @@ function readBookkeeping(value: unknown): Bookkeeping {
 async function resolveCurrentEvent(): Promise<{ event: CurrentEvent | null; failure: SourceResponse | null }> {
   const now = Date.now();
   if (manualEventKey) return { event: pickCurrentEvent({ manualEventKey, nexusEvents: null, nexusSchedules: {}, tbaEvents: null, now }), failure: null };
-  if (stillRunning(currentEvent, now)) return { event: currentEvent, failure: null };
+  if (isStillRunning(currentEvent, now)) return { event: currentEvent, failure: null };
   if (now - detectedAt < DETECTION_RETRY_MS) return { event: null, failure: null };
   const list = await native.nexus.events();
   if (list.kind !== "ok" && list.kind !== "not-modified" && list.kind !== "not-found") return { event: null, failure: list };
@@ -145,7 +131,7 @@ async function run(): Promise<void> {
     return;
   }
   if (response.kind === "not-modified") {
-    await remember("nexus", eventKey, etagKey, response.etag);
+    await recordRead("nexus", eventKey, etagKey, response.etag);
     report("synced", "Up to date with Nexus.", eventKey);
     return;
   }
@@ -164,7 +150,7 @@ async function syncFromTba(eventKey: string): Promise<void> {
   const etagKey = `tba:matches:${eventKey}`;
   const response = await native.tba.teamMatchesStatus(OUR_TEAM, eventKey, bookkeeping.etags[etagKey]);
   if (response.kind === "not-modified") {
-    await remember("tba", eventKey, etagKey, response.etag);
+    await recordRead("tba", eventKey, etagKey, response.etag);
     report("synced", "Up to date with TBA.", eventKey);
     return;
   }
@@ -184,8 +170,8 @@ async function applySchedule(schedule: EventSchedule, etagKey: string, etag: str
   if (plan.update.length) lastChange = { revision: lastChange.revision + 1, ids: plan.update.map((packet) => packet[7]) };
   queue = { eventKey, schedule: plan.schedule, nextMatch: plan.nextMatch };
   await native.storage.set(QUEUE_KEY, queue as unknown as JsonValue).catch(() => undefined);
-  await remember(source, eventKey, etagKey, etag);
-  const { name } = SOURCE_NAMES[source];
+  await recordRead(source, eventKey, etagKey, etag);
+  const name = SCHEDULE_SOURCE_NAMES[source];
   const changes = [plan.add.length && `added ${plan.add.length} match${plan.add.length === 1 ? "" : "es"}`, plan.update.length && `updated ${plan.update.length}`].filter(Boolean).join(" and ");
   report("synced", changes ? `${name} sync ${changes}.` : `Up to date with ${name}.`, eventKey);
 }
@@ -234,12 +220,12 @@ export const scheduleSync = {
 
   init(): Promise<void> {
     loading ??= Promise.all([native.storage.get(MANUAL_EVENT_KEY), native.storage.get(BOOKKEEPING_KEY), native.storage.get(QUEUE_KEY), native.storage.get(DISMISSED_KEY)]).then(
-      ([stored, kept, queued, deleted]) => {
-        dismissed = readDismissedMatches(deleted);
-        manualEventKey = typeof stored === "string" && EVENT_KEY.test(stored) ? stored : null;
-        bookkeeping = readBookkeeping(kept);
-        if (stillRunning(bookkeeping.detected, Date.now())) currentEvent = bookkeeping.detected;
-        queue = queued && typeof queued === "object" && !Array.isArray(queued) && typeof queued.eventKey === "string" ? queued as unknown as EventQueue : null;
+      ([storedEventKey, storedBookkeeping, storedQueue, storedDismissed]) => {
+        dismissed = readDismissedMatches(storedDismissed);
+        manualEventKey = isEventKey(storedEventKey) ? storedEventKey : null;
+        bookkeeping = readBookkeeping(storedBookkeeping);
+        if (isStillRunning(bookkeeping.detected, Date.now())) currentEvent = bookkeeping.detected;
+        queue = isObject(storedQueue) && typeof storedQueue.eventKey === "string" ? storedQueue as unknown as EventQueue : null;
         status = { ...status, eventKey: bookkeeping.eventKey, source: bookkeeping.source, at: bookkeeping.at };
       },
       () => undefined,
@@ -249,7 +235,7 @@ export const scheduleSync = {
 
   async setManualEventKey(input: string | null): Promise<void> {
     const key = input?.trim().toLowerCase() || null;
-    if (key && !EVENT_KEY.test(key)) throw new Error("An event key looks like 2026isde1.");
+    if (key && !isEventKey(key)) throw new Error("An event key looks like 2026isde1.");
     manualEventKey = key;
     currentEvent = null;
     detectedAt = 0;

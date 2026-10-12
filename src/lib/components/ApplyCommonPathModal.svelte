@@ -1,18 +1,15 @@
 <script lang="ts">
-  import { STATIONS, type CommonPath, type CommonPathChoice, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
+  import { phaseName, STATION_NAMES, STATIONS, type CommonPath, type CommonPathChoice, type Lineup, type StationKey } from "$lib/domain";
   import Modal from "./Modal.svelte";
 
-  let { open, choices, lineup, fieldYear, phaseLabels, onApply, onClose }: {
+  let { open, choices, lineup, fieldYear, onApply, onClose }: {
     open: boolean;
     choices: CommonPathChoice[];
     lineup: Lineup;
     fieldYear: number;
-    phaseLabels: Readonly<Record<MatchPhase, string>>;
     onApply: (path: CommonPath, station: StationKey) => void;
     onClose: () => void;
   } = $props();
-
-  const STATION_NAMES: Record<StationKey, string> = { redOne: "Red 1", redTwo: "Red 2", redThree: "Red 3", blueOne: "Blue 1", blueTwo: "Blue 2", blueThree: "Blue 3" };
 
   let targets = $state<Record<string, StationKey | "">>({});
   const occupied = $derived(STATIONS.filter((station) => lineup[station].trim()));
@@ -39,7 +36,7 @@
         <div class="flex-1 min-w-48">
           <div class="text-base font-semibold text-[#e8e8e8]">{path.name}</div>
           <div class="text-sm text-[#999]">
-            {path.tag ? `For ${path.tag}` : "Any robot"} · {phaseLabels[path.phase]} · {path.strokes.length} {path.strokes.length === 1 ? "Stroke" : "Strokes"}
+            {path.tag ? `For ${path.tag}` : "Any robot"} · {phaseName(path.phase, fieldYear)} · {path.strokes.length} {path.strokes.length === 1 ? "Stroke" : "Strokes"}
           </div>
         </div>
         <select

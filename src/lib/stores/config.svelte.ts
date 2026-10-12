@@ -18,7 +18,7 @@ export const boardConfig = {
       (stored) => { current = readBoardConfig(stored); },
       (error: unknown) => {
         console.error("Failed to load the Board Config", error);
-        toast.show("Could not load this device's settings.", "error");
+        toast.show("Could not load this device's Board Config.", "error");
       },
     );
     return loading;
@@ -30,7 +30,7 @@ export const boardConfig = {
       .then(() => native.storage.set(STORAGE_KEY, next as unknown as JsonValue))
       .catch((error: unknown) => {
         console.error("Failed to save the Board Config", error);
-        toast.show("Could not save that setting on this device.", "error");
+        toast.show("Could not save the Board Config on this device.", "error");
       });
     return writes;
   },

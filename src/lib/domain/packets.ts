@@ -3,7 +3,7 @@ import type { CreateMatchInput, JsonValue, MatchPacket } from "$lib/native/types
 import { fieldLayout } from "./field-layout";
 import { STATIONS } from "./stations";
 
-const ROBOT_SIZE = 152.4;
+export const ROBOT_SIZE = 152.4;
 
 export type MatchPhase = "auto" | "teleop" | "transition" | "endgame" | "notes";
 // the official app fixes this order in the packet body

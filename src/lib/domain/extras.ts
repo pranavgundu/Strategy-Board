@@ -1,19 +1,14 @@
 import type { JsonObject, MatchPacket } from "$lib/native/types";
 
 import { isObject } from "./json";
-
-export type MatchLevel = "practice" | "qual" | "playoff" | "final";
-export const MATCH_LEVELS: readonly MatchLevel[] = ["practice", "qual", "playoff", "final"];
+import { MATCH_LEVELS, type MatchLevel, type ScheduleIdentity, type ScheduleSource } from "./schedule";
 
 // red and blue are the lists the schedule last gave - sync moves teams only when those change so hand edits stay
-export interface SyncMarker {
-  eventKey: string;
-  level: MatchLevel;
-  number: number;
+export interface SyncMarker extends ScheduleIdentity {
   red: string[];
   blue: string[];
   // nexus and tba order playoff teams differently - a reorder from the other source is not a team change
-  source?: "nexus" | "tba";
+  source?: ScheduleSource;
 }
 export interface BenchTeams { red?: string; blue?: string }
 export interface MatchExtras {

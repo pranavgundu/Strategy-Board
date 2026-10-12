@@ -11,7 +11,7 @@
   import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, isNativeRuntime, newId, safeFilename, shareBoardFile, timeAgo } from "$lib/features";
-  import { BoardFileError, encodeMatchFile, groupMatchesByEvent, identityKey, planTbaImport, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
+  import { encodeMatchFile, homeEventGroups, planTbaImport, toWhatIfMatch } from "$lib/domain";
   import { queueBadge } from "$lib/features/queue";
   import { registerServiceWorker, requestPersistentStorage } from "$lib/features/offline";
   import AppLoading from "$lib/components/AppLoading.svelte";
@@ -51,23 +51,12 @@
   let collapsedGroups = $state<Record<string, boolean>>({});
   let deletingGroup = $state<MatchGroup | null>(null);
 
-  function identityOf(packet: MatchPacket): string | null {
-    const marker = readExtras(packet).sync;
-    return marker ? identityKey(marker) : null;
-  }
-
   const groups = $derived.by((): MatchGroup[] => {
-    const queue = scheduleSync.queue;
     const current = scheduleSync.currentEvent;
     const currentKey = current?.eventKey ?? null;
-    const dismissed = scheduleSync.dismissed;
     const byId = new Map(app.matches.map((match) => [match.id, match]));
-    const grouped = groupMatchesByEvent(app.matches.map((match) => match.packet), currentKey);
-    if (currentKey && dismissed[currentKey]?.length && !grouped.some((group) => group.eventKey === currentKey)) grouped.unshift({ eventKey: currentKey, current: true, packets: [] });
+    const grouped = homeEventGroups(app.matches.map((match) => match.packet), { currentEventKey: currentKey, queue: scheduleSync.queue, dismissed: scheduleSync.dismissed });
     return grouped.map((group) => {
-      const info = queue && queue.eventKey === group.eventKey ? queue : null;
-      const sorted = group.eventKey ? scheduleSort(group.packets, info?.schedule ?? {}) : group.packets;
-      const next = info ? sorted.find((packet) => identityOf(packet) === info.nextMatch) : undefined;
       const key = group.eventKey ?? "what-if";
       return {
         key,
@@ -75,11 +64,8 @@
         title: group.eventKey === null ? "What-if Matches" : group.current && current?.name ? `${current.name} · ${group.eventKey}` : group.eventKey,
         current: group.current,
         collapsed: collapsedGroups[key] ?? Boolean(currentKey && group.eventKey && !group.current),
-        dismissedCount: group.eventKey ? dismissed[group.eventKey]?.length ?? 0 : 0,
-        matches: [...(next ? [next] : []), ...sorted.filter((packet) => packet !== next)].map((packet) => {
-          const identity = info ? identityOf(packet) : null;
-          return { ...asMatch(byId.get(packet[7])!), next: packet === next, queue: identity && info ? queueBadge(info.schedule[identity]) : null };
-        }),
+        dismissedCount: group.dismissedCount,
+        matches: group.matches.map(({ packet, next, info }) => ({ ...asMatch(byId.get(packet[7])!), next, queue: info && queueBadge(info) })),
       };
     });
   });
@@ -183,19 +169,6 @@
     }
   }
 
-  async function importFile(event: Event) {
-    const input = event.currentTarget as HTMLInputElement;
-    const chosen = input.files?.[0];
-    input.value = "";
-    if (!chosen) return;
-    try {
-      const message = await boardFiles.open(chosen);
-      if (message) notice(message);
-    } catch (error) {
-      notice(error instanceof BoardFileError ? error.message : "Could not import that file.");
-    }
-  }
-
   async function confirmReplacingFile() {
     try {
       notice(await boardFiles.confirm());
@@ -277,7 +250,7 @@
 <TbaImportModal open={tbaOpen} onImport={importTba} onClose={() => tbaOpen = false} />
 <QrImportModal open={qrImportOpen} onImport={importQr} onNotice={notice} onClose={() => qrImportOpen = false} />
 <QrExportModal open={qrMatch !== null} packet={qrMatch ? app.matches.find((match) => match.id === qrMatch?.id)?.packet ?? null : null} matchName={qrMatch?.matchName || "this match"} onNotice={notice} onClose={() => qrMatch = null} />
-<input bind:this={fileInput} id="home-import-file-input" type="file" accept=".txt,.json,text/plain,application/json" class="hidden" onchange={importFile} />
+<input bind:this={fileInput} id="home-import-file-input" type="file" accept=".txt,.json,text/plain,application/json" class="hidden" onchange={(event) => boardFiles.openPicked(event.currentTarget)} />
 {#if latestToast}<button class="toast" class:toast-error={latestToast.kind === "error"} onclick={() => toast.dismiss(latestToast.id)} aria-live="polite">{latestToast.text}</button>{/if}
 
 <style>

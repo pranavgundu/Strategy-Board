@@ -3,6 +3,7 @@ import field2026 from "../images/2026.png";
 import { fieldLayout } from "$lib/domain/field-layout";
 import { commonPathPaste, type CommonPath } from "$lib/domain/common-paths";
 import { defaultInk, inkColor, inkStation, isStrokeErasable, isStrokeVisible, NEUTRAL_INK, officialInkColor, teamInk, type Lineup } from "$lib/domain/ink";
+import type { StationKey } from "$lib/domain/stations";
 import { resolveTeamColor, type TeamColorOverrides } from "$lib/domain/team-colors";
 import { canvasLayout, distanceToSegment, pointInRotatedRect, segmentTouchesBounds, segmentsIntersect, strokeBounds, type Point } from "./geometry";
 import { FIELD_HEIGHT, FIELD_WIDTH, MAX_HISTORY, type BoardPhaseName, type CheckboxAnnotation, type RobotPosition, type Stroke, type WhiteboardCommit, type WhiteboardControllerOptions, type WhiteboardMatch, type WhiteboardMode, type WhiteboardPhase, type WhiteboardRefs, type WhiteboardState, type WhiteboardTool } from "./types";
@@ -11,7 +12,7 @@ export * from "./geometry";
 export * from "./packet";
 export * from "./types";
 
-type Slot = "redOne" | "redTwo" | "redThree" | "blueOne" | "blueTwo" | "blueThree";
+type Slot = StationKey;
 type View = "full" | "red" | "blue";
 type Action =
   | { kind: "stroke"; stroke: Stroke }
@@ -164,7 +165,7 @@ export class WhiteboardController {
   undo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.undoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "undo"); this.history(this.redoHistory, mode).push(action); this.redrawFor(action); this.commit("undo"); }
   redo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.redoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "redo"); this.history(this.undoHistory, mode).push(action); this.redrawFor(action); this.commit("redo"); }
 
-  pasteCommonPath(path: CommonPath, station: Slot): void {
+  pasteCommonPath(path: CommonPath, station: StationKey): void {
     const phase = this.phase(); if (!phase || !this.match) return;
     const paste = commonPathPaste(path, station);
     const strokes: Stroke[] = paste.strokes;
@@ -338,7 +339,7 @@ export class WhiteboardController {
     if (stroke.length === 2) { context.fillStyle = context.strokeStyle; context.beginPath(); context.arc(first[0], first[1], 5, 0, Math.PI * 2); context.fill(); return; }
     context.beginPath(); context.moveTo(first[0], first[1]); for (const point of stroke.slice(2) as Point[]) { const screen = this.screen(point); context.lineTo(screen[0], screen[1]); } context.stroke();
   }
-  private drawStrokeSegment(start: Point, end: Point, color: number): void { const context = this.contexts?.drawing; if (!context) return; const a = this.screen(start); const b = this.screen(end); context.lineWidth = 10; context.lineCap = "round"; context.lineJoin = "round"; context.strokeStyle = this.strokeColor(color); context.beginPath(); context.moveTo(a[0], a[1]); context.lineTo(b[0], b[1]); context.stroke(); }
+  private drawStrokeSegment(start: Point, end: Point, ink: number): void { const context = this.contexts?.drawing; if (!context) return; const a = this.screen(start); const b = this.screen(end); context.lineWidth = 10; context.lineCap = "round"; context.lineJoin = "round"; context.strokeStyle = this.strokeColor(ink); context.beginPath(); context.moveTo(a[0], a[1]); context.lineTo(b[0], b[1]); context.stroke(); }
   private drawCheckbox(context: CanvasRenderingContext2D, checkbox: CheckboxAnnotation): void { const [x, y] = this.screen([checkbox[0], checkbox[1]]); const size = 150; context.strokeStyle = officialInkColor(checkbox[2]); context.lineWidth = 8; context.strokeRect(x - size / 2, y - size / 2, size, size); if (checkbox[3]) { context.strokeStyle = "#22c55e"; context.lineWidth = 12; context.lineCap = "round"; context.beginPath(); context.moveTo(x - size / 2 + 15, y); context.lineTo(x - size / 6, y + size / 2 - 15); context.lineTo(x + size / 2 - 15, y - size / 2 + 15); context.stroke(); } }
   private inkTeam(ink: number): string | null { const station = inkStation(ink); return station && this.match ? this.match[station].trim() || null : null; }
   private strokeColor(ink: number): string { return this.match ? inkColor(ink, lineupOf(this.match), this.teamColors) : officialInkColor(ink); }
