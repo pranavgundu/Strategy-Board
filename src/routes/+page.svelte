@@ -10,7 +10,7 @@
   import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, isNativeRuntime, safeFilename, shareBoardFile, timeAgo } from "$lib/features";
-  import { BoardFileError, encodeMatchFile, identityKey, readBoardFile, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
+  import { BoardFileError, encodeMatchFile, groupMatchesByEvent, identityKey, readBoardFile, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
   import { queueBadge } from "$lib/features/queue";
   import { registerServiceWorker, requestPersistentStorage } from "$lib/features/offline";
   import AppLoading from "$lib/components/AppLoading.svelte";
@@ -25,7 +25,7 @@
   import SyncStatusLine from "$lib/components/SyncStatusLine.svelte";
   import TbaImportModal from "$lib/components/TbaImportModal.svelte";
   import WhiteboardScreen from "$lib/components/WhiteboardScreen.svelte";
-  import type { Match, MatchFormValues } from "$lib/components/types";
+  import type { Match, MatchFormValues, MatchGroup } from "$lib/components/types";
   import type { MatchPacket, StrategyMatch } from "$lib/native/types";
 
   let createOpen = $state(false);
@@ -47,24 +47,72 @@
       tbaMatchKey: match.tbaMatchKey,
     };
   }
-  // the Current Event's Synced Matches come first in schedule order, led by the Next Match
-  const matches = $derived.by(() => {
+  let collapsedGroups = $state<Record<string, boolean>>({});
+  let deletingGroup = $state<MatchGroup | null>(null);
+
+  function identityOf(packet: MatchPacket): string | null {
+    const marker = readExtras(packet).sync;
+    return marker ? identityKey(marker) : null;
+  }
+
+  // the Current Event comes first, in schedule order and led by the Next Match; past events start collapsed
+  const groups = $derived.by((): MatchGroup[] => {
     const queue = scheduleSync.queue;
-    if (!queue) return app.matches.map(asMatch);
-    const keyOf = (match: StrategyMatch) => {
-      const marker = readExtras(match.packet).sync;
-      return marker?.eventKey === queue.eventKey ? identityKey(marker) : null;
-    };
-    const synced = app.matches.filter((match) => keyOf(match));
-    const order = new Map(scheduleSort(synced.map((match) => match.packet), queue.schedule).map((packet, index) => [packet[7], index]));
-    synced.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
-    const next = synced.find((match) => keyOf(match) === queue.nextMatch);
-    const ordered = [...(next ? [next] : []), ...synced.filter((match) => match !== next), ...app.matches.filter((match) => !keyOf(match))];
-    return ordered.map((match) => {
-      const key = keyOf(match);
-      return { ...asMatch(match), next: match === next, queue: key ? queueBadge(queue.schedule[key]) : null };
+    const current = scheduleSync.currentEvent;
+    const currentKey = current?.eventKey ?? null;
+    const dismissed = scheduleSync.dismissed;
+    const byId = new Map(app.matches.map((match) => [match.id, match]));
+    const grouped = groupMatchesByEvent(app.matches.map((match) => match.packet), currentKey);
+    if (currentKey && dismissed[currentKey]?.length && !grouped.some((group) => group.eventKey === currentKey)) grouped.unshift({ eventKey: currentKey, current: true, packets: [] });
+    return grouped.map((group) => {
+      const info = queue && queue.eventKey === group.eventKey ? queue : null;
+      const sorted = group.eventKey ? scheduleSort(group.packets, info?.schedule ?? {}) : group.packets;
+      const next = info ? sorted.find((packet) => identityOf(packet) === info.nextMatch) : undefined;
+      const key = group.eventKey ?? "what-if";
+      return {
+        key,
+        eventKey: group.eventKey,
+        title: group.eventKey === null ? "What-if Matches" : group.current && current?.name ? `${current.name} · ${group.eventKey}` : group.eventKey,
+        current: group.current,
+        collapsed: collapsedGroups[key] ?? Boolean(currentKey && group.eventKey && !group.current),
+        dismissedCount: group.eventKey ? dismissed[group.eventKey]?.length ?? 0 : 0,
+        matches: [...(next ? [next] : []), ...sorted.filter((packet) => packet !== next)].map((packet) => {
+          const identity = info ? identityOf(packet) : null;
+          return { ...asMatch(byId.get(packet[7])!), next: packet === next, queue: identity && info ? queueBadge(info.schedule[identity]) : null };
+        }),
+      };
     });
   });
+
+  async function deleteMatch(match: Match) {
+    const packet = app.matches.find((candidate) => candidate.id === match.id)?.packet;
+    try {
+      if (packet) await scheduleSync.dismiss([packet]);
+      await app.deleteMatch(match.id);
+    } catch {
+      notice("Could not delete this match.");
+    }
+  }
+
+  async function deleteEvent(group: MatchGroup) {
+    const ids = new Set(group.matches.map((match) => match.id));
+    const packets = app.matches.filter((match) => ids.has(match.id)).map((match) => match.packet);
+    try {
+      await scheduleSync.dismiss(packets);
+      await app.deleteMatches([...ids]);
+      notice(`Deleted ${group.eventKey}.`);
+    } catch {
+      notice("Could not delete this event.");
+    } finally {
+      deletingGroup = null;
+    }
+  }
+
+  async function restoreEvent(group: MatchGroup) {
+    if (!group.eventKey) return;
+    await scheduleSync.restore(group.eventKey);
+    notice(group.current ? "Restoring deleted matches from the schedule." : `Deleted matches of ${group.eventKey} will come back when it is the Current Event.`);
+  }
 
   onMount(() => {
     registerServiceWorker();
@@ -172,7 +220,12 @@
 {#if app.screen === "home"}
   <div id="home-container" class="flex flex-col w-full h-full touch-none">
     <HomeToolbar onNew={() => createOpen = true} onTba={() => tbaOpen = true} onImportQr={() => qrImportOpen = true} onImportFile={() => fileInput?.click()} onClear={() => clearOpen = true} onSettings={() => settingsOpen = true} />
-    <MatchList {matches} onOpen={(match) => app.openMatch(match.id)} onEdit={(match) => editing = match} onDuplicate={(match) => app.duplicateMatch(match.id)} onExportPng={(match) => { app.openMatch(match.id); pngRequest += 1; }} onExportQr={(match) => qrMatch = match} onSaveFile={saveAsFile} onDelete={(match) => app.deleteMatch(match.id)} />
+    <MatchList
+      {groups}
+      onToggleGroup={(group) => (collapsedGroups = { ...collapsedGroups, [group.key]: !group.collapsed })}
+      onDeleteEvent={(group) => (deletingGroup = group)}
+      onRestoreEvent={restoreEvent}
+      onOpen={(match) => app.openMatch(match.id)} onEdit={(match) => editing = match} onDuplicate={(match) => app.duplicateMatch(match.id)} onExportPng={(match) => { app.openMatch(match.id); pngRequest += 1; }} onExportQr={(match) => qrMatch = match} onSaveFile={saveAsFile} onDelete={deleteMatch} />
     <div
       id="home-bottom-bar"
       class="w-full bg-[#0d0d0d] flex items-center justify-center border-t border-[#1a1a1a] relative"
@@ -202,6 +255,15 @@
 <WhiteboardScreen {pngRequest} onNotice={notice} />
 <MatchEditorModal open={createOpen} onSave={create} onClose={() => createOpen = false} />
 <MatchEditorModal open={editing !== null} match={editing} onSave={save} onClose={() => editing = null} />
+<ConfirmModal
+  open={deletingGroup !== null}
+  title="Delete {deletingGroup?.eventKey}?"
+  message="This deletes all {deletingGroup?.matches.length} matches of {deletingGroup?.eventKey}. Schedule Sync won't add them again unless you restore them."
+  confirmLabel="Delete event"
+  destructive
+  onConfirm={() => { if (deletingGroup) void deleteEvent(deletingGroup); }}
+  onClose={() => (deletingGroup = null)}
+/>
 <ConfirmModal open={clearOpen} title="Clear All Data?" message="This will permanently delete all matches and data. This action cannot be undone." confirmLabel="Clear All" destructive onConfirm={async () => { await app.clearAll(); clearOpen = false; }} onClose={() => clearOpen = false} />
 <TbaImportModal open={tbaOpen} onImport={importTba} onClose={() => tbaOpen = false} />
 <QrImportModal open={qrImportOpen} onImport={importQr} onNotice={notice} onClose={() => qrImportOpen = false} />

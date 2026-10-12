@@ -1,7 +1,14 @@
 <script lang="ts">
-  import type { Match } from "./types";
+  import type { Match, MatchGroup } from "./types";
 
-  let { matches, onOpen, onEdit, onDuplicate, onExportPng, onExportQr, onSaveFile, onDelete }: { matches: Match[]; onOpen: (match: Match) => void; onEdit: (match: Match) => void; onDuplicate: (match: Match) => void; onExportPng: (match: Match) => void; onExportQr: (match: Match) => void; onSaveFile: (match: Match) => void; onDelete: (match: Match) => void } = $props();
+  let { groups, onToggleGroup, onDeleteEvent, onRestoreEvent, onOpen, onEdit, onDuplicate, onExportPng, onExportQr, onSaveFile, onDelete }: {
+    groups: MatchGroup[];
+    onToggleGroup: (group: MatchGroup) => void;
+    onDeleteEvent: (group: MatchGroup) => void;
+    onRestoreEvent: (group: MatchGroup) => void;
+    onOpen: (match: Match) => void; onEdit: (match: Match) => void; onDuplicate: (match: Match) => void; onExportPng: (match: Match) => void;
+    onExportQr: (match: Match) => void; onSaveFile: (match: Match) => void; onDelete: (match: Match) => void;
+  } = $props();
 
   let openId = $state<string | null>(null);
 
@@ -29,14 +36,32 @@
   class="relative w-full p-10 flex-1 flex flex-col gap-3 items-stretch overflow-y-auto bg-[#0d0d0d]"
   class:match-list-actions-open={openId !== null}
 >
-  {#if matches.length === 0}
+  {#if groups.length === 0}
     <div id="home-match-list-empty-placeholder" class="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 text-center text-[#999] text-xl pointer-events-none">
       Click
       <span class="not-italic text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-3 py-1 rounded">New</span>
       to add matches
     </div>
   {/if}
-  {#each matches as match (match.id)}
+  {#each groups as group (group.key)}
+    <header class="group-header" class:group-current={group.current}>
+      <button class="group-toggle" aria-expanded={!group.collapsed} onclick={() => onToggleGroup(group)}>
+        <i class="fas fa-chevron-right group-chevron" class:open={!group.collapsed}></i>
+        <span class="group-title">{group.title}</span>
+        {#if group.current}<span class="current-pill">Current event</span>{/if}
+        <span class="group-count">{group.matches.length} {group.matches.length === 1 ? "match" : "matches"}</span>
+      </button>
+      <div class="flex shrink-0 items-center gap-3">
+        {#if group.dismissedCount > 0}
+          <button class="px-4 py-2 text-sm btn-secondary" onclick={() => onRestoreEvent(group)}>Restore deleted ({group.dismissedCount})</button>
+        {/if}
+        {#if group.eventKey && group.matches.length}
+          <button class="px-4 py-2 text-sm btn-danger" onclick={() => onDeleteEvent(group)}>Delete event</button>
+        {/if}
+      </div>
+    </header>
+    {#if !group.collapsed}
+    {#each group.matches as match (match.id)}
     <div
       class="w-full h-[5.5rem] bg-[#141414] border border-[#1e1e1e] flex shrink-0 justify-between items-center rounded-xl px-10"
       class:match-actions-open={openId === match.id}
@@ -91,10 +116,54 @@
         {/if}
       </div>
     </div>
+    {/each}
+    {/if}
   {/each}
 </div>
 
 <style>
+  .group-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+  .group-header:first-of-type { margin-top: 0; }
+  .group-toggle {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0;
+    border: none;
+    background: transparent;
+    color: #e8e8e8;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .group-chevron { width: 1rem; color: #777; transition: transform 0.15s ease; }
+  .group-chevron.open { transform: rotate(90deg); }
+  .group-title {
+    overflow: hidden;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .group-count { flex-shrink: 0; color: #777; font-size: 0.9rem; }
+  .current-pill {
+    flex-shrink: 0;
+    padding: 0.1rem 0.6rem;
+    border: 1px solid #22c55e;
+    border-radius: 999px;
+    color: #22c55e;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
   .match-next { border-color: #4a4a4a; background: #181818; }
   .next-pill {
     flex-shrink: 0;

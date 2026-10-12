@@ -1,13 +1,14 @@
-import { OUR_TEAM, parseNexusEvent, pickCurrentEvent, planSync, runningNexusEvents, type CurrentEvent, type ScheduleInfo } from "$lib/domain";
+import { dismissMatches, OUR_TEAM, parseNexusEvent, pickCurrentEvent, planSync, restoreDismissed, runningNexusEvents, type CurrentEvent, type DismissedMatches, type ScheduleInfo } from "$lib/domain";
 import { newId } from "$lib/features/runtime";
 import { native } from "$lib/native/api";
-import type { JsonValue, SourceResponse } from "$lib/native/types";
+import type { JsonValue, MatchPacket, SourceResponse } from "$lib/native/types";
 
 import { app } from "./app.svelte";
 
 const MANUAL_EVENT_KEY = "manualEventKey";
 const BOOKKEEPING_KEY = "syncBookkeeping";
 const QUEUE_KEY = "queueStatus";
+const DISMISSED_KEY = "dismissedMatches";
 const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 const NEXUS_INTERVAL_MS = 30_000;
 const DETECTION_RETRY_MS = 5 * 60_000;
@@ -40,6 +41,7 @@ interface Bookkeeping {
 let manualEventKey = $state<string | null>(null);
 let currentEvent = $state<CurrentEvent | null>(null);
 let queue = $state.raw<EventQueue | null>(null);
+let dismissed = $state.raw<DismissedMatches>({});
 let detectedAt = 0;
 let status = $state<SyncStatus>({ state: "idle", message: "", eventKey: null, source: null, at: null });
 let bookkeeping: Bookkeeping = { etags: {}, source: null, eventKey: null, at: null };
@@ -69,6 +71,11 @@ async function remember(source: SyncSource, eventKey: string, etagKey: string, e
   else delete etags[etagKey];
   bookkeeping = { etags, source, eventKey, at: Date.now() };
   await native.storage.set(BOOKKEEPING_KEY, bookkeeping as unknown as JsonValue).catch(() => undefined);
+}
+
+function readDismissed(value: unknown): DismissedMatches {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).filter(([, keys]) => Array.isArray(keys) && keys.every((key) => typeof key === "string")));
 }
 
 function readBookkeeping(value: unknown): Bookkeeping {
@@ -136,7 +143,7 @@ async function run(): Promise<void> {
     return;
   }
   await app.init();
-  const plan = planSync({ packets: app.packets, schedule, newId });
+  const plan = planSync({ packets: app.packets, schedule, dismissed, newId });
   await app.applySyncPlan(plan);
   queue = { eventKey, schedule: plan.schedule, nextMatch: plan.nextMatch };
   await native.storage.set(QUEUE_KEY, queue as unknown as JsonValue).catch(() => undefined);
@@ -165,11 +172,25 @@ export const scheduleSync = {
   /** The event Schedule Sync follows: hand-entered, or detected from Nexus or TBA. */
   get currentEvent(): CurrentEvent | null { return currentEvent; },
   get queue(): EventQueue | null { return queue; },
+  get dismissed(): DismissedMatches { return dismissed; },
+
+  /** Remembers deleted Synced Matches so sync never adds them again. */
+  async dismiss(deleted: readonly MatchPacket[]): Promise<void> {
+    dismissed = dismissMatches(dismissed, deleted);
+    await native.storage.set(DISMISSED_KEY, dismissed as unknown as JsonValue);
+  },
+
+  async restore(eventKey: string): Promise<void> {
+    dismissed = restoreDismissed(dismissed, eventKey);
+    await native.storage.set(DISMISSED_KEY, dismissed as unknown as JsonValue);
+    if (eventKey === currentEvent?.eventKey) void this.syncNow();
+  },
   get status(): SyncStatus { return status; },
 
   init(): Promise<void> {
-    loading ??= Promise.all([native.storage.get(MANUAL_EVENT_KEY), native.storage.get(BOOKKEEPING_KEY), native.storage.get(QUEUE_KEY)]).then(
-      ([stored, kept, queued]) => {
+    loading ??= Promise.all([native.storage.get(MANUAL_EVENT_KEY), native.storage.get(BOOKKEEPING_KEY), native.storage.get(QUEUE_KEY), native.storage.get(DISMISSED_KEY)]).then(
+      ([stored, kept, queued, deleted]) => {
+        dismissed = readDismissed(deleted);
         manualEventKey = typeof stored === "string" && EVENT_KEY.test(stored) ? stored : null;
         bookkeeping = readBookkeeping(kept);
         queue = queued && typeof queued === "object" && !Array.isArray(queued) && typeof queued.eventKey === "string" ? queued as unknown as EventQueue : null;

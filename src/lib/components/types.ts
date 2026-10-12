@@ -17,6 +17,18 @@ export type Match = {
 
 export type MatchFormValues = Omit<Match, "id" | "tbaMatchKey" | "next" | "queue">;
 
+/** One event's Matches on Home, or the What-if Matches made with New when eventKey is null. */
+export type MatchGroup = {
+  key: string;
+  eventKey: string | null;
+  title: string;
+  current: boolean;
+  collapsed: boolean;
+  /** Deleted Synced Matches of this event that sync is skipping. */
+  dismissedCount: number;
+  matches: Match[];
+};
+
 export const emptyMatchForm = (): MatchFormValues => ({
   matchName: "",
   redOne: "",

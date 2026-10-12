@@ -230,6 +230,16 @@ export const app = {
     });
   },
 
+  async deleteMatches(ids: readonly string[]): Promise<void> {
+    const doomed = new Set(ids);
+    if (!packets.some((packet) => doomed.has(packet[7]))) return;
+    await queueWrite(async () => {
+      for (const id of doomed) await native.model.deleteMatch(id);
+      packets = packets.filter((packet) => !doomed.has(packet[7]));
+      if (activeMatchId && doomed.has(activeMatchId)) this.closeMatch();
+    });
+  },
+
   async clearAll(): Promise<void> {
     await queueWrite(async () => {
       await native.model.clearMatches();
