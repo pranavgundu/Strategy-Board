@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { addChecklistRow, deleteChecklistRow, emptyBoardConfig, moveChecklistRow, readBoardConfig, renameChecklistRow, type BoardConfig } from "$lib/domain";
+import { addChecklistRow, checklistProgress, deleteChecklistRow, emptyBoardConfig, moveChecklistRow, newMatchPacket, readBoardConfig, readExtras, readTicks, renameChecklistRow, toggleTick, type BoardConfig } from "$lib/domain";
+import { normalizeBrowserMatchPacket } from "$lib/native/web";
+import { whiteboardMatchFromPacket, writeWhiteboardPacket } from "$lib/whiteboard/packet";
 
 function meetingChecklist(): BoardConfig {
   let config = emptyBoardConfig();
@@ -51,5 +53,52 @@ describe("Checklist editing", () => {
     stored.checklist.push({ id: "auto", kind: "item", text: "Duplicate id" }, { id: "x", kind: "note", text: "Unknown kind" }, { kind: "item", text: "No id" });
 
     expect(readBoardConfig(stored).checklist).toEqual(meetingChecklist().checklist);
+  });
+});
+
+describe("Ticks", () => {
+  const match = () => newMatchPacket({ matchName: "Quals 12", redTeams: ["1690", "2231", "11480"], blueTeams: ["4590", "1577", "2679"], tbaYear: 2026 }, "quals-12");
+
+  it("tick and untick an Item in one Match, while Headings can't be ticked", () => {
+    const { checklist } = meetingChecklist();
+
+    const ticked = toggleTick(toggleTick(match(), checklist, "paths"), checklist, "defense");
+
+    expect(readTicks(ticked, checklist)).toEqual(["paths", "defense"]);
+    expect(readTicks(toggleTick(ticked, checklist, "paths"), checklist)).toEqual(["defense"]);
+    expect(readTicks(toggleTick(ticked, checklist, "auto"), checklist)).toEqual(["paths", "defense"]);
+    expect(readTicks(match(), checklist)).toEqual([]);
+  });
+
+  it("stay with their Items through renames and reorders", () => {
+    const ticked = toggleTick(match(), meetingChecklist().checklist, "start");
+
+    const edited = moveChecklistRow(renameChecklistRow(meetingChecklist(), "start", "Who starts where"), "start", 4);
+
+    expect(readTicks(ticked, edited.checklist)).toEqual(["start"]);
+  });
+
+  it("of a deleted Item are ignored, then pruned the next time the Match's Ticks are written", () => {
+    const ticked = toggleTick(toggleTick(match(), meetingChecklist().checklist, "start"), meetingChecklist().checklist, "paths");
+    const { checklist } = deleteChecklistRow(meetingChecklist(), "start");
+
+    expect(readTicks(ticked, checklist)).toEqual(["paths"]);
+    expect(readExtras(toggleTick(ticked, checklist, "defense")).ticks).toEqual(["paths", "defense"]);
+  });
+
+  it("show progress as ticked Items over all Items", () => {
+    const { checklist } = meetingChecklist();
+
+    expect(checklistProgress(checklist, ["paths", "defense"])).toEqual({ ticked: 2, total: 3 });
+  });
+
+  it("survive the existing packet codec and the browser runtime's normalization", () => {
+    const { checklist } = meetingChecklist();
+    const ticked = toggleTick(match(), checklist, "paths");
+
+    const redrawn = writeWhiteboardPacket(ticked, whiteboardMatchFromPacket(ticked));
+
+    expect(readTicks(redrawn, checklist)).toEqual(["paths"]);
+    expect(readTicks(normalizeBrowserMatchPacket(structuredClone(redrawn)), checklist)).toEqual(["paths"]);
   });
 });

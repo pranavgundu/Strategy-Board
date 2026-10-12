@@ -1,4 +1,7 @@
+import type { MatchPacket } from "$lib/native/types";
+
 import type { BoardConfig } from "./board-config";
+import { readExtras, withExtras } from "./extras";
 import { isObject } from "./json";
 
 export type ChecklistRowKind = "item" | "heading";
@@ -44,4 +47,23 @@ export function readChecklist(value: unknown): ChecklistRow[] {
     rows.push({ id: row.id, kind: row.kind, text: row.text });
   }
   return rows;
+}
+
+/** The Match's Ticks for Items still on the Checklist; Ticks of deleted Items are ignored. */
+export function readTicks(packet: MatchPacket, checklist: readonly ChecklistRow[]): string[] {
+  const items = new Set(checklist.filter((row) => row.kind === "item").map((row) => row.id));
+  return (readExtras(packet).ticks ?? []).filter((id) => items.has(id));
+}
+
+/** Ticks or unticks one Item; writing the Ticks drops those of deleted Items. Headings can't be ticked. */
+export function toggleTick(packet: MatchPacket, checklist: readonly ChecklistRow[], itemId: string): MatchPacket {
+  if (!checklist.some((row) => row.id === itemId && row.kind === "item")) return packet;
+  const ticks = readTicks(packet, checklist);
+  const next = ticks.includes(itemId) ? ticks.filter((id) => id !== itemId) : [...ticks, itemId];
+  return withExtras(packet, { ticks: next.length ? next : undefined });
+}
+
+export function checklistProgress(checklist: readonly ChecklistRow[], ticks: readonly string[]): { ticked: number; total: number } {
+  const items = checklist.filter((row) => row.kind === "item");
+  return { ticked: items.filter((row) => ticks.includes(row.id)).length, total: items.length };
 }

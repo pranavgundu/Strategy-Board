@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { tick, untrack } from "svelte";
+  import { onMount, tick, untrack } from "svelte";
   import { app } from "$lib/stores/app.svelte";
   import { boardConfig } from "$lib/stores/config.svelte";
   import { scheduleSync } from "$lib/stores/sync.svelte";
   import { createWhiteboardController, whiteboardMatchFromPacket, writeWhiteboardPacket, type WhiteboardController, type WhiteboardMatch, type WhiteboardMode, type WhiteboardState } from "$lib/whiteboard";
   import { newId, safeFilename, savePng } from "$lib/features";
-  import { addCommonPath, commonPathChoices, matchFieldYear, readExtras, saveCommonPath, swapBenchTeam, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
+  import { addCommonPath, commonPathChoices, matchFieldYear, readExtras, readTicks, saveCommonPath, STATIONS, swapBenchTeam, toggleTick, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
+  import { native } from "$lib/native/api";
   import type { MatchPacket } from "$lib/native/types";
   import ApplyCommonPathModal from "./ApplyCommonPathModal.svelte";
+  import ChecklistPanel from "./ChecklistPanel.svelte";
   import InkPicker from "./InkPicker.svelte";
   import SaveCommonPathModal from "./SaveCommonPathModal.svelte";
   import StatboticsPanel from "./StatboticsPanel.svelte";
@@ -27,6 +29,8 @@
   let toolbarRight = $state<HTMLDivElement>();
   let toolbarFit = $state<"" | "toolbar-condensed" | "toolbar-ultra">("");
 
+  const CHECKLIST_OPEN_KEY = "checklistPanelOpen";
+  let checklistOpen = $state(true);
   let savePathFor = $state<StationKey | null>(null);
   let applyOpen = $state(false);
 
@@ -40,6 +44,7 @@
     blueOne: app.activeMatch.blueOne, blueTwo: app.activeMatch.blueTwo, blueThree: app.activeMatch.blueThree,
   });
   const bench = $derived(app.activeMatch ? readExtras(app.activeMatch.packet).bench ?? {} : {});
+  const ticks = $derived(app.activeMatch ? readTicks(app.activeMatch.packet, boardConfig.current.checklist) : []);
   const teleopLabel = $derived(fieldYear === 2026 ? "ACTIVE" : "TELEOP");
   const endgameLabel = $derived(fieldYear === 2026 ? "INACTIVE" : "ENDGAME");
   const phaseLabels = $derived<Record<MatchPhase, string>>({ auto: "AUTO", transition: "TRANSITION", teleop: teleopLabel, endgame: endgameLabel, notes: "NOTES" });
@@ -59,12 +64,34 @@
       .some((team) => team && team.trim() !== ""),
   );
 
+  // each save is worked out when its turn comes, from the latest stored packet, so queued changes never undo each other
   function queueCommit(match: WhiteboardMatch) {
-    const source = app.activeMatch;
-    if (!source || source.id !== match.id) return;
-    const packet = writeWhiteboardPacket(source.packet, match);
-    commitQueue = commitQueue.then(() => app.commitPacket(packet)).catch(() => onNotice("Could not save the latest whiteboard change."));
+    const { id } = match;
+    commitQueue = commitQueue.then(() => {
+      const source = app.packets.find((packet) => packet[7] === id);
+      // sync just moved this match's teams and the canvas reloads next, so its scene is out of date
+      if (!source || STATIONS.some((station, index) => source[index + 1] !== match[station])) return;
+      return app.commitPacket(writeWhiteboardPacket(source, match));
+    }).catch(() => onNotice("Could not save the latest whiteboard change."));
   }
+
+  function toggleItem(itemId: string) {
+    const id = app.activeMatch?.id;
+    if (!id) return;
+    commitQueue = commitQueue.then(() => {
+      const source = app.packets.find((packet) => packet[7] === id);
+      return source ? app.commitPacket(toggleTick(source, boardConfig.current.checklist, itemId)) : undefined;
+    }).catch(() => onNotice("Could not save that tick."));
+  }
+
+  function toggleChecklist() {
+    checklistOpen = !checklistOpen;
+    void native.storage.set(CHECKLIST_OPEN_KEY, checklistOpen).catch(() => undefined);
+  }
+
+  onMount(() => {
+    void native.storage.get(CHECKLIST_OPEN_KEY).then((stored) => { if (stored === false) checklistOpen = false; }, () => undefined);
+  });
 
   $effect(() => {
     if (!container || !background || !items || !drawing || app.screen !== "whiteboard") return;
@@ -233,42 +260,47 @@
       </div>
     </div>
 
-    <div
-      bind:this={container}
-      id="whiteboard-wrapper"
-      class="w-full flex-1 min-h-0 m-0 p-0 bg-[#0d0d0d]"
-      class:hidden={!ui.isCanvasVisible}
-    >
-      <canvas bind:this={background} id="whiteboard-canvas-background" width="3510" height="1610" class="absolute m-0 select-none touch-none"></canvas>
-      <canvas bind:this={items} id="whiteboard-canvas-items" width="3510" height="1610" class="absolute m-0 select-none touch-none"></canvas>
-      <canvas bind:this={drawing} id="whiteboard-canvas-drawing" width="3510" height="1610" class="absolute m-0 select-none touch-none"></canvas>
+    <div class="flex flex-1 min-h-0">
+      <div class="relative flex flex-col flex-1 min-w-0">
+        <div
+          bind:this={container}
+          id="whiteboard-wrapper"
+          class="w-full flex-1 min-h-0 m-0 p-0 bg-[#0d0d0d]"
+          class:hidden={!ui.isCanvasVisible}
+        >
+          <canvas bind:this={background} id="whiteboard-canvas-background" width="3510" height="1610" class="absolute m-0 select-none touch-none"></canvas>
+          <canvas bind:this={items} id="whiteboard-canvas-items" width="3510" height="1610" class="absolute m-0 select-none touch-none"></canvas>
+          <canvas bind:this={drawing} id="whiteboard-canvas-drawing" width="3510" height="1610" class="absolute m-0 select-none touch-none"></canvas>
+        </div>
+
+        {#if !ui.isCanvasVisible}
+          <div id="whiteboard-statbotics-container" class="w-full flex-1 min-h-0 m-0 p-0 bg-[#0d0d0d] flex flex-col overflow-y-auto">
+            <StatboticsPanel match={app.activeMatch} visible={!ui.isCanvasVisible} />
+          </div>
+        {/if}
+
+        {#if ui.isCanvasVisible}
+          <div
+            id="whiteboard-draw-config"
+            class="absolute flex flex-col justify-center items-center size-10 sm:size-12 md:size-14 lg:size-16 xl:size-20 bottom-3 sm:bottom-4 md:bottom-6 right-3 sm:right-4 md:right-6 bg-[#1a1a1a] border border-[#3a3a3a] rounded-full cursor-pointer"
+            role="button"
+            tabindex="0"
+            aria-label="Change tool"
+            onclick={cycleTool}
+            onkeydown={(event) => { if (event.key === "Enter" || event.key === " ") cycleTool(); }}
+          >
+            <i id="whiteboard-draw-config-marker" class="fa fa-pencil text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white" style:display={ui.tool === "marker" ? "inline" : "none"}></i>
+            <i id="whiteboard-draw-config-eraser" class="fa fa-eraser text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white" style:display={ui.tool === "eraser" ? "inline" : "none"}></i>
+            <i id="whiteboard-draw-config-checkbox" class="fa-regular fa-square-check text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white" style:display={ui.tool === "checkbox" ? "inline" : "none"}></i>
+          </div>
+
+          {#if lineup}
+            <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hiddenTeams={ui.hiddenTeams} onPick={(ink) => controller?.setInk(ink)} onToggleHidden={(team) => controller?.toggleHiddenTeam(team)} onSavePath={(station) => (savePathFor = station)} {bench} onSwapBench={swapBench} />
+          {/if}
+        {/if}
+      </div>
+      <ChecklistPanel checklist={boardConfig.current.checklist} {ticks} open={checklistOpen} onToggleOpen={toggleChecklist} onTick={toggleItem} />
     </div>
-
-    {#if !ui.isCanvasVisible}
-      <div id="whiteboard-statbotics-container" class="w-full flex-1 min-h-0 m-0 p-0 bg-[#0d0d0d] flex flex-col overflow-y-auto">
-        <StatboticsPanel match={app.activeMatch} visible={!ui.isCanvasVisible} />
-      </div>
-    {/if}
-
-    {#if ui.isCanvasVisible}
-      <div
-        id="whiteboard-draw-config"
-        class="absolute flex flex-col justify-center items-center size-10 sm:size-12 md:size-14 lg:size-16 xl:size-20 bottom-3 sm:bottom-4 md:bottom-6 right-3 sm:right-4 md:right-6 bg-[#1a1a1a] border border-[#3a3a3a] rounded-full cursor-pointer"
-        role="button"
-        tabindex="0"
-        aria-label="Change tool"
-        onclick={cycleTool}
-        onkeydown={(event) => { if (event.key === "Enter" || event.key === " ") cycleTool(); }}
-      >
-        <i id="whiteboard-draw-config-marker" class="fa fa-pencil text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white" style:display={ui.tool === "marker" ? "inline" : "none"}></i>
-        <i id="whiteboard-draw-config-eraser" class="fa fa-eraser text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white" style:display={ui.tool === "eraser" ? "inline" : "none"}></i>
-        <i id="whiteboard-draw-config-checkbox" class="fa-regular fa-square-check text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white" style:display={ui.tool === "checkbox" ? "inline" : "none"}></i>
-      </div>
-
-      {#if lineup}
-        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hiddenTeams={ui.hiddenTeams} onPick={(ink) => controller?.setInk(ink)} onToggleHidden={(team) => controller?.toggleHiddenTeam(team)} onSavePath={(station) => (savePathFor = station)} {bench} onSwapBench={swapBench} />
-      {/if}
-    {/if}
   </div>
 
   {#if lineup}
