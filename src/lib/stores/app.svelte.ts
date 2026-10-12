@@ -1,4 +1,4 @@
-import { toWhatIfMatch, type SyncPlan } from "$lib/domain";
+import { reassignStations, toWhatIfMatch, type SyncPlan } from "$lib/domain";
 import { native } from "$lib/native/api";
 import type { Alliance, CreateMatchInput, MatchPacket, StrategyMatch } from "$lib/native/types";
 import { readLegacyMatchPackets } from "$lib/features/legacy-migration";
@@ -191,17 +191,13 @@ export const app = {
     });
   },
 
+  /** Renames a Match and puts in its new lineup through Station reassignment, so every team keeps its plan. */
   async updateMatch(id: string, update: MatchInfoUpdate): Promise<void> {
     const source = packets.find((packet) => packet[7] === id);
     if (!source) throw new Error("Cannot update a match that is not loaded.");
-    const next = structuredClone(source);
-    next[0] = update.matchName;
-    next[1] = update.redOne;
-    next[2] = update.redTwo;
-    next[3] = update.redThree;
-    next[4] = update.blueOne;
-    next[5] = update.blueTwo;
-    next[6] = update.blueThree;
+    const { matchName, ...lineup } = update;
+    const next = reassignStations(source, lineup);
+    next[0] = matchName;
     await this.commitPacket(next);
   },
 

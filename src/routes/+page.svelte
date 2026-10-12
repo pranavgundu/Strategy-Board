@@ -79,13 +79,8 @@
 
   async function save(values: MatchFormValues) {
     if (!editing) return;
-    const packet = structuredClone(app.matches.find((match) => match.id === editing?.id)?.packet) as MatchPacket | undefined;
-    if (!packet) return;
-    packet[0] = values.matchName.trim() || "Untitled match";
-    packet[1] = values.redOne; packet[2] = values.redTwo; packet[3] = values.redThree;
-    packet[4] = values.blueOne; packet[5] = values.blueTwo; packet[6] = values.blueThree;
     try {
-      await app.commitPacket(packet);
+      await app.updateMatch(editing.id, { ...values, matchName: values.matchName.trim() || "Untitled match" });
       editing = null;
     } catch {
       notice("Could not save your changes.");
