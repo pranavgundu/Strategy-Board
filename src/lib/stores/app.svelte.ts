@@ -211,13 +211,18 @@ export const app = {
     });
   },
 
-  /** Adds and updates the Synced Matches of one sync plan in a single queued write. */
-  async applySyncPlan(plan: SyncPlan): Promise<void> {
-    if (!plan.add.length && !plan.update.length) return;
-    await queueWrite(async () => {
+  /**
+   * Plans and applies a sync in one queued write, so the plan always starts from the latest saved
+   * packets and no edit can land between planning and writing.
+   */
+  applySync(planFor: (current: readonly MatchPacket[]) => SyncPlan): Promise<SyncPlan> {
+    return queueWrite(async () => {
+      const plan = planFor(packets);
+      if (!plan.add.length && !plan.update.length) return plan;
       if (plan.add.length) await native.model.addPackets(plan.add);
       for (const packet of plan.update) await native.model.replacePacket(packet);
       setPackets(await native.model.loadPackets());
+      return plan;
     });
   },
 

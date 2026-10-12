@@ -1,9 +1,11 @@
 import type { MatchPacket } from "$lib/native/types";
 
-import { readExtras, withExtras } from "./extras";
+import { readExtras, withExtras, type BenchTeams, type SyncMarker } from "./extras";
+import type { Lineup } from "./ink";
 import { newMatchPacket } from "./packets";
+import { packetLineup, reassignStations } from "./reassign";
 import { eventFieldYear, identityKey, scheduledMatchName, scheduledTbaMatchKey, type EventSchedule, type QueueTimes, type ScheduleEntry } from "./schedule";
-import { OUR_TEAM } from "./stations";
+import { OUR_TEAM, stationAlliance, type StationKey } from "./stations";
 
 /** Deleted Synced Matches as identity keys by event key; Schedule Sync never adds them again. */
 export type DismissedMatches = Readonly<Record<string, readonly string[]>>;
@@ -36,8 +38,46 @@ function stations(teams: readonly string[]): [string, string, string] {
   return [teams[0] ?? "", teams[1] ?? "", teams[2] ?? ""];
 }
 
+/** 1690 plays in a Station or sits as an alliance's Bench Team. */
 function includesOurTeam(entry: ScheduleEntry): boolean {
-  return [...entry.red.slice(0, 3), ...entry.blue.slice(0, 3)].includes(OUR_TEAM);
+  return [...entry.red.slice(0, 4), ...entry.blue.slice(0, 4)].includes(OUR_TEAM);
+}
+
+function benchOf(entry: ScheduleEntry): BenchTeams | undefined {
+  const bench: BenchTeams = {};
+  if (entry.red[3]) bench.red = entry.red[3];
+  if (entry.blue[3]) bench.blue = entry.blue[3];
+  return bench.red || bench.blue ? bench : undefined;
+}
+
+function markerOf(entry: ScheduleEntry): SyncMarker {
+  return { ...entry.identity, red: [...entry.red], blue: [...entry.blue] };
+}
+
+const sameTeams = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((team, index) => team === b[index]);
+
+const ALLIANCE_STATIONS: Record<"red" | "blue", readonly StationKey[]> = { red: ["redOne", "redTwo", "redThree"], blue: ["blueOne", "blueTwo", "blueThree"] };
+
+/** A full list sets the Stations in order; a shorter one keeps listed teams where they stand and never shifts anyone. */
+function scheduledLineup(current: Lineup, entry: ScheduleEntry): Lineup {
+  const lineup: Record<StationKey, string> = { ...current };
+  for (const alliance of ["red", "blue"] as const) {
+    const stations = ALLIANCE_STATIONS[alliance];
+    const listed = entry[alliance].slice(0, 3);
+    if (listed.length === 3) {
+      stations.forEach((station, index) => { lineup[station] = listed[index]; });
+      continue;
+    }
+    const kept = stations.filter((station) => listed.includes(current[station].trim()));
+    const arriving = listed.filter((team) => !kept.some((station) => current[station].trim() === team));
+    for (const station of stations) if (!kept.includes(station)) lineup[station] = arriving.shift() ?? "";
+  }
+  return lineup;
+}
+
+/** Applies a team change the schedule reports to a Synced Match's current state, hand edits included. */
+function applyScheduleChange(packet: MatchPacket, entry: ScheduleEntry): MatchPacket {
+  return withExtras(reassignStations(packet, scheduledLineup(packetLineup(packet), entry)), { sync: markerOf(entry), bench: benchOf(entry) });
 }
 
 function syncedMatch(entry: ScheduleEntry, id: string): MatchPacket {
@@ -50,31 +90,44 @@ function syncedMatch(entry: ScheduleEntry, id: string): MatchPacket {
     tbaMatchKey: scheduledTbaMatchKey(identity) ?? undefined,
     tbaYear: eventFieldYear(identity.eventKey),
   }, id);
-  return withExtras(packet, { sync: { ...identity, red: [...entry.red], blue: [...entry.blue] } });
+  return withExtras(packet, { sync: markerOf(entry), bench: benchOf(entry) });
 }
 
 /** Works out how the board should change to follow the schedule. It never touches storage. */
 export function planSync({ packets, schedule, dismissed = {}, newId }: SyncInput): SyncPlan {
   const skipped = new Set(dismissed[schedule.eventKey] ?? []);
-  const onBoard = new Set(packets.flatMap((packet) => {
+  const board = new Map<string, MatchPacket>();
+  for (const packet of packets) {
     const marker = readExtras(packet).sync;
-    return marker ? [identityKey(marker)] : [];
-  }));
-  const add: MatchPacket[] = [];
-  const info: Record<string, ScheduleInfo> = {};
+    if (marker) board.set(identityKey(marker), packet);
+  }
+  // a replay keeps the original's place in the schedule but reports its own teams and progress
+  const entries = new Map<string, { first: ScheduleEntry; last: ScheduleEntry }>();
   for (const entry of schedule.entries) {
-    if (!includesOurTeam(entry)) continue;
     const key = identityKey(entry.identity);
-    // a replay keeps the original's place in the schedule but reports its own progress
-    info[key] = { order: info[key]?.order ?? entry.order, status: entry.status, times: { ...entry.times }, played: entry.played };
-    if (onBoard.has(key) || skipped.has(key)) continue;
+    if (!includesOurTeam(entry) && !board.has(key)) continue;
+    entries.set(key, { first: entries.get(key)?.first ?? entry, last: entry });
+  }
+  const add: MatchPacket[] = [];
+  const update: MatchPacket[] = [];
+  const info: Record<string, ScheduleInfo> = {};
+  const onBoard = new Set(board.keys());
+  for (const [key, { first, last }] of entries) {
+    info[key] = { order: first.order, status: last.status, times: { ...last.times }, played: last.played };
+    const existing = board.get(key);
+    if (existing) {
+      const marker = readExtras(existing).sync!;
+      if (!sameTeams(marker.red, last.red) || !sameTeams(marker.blue, last.blue)) update.push(applyScheduleChange(existing, last));
+      continue;
+    }
+    if (skipped.has(key)) continue;
     onBoard.add(key);
-    add.push(syncedMatch(entry, newId()));
+    add.push(syncedMatch(last, newId()));
   }
   const nextMatch = Object.entries(info)
     .filter(([key, { played }]) => !played && onBoard.has(key))
     .sort(([, a], [, b]) => a.order - b.order)[0]?.[0] ?? null;
-  return { add, update: [], schedule: info, nextMatch };
+  return { add, update, schedule: info, nextMatch };
 }
 
 const LEVEL_RANK: Record<string, number> = { practice: 0, qual: 1, playoff: 2, final: 3 };
@@ -135,4 +188,15 @@ export function groupMatchesByEvent<T extends MatchPacket>(packets: readonly T[]
   return [...groups.entries()]
     .sort(([a, first], [b, second]) => rank(a) - rank(b) || second.last - first.last)
     .map(([eventKey, group]) => ({ eventKey, current: eventKey !== null && eventKey === currentEventKey, packets: group.packets }));
+}
+
+/** Swaps an alliance's Bench Team into one of its Stations; the team it displaces becomes the Bench Team. */
+export function swapBenchTeam(packet: MatchPacket, station: StationKey): MatchPacket {
+  const alliance = stationAlliance(station);
+  const bench = readExtras(packet).bench;
+  const incoming = bench?.[alliance];
+  if (!incoming) return packet;
+  const lineup = packetLineup(packet);
+  const displaced = lineup[station].trim();
+  return withExtras(reassignStations(packet, { ...lineup, [station]: incoming }), { bench: { ...bench, [alliance]: displaced || undefined } });
 }

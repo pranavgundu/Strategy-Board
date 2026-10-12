@@ -119,6 +119,13 @@ export class WhiteboardController {
     this.redrawAll(); this.emitState();
   }
   getMatch(): WhiteboardMatch | null { return this.match; }
+  /** Takes in the open Match after it changed outside the canvas, like a sync or a Bench swap; its undo history no longer applies. */
+  reloadMatch(match: WhiteboardMatch): void {
+    this.undoHistory.clear(); this.redoHistory.clear();
+    this.match = match; this.selected = null; this.pointer = null;
+    if (this.ink !== NEUTRAL_INK && !this.inkTeam(this.ink)) this.ink = defaultInk(lineupOf(match));
+    this.loadFieldImage(); this.redrawAll(); this.emitState();
+  }
   /** Field artwork year in use; phase labels differ from 2026 onward. */
   getCurrentFieldYear(): number | undefined { return this.fieldYear(); }
   getState(): WhiteboardState { return { mode: this.mode, tool: this.tool, ink: this.ink, view: this.view, canUndo: this.canUndo(), canRedo: this.canRedo(), isCanvasVisible: this.mode !== "statbotics", hiddenTeams: [...this.hiddenTeams] }; }

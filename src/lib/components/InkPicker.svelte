@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { inkColor, NEUTRAL_INK, STATIONS, teamInk, type Lineup, type StationKey, type TeamColorOverrides } from "$lib/domain";
+  import { inkColor, NEUTRAL_INK, resolveTeamColor, STATIONS, stationAlliance, teamInk, type AllianceColor, type BenchTeams, type Lineup, type StationKey, type TeamColorOverrides } from "$lib/domain";
 
-  let { lineup, ink, overrides, hiddenTeams, onPick, onToggleHidden, onSavePath }: {
+  let { lineup, ink, overrides, hiddenTeams, bench, onPick, onToggleHidden, onSavePath, onSwapBench }: {
     lineup: Lineup;
     ink: number;
     overrides: TeamColorOverrides;
@@ -9,9 +9,15 @@
     onPick: (ink: number) => void;
     onToggleHidden: (team: string) => void;
     onSavePath: (station: StationKey) => void;
+    bench: BenchTeams;
+    onSwapBench: (station: StationKey) => void;
   } = $props();
 
-  let menu = $state<{ station: StationKey; team: string; top: number } | null>(null);
+  const STATION_NAMES: Record<StationKey, string> = { redOne: "Red 1", redTwo: "Red 2", redThree: "Red 3", blueOne: "Blue 1", blueTwo: "Blue 2", blueThree: "Blue 3" };
+  const LAST_STATION: Partial<Record<StationKey, AllianceColor>> = { redThree: "red", blueThree: "blue" };
+
+  type Menu = { kind: "team"; station: StationKey; team: string; top: number } | { kind: "bench"; alliance: AllianceColor; team: string; top: number };
+  let menu = $state<Menu | null>(null);
 
   // expanded shows every chip plus the close control; collapsed leaves only the active Ink
   let open = $state(true);
@@ -33,8 +39,8 @@
     onPick(chipInk);
   }
 
-  function openMenu(station: StationKey, team: string, button: HTMLElement) {
-    menu = menu?.station === station ? null : { station, team, top: button.offsetTop };
+  function openMenu(next: Menu) {
+    menu = menu && menu.kind === next.kind && menu.team === next.team ? null : next;
   }
 
   function collapse() {
@@ -72,19 +78,43 @@
         >
           <i class="fas {chip.hidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
         </button>
-        <button class="ink-eye" aria-label={`More for team ${chip.team}`} aria-expanded={menu?.station === station} onclick={(event) => openMenu(station, chip.team, event.currentTarget)}>
+        <button class="ink-eye" aria-label={`More for team ${chip.team}`} aria-expanded={menu?.kind === "team" && menu.station === station} onclick={(event) => openMenu({ kind: "team", station, team: chip.team, top: event.currentTarget.offsetTop })}>
           <i class="fas fa-ellipsis-vertical"></i>
         </button>
       {/if}
     </div>
+    {@const benchAlliance = chip.station ? LAST_STATION[chip.station] : undefined}
+    {@const benchTeam = benchAlliance ? bench[benchAlliance] : undefined}
+    {#if benchAlliance && benchTeam}
+      <div class="ink-chip bench-chip {benchAlliance}" class:collapsed-away={!open}>
+        <button
+          class="ink-pick"
+          aria-label={`Bench Team ${benchTeam}, swap into a Station`}
+          aria-expanded={menu?.kind === "bench" && menu.alliance === benchAlliance}
+          onclick={(event) => openMenu({ kind: "bench", alliance: benchAlliance, team: benchTeam, top: event.currentTarget.offsetTop })}
+        >
+          <span class="ink-swatch" style:background={resolveTeamColor(benchTeam, overrides)}></span>
+          <span>{benchTeam}</span>
+          <span class="bench-label">Bench <i class="fas fa-right-left"></i></span>
+        </button>
+      </div>
+    {/if}
   {/each}
   {#if menu}
     {@const current = menu}
     <button class="ink-menu-backdrop" aria-label="Close the team menu" onclick={() => (menu = null)}></button>
     <div class="ink-menu" style:top="{current.top}px" role="menu" aria-label={`Team ${current.team}`}>
-      <button role="menuitem" onclick={() => { const { station } = current; menu = null; onSavePath(station); }}>
-        <i class="fas fa-route w-5"></i> Save as Common Path…
-      </button>
+      {#if current.kind === "team"}
+        <button role="menuitem" onclick={() => { const { station } = current; menu = null; onSavePath(station); }}>
+          <i class="fas fa-route w-5"></i> Save as Common Path…
+        </button>
+      {:else}
+        {#each STATIONS.filter((station) => stationAlliance(station) === current.alliance) as station (station)}
+          <button role="menuitem" onclick={() => { menu = null; onSwapBench(station); }}>
+            <i class="fas fa-right-left w-5"></i> Swap {current.team} into {STATION_NAMES[station]}{lineup[station].trim() ? ` for ${lineup[station]}` : ""}
+          </button>
+        {/each}
+      {/if}
     </div>
   {/if}
   <div class="ink-chip justify-center" class:collapsed-away={!open}>
@@ -117,6 +147,16 @@
   .ink-chip.red.selected { border-left-color: #dc2626; }
   .ink-chip.blue.selected { border-left-color: #2563eb; }
   .ink-chip.empty { opacity: 0.35; }
+  .bench-chip { border-style: dashed; border-left-style: solid; }
+  .bench-label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: auto;
+    color: #888;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
   .ink-chip.collapsed-away { display: none; }
   .ink-pick,
   .ink-eye {

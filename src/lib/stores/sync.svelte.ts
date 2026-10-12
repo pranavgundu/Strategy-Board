@@ -42,6 +42,8 @@ let manualEventKey = $state<string | null>(null);
 let currentEvent = $state<CurrentEvent | null>(null);
 let queue = $state.raw<EventQueue | null>(null);
 let dismissed = $state.raw<DismissedMatches>({});
+/** The Matches the last sync changed, so an open Match can reload; the revision makes each change distinct. */
+let lastChange = $state.raw<{ revision: number; ids: readonly string[] }>({ revision: 0, ids: [] });
 let detectedAt = 0;
 let status = $state<SyncStatus>({ state: "idle", message: "", eventKey: null, source: null, at: null });
 let bookkeeping: Bookkeeping = { etags: {}, source: null, eventKey: null, at: null };
@@ -143,13 +145,13 @@ async function run(): Promise<void> {
     return;
   }
   await app.init();
-  const plan = planSync({ packets: app.packets, schedule, dismissed, newId });
-  await app.applySyncPlan(plan);
+  const plan = await app.applySync((packets) => planSync({ packets, schedule, dismissed, newId }));
+  if (plan.update.length) lastChange = { revision: lastChange.revision + 1, ids: plan.update.map((packet) => packet[7]) };
   queue = { eventKey, schedule: plan.schedule, nextMatch: plan.nextMatch };
   await native.storage.set(QUEUE_KEY, queue as unknown as JsonValue).catch(() => undefined);
   await remember("nexus", eventKey, etagKey, response.etag);
-  const added = plan.add.length;
-  report("synced", added ? `Added ${added} match${added === 1 ? "" : "es"} from Nexus.` : "Up to date with Nexus.", eventKey);
+  const changes = [plan.add.length && `added ${plan.add.length} match${plan.add.length === 1 ? "" : "es"}`, plan.update.length && `updated ${plan.update.length}`].filter(Boolean).join(" and ");
+  report("synced", changes ? `Nexus sync ${changes}.` : "Up to date with Nexus.", eventKey);
 }
 
 function canPoll(): boolean {
@@ -173,6 +175,7 @@ export const scheduleSync = {
   get currentEvent(): CurrentEvent | null { return currentEvent; },
   get queue(): EventQueue | null { return queue; },
   get dismissed(): DismissedMatches { return dismissed; },
+  get lastChange(): { revision: number; ids: readonly string[] } { return lastChange; },
 
   /** Remembers deleted Synced Matches so sync never adds them again. */
   async dismiss(deleted: readonly MatchPacket[]): Promise<void> {

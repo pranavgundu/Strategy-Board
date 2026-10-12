@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { tick } from "svelte";
+  import { tick, untrack } from "svelte";
   import { app } from "$lib/stores/app.svelte";
   import { boardConfig } from "$lib/stores/config.svelte";
+  import { scheduleSync } from "$lib/stores/sync.svelte";
   import { createWhiteboardController, whiteboardMatchFromPacket, writeWhiteboardPacket, type WhiteboardController, type WhiteboardMatch, type WhiteboardMode, type WhiteboardState } from "$lib/whiteboard";
   import { newId, safeFilename, savePng } from "$lib/features";
-  import { addCommonPath, commonPathChoices, matchFieldYear, saveCommonPath, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
+  import { addCommonPath, commonPathChoices, matchFieldYear, readExtras, saveCommonPath, swapBenchTeam, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
   import type { MatchPacket } from "$lib/native/types";
   import ApplyCommonPathModal from "./ApplyCommonPathModal.svelte";
   import InkPicker from "./InkPicker.svelte";
@@ -30,6 +31,7 @@
   let applyOpen = $state(false);
 
   let loadedMatchId = "";
+  let handledSyncChange = scheduleSync.lastChange.revision;
   let commitQueue: Promise<void> = Promise.resolve();
   let handledPngRequest = 0;
 
@@ -37,6 +39,7 @@
     redOne: app.activeMatch.redOne, redTwo: app.activeMatch.redTwo, redThree: app.activeMatch.redThree,
     blueOne: app.activeMatch.blueOne, blueTwo: app.activeMatch.blueTwo, blueThree: app.activeMatch.blueThree,
   });
+  const bench = $derived(app.activeMatch ? readExtras(app.activeMatch.packet).bench ?? {} : {});
   const teleopLabel = $derived(fieldYear === 2026 ? "ACTIVE" : "TELEOP");
   const endgameLabel = $derived(fieldYear === 2026 ? "INACTIVE" : "ENDGAME");
   const phaseLabels = $derived<Record<MatchPhase, string>>({ auto: "AUTO", transition: "TRANSITION", teleop: teleopLabel, endgame: endgameLabel, notes: "NOTES" });
@@ -84,6 +87,18 @@
   });
 
   $effect(() => {
+    const change = scheduleSync.lastChange;
+    if (change.revision === handledSyncChange) return;
+    handledSyncChange = change.revision;
+    untrack(() => {
+      const active = app.activeMatch;
+      if (!controller || !active || !change.ids.includes(active.id)) return;
+      controller.reloadMatch(whiteboardMatchFromPacket(active.packet));
+      onNotice("The schedule changed this match's teams. Each plan moved with its team.");
+    });
+  });
+
+  $effect(() => {
     if (!pngRequest || pngRequest === handledPngRequest || !controller) return;
     handledPngRequest = pngRequest;
     tick().then(exportPng);
@@ -120,6 +135,19 @@
     void boardConfig.update(addCommonPath(boardConfig.current, path));
     savePathFor = null;
     onNotice(`Saved "${path.name}" as a Common Path.`);
+  }
+
+  async function swapBench(station: StationKey) {
+    await commitQueue;
+    const packet = livePacket();
+    if (!packet) return;
+    try {
+      await app.commitPacket(swapBenchTeam(packet, station));
+      const active = app.activeMatch;
+      if (active) controller?.reloadMatch(whiteboardMatchFromPacket(active.packet));
+    } catch {
+      onNotice("Could not swap the Bench Team.");
+    }
   }
 
   function applyPath(path: CommonPath, station: StationKey) {
@@ -238,7 +266,7 @@
       </div>
 
       {#if lineup}
-        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hiddenTeams={ui.hiddenTeams} onPick={(ink) => controller?.setInk(ink)} onToggleHidden={(team) => controller?.toggleHiddenTeam(team)} onSavePath={(station) => (savePathFor = station)} />
+        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hiddenTeams={ui.hiddenTeams} onPick={(ink) => controller?.setInk(ink)} onToggleHidden={(team) => controller?.toggleHiddenTeam(team)} onSavePath={(station) => (savePathFor = station)} {bench} onSwapBench={swapBench} />
       {/if}
     {/if}
   </div>
