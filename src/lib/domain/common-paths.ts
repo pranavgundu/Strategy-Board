@@ -10,16 +10,14 @@ import { PHASE_INDEX, type MatchPhase } from "./packets";
 import { STATIONS, stationAlliance, teamNumberKey, type AllianceColor, type StationKey } from "./stations";
 
 export interface CommonPathPose { x: number; y: number; r: number }
-/** One robot's Strokes from one Phase plus its Bumper Sprite pose, saved to paste into other Matches. */
 export interface CommonPath {
   id: string;
   name: string;
-  /** The team the path was drawn for, or null when any robot can run it. */
+  // null when any robot can run it
   tag: string | null;
   fieldYear: number;
   phase: MatchPhase;
   alliance: AllianceColor;
-  /** Each Stroke's points in field coordinates. */
   strokes: [number, number][][];
   pose: CommonPathPose;
 }
@@ -55,7 +53,7 @@ export function saveCommonPath(packet: MatchPacket, station: StationKey, phase: 
 export type PastedStroke = [ink: number, ...points: [number, number][]];
 export interface CommonPathPaste { strokes: PastedStroke[]; pose: CommonPathPose }
 
-/** What a Common Path puts into a Station: fresh copies in its Team Ink that keep no link back to the library. */
+// pasted strokes are fresh copies with no link back to the library - deleting a path never changes a match
 export function commonPathPaste(path: CommonPath, station: StationKey): CommonPathPaste {
   const turned = stationAlliance(station) !== path.alliance;
   const place = ([x, y]: [number, number]): [number, number] => (turned ? [FIELD_WIDTH - x, FIELD_HEIGHT - y] : [x, y]);
@@ -63,7 +61,7 @@ export function commonPathPaste(path: CommonPath, station: StationKey): CommonPa
   const ink = teamInk(station);
   return {
     strokes: path.strokes.map((stroke): PastedStroke => [ink, ...stroke.map(place)]),
-    // sprite rotation is stored relative to each alliance's wall, so turning the pose half a turn keeps its r
+    // sprite rotation is stored relative to each alliance's wall - turning the pose half a turn keeps its r
     pose: { x, y, r: path.pose.r },
   };
 }
@@ -83,14 +81,9 @@ export function applyCommonPath(packet: MatchPacket, path: CommonPath, station: 
 
 export interface CommonPathChoice {
   path: CommonPath;
-  /** The tagged team's Station when that team plays in the Match. */
   station: StationKey | null;
 }
 
-/**
- * The paths the apply picker offers for a Match: only its field year, paths saved from the Phase on screen first,
- * and within each of those, paths tagged with a team in the Match first.
- */
 export function commonPathChoices(paths: readonly CommonPath[], { fieldYear, phase, lineup }: { fieldYear: number; phase: MatchPhase; lineup: Lineup }): CommonPathChoice[] {
   const stationOf = (tag: string | null) => (tag ? STATIONS.find((station) => lineup[station].trim() === tag) ?? null : null);
   return paths
@@ -115,14 +108,12 @@ export function renameCommonPath(config: BoardConfig, id: string, name: string):
   return updatePath(config, id, { name });
 }
 
-/** Tags a path with a team number, or with null when any robot can run it. */
 export function retagCommonPath(config: BoardConfig, id: string, tag: string | null): BoardConfig {
   const key = tag === null ? null : teamNumberKey(tag);
   if (tag !== null && !key) throw new Error("A Common Path is tagged with a team number or with any robot.");
   return updatePath(config, id, { tag: key });
 }
 
-/** Pasted copies keep no link to the library, so Matches never change when a path is deleted. */
 export function deleteCommonPath(config: BoardConfig, id: string): BoardConfig {
   return { ...config, commonPaths: config.commonPaths.filter((path) => path.id !== id) };
 }
@@ -142,7 +133,6 @@ function commonPath(value: unknown): CommonPath | null {
   return { id, name, tag, fieldYear, phase: phase as MatchPhase, alliance, strokes: strokes as [number, number][][], pose: { x: pose.x, y: pose.y, r: pose.r } };
 }
 
-/** Keeps the valid Common Paths from storage or a file; a repeated id keeps only its first path. */
 export function readCommonPaths(value: unknown): CommonPath[] {
   if (!Array.isArray(value)) return [];
   const seen = new Set<string>();

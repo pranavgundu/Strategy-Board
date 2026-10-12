@@ -99,7 +99,7 @@ export interface TbaSimpleMatch {
   match_key: string;
 }
 
-/** What a schedule source answered. Failures are results too, so sync can say exactly what went wrong. */
+// failures are results too so sync can say exactly what went wrong
 export type SourceResponse =
   | { kind: "ok"; data: JsonValue; etag: string | null }
   | { kind: "not-modified"; etag: string | null }

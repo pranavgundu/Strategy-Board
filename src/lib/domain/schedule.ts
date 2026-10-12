@@ -1,13 +1,13 @@
 import type { MatchLevel } from "./extras";
 import { isObject } from "./json";
 
-/** Which scheduled match a Synced Match is: the same identity whichever source reports it. */
+// the same identity whichever source reports the match
 export interface ScheduleIdentity {
   eventKey: string;
   level: MatchLevel;
   number: number;
 }
-/** Nexus's estimated and actual times for a match, in ms. */
+// nexus's estimated and actual times in ms
 export interface QueueTimes {
   scheduledStartTime?: number;
   estimatedQueueTime?: number;
@@ -20,16 +20,14 @@ export interface QueueTimes {
 }
 export interface ScheduleEntry {
   identity: ScheduleIdentity;
-  /** Teams in Station order as the schedule lists them; a playoff alliance may list a fourth. */
+  // in station order - a playoff alliance may list a fourth team
   red: string[];
   blue: string[];
-  /** Position in the source's schedule. */
   order: number;
-  /** Nexus's Queue Status, like "Now queuing"; null when the source has none. */
   status: string | null;
   times: QueueTimes;
   played: boolean;
-  /** A replay entry reports on the match it replays. */
+  // a replay entry reports on the match it replays
   replay: boolean;
 }
 export interface EventSchedule {
@@ -45,12 +43,10 @@ export function identityKey({ eventKey, level, number }: ScheduleIdentity): stri
   return `${eventKey}:${level}:${number}`;
 }
 
-/** Named like the field display: Practice 3, Quals 12, Playoff 7, Final 2. */
 export function scheduledMatchName({ level, number }: ScheduleIdentity): string {
   return `${NAMES[level]} ${number}`;
 }
 
-/** The TBA match key STATS looks up; practice matches have none. */
 export function scheduledTbaMatchKey({ eventKey, level, number }: ScheduleIdentity): string | null {
   if (level === "qual") return `${eventKey}_qm${number}`;
   if (level === "playoff") return `${eventKey}_sf${number}m1`;
@@ -58,7 +54,7 @@ export function scheduledTbaMatchKey({ eventKey, level, number }: ScheduleIdenti
   return null;
 }
 
-/** The schedule identity behind a TBA match key like 2026isde1_qm13, 2026isde1_sf7m1, or 2026isde1_f1m2. */
+// tba keys look like 2026isde1_qm13 or 2026isde1_sf7m1 or 2026isde1_f1m2
 export function identityFromTbaKey(key: string): ScheduleIdentity | null {
   const quals = /^(\w+)_qm(\d+)$/.exec(key);
   if (quals) return { eventKey: quals[1], level: "qual", number: Number(quals[2]) };
@@ -93,12 +89,12 @@ function teamList(value: unknown): string[] | null {
   return teams.some(Boolean) ? teams : null;
 }
 
-/** Reads a Nexus live event status. Null means Nexus has no schedule for the event yet. */
+// null while nexus has no schedule for the event yet
 export function parseNexusEvent(json: unknown): EventSchedule | null {
   if (!isObject(json) || typeof json.eventKey !== "string" || !Array.isArray(json.matches)) return null;
   const eventKey = json.eventKey;
   const matches = json.matches.map((match) => (isObject(match) ? match : {}));
-  // played means a later match has reached the field, so look back from the end of the schedule
+  // played means a later match has reached the field - so look back from the end of the schedule
   const laterOnField: boolean[] = [];
   for (let index = matches.length - 1, seen = false; index >= 0; index--) {
     laterOnField[index] = seen;
@@ -128,7 +124,7 @@ export function parseNexusEvent(json: unknown): EventSchedule | null {
 
 const TBA_LEVEL_RANK: Readonly<Record<string, number>> = { qm: 0, sf: 1, f: 2 };
 
-/** Playoff N is TBA's sfNm1 and any later sfN match replays it; Final N is f1mN. */
+// playoff N is tba's sfNm1 and any later sfN match replays it - final N is f1mN
 function tbaIdentity(eventKey: string, compLevel: string, setNumber: number, matchNumber: number): { identity: ScheduleIdentity; replay: boolean } | null {
   if (compLevel === "qm") return { identity: { eventKey, level: "qual", number: matchNumber }, replay: false };
   if (compLevel === "sf") return { identity: { eventKey, level: "playoff", number: setNumber }, replay: matchNumber > 1 };
@@ -142,7 +138,7 @@ function tbaAlliance(value: unknown): { teams: string[] | null; score: number } 
   return { teams, score: typeof value.score === "number" ? value.score : -1 };
 }
 
-/** Reads TBA's match list for an event. TBA has no Queue Status, and a match counts as played once it has a result. */
+// tba has no queue status - a match counts as played once it has a result
 export function parseTbaMatches(json: unknown, eventKey: string): EventSchedule | null {
   if (!Array.isArray(json)) return null;
   const matches = json

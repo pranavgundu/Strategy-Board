@@ -10,7 +10,6 @@ let current = $state.raw<BoardConfig>(emptyBoardConfig());
 let loading: Promise<void> | null = null;
 let writes: Promise<void> = Promise.resolve();
 
-/** This device's Board Config. Every change is saved on the device right away. */
 export const boardConfig = {
   get current(): BoardConfig { return current; },
 

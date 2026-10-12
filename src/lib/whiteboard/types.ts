@@ -35,7 +35,7 @@ export interface WhiteboardState {
   mode: WhiteboardMode; tool: WhiteboardTool; ink: number;
   view: "full" | "red" | "blue"; canUndo: boolean; canRedo: boolean;
   isCanvasVisible: boolean;
-  /** Teams whose Strokes are hidden while this Match is open; never saved. */
+  // never saved
   hiddenTeams: readonly string[];
 }
 export interface WhiteboardCommit {

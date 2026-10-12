@@ -56,7 +56,6 @@
     return marker ? identityKey(marker) : null;
   }
 
-  // the Current Event comes first, in schedule order and led by the Next Match; past events start collapsed
   const groups = $derived.by((): MatchGroup[] => {
     const queue = scheduleSync.queue;
     const current = scheduleSync.currentEvent;

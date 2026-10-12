@@ -31,7 +31,7 @@
 </script>
 
 {#if open}
-  <!-- Home stays mounted underneath, so closing Settings returns to it exactly as it was -->
+  <!-- home stays mounted underneath so closing settings returns to it exactly as it was -->
   <div id="settings-container" class="fixed inset-0 z-40 flex flex-col bg-[#0d0d0d] touch-none" role="dialog" aria-modal="true" aria-label="Settings">
     <div
       id="settings-toolbar"

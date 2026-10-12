@@ -5,7 +5,7 @@ export function isNativeRuntime(): boolean {
   return typeof window !== "undefined" && isTauri();
 }
 
-/** A random id that also works outside secure contexts, where crypto.randomUUID is missing. */
+// crypto.randomUUID is missing outside secure contexts
 export function newId(): string {
   return typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }

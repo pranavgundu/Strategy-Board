@@ -15,7 +15,7 @@ export interface CurrentEvent {
   eventKey: string;
   name: string | null;
   source: CurrentEventSource;
-  /** When the event ends, so a detected event is kept until then; null for a hand-entered key. */
+  // a detected event is kept until it ends - null for a hand-entered key
   end: number | null;
 }
 
@@ -25,7 +25,6 @@ function running(candidates: EventCandidate[], now: number): EventCandidate[] {
     .sort((a, b) => a.start - b.start);
 }
 
-/** Nexus events running now, with a day of slack either side, earliest first. */
 export function runningNexusEvents(json: unknown, now: number): EventCandidate[] {
   if (!isObject(json)) return [];
   return running(Object.entries(json).flatMap(([eventKey, event]) => {
@@ -34,7 +33,7 @@ export function runningNexusEvents(json: unknown, now: number): EventCandidate[]
   }), now);
 }
 
-/** TBA events running now; TBA gives local dates, so each spans whole days before the slack is added. */
+// tba gives local dates - so each event spans whole days before the slack is added
 export function runningTbaEvents(json: unknown, now: number): EventCandidate[] {
   if (!Array.isArray(json)) return [];
   return running(json.flatMap((event) => {
@@ -52,19 +51,14 @@ function scheduleIncludesOurTeam(json: unknown): boolean {
 
 export interface CurrentEventInput {
   manualEventKey: string | null;
-  /** The Nexus events list. */
   nexusEvents: unknown;
-  /** Nexus live event status by event key, for the running events that were looked up. */
+  // live status by event key - only the running events get looked up
   nexusSchedules: Readonly<Record<string, unknown>>;
-  /** TBA's events for Our Team this year. */
+  // only our team's events this year
   tbaEvents: unknown;
   now: number;
 }
 
-/**
- * A hand-entered key always wins. Otherwise the Nexus event running today whose schedule includes 1690,
- * otherwise the TBA event 1690 is registered for that runs today. Null means waiting for a schedule.
- */
 export function pickCurrentEvent({ manualEventKey, nexusEvents, nexusSchedules, tbaEvents, now }: CurrentEventInput): CurrentEvent | null {
   if (manualEventKey) return { eventKey: manualEventKey, name: null, source: "manual", end: null };
   const nexus = runningNexusEvents(nexusEvents, now).find((event) => scheduleIncludesOurTeam(nexusSchedules[event.eventKey]));

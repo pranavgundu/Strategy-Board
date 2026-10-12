@@ -59,12 +59,8 @@ export async function saveFile(bytes: Uint8Array, options: SaveFileOptions): Pro
   return { saved: true, path };
 }
 
-/**
- * Offers a board file through the share sheet (the Android share sheet on the tablet) and
- * falls back to an ordinary save where files can't be shared. A dismissed sheet is not an error.
- */
 export async function shareBoardFile(text: string, options: { filename: string; title: string }): Promise<SaveFileResult> {
-  // chrome only shares a fixed list of file types and json is not on it, so the json goes out as text
+  // chrome only shares a fixed list of file types and json is not on it - so the json goes out as text
   const filename = withExtension(options.filename, "txt");
   const file = new File([text], filename, { type: "text/plain" });
   if (!isNativeRuntime() && navigator.canShare?.({ files: [file] })) {

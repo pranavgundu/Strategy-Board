@@ -89,10 +89,10 @@ function uuid(): string {
 }
 
 function positionsForYear(year?: number | null): FieldRobotPositions {
-  const { defaults } = fieldLayout(year);
+  const { spriteStarts } = fieldLayout(year);
   return {
-    red: { one: { ...defaults.redOne }, two: { ...defaults.redTwo }, three: { ...defaults.redThree } },
-    blue: { one: { ...defaults.blueOne }, two: { ...defaults.blueTwo }, three: { ...defaults.blueThree } },
+    red: { one: { ...spriteStarts.redOne }, two: { ...spriteStarts.redTwo }, three: { ...spriteStarts.redThree } },
+    blue: { one: { ...spriteStarts.blueOne }, two: { ...spriteStarts.blueTwo }, three: { ...spriteStarts.blueThree } },
   };
 }
 
@@ -159,7 +159,7 @@ async function sourceRequest(url: string, headers: Record<string, string>, etag?
   if (isOffline()) return { kind: "offline" };
   try {
     const response = await fetch(url, { headers: { ...headers, ...(etag ? { "If-None-Match": etag } : {}) }, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
-    // nexus does not expose its etag to browsers, so a null etag here is normal and the http cache revalidates instead
+    // nexus does not expose its etag to browsers - a null etag here is normal and the http cache revalidates instead
     const nextEtag = response.headers.get("etag");
     if (response.status === 304) return { kind: "not-modified", etag: nextEtag ?? etag ?? null };
     if (response.status === 401) return { kind: "missing-key" };
@@ -193,7 +193,7 @@ async function tbaSourceRequest(endpoint: string, etag?: string | null): Promise
   const key = await tbaKey();
   if (!key) return { kind: "missing-key" };
   const response = await sourceRequest(`${TBA_BASE}${endpoint}`, { "X-TBA-Auth-Key": key }, etag);
-  // tba answers 401 for a key it doesn't accept, and one was sent
+  // tba answers 401 for a key it rejects - and a key was sent
   return response.kind === "missing-key" ? { kind: "rejected-key" } : response;
 }
 
@@ -304,7 +304,7 @@ function fuzzyMatch(searchTerm: string, target: string, originalTarget?: string)
   return cursor === query.length ? { score: Math.max(1, 50 - text.length + query.length), matchedIndices } : (originalTarget ? fuzzyMatch(searchTerm, originalTarget) : null);
 }
 
-const labels = fieldLayout().labels;
+const labels = fieldLayout().teamLabels;
 const config: NativeConfig = {
   fieldPngPixelWidth: 3510, fieldPngPixelHeight: 1610, fieldRealWidthInches: 690.875, fieldRealHeightInches: 317,
   redOneStationX: labels.redOne.x, redOneStationY: labels.redOne.y, redTwoStationX: labels.redTwo.x, redTwoStationY: labels.redTwo.y, redThreeStationX: labels.redThree.x, redThreeStationY: labels.redThree.y,

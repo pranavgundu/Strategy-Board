@@ -64,7 +64,7 @@
       .some((team) => team && team.trim() !== ""),
   );
 
-  // each save is worked out when its turn comes, from the latest stored packet, so queued changes never undo each other
+  // each save is worked out from the latest stored packet when its turn comes - so queued changes never undo each other
   function queueCommit(match: WhiteboardMatch) {
     const { id } = match;
     commitQueue = commitQueue.then(() => {
@@ -154,7 +154,7 @@
 
   function setMode(mode: WhiteboardMode) { controller?.setMode(mode); }
 
-  /** The open Match as the canvas holds it right now, including edits still being saved. */
+  // includes canvas edits still waiting to be saved
   function livePacket(): MatchPacket | null {
     const source = app.activeMatch;
     const scene = controller?.getMatch();
@@ -188,7 +188,6 @@
     applyOpen = false;
   }
 
-  /** Cycles marker → eraser → checkbox (notes only) → marker. */
   function cycleTool() {
     controller?.toggleTool();
   }

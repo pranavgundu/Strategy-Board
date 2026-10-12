@@ -17,7 +17,7 @@ function schedule(edit: (matches: NexusMatch[]) => void = () => undefined) {
 const byLabel = (matches: NexusMatch[], label: string) => matches.find((match) => match.label === label)!;
 const named = (packets: readonly MatchPacket[], name: string) => packets.find((packet) => packet[0] === name)!;
 
-/** Gives every occupied Station one auto Stroke and a distinct pose, so moves are visible. */
+// every occupied station gets one auto stroke and a distinct pose so moves are visible
 function planned(packet: MatchPacket): MatchPacket {
   const copy = structuredClone(packet);
   const auto = (copy[8] as unknown[][])[1];
@@ -27,7 +27,6 @@ function planned(packet: MatchPacket): MatchPacket {
   return copy;
 }
 
-/** A team's auto Strokes and pose, wherever it stands. */
 function planOf(packet: MatchPacket, team: string) {
   const station = STATIONS[packet.slice(1, 7).indexOf(team)];
   const auto = (packet[8] as unknown[][])[1];

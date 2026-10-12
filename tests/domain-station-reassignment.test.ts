@@ -8,7 +8,7 @@ const PHASES = [1, 2, 3, 4, 5];
 type Pose = number[];
 type Points = number[][];
 
-/** Every Station gets a distinct sprite pose and one Stroke in every Phase, plus one Neutral Stroke. */
+// every station gets a distinct sprite pose and one stroke in every phase - plus one neutral stroke
 function plannedMatch(red: [string, string, string], blue: [string, string, string]): MatchPacket {
   const packet = newMatchPacket({ matchName: "Quals 9", redTeams: red, blueTeams: blue, tbaYear: 2026 }, "match");
   const body = packet[8] as unknown[][];
@@ -32,7 +32,6 @@ function stationOf(packet: MatchPacket, team: string): StationKey {
   return STATIONS[index];
 }
 
-/** Everything a Station holds: its sprite pose and size and its Team Ink Strokes, in every Phase. */
 function contentAt(packet: MatchPacket, station: StationKey): { size: unknown; poses: Pose[]; strokes: Points[][] } {
   const index = STATIONS.indexOf(station);
   const body = packet[8] as unknown[][];

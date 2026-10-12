@@ -11,7 +11,6 @@ const BACKUP_FILE = "orbit-strategy-board/backup";
 const FILE_VERSION = 1;
 const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 
-/** Everything on one tablet, for restoring onto a replacement. */
 export interface Backup {
   packets: MatchPacket[];
   config: BoardConfig;
@@ -28,7 +27,7 @@ export class BoardFileError extends Error {
   override name = "BoardFileError";
 }
 
-/** Clears the local id like a QR export does, so an import always becomes a new Match. */
+// clears the local id like a qr export does - an import always becomes a new match
 function portablePacket(packet: readonly unknown[]): MatchPacket {
   const copy = structuredClone([...packet]) as unknown as MatchPacket;
   copy[7] = null as unknown as string;
@@ -67,7 +66,6 @@ export function encodeBackup(backup: Backup): string {
   return JSON.stringify({ type: BACKUP_FILE, version: FILE_VERSION, ...backup });
 }
 
-/** Reads any file the board saves, recognizing it by its type tag. */
 export function readBoardFile(text: string): BoardFile {
   let parsed: unknown;
   try { parsed = JSON.parse(text); } catch { parsed = null; }

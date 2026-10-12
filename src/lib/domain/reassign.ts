@@ -11,7 +11,7 @@ export function packetLineup(packet: MatchPacket): Lineup {
   return Object.fromEntries(STATIONS.map((station, index) => [station, typeof packet[index + 1] === "string" ? packet[index + 1] : ""])) as unknown as Lineup;
 }
 
-/** For each Station after the change, the Station whose content it takes over, or null to start fresh. */
+// for each station after the change - the station whose content it takes over or null to start fresh
 function contentSources(current: Lineup, next: Lineup): Record<StationKey, StationKey | null> {
   const sources: Partial<Record<StationKey, StationKey | null>> = {};
   const claimed = new Set<StationKey>();
@@ -31,11 +31,9 @@ function contentSources(current: Lineup, next: Lineup): Record<StationKey, Stati
   return sources as Record<StationKey, StationKey | null>;
 }
 
-/**
- * Puts a new lineup into a Match without losing anyone's plan: a team keeps its Strokes and Bumper Sprite
- * wherever it moves, arriving teams inherit what the departing teams of their alliance leave in Station order,
- * and a Station left without a team keeps its content until a team arrives.
- */
+// a team keeps its strokes and sprite wherever it moves
+// arriving teams inherit what the departing teams of their alliance leave - in station order
+// a station left without a team keeps its content until a team arrives
 export function reassignStations(packet: MatchPacket, next: Lineup): MatchPacket {
   const sources = contentSources(packetLineup(packet), next);
   const destinations = new Map<StationKey, StationKey>();
@@ -46,7 +44,7 @@ export function reassignStations(packet: MatchPacket, next: Lineup): MatchPacket
   const copy = structuredClone(packet);
   STATIONS.forEach((station, index) => { copy[index + 1] = next[station]; });
   const body = copy[8];
-  const { defaults } = fieldLayout(typeof packet[11] === "number" ? packet[11] : undefined);
+  const { spriteStarts } = fieldLayout(typeof packet[11] === "number" ? packet[11] : undefined);
   const sizes = Array.isArray(body[0]) ? body[0] : [];
   body[0] = STATIONS.map((target) => {
     const from = sources[target];
@@ -57,7 +55,7 @@ export function reassignStations(packet: MatchPacket, next: Lineup): MatchPacket
     const poses = phase.slice(0, 6);
     STATIONS.forEach((target, index) => {
       const from = sources[target];
-      phase[index] = (from && poses[STATIONS.indexOf(from)]) || [defaults[target].x, defaults[target].y, 0];
+      phase[index] = (from && poses[STATIONS.indexOf(from)]) || [spriteStarts[target].x, spriteStarts[target].y, 0];
     });
     for (const stroke of Array.isArray(phase[6]) ? phase[6] : []) {
       if (!Array.isArray(stroke) || typeof stroke[0] !== "number") continue;

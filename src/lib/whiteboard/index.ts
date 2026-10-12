@@ -119,7 +119,7 @@ export class WhiteboardController {
     this.redrawAll(); this.emitState();
   }
   getMatch(): WhiteboardMatch | null { return this.match; }
-  /** Takes in the open Match after it changed outside the canvas, like a sync or a Bench swap; its undo history no longer applies. */
+  // the match changed outside the canvas - its undo history no longer applies
   reloadMatch(match: WhiteboardMatch): void {
     const inkTeam = this.inkTeam(this.ink);
     this.undoHistory.clear(); this.redoHistory.clear();
@@ -147,7 +147,7 @@ export class WhiteboardController {
     if (team && this.hiddenTeams.delete(team)) this.redrawDrawing();
     this.ink = next; this.emitState();
   }
-  /** Hiding the team whose Ink is selected falls back to Neutral so new Strokes never vanish as they are drawn. */
+  // hiding the selected ink's team falls back to neutral so new strokes never vanish as they are drawn
   toggleHiddenTeam(team: string): void {
     if (!team.trim()) return;
     if (this.hiddenTeams.has(team)) this.hiddenTeams.delete(team);
@@ -164,7 +164,6 @@ export class WhiteboardController {
   undo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.undoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "undo"); this.history(this.redoHistory, mode).push(action); this.redrawFor(action); this.commit("undo"); }
   redo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.redoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "redo"); this.history(this.undoHistory, mode).push(action); this.redrawFor(action); this.commit("redo"); }
 
-  /** Pastes a Common Path into one Station in the Phase on screen, as a single undo step. */
   pasteCommonPath(path: CommonPath, station: Slot): void {
     const phase = this.phase(); if (!phase || !this.match) return;
     const paste = commonPathPaste(path, station);
@@ -302,7 +301,7 @@ export class WhiteboardController {
     context.fillStyle = "#0d0d0d"; context.fillRect(0, 0, FIELD_WIDTH, FIELD_HEIGHT);
     if (this.image?.complete && this.image.naturalWidth) { const [x, y] = this.screen([0, 0]); context.drawImage(this.image, x, y, FIELD_WIDTH, FIELD_HEIGHT); }
     if (!this.match) return;
-    const { labels } = fieldLayout(this.fieldYear());
+    const labels = fieldLayout(this.fieldYear()).teamLabels;
     const teams = slots.map((slot): [string, number, number] => [this.match![slot], labels[slot].x, labels[slot].y]);
     context.font = "bold 64px sans-serif"; context.fillStyle = "white"; context.textAlign = "center"; context.textBaseline = "middle";
     for (const [name, x, y] of teams) { if ((x > FIELD_WIDTH / 2 && this.view === "blue") || (x < FIELD_WIDTH / 2 && this.view === "red")) continue; const [sx, sy] = this.screen([x, y]); context.save(); context.translate(Math.max(70, Math.min(FIELD_WIDTH - 70, sx)), Math.max(70, Math.min(FIELD_HEIGHT - 70, sy))); context.rotate(Math.PI / 2); context.fillText(name, 0, 0); context.restore(); }

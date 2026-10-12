@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { addCommonPath, applyCommonPath, commonPathChoices, deleteCommonPath, emptyBoardConfig, NEUTRAL_INK, newMatchPacket, packetLineup, readBoardConfig, renameCommonPath, retagCommonPath, saveCommonPath, teamInk, type CommonPath } from "$lib/domain";
 import type { MatchPacket } from "$lib/native/types";
 
-/** 1690 in Red 1 has a two-Stroke auto and one teleop Stroke; 2231 and a Neutral note share the auto. */
+// 1690 in red one has a two-stroke auto and one teleop stroke - 2231 and a neutral note share the auto
 function plannedMatch(): MatchPacket {
   const packet = newMatchPacket({ matchName: "Quals 9", redTeams: ["1690", "2231", "11480"], blueTeams: ["4590", "1577", "2679"], tbaYear: 2026 }, "match");
   const body = packet[8] as unknown[][];

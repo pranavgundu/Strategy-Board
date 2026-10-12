@@ -78,7 +78,6 @@ export const native = {
     events: (year: number) => call<TbaEvent[]>("tba_events", { year }),
     matchesAtEvent: (eventKey: string) => call<TbaMatch[]>("tba_matches_at_event", { eventKey }),
     teamMatches: (teamKey: string, eventKey: string) => call<TbaMatch[]>("tba_team_matches", { teamKey, eventKey }),
-    /** A team's matches at an event for Schedule Sync. Pass the last ETag so unchanged data answers "not-modified". */
     teamMatchesStatus: (teamKey: string, eventKey: string, etag?: string | null) => call<SourceResponse>("tba_team_matches_status", { teamKey, eventKey, etag: etag ?? null }),
     teamEvents: (teamKey: string, year: number) => call<TbaEvent[]>("tba_team_events", { teamKey, year }),
     teamsAtEvent: (eventKey: string) => call<string[]>("tba_teams_at_event", { eventKey }),
@@ -86,9 +85,7 @@ export const native = {
     simpleMatches: (matches: TbaMatch[]) => call<TbaSimpleMatch[]>("tba_simple_matches", { matches }),
   },
   nexus: {
-    /** Every event registered with Nexus, with its start and end times. */
     events: (etag?: string | null) => call<SourceResponse>("nexus_events", { etag: etag ?? null }),
-    /** Live status of one event. Pass the last ETag so an unchanged schedule answers "not-modified". */
     eventStatus: (eventKey: string, etag?: string | null) => call<SourceResponse>("nexus_event_status", { eventKey, etag: etag ?? null }),
   },
   statbotics: {

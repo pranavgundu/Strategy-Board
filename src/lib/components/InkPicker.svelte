@@ -19,8 +19,7 @@
   type Menu = { kind: "team"; station: StationKey; team: string; top: number } | { kind: "bench"; alliance: AllianceColor; team: string; top: number };
   let menu = $state<Menu | null>(null);
 
-  // expanded shows every chip plus the close control; collapsed leaves only the active Ink
-  let open = $state(true);
+  let expanded = $state(true);
   let closing = $state(false);
 
   const chips = $derived([
@@ -35,7 +34,7 @@
   ]);
 
   function pick(chipInk: number) {
-    if (!open) { open = true; return; }
+    if (!expanded) { expanded = true; return; }
     onPick(chipInk);
   }
 
@@ -45,7 +44,7 @@
 
   function collapse() {
     closing = true;
-    window.setTimeout(() => { closing = false; open = false; }, 300);
+    window.setTimeout(() => { closing = false; expanded = false; }, 300);
   }
 </script>
 
@@ -57,7 +56,7 @@
   aria-label="Ink"
 >
   {#each chips as chip (chip.ink)}
-    <div class="ink-chip {chip.alliance}" class:selected={chip.ink === ink} class:empty={chip.empty} class:hidden-team={chip.hidden} class:collapsed-away={!open && chip.ink !== ink}>
+    <div class="ink-chip {chip.alliance}" class:selected={chip.ink === ink} class:empty={chip.empty} class:hidden-team={chip.hidden} class:collapsed-away={!expanded && chip.ink !== ink}>
       <button
         class="ink-pick"
         disabled={chip.empty}
@@ -86,7 +85,7 @@
     {@const benchAlliance = chip.station ? LAST_STATION[chip.station] : undefined}
     {@const benchTeam = benchAlliance ? bench[benchAlliance] : undefined}
     {#if benchAlliance && benchTeam}
-      <div class="ink-chip bench-chip {benchAlliance}" class:collapsed-away={!open}>
+      <div class="ink-chip bench-chip {benchAlliance}" class:collapsed-away={!expanded}>
         <button
           class="ink-pick"
           aria-label={`Bench Team ${benchTeam}, swap into a Station`}
@@ -117,7 +116,7 @@
       {/if}
     </div>
   {/if}
-  <div class="ink-chip justify-center" class:collapsed-away={!open}>
+  <div class="ink-chip justify-center" class:collapsed-away={!expanded}>
     <button id="whiteboard-ink-close" class="ink-pick justify-center" aria-label="Collapse the Ink picker" onclick={collapse}>
       <i class="fa fa-close text-red-500"></i>
     </button>

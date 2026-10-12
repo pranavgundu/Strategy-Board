@@ -5,7 +5,7 @@ import { isObject } from "./json";
 export type MatchLevel = "practice" | "qual" | "playoff" | "final";
 export const MATCH_LEVELS: readonly MatchLevel[] = ["practice", "qual", "playoff", "final"];
 
-/** The schedule identity of a Synced Match plus the last schedule team lists seen for it. */
+// red and blue are the lists the schedule last gave - sync moves teams only when those change so hand edits stay
 export interface SyncMarker {
   eventKey: string;
   level: MatchLevel;
@@ -17,14 +17,13 @@ export interface SyncMarker {
 }
 export interface BenchTeams { red?: string; blue?: string }
 export interface MatchExtras {
-  /** Ids of the ticked Checklist Items. */
   ticks?: string[];
   sync?: SyncMarker;
   bench?: BenchTeams;
 }
 export type ExtrasPatch = { [Key in keyof MatchExtras]?: MatchExtras[Key] | undefined };
 
-// the official app and both runtimes keep unknown metadata keys, so all extras live under this one
+// the official app and both runtimes keep unknown metadata keys - all extras live under this one
 const EXTRAS_KEY = "orbit";
 
 function strings(value: unknown): string[] | undefined {
@@ -60,7 +59,7 @@ export function readExtras(packet: MatchPacket): MatchExtras {
   return extras;
 }
 
-/** Returns a copy of the packet with the patched extras; an undefined value removes that extra. */
+// an undefined value in the patch removes that extra
 export function withExtras(packet: MatchPacket, patch: ExtrasPatch): MatchPacket {
   const copy = structuredClone(packet);
   const metadata: Record<string, unknown> = isObject(copy[12]) ? { ...copy[12] } : {};
@@ -75,7 +74,7 @@ export function withExtras(packet: MatchPacket, patch: ExtrasPatch): MatchPacket
   return copy;
 }
 
-/** A What-if Match is never touched by Schedule Sync: it keeps its TBA keys but carries no sync marker. */
+// keeps its tba keys for stats - without a sync marker schedule sync never touches it
 export function toWhatIfMatch(packet: MatchPacket): MatchPacket {
   return withExtras(packet, { sync: undefined });
 }

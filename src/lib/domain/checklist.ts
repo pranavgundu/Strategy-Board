@@ -5,7 +5,6 @@ import { readExtras, withExtras } from "./extras";
 import { isObject } from "./json";
 
 export type ChecklistRowKind = "item" | "heading";
-/** A Checklist Item, which can be ticked per Match, or a Heading that groups the Items below it. */
 export interface ChecklistRow {
   id: string;
   kind: ChecklistRowKind;
@@ -21,7 +20,6 @@ export function renameChecklistRow(config: BoardConfig, id: string, text: string
   return { ...config, checklist: config.checklist.map((row) => (row.id === id ? { ...row, text } : row)) };
 }
 
-/** Moves a row so it ends up at the given index, clamped to the Checklist. */
 export function moveChecklistRow(config: BoardConfig, id: string, toIndex: number): BoardConfig {
   const from = config.checklist.findIndex((row) => row.id === id);
   if (from < 0) return config;
@@ -35,7 +33,6 @@ export function deleteChecklistRow(config: BoardConfig, id: string): BoardConfig
   return { ...config, checklist: config.checklist.filter((row) => row.id !== id) };
 }
 
-/** Keeps valid rows in order; a repeated id keeps only its first row. */
 export function readChecklist(value: unknown): ChecklistRow[] {
   if (!Array.isArray(value)) return [];
   const seen = new Set<string>();
@@ -49,13 +46,12 @@ export function readChecklist(value: unknown): ChecklistRow[] {
   return rows;
 }
 
-/** The Match's Ticks for Items still on the Checklist; Ticks of deleted Items are ignored. */
+// ticks of deleted items stay in the packet until the next toggle rewrites them - they never count
 export function readTicks(packet: MatchPacket, checklist: readonly ChecklistRow[]): string[] {
   const items = new Set(checklist.filter((row) => row.kind === "item").map((row) => row.id));
   return (readExtras(packet).ticks ?? []).filter((id) => items.has(id));
 }
 
-/** Ticks or unticks one Item; writing the Ticks drops those of deleted Items. Headings can't be ticked. */
 export function toggleTick(packet: MatchPacket, checklist: readonly ChecklistRow[], itemId: string): MatchPacket {
   if (!checklist.some((row) => row.id === itemId && row.kind === "item")) return packet;
   const ticks = readTicks(packet, checklist);

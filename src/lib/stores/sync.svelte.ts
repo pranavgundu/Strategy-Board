@@ -11,7 +11,7 @@ const QUEUE_KEY = "queueStatus";
 const DISMISSED_KEY = "dismissedMatches";
 const EVENT_KEY = /^\d{4}[a-z0-9]+$/;
 const NEXUS_INTERVAL_MS = 30_000;
-// tba caches responses for 61 seconds, so asking more often only repeats the same answer
+// tba caches responses for 61 seconds - asking more often only repeats the same answer
 const TBA_INTERVAL_MS = 60_000;
 const DETECTION_RETRY_MS = 5 * 60_000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -22,12 +22,10 @@ export interface SyncStatus {
   state: SyncState;
   message: string;
   eventKey: string | null;
-  /** The source of the last successful sync. */
   source: SyncSource | null;
-  /** When the schedule was last read successfully, in ms. */
+  // last successful schedule read
   at: number | null;
 }
-/** Queue Status and the Next Match for the event last synced. */
 export interface EventQueue {
   eventKey: string;
   schedule: Record<string, ScheduleInfo>;
@@ -46,7 +44,7 @@ let manualEventKey = $state<string | null>(null);
 let currentEvent = $state<CurrentEvent | null>(null);
 let queue = $state.raw<EventQueue | null>(null);
 let dismissed = $state.raw<DismissedMatches>({});
-/** The Matches the last sync changed, so an open Match can reload; the revision makes each change distinct. */
+// the revision makes each change distinct so an open match reloads even when the same ids change again
 let lastChange = $state.raw<{ revision: number; ids: readonly string[] }>({ revision: 0, ids: [] });
 let detectedAt = 0;
 let status = $state<SyncStatus>({ state: "idle", message: "", eventKey: null, source: null, at: null });
@@ -104,7 +102,6 @@ function readBookkeeping(value: unknown): Bookkeeping {
   };
 }
 
-/** The hand-entered event, a detected event that hasn't ended yet, or a fresh detection. */
 async function resolveCurrentEvent(): Promise<{ event: CurrentEvent | null; failure: SourceResponse | null }> {
   const now = Date.now();
   if (manualEventKey) return { event: pickCurrentEvent({ manualEventKey, nexusEvents: null, nexusSchedules: {}, tbaEvents: null, now }), failure: null };
@@ -158,7 +155,7 @@ async function run(): Promise<void> {
   else report(response.kind === "offline" ? "offline" : "error", failureMessage(response, eventKey), eventKey);
 }
 
-/** Used while Nexus has no schedule for the event; TBA has no Queue Status and no practice matches. */
+// used while nexus has no schedule for the event - tba has no queue status and no practice matches
 async function syncFromTba(eventKey: string): Promise<void> {
   if (bookkeeping.source === "tba" && bookkeeping.eventKey === eventKey && bookkeeping.at !== null && Date.now() - bookkeeping.at < TBA_INTERVAL_MS) {
     report("synced", "Up to date with TBA.", eventKey);
@@ -207,22 +204,18 @@ async function syncAndContinue(): Promise<void> {
   scheduleNext();
 }
 
-/** Keeps Our Team's Matches at the Current Event in step with its schedule. */
 export const scheduleSync = {
   get manualEventKey(): string | null { return manualEventKey; },
-  /** The event Schedule Sync follows: hand-entered, or detected from Nexus or TBA. */
   get currentEvent(): CurrentEvent | null { return currentEvent; },
   get queue(): EventQueue | null { return queue; },
   get dismissed(): DismissedMatches { return dismissed; },
   get lastChange(): { revision: number; ids: readonly string[] } { return lastChange; },
 
-  /** Remembers deleted Synced Matches so sync never adds them again. */
   async dismiss(deleted: readonly MatchPacket[]): Promise<void> {
     dismissed = dismissMatches(dismissed, deleted);
     await native.storage.set(DISMISSED_KEY, dismissed as unknown as JsonValue);
   },
 
-  /** Puts back the hand-entered event key and Dismissed Matches from a Backup. */
   async restoreState(restored: { manualEventKey: string | null; dismissed: DismissedMatches }): Promise<void> {
     dismissed = restored.dismissed;
     queue = null;
@@ -254,7 +247,6 @@ export const scheduleSync = {
     return loading;
   },
 
-  /** A hand-entered event key always wins; clearing it lets detection take over again. */
   async setManualEventKey(input: string | null): Promise<void> {
     const key = input?.trim().toLowerCase() || null;
     if (key && !EVENT_KEY.test(key)) throw new Error("An event key looks like 2026isde1.");
@@ -275,10 +267,6 @@ export const scheduleSync = {
     return running;
   },
 
-  /**
-   * Syncs now and then about every 30 seconds while the board is on screen and online. It pauses in the
-   * background and syncs right away on resume and reconnect. Returns a function that stops it.
-   */
   start(): () => void {
     if (polling) return () => undefined;
     polling = true;

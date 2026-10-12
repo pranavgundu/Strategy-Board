@@ -8,7 +8,7 @@ import nexusEvents from "./fixtures/nexus-events-2026-10.json";
 import tbaEvents from "./fixtures/tba-1690-events-2026.json";
 
 const at = (iso: string) => Date.parse(iso);
-// the October list no longer has the June district event, so it is added back with its real dates
+// the october list no longer has the june district event - so it is added back with its real dates
 const withIsde1 = { ...nexusEvents, "2026isde1": { name: "ISR District Event #1", start: at("2026-06-28T05:00:00Z"), end: at("2026-06-29T16:00:00Z") } };
 
 describe("Current Event detection", () => {

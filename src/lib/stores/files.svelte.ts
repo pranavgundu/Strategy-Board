@@ -9,12 +9,10 @@ export type ReplacingFile = Exclude<BoardFile, { kind: "match" }>;
 
 let pending = $state.raw<ReplacingFile | null>(null);
 
-/** Saving and opening the files the board makes: Match Files, the Board Config, and Backups. */
 export const boardFiles = {
-  /** A Board Config or Backup waiting for confirmation before it replaces this tablet's data. */
   get pending(): ReplacingFile | null { return pending; },
 
-  /** A Match File is added at once as a What-if Match; a file that would replace data waits for confirm(). */
+  // a match file is added at once - a file that would replace data waits for confirm()
   async open(file: File): Promise<string | null> {
     const read = readBoardFile(await file.text());
     if (read.kind !== "match") {

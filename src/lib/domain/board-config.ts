@@ -4,7 +4,6 @@ import { isObject } from "./json";
 import { teamNumberKey } from "./stations";
 import type { TeamColorOverrides } from "./team-colors";
 
-/** The device-level setup that travels together between tablets. */
 export interface BoardConfig {
   checklist: ChecklistRow[];
   teamColors: TeamColorOverrides;
@@ -17,7 +16,6 @@ export function emptyBoardConfig(): BoardConfig {
   return { checklist: [], teamColors: {}, commonPaths: [] };
 }
 
-/** Reads a Board Config from storage or a file, keeping only the parts that are valid. */
 export function readBoardConfig(value: unknown): BoardConfig {
   const source = isObject(value) ? value : {};
   const teamColors: Record<string, string> = {};

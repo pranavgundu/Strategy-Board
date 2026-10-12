@@ -23,7 +23,7 @@
     openId = null;
   }
   function run(action: (match: Match) => void, match: Match) { openId = null; action(match); }
-  // the menu button disappears once the actions open - if it kept focus, chrome's focusout on removal would close them again
+  // the menu button disappears once the actions open - if it kept focus chrome's focusout on removal would close them again
   function focusRow(button: HTMLElement) { button.closest<HTMLElement>('[role="button"]')?.focus(); }
 </script>
 

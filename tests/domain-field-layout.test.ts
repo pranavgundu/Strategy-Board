@@ -10,7 +10,7 @@ function autoPoses(year: number): number[][] {
 
 describe("2026 station layout", () => {
   it("reads red 3, 2, 1 and blue 1, 2, 3 from the top of each wall at the real driver station positions", () => {
-    const { labels } = fieldLayout(2026);
+    const labels = fieldLayout(2026).teamLabels;
 
     expect([labels.redThree.y, labels.redTwo.y, labels.redOne.y]).toEqual([486, 1022, 1337]);
     expect([labels.blueOne.y, labels.blueTwo.y, labels.blueThree.y]).toEqual([273, 588, 1124]);
@@ -33,8 +33,8 @@ describe("2026 station layout", () => {
     expect((loaded[8][1] as number[][]).slice(0, 3)).toEqual([[2680, 205, 0], [2680, 805, 0], [2680, 1405, 0]]);
   });
 
-  it("leaves the 2025 field's labels and defaults unchanged", () => {
-    const { labels } = fieldLayout(2025);
+  it("leaves the 2025 field's team labels and sprite starts unchanged", () => {
+    const labels = fieldLayout(2025).teamLabels;
 
     expect(autoPoses(2025)).toEqual([
       [2055, 455, 0], [2055, 805, 0], [2055, 1155, 0],

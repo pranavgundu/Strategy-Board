@@ -191,7 +191,6 @@ export const app = {
     });
   },
 
-  /** Renames a Match and puts in its new lineup through Station reassignment, so every team keeps its plan. */
   async updateMatch(id: string, update: MatchInfoUpdate): Promise<void> {
     const source = packets.find((packet) => packet[7] === id);
     if (!source) throw new Error("Cannot update a match that is not loaded.");
@@ -211,10 +210,7 @@ export const app = {
     });
   },
 
-  /**
-   * Plans and applies a sync in one queued write, so the plan always starts from the latest saved
-   * packets and no edit can land between planning and writing.
-   */
+  // planned inside the queued write so it starts from the latest saved packets and no edit lands in between
   applySync(planFor: (current: readonly MatchPacket[]) => SyncPlan): Promise<SyncPlan> {
     return queueWrite(async () => {
       const plan = planFor(packets);
@@ -245,7 +241,6 @@ export const app = {
     });
   },
 
-  /** Replaces every Match on the device, as restoring a Backup does. */
   async replaceAll(next: readonly MatchPacket[]): Promise<void> {
     await queueWrite(async () => {
       // every packet is checked before anything is cleared - the old matches come back if the write fails
