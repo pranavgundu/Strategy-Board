@@ -64,5 +64,5 @@ export async function savePng(dataUrl: string, filename: string): Promise<SaveFi
   if (!dataUrl.startsWith("data:image/png;") || comma < 0) throw new Error("Expected a PNG data URL");
   const binary = atob(dataUrl.slice(comma + 1));
   const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-  return saveFile(bytes, { filename, extension: "png", mimeType: "image/png", title: "Export Strategy Board image" });
+  return saveFile(bytes, { filename, extension: "png", mimeType: "image/png", title: "Export Orbit Strategy Board image" });
 }

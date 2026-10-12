@@ -12,10 +12,10 @@ use tauri_plugin_opener::OpenerExt;
 
 use crate::helpers::storage::KeyValueStore;
 use crate::{
-    adapters::{FirestoreAdapter, GithubAdapter, HttpAdapter, JsonFileStore},
+    adapters::{FirestoreAdapter, HttpAdapter, JsonFileStore},
     helpers::{
-        board, cloud, config, contributors, manager, match_model, pdf, platform, qr, search,
-        statbotics, storage, tba,
+        board, cloud, config, manager, match_model, pdf, platform, qr, search, statbotics, storage,
+        tba,
     },
 };
 
@@ -28,9 +28,6 @@ pub struct RuntimeState {
     pub tba_key: Mutex<Option<String>>,
     pub http: HttpAdapter,
     pub firestore: FirestoreAdapter,
-    pub github: GithubAdapter,
-    pub teams: Mutex<Option<Vec<String>>>,
-    pub contributors: Mutex<Option<Vec<contributors::Contributor>>>,
 }
 
 impl RuntimeState {
@@ -53,10 +50,7 @@ impl RuntimeState {
             qr_import: Mutex::new(qr::QrImportState::default()),
             tba_key: Mutex::new(tba_key),
             firestore: FirestoreAdapter::from_env(http.clone()),
-            github: GithubAdapter::new(http.clone()),
             http,
-            teams: Mutex::new(None),
-            contributors: Mutex::new(None),
         })
     }
 }
@@ -322,51 +316,6 @@ pub async fn statbotics_team_year(
 ) -> CommandResult<statbotics::StatboticsTeamYear> {
     serde_json::from_value(statbotics_fetch(state, format!("/team_year/{team}/{year}")).await?)
         .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-pub async fn github_teams(state: State<'_, RuntimeState>) -> CommandResult<Vec<String>> {
-    if let Some(value) = lock(&state.teams)?.clone() {
-        return Ok(value);
-    }
-    let teams = contributors::parse_teams(&state.github.teams().await?);
-    *lock(&state.teams)? = Some(teams.clone());
-    Ok(teams)
-}
-#[tauri::command]
-pub async fn github_contributors(
-    state: State<'_, RuntimeState>,
-    count: Option<usize>,
-) -> CommandResult<Vec<contributors::Contributor>> {
-    let cached = { lock(&state.contributors)?.clone() };
-    let values = if let Some(value) = cached {
-        value
-    } else {
-        // The contributors endpoint already contains everything needed by the UI.
-        // Avoid one additional GitHub request per contributor: it is substantially
-        // faster and is far less likely to exhaust the unauthenticated rate limit.
-        let enriched = state
-            .github
-            .contributors()
-            .await?
-            .into_iter()
-            .filter(|contributor| !contributors::is_dependabot(&contributor.login))
-            .map(|contributor| contributors::Contributor {
-                login: contributor.login,
-                avatar_url: contributor.avatar_url,
-                html_url: contributor.html_url,
-                contributions: contributor.contributions,
-                name: None,
-                bio: None,
-            })
-            .collect::<Vec<_>>();
-        *lock(&state.contributors)? = Some(enriched.clone());
-        enriched
-    };
-    Ok(values
-        .into_iter()
-        .take(count.unwrap_or(usize::MAX))
-        .collect())
 }
 
 fn next_share_code() -> CommandResult<String> {
@@ -719,7 +668,7 @@ pub fn platform_open_url(app: AppHandle, url: String) -> CommandResult<()> {
 #[tauri::command]
 pub fn config_current() -> Value {
     let config = config::Config::current();
-    json!({"fieldPngPixelWidth":config.field_png_pixel_width,"fieldPngPixelHeight":config.field_png_pixel_height,"fieldRealWidthInches":config.field_real_width_inches,"fieldRealHeightInches":config.field_real_height_inches,"redOneStationX":config.red_one_station_x,"redOneStationY":config.red_one_station_y,"redTwoStationX":config.red_two_station_x,"redTwoStationY":config.red_two_station_y,"redThreeStationX":config.red_three_station_x,"redThreeStationY":config.red_three_station_y,"blueOneStationX":config.blue_one_station_x,"blueOneStationY":config.blue_one_station_y,"blueTwoStationX":config.blue_two_station_x,"blueTwoStationY":config.blue_two_station_y,"blueThreeStationX":config.blue_three_station_x,"blueThreeStationY":config.blue_three_station_y,"sharedTbaApiKey":config.shared_tba_api_key,"releaseAnnouncement":{"enabled":config.release_announcement.enabled,"id":config.release_announcement.id,"title":config.release_announcement.title,"message":config.release_announcement.message,"ctaLabel":config.release_announcement.cta_label,"ctaUrl":config.release_announcement.cta_url,"showOnce":config.release_announcement.show_once}})
+    json!({"fieldPngPixelWidth":config.field_png_pixel_width,"fieldPngPixelHeight":config.field_png_pixel_height,"fieldRealWidthInches":config.field_real_width_inches,"fieldRealHeightInches":config.field_real_height_inches,"redOneStationX":config.red_one_station_x,"redOneStationY":config.red_one_station_y,"redTwoStationX":config.red_two_station_x,"redTwoStationY":config.red_two_station_y,"redThreeStationX":config.red_three_station_x,"redThreeStationY":config.red_three_station_y,"blueOneStationX":config.blue_one_station_x,"blueOneStationY":config.blue_one_station_y,"blueTwoStationX":config.blue_two_station_x,"blueTwoStationY":config.blue_two_station_y,"blueThreeStationX":config.blue_three_station_x,"blueThreeStationY":config.blue_three_station_y,"sharedTbaApiKey":config.shared_tba_api_key})
 }
 
 #[cfg(test)]

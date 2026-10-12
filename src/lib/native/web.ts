@@ -1,5 +1,5 @@
 import type {
-  BoardMode, BoardState, BoardTool, Contributor, CreateMatchInput, FieldRobotPositions,
+  BoardMode, BoardState, BoardTool, CreateMatchInput, FieldRobotPositions,
   FuzzyBatchItem, FuzzyBatchMatch, FuzzyMatchResult, JsonValue, MatchPacket, NativeConfig,
   PdfDocumentPlan, QrProgress, StatboticsMatch, StatboticsTeamYear, StatboticsYear, TbaEvent,
   TbaMatch, TbaSimpleEvent, TbaSimpleMatch,
@@ -352,7 +352,6 @@ const config: NativeConfig = {
   redOneStationX: 3575, redOneStationY: 455, redTwoStationX: 3575, redTwoStationY: 805, redThreeStationX: 3575, redThreeStationY: 1155,
   blueOneStationX: -65, blueOneStationY: 455, blueTwoStationX: -65, blueTwoStationY: 805, blueThreeStationX: -65, blueThreeStationY: 1155,
   sharedTbaApiKey: null,
-  releaseAnnouncement: { enabled: false, id: "release-2026-2-0", title: "New update available", message: "We shipped a new release with fixes and improvements.", ctaLabel: "View release notes", ctaUrl: "https://github.com/pranavgundu/Strategy-Board/releases", showOnce: true },
 };
 
 /** Browser implementation of the command boundary used by the deployed static site. */
@@ -399,8 +398,6 @@ export async function browserInvoke<TResult>(command: string, args: Record<strin
     case "statbotics_cached": { const cached = await storageGet(`statbotics_${args.matchKey}`); result = cached && typeof cached === "object" && !Array.isArray(cached) ? (cached as Record<string, JsonValue>).data ?? null : null; break; }
     case "statbotics_clear_cache": { const entries = (await storageEntries()).filter(([key]) => key.startsWith("statbotics_")); await Promise.all(entries.map(([key]) => storageDelete(key))); result = entries.length; break; }
     case "statbotics_match_key": result = `${args.eventKey}_${String(args.matchName).toLowerCase().replace(/\s+/g, "")}`; break;
-    case "github_teams": result = (await (await fetch("/contributors.txt")).text()).split(/\r?\n/).map((line) => line.trim()).filter(Boolean); break;
-    case "github_contributors": { const people = await requestJson<Contributor[]>("https://api.github.com/repos/pranavgundu/Strategy-Board/contributors?per_page=100"); const filtered = people.filter((person) => !person.login.toLowerCase().startsWith("dependabot")); result = typeof args.count === "number" ? filtered.slice(0, args.count) : filtered; break; }
     case "qr_encode": result = qrEncode(String(args.payload)); break;
     case "qr_reset": qrChunks.clear(); qrTotal = null; break;
     case "qr_receive": result = qrReceive(String(args.frame)); break;

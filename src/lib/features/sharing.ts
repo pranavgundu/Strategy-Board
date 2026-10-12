@@ -13,7 +13,7 @@ export async function copyText(text: string): Promise<void> {
   if (!text) throw new Error("Cannot copy empty text");
   if (isNativeRuntime()) {
     const { writeText } = await import("@tauri-apps/plugin-clipboard-manager");
-    await writeText(text, { label: "Strategy Board" });
+    await writeText(text, { label: "Orbit Strategy Board" });
     return;
   }
   if (navigator.clipboard?.writeText) {

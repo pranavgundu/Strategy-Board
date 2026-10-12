@@ -15,7 +15,7 @@ use atomicwrites::{AtomicFile, OverwriteBehavior};
 use reqwest::StatusCode;
 use serde_json::{json, Value};
 
-use crate::helpers::{cloud, contributors, statbotics, storage, tba};
+use crate::helpers::{cloud, statbotics, storage, tba};
 
 /// Small, durable JSON store.  Writes use a sibling temporary file followed
 /// by rename, so a process interruption cannot leave a partially-written DB.
@@ -114,14 +114,14 @@ impl HttpAdapter {
             .use_native_tls()
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(15))
-            .user_agent("strategy-board/0.1")
+            .user_agent("orbit-strategy-board/0.1")
             .build()
             .map_err(|error| error.to_string())?;
         let blocking = reqwest::blocking::Client::builder()
             .use_native_tls()
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(15))
-            .user_agent("strategy-board/0.1")
+            .user_agent("orbit-strategy-board/0.1")
             .build()
             .map_err(|error| error.to_string())?;
         Ok(Self { client, blocking })
@@ -386,74 +386,6 @@ impl cloud::CloudStore for FirestoreAdapter {
             response.require_success("Firestore")?;
             parse_firestore_record(&response.body).map(Some)
         }
-    }
-}
-
-#[derive(Clone)]
-pub struct GithubAdapter {
-    http: HttpAdapter,
-    raw_base: String,
-}
-
-impl GithubAdapter {
-    pub fn new(http: HttpAdapter) -> Self {
-        Self {
-            http,
-            raw_base: "https://raw.githubusercontent.com/pranavgundu/Strategy-Board/main/static"
-                .into(),
-        }
-    }
-    pub async fn teams(&self) -> Result<String, String> {
-        self.http
-            .get(&format!("{}/contributors.txt", self.raw_base), &[])
-            .await?
-            .body_or_error("GitHub")
-    }
-    pub async fn contributors(&self) -> Result<Vec<contributors::GithubContributor>, String> {
-        let response = self.http.get(contributors::CONTRIBUTORS_URL, &[]).await?;
-        response.require_success("GitHub")?;
-        response.json()
-    }
-    pub async fn user(&self, login: &str) -> Result<contributors::GithubUser, String> {
-        let response = self
-            .http
-            .get(
-                &contributors::ContributorsService::user_request_url(login),
-                &[],
-            )
-            .await?;
-        response.require_success("GitHub")?;
-        response.json()
-    }
-}
-
-impl NetResponse {
-    fn body_or_error(self, service: &str) -> Result<String, String> {
-        self.require_success(service)?;
-        Ok(self.body)
-    }
-}
-
-impl contributors::ContributorsSource for GithubAdapter {
-    fn contributors_text(&self) -> Result<String, String> {
-        self.http
-            .blocking_get(&format!("{}/contributors.txt", self.raw_base), &[])?
-            .body_or_error("GitHub")
-    }
-    fn contributors(&self) -> Result<Vec<contributors::GithubContributor>, String> {
-        let response = self
-            .http
-            .blocking_get(contributors::CONTRIBUTORS_URL, &[])?;
-        response.require_success("GitHub")?;
-        response.json()
-    }
-    fn user(&self, login: &str) -> Result<contributors::GithubUser, String> {
-        let response = self.http.blocking_get(
-            &contributors::ContributorsService::user_request_url(login),
-            &[],
-        )?;
-        response.require_success("GitHub")?;
-        response.json()
     }
 }
 

@@ -3,7 +3,7 @@ import { invoke, isTauri, type InvokeArgs } from "@tauri-apps/api/core";
 import { browserInvoke } from "./web";
 
 import type {
-  BoardMode, BoardState, BoardTool, Contributor, CreateMatchInput, FieldRobotPositions,
+  BoardMode, BoardState, BoardTool, CreateMatchInput, FieldRobotPositions,
   FuzzyBatchItem, FuzzyBatchMatch, FuzzyMatchResult, JsonValue, MatchPacket, NativeConfig,
   PdfDocumentPlan, QrProgress, StatboticsMatch, StatboticsTeamYear, StatboticsYear, TbaEvent,
   TbaMatch, TbaSimpleEvent, TbaSimpleMatch,
@@ -92,10 +92,6 @@ export const native = {
     match: (matchKey: string) => call<StatboticsMatch>("statbotics_match", { matchKey }),
     year: (year: number) => call<StatboticsYear>("statbotics_year", { year }),
     teamYear: (team: number, year: number) => call<StatboticsTeamYear>("statbotics_team_year", { team, year }),
-  },
-  github: {
-    teams: () => call<string[]>("github_teams"),
-    contributors: (count?: number) => call<Contributor[]>("github_contributors", { count }),
   },
   cloud: {
     upload: (packet: MatchPacket) => call<string>("cloud_upload", { packet }),

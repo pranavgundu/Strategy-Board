@@ -1,8 +1,8 @@
 [package]
 name = "strategy-board"
 version = "26.6.0"
-description = "The Digital Strategy Whiteboard for FRC"
-authors = ["Pranav Gundu"]
+description = "Orbit 1690's match strategy whiteboard for FRC"
+authors = ["Orbit 1690"]
 license = "MIT"
 edition = "2021"
 

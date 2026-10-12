@@ -83,6 +83,6 @@ export async function exportQrPdf(frames: string[], matchName: string, size: Pdf
     filename: `${safeFilename(matchName)} QR export`,
     extension: "pdf",
     mimeType: "application/pdf",
-    title: "Export Strategy Board QR PDF",
+    title: "Export Orbit Strategy Board QR PDF",
   });
 }

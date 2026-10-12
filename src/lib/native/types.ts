@@ -99,15 +99,6 @@ export interface TbaSimpleMatch {
   match_key: string;
 }
 
-export interface Contributor {
-  login: string;
-  avatar_url: string;
-  html_url: string;
-  contributions: number;
-  name: string | null;
-  bio: string | null;
-}
-
 export interface QrReceivingProgress {
   status: "receiving";
   received: number;
@@ -154,15 +145,6 @@ export interface PdfQrPlan {
 export interface PdfPagePlan { pageIndex: number; texts: PdfTextPlan[]; qrCodes: PdfQrPlan[]; }
 export interface PdfDocumentPlan { widthMm: number; heightMm: number; pages: PdfPagePlan[]; }
 
-export interface ReleaseAnnouncement {
-  enabled: boolean;
-  id: string;
-  title: string;
-  message: string;
-  ctaLabel: string;
-  ctaUrl: string;
-  showOnce: boolean;
-}
 export interface NativeConfig {
   fieldPngPixelWidth: number;
   fieldPngPixelHeight: number;
@@ -182,7 +164,6 @@ export interface NativeConfig {
   blueThreeStationY: number;
   /** Never render this value or expose it beyond the native call boundary. */
   sharedTbaApiKey: string | null;
-  releaseAnnouncement: ReleaseAnnouncement;
 }
 
 export interface StatboticsMatch {

@@ -10,7 +10,7 @@ configs:
 settingGroups:
   app:
     base:
-      PRODUCT_NAME: Strategy Board
+      PRODUCT_NAME: Orbit Strategy Board
       PRODUCT_BUNDLE_IDENTIFIER: app.strategyboard
 targetTemplates:
   app:

@@ -1462,8 +1462,7 @@ a,
 
 #home-match-list,
 #tba-event-list,
-#tba-team-list,
-#contributors-list {
+#tba-team-list {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     scroll-behavior: smooth;
@@ -1658,21 +1657,6 @@ a:active,
     }
 }
 
-@media (max-width: 768px) {
-    #contributors-inner-container {
-        width: 95vw !important;
-        max-width: 95vw !important;
-    }
-
-    #contributors-list {
-        grid-template-columns: 1fr !important;
-    }
-
-    #contributors-content {
-        padding: 1rem;
-    }
-}
-
 @media (max-width: 653px) and (max-height: 280px) {
     #home-toolbar {
         height: 2.5rem !important;
@@ -1714,67 +1698,6 @@ a:active,
         0 0 20px rgba(255, 255, 255, 0.6),
         0 0 30px rgba(255, 255, 255, 0.4),
         0 0 40px rgba(255, 255, 255, 0.2);
-}
-
-.special-team-digit {
-    display: inline-block;
-    animation: gold-glow 2s ease-in-out infinite;
-}
-
-@keyframes gold-glow {
-    0% {
-        color: inherit;
-    }
-    15% {
-        color: #fbbf24;
-    }
-    30% {
-        color: #fbbf24;
-    }
-    45% {
-        color: inherit;
-    }
-    100% {
-        color: inherit;
-    }
-}
-
-.rainbow-team-digit {
-    display: inline-block;
-    animation: rainbow-glow 2s ease-in-out infinite;
-}
-
-@keyframes rainbow-glow {
-    0% {
-        color: inherit;
-    }
-    10% {
-        color: #ef4444;
-    }
-    20% {
-        color: #f97316;
-    }
-    30% {
-        color: #eab308;
-    }
-    40% {
-        color: #22c55e;
-    }
-    50% {
-        color: #3b82f6;
-    }
-    60% {
-        color: #8b5cf6;
-    }
-    70% {
-        color: #ec4899;
-    }
-    80% {
-        color: inherit;
-    }
-    100% {
-        color: inherit;
-    }
 }
 
 #tba-import-container > div,

@@ -14,7 +14,7 @@
     tabindex="0"
     onkeydown={(event) => { if (event.key === "Enter" || event.key === " ") location.reload(); }}
   >
-    Strategy Board
+    Orbit Strategy Board
   </div>
   <!-- Paddings step down with the viewport: at full size the five buttons plus the
        logo need ~1150px, so anything narrower than `lg` has to compact or the row

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9F18D249B1C72DAE28A4F668"
-               BuildableName = "Strategy Board.app"
+               BuildableName = "Orbit Strategy Board.app"
                BlueprintName = "strategy-board_iOS"
                ReferencedContainer = "container:strategy-board.xcodeproj">
             </BuildableReference>
@@ -31,7 +31,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9F18D249B1C72DAE28A4F668"
-            BuildableName = "Strategy Board.app"
+            BuildableName = "Orbit Strategy Board.app"
             BlueprintName = "strategy-board_iOS"
             ReferencedContainer = "container:strategy-board.xcodeproj">
          </BuildableReference>
@@ -66,7 +66,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9F18D249B1C72DAE28A4F668"
-            BuildableName = "Strategy Board.app"
+            BuildableName = "Orbit Strategy Board.app"
             BlueprintName = "strategy-board_iOS"
             ReferencedContainer = "container:strategy-board.xcodeproj">
          </BuildableReference>
@@ -95,7 +95,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9F18D249B1C72DAE28A4F668"
-            BuildableName = "Strategy Board.app"
+            BuildableName = "Orbit Strategy Board.app"
             BlueprintName = "strategy-board_iOS"
             ReferencedContainer = "container:strategy-board.xcodeproj">
          </BuildableReference>
