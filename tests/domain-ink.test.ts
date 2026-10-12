@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultInk, inkColor, inkStation, NEUTRAL_INK, newMatchPacket, officialInkColor, STATIONS, teamInk, type Lineup } from "$lib/domain";
+import { defaultInk, inkColor, inkStation, isStrokeErasable, isStrokeVisible, NEUTRAL_INK, newMatchPacket, officialInkColor, STATIONS, teamInk, type Lineup } from "$lib/domain";
 import type { MatchPacket } from "$lib/native/types";
 import { normalizeBrowserMatchPacket } from "$lib/native/web";
 import { whiteboardMatchFromPacket } from "$lib/whiteboard/packet";
@@ -59,5 +59,33 @@ describe("Team Ink compatibility with the official app", () => {
 
   it("shows Team Ink as plain white in the official app's palette", () => {
     expect(STATIONS.map((station) => officialInkColor(teamInk(station)))).toEqual(Array(6).fill("#ffffff"));
+  });
+});
+
+describe("Hidden Teams", () => {
+  const hidden = (...teams: string[]) => new Set(teams);
+
+  it("hide only the Strokes in the Team Ink of a hidden team, and keep them out of the eraser's reach", () => {
+    for (const check of [isStrokeVisible, isStrokeErasable]) {
+      expect(check(teamInk("redOne"), lineup, hidden("1690"))).toBe(false);
+      expect(check(teamInk("redTwo"), lineup, hidden("1690"))).toBe(true);
+      expect(check(teamInk("blueOne"), lineup, hidden("1690", "4590"))).toBe(false);
+      expect(check(teamInk("redOne"), lineup, hidden())).toBe(true);
+    }
+  });
+
+  it("never hide Neutral Ink, including the legacy colors", () => {
+    const everyone = hidden("1690", "2231", "11480", "4590", "1577");
+
+    expect([0, 1, 2, 3, 4].map((ink) => isStrokeVisible(ink, lineup, everyone))).toEqual([true, true, true, true, true]);
+    expect([0, 1, 2, 3, 4].map((ink) => isStrokeErasable(ink, lineup, everyone))).toEqual([true, true, true, true, true]);
+  });
+
+  it("follow the team, not the Station, and leave the white Strokes of an empty Station visible", () => {
+    const moved = { ...lineup, redOne: "2231", redTwo: "1690" };
+
+    expect(isStrokeVisible(teamInk("redTwo"), moved, hidden("1690"))).toBe(false);
+    expect(isStrokeVisible(teamInk("redOne"), moved, hidden("1690"))).toBe(true);
+    expect(isStrokeVisible(teamInk("blueThree"), lineup, hidden("1690", "4590"))).toBe(true);
   });
 });

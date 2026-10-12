@@ -15,7 +15,7 @@
   let items = $state<HTMLCanvasElement>();
   let drawing = $state<HTMLCanvasElement>();
   let controller = $state<WhiteboardController | null>(null);
-  let ui = $state<WhiteboardState>({ mode: "auto", tool: "marker", ink: 0, view: "full", canUndo: false, canRedo: false, isCanvasVisible: true });
+  let ui = $state<WhiteboardState>({ mode: "auto", tool: "marker", ink: 0, view: "full", canUndo: false, canRedo: false, isCanvasVisible: true, hiddenTeams: [] });
   let fieldYear = $state<number | undefined>(undefined);
   let toolbar = $state<HTMLDivElement>();
   let toolbarLeft = $state<HTMLDivElement>();
@@ -191,7 +191,7 @@
       </div>
 
       {#if lineup}
-        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hidden={ui.tool === "eraser"} onPick={(ink) => controller?.setInk(ink)} />
+        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hiddenTeams={ui.hiddenTeams} onPick={(ink) => controller?.setInk(ink)} onToggleHidden={(team) => controller?.toggleHiddenTeam(team)} />
       {/if}
     {/if}
   </div>

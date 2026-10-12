@@ -38,3 +38,15 @@ export function defaultInk(lineup: Lineup): number {
   const ours = STATIONS.find((station) => lineup[station].trim() === OUR_TEAM);
   return ours ? teamInk(ours) : NEUTRAL_INK;
 }
+
+/** Hidden Teams hide only their Team Ink; Neutral Ink and an empty Station's white Strokes always show. */
+export function isStrokeVisible(ink: number, lineup: Lineup, hiddenTeams: ReadonlySet<string>): boolean {
+  const station = inkStation(ink);
+  const team = station ? lineup[station].trim() : "";
+  return !team || !hiddenTeams.has(team);
+}
+
+/** The eraser only removes Strokes the strategist can see. */
+export function isStrokeErasable(ink: number, lineup: Lineup, hiddenTeams: ReadonlySet<string>): boolean {
+  return isStrokeVisible(ink, lineup, hiddenTeams);
+}
