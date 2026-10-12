@@ -1,9 +1,16 @@
 import { execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { parseEnv } from "node:util";
 import { defineConfig } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 
 const host = process.env.TAURI_DEV_HOST;
+
+const envFile = fileURLToPath(new URL("./orbit-strategy-board.env", import.meta.url));
+// real environment variables win so ci and vercel secrets override the local file
+const env = { ...(existsSync(envFile) ? parseEnv(readFileSync(envFile, "utf-8")) : {}), ...process.env };
 
 /** Build-time commit stamp shown in the footer. */
 function getGitCommitInfo() {
@@ -33,8 +40,8 @@ export default defineConfig(async () => ({
     __BUILD_COMMIT__: JSON.stringify(getGitCommitInfo()),
     // VITE_* names are conventional for local builds; the unprefixed names
     // also support CI/Vercel secrets without exposing process.env at runtime.
-    __FIREBASE_API_KEY__: JSON.stringify(process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY || ""),
-    __TBA_API_KEY__: JSON.stringify(process.env.VITE_TBA_API_KEY || process.env.TBA_API_KEY || ""),
+    __FIREBASE_API_KEY__: JSON.stringify(env.VITE_FIREBASE_API_KEY || env.FIREBASE_API_KEY || ""),
+    __TBA_API_KEY__: JSON.stringify(env.VITE_TBA_API_KEY || env.TBA_API_KEY || ""),
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
