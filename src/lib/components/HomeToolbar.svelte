@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { onNew, onTba, onImportQr, onImportLink, onClear, onSettings }: { onNew: () => void; onTba: () => void; onImportQr: () => void; onImportLink: () => void; onClear: () => void; onSettings: () => void } = $props();
+  let { onNew, onTba, onImportQr, onImportFile, onClear, onSettings }: { onNew: () => void; onTba: () => void; onImportQr: () => void; onImportFile: () => void; onClear: () => void; onSettings: () => void } = $props();
 </script>
 
 <div
@@ -44,12 +44,13 @@
       <span class="sm:hidden">Import</span>
     </button>
     <button
-      id="home-toolbar-import-link-btn"
+      id="home-toolbar-import-file-btn"
       class="flex items-center justify-center gap-1.5 md:gap-2 lg:gap-2.5 px-3 sm:px-4 md:px-6 lg:px-10 h-11 md:h-12 lg:h-14 btn-secondary text-sm sm:text-base md:text-lg lg:text-xl"
-      onclick={onImportLink}
+      onclick={onImportFile}
     >
-      <span>Import</span>
-      <i class="fas fa-link"></i>
+      <span class="hidden sm:inline">Import file</span>
+      <span class="sm:hidden">File</span>
+      <i class="fas fa-file-import"></i>
     </button>
     <button
       id="home-toolbar-clear-btn"

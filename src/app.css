@@ -835,7 +835,7 @@ body {
     #home-toolbar-new-btn,
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
-    #home-toolbar-import-link-btn,
+    #home-toolbar-import-file-btn,
     #home-toolbar-clear-btn,
     #home-toolbar-settings-btn {
         min-width: 0;
@@ -861,7 +861,7 @@ body {
     #home-toolbar-new-btn,
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
-    #home-toolbar-import-link-btn,
+    #home-toolbar-import-file-btn,
     #home-toolbar-clear-btn,
     #home-toolbar-settings-btn {
         min-height: 2.5rem !important;
@@ -879,7 +879,7 @@ body {
     #home-toolbar-new-btn,
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
-    #home-toolbar-import-link-btn,
+    #home-toolbar-import-file-btn,
     #home-toolbar-clear-btn,
     #home-toolbar-settings-btn {
         min-height: 2.25rem !important;
@@ -907,7 +907,7 @@ body {
     #home-toolbar-new-btn,
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
-    #home-toolbar-import-link-btn,
+    #home-toolbar-import-file-btn,
     #home-toolbar-clear-btn,
     #home-toolbar-settings-btn {
         height: 2.5rem !important;
@@ -915,7 +915,6 @@ body {
     #tba-import-container > div,
     #create-match-container > div,
     #edit-match-container > div,
-    #link-import-container > div,
     #clear-confirm-container > div,
     #team-number-popup > div {
         max-height: calc(100dvh - 1rem) !important;
@@ -943,15 +942,12 @@ body {
         line-height: 1.2;
     }
     #tba-import-container > div > div:first-child,
-    #link-import-container > div > div:first-child,
     #clear-confirm-container > div > div:first-child {
         padding-top: 0.75rem !important;
         padding-bottom: 0.75rem !important;
     }
     #tba-import-btn,
-    #tba-cancel-btn,
-    #link-import-import-btn,
-    #link-import-cancel-btn {
+    #tba-cancel-btn {
         padding-top: 0.75rem !important;
         padding-bottom: 0.75rem !important;
     }
@@ -1503,7 +1499,7 @@ a:active,
     #clear-confirm-cancel-btn,
     #home-toolbar-new-btn,
     #home-toolbar-import-btn,
-    #home-toolbar-import-link-btn,
+    #home-toolbar-import-file-btn,
     #home-toolbar-tba-btn,
     #home-toolbar-clear-btn,
     #home-toolbar-settings-btn {
@@ -1706,8 +1702,6 @@ a:active,
 }
 
 #tba-import-container > div,
-#link-import-container > div,
-#share-success-container > div,
 #qr-import-inner-container,
 #qr-export-inner-container {
     scale: 1.5;
@@ -1716,8 +1710,6 @@ a:active,
 
 @media (max-width: 1024px) {
     #tba-import-container > div,
-    #link-import-container > div,
-    #share-success-container > div,
     #qr-import-inner-container,
     #qr-export-inner-container {
         scale: 1.2;
@@ -1726,8 +1718,6 @@ a:active,
 
 @media (max-width: 640px) {
     #tba-import-container > div,
-    #link-import-container > div,
-    #share-success-container > div,
     #qr-import-inner-container,
     #qr-export-inner-container {
         scale: 1.05;
@@ -1736,8 +1726,6 @@ a:active,
 
 @media (max-width: 834px) and (orientation: landscape) {
     #tba-import-container > div,
-    #link-import-container > div,
-    #share-success-container > div,
     #qr-import-inner-container,
     #qr-export-inner-container {
         scale: 1;

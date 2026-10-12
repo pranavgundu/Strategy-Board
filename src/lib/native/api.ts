@@ -51,7 +51,7 @@ export const native = {
   model: {
     loadPackets: () => call<MatchPacket[]>("model_load_packets"),
     addPacket: (packet: MatchPacket) => call<string>("model_add_packet", { packet }),
-    /** Atomic import path for TBA, QR, and cloud packets. */
+    /** Atomic import path for TBA, QR, and file packets. */
     addPackets: (packets: MatchPacket[]) => call<string[]>("model_add_packets", { packets }),
     /** Atomic normalized replacement for a completed form or canvas commit. */
     replacePacket: (packet: MatchPacket) => call<string>("model_replace_packet", { packet }),
@@ -92,11 +92,6 @@ export const native = {
     match: (matchKey: string) => call<StatboticsMatch>("statbotics_match", { matchKey }),
     year: (year: number) => call<StatboticsYear>("statbotics_year", { year }),
     teamYear: (team: number, year: number) => call<StatboticsTeamYear>("statbotics_team_year", { team, year }),
-  },
-  cloud: {
-    upload: (packet: MatchPacket) => call<string>("cloud_upload", { packet }),
-    download: (shareCode: string) => call<MatchPacket | null>("cloud_download", { shareCode }),
-    shareExists: (shareCode: string) => call<boolean>("cloud_share_exists", { shareCode }),
   },
   qr: {
     encode: (payload: string) => call<string[]>("qr_encode", { payload }),

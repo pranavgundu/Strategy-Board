@@ -10,13 +10,6 @@ import { whiteboardMatchFromPacket, writeWhiteboardPacket } from "$lib/whiteboar
 const DB_NAME = "strategy-board-web";
 const STORE_NAME = "keyval";
 const APP_DATA_KEY = "appData";
-const SHARE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const SHARE_CODE = /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/;
-const SHARE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-const FIRESTORE_BASE = "https://firestore.googleapis.com/v1/projects/strategyboard-app/databases/(default)/documents";
-// Firebase web API keys identify a project; Firestore rules provide access
-// control. Keep the deployed web app functional when CI has no key override.
-const FIREBASE_PUBLIC_API_KEY = "AIzaSyDT2M0XwxAJxqrARFe3GVJKDds-IAwomMM";
 const TBA_BASE = "https://www.thebluealliance.com/api/v3";
 const STATBOTICS_BASE = "https://api.statbotics.io/v3";
 const STATBOTICS_TTL_MS = 24 * 60 * 60 * 1000;
@@ -166,62 +159,6 @@ async function addPackets(values: MatchPacket[]): Promise<string[]> {
   }
   await storageSet(APP_DATA_KEY, [...packets, ...additions] as JsonValue);
   return additions.map((packet) => packet[7]);
-}
-
-function firebaseKey(): string {
-  return __FIREBASE_API_KEY__ || FIREBASE_PUBLIC_API_KEY;
-}
-
-function generateShareCode(): string {
-  const random = crypto.getRandomValues(new Uint8Array(6));
-  return [...random].map((value) => SHARE_ALPHABET[value % SHARE_ALPHABET.length]).join("");
-}
-
-function firestoreDocument(record: { data: string; createdAt: number; expiresAt: number }): object {
-  return { fields: {
-    data: { stringValue: record.data },
-    createdAt: { integerValue: String(record.createdAt) },
-    expiresAt: { integerValue: String(record.expiresAt) },
-    version: { integerValue: "1" },
-  } };
-}
-
-function parseFirestoreInteger(field: unknown): number {
-  if (!field || typeof field !== "object") return 0;
-  const value = (field as { integerValue?: unknown }).integerValue;
-  return typeof value === "string" || typeof value === "number" ? Number(value) : 0;
-}
-
-async function cloudUpload(packet: MatchPacket): Promise<string> {
-  const portable = structuredClone(packet) as Array<JsonValue>;
-  portable[7] = null;
-  const createdAt = Date.now();
-  const body = firestoreDocument({ data: JSON.stringify(portable), createdAt, expiresAt: createdAt + SHARE_TTL_MS });
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const code = generateShareCode();
-    const response = await fetch(`${FIRESTORE_BASE}/matches?documentId=${code}&key=${encodeURIComponent(firebaseKey())}`, {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
-    });
-    if (response.ok) return code;
-    if (response.status === 403 || response.status === 409) continue;
-    throw new Error(`Firestore upload failed (${response.status})`);
-  }
-  throw new Error("Could not allocate a unique share code");
-}
-
-async function cloudDownload(rawCode: string): Promise<MatchPacket | null> {
-  const code = rawCode.trim().toUpperCase();
-  if (!SHARE_CODE.test(code)) throw new Error("Invalid share code format");
-  const response = await fetch(`${FIRESTORE_BASE}/matches/${code}?key=${encodeURIComponent(firebaseKey())}`);
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Firestore download failed (${response.status})`);
-  const document = await response.json() as { fields?: Record<string, unknown> };
-  const fields = document.fields;
-  const data = fields?.data && typeof fields.data === "object" ? (fields.data as { stringValue?: unknown }).stringValue : null;
-  const expiresAt = parseFirestoreInteger(fields?.expiresAt);
-  if (typeof data !== "string") throw new Error("Shared match data is invalid");
-  if (expiresAt && Date.now() > expiresAt) throw new Error("This share code has expired");
-  return normalizeBrowserMatchPacket(JSON.parse(data));
 }
 
 async function requestJson<T>(url: string, headers: HeadersInit = {}): Promise<T> {
@@ -377,9 +314,6 @@ export async function browserInvoke<TResult>(command: string, args: Record<strin
     case "model_clear_matches": await storageSet(APP_DATA_KEY, []); break;
     case "match_create_packet": result = createBrowserMatchPacket({ matchName: args.matchName, redTeams: args.redTeams, blueTeams: args.blueTeams, tbaEventKey: args.tbaEventKey, tbaMatchKey: args.tbaMatchKey, tbaYear: args.tbaYear } as CreateMatchInput); break;
     case "match_normalize_packet": result = normalizeBrowserMatchPacket(args.packet); break;
-    case "cloud_upload": result = await cloudUpload(args.packet as MatchPacket); break;
-    case "cloud_download": result = await cloudDownload(String(args.shareCode)); break;
-    case "cloud_share_exists": result = (await cloudDownload(String(args.shareCode))) !== null; break;
     case "tba_set_api_key": await storageSet("tbaApiKey", String(args.apiKey)); break;
     case "tba_has_api_key": result = Boolean((await storageGet("tbaApiKey")) || __TBA_API_KEY__); break;
     case "tba_events": result = await tbaRequest<TbaEvent[]>(`/events/${args.year}`); break;

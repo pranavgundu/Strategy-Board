@@ -19,7 +19,7 @@ export interface BoardState {
 
 /**
  * The persisted and shared match format. It intentionally stays positional so
- * existing local data, QR codes, and cloud links remain compatible.
+ * existing local data, QR codes, and Match Files remain compatible.
  */
 export type MatchPacket = [
   matchName: string,
