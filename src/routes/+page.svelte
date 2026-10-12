@@ -5,6 +5,7 @@
   import "@fortawesome/fontawesome-free/css/regular.min.css";
   import "../app.css";
   import { app } from "$lib/stores/app.svelte";
+  import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, isNativeRuntime, loadTeamNumber, safeFilename, saveTeamNumber, shareBoardFile, timeAgo } from "$lib/features";
   import { BoardFileError, encodeMatchFile, readBoardFile, toWhatIfMatch } from "$lib/domain";
@@ -33,7 +34,7 @@
   let editing = $state<Match | null>(null);
   let qrMatch = $state<Match | null>(null);
   let fileInput = $state<HTMLInputElement>();
-  let toast = $state("");
+  const latestToast = $derived(toast.messages.at(-1));
   let pngRequest = $state(0);
 
   function asMatch(match: StrategyMatch): Match {
@@ -68,8 +69,7 @@
   });
 
   function notice(message: string) {
-    toast = message;
-    window.setTimeout(() => { if (toast === message) toast = ""; }, 3500);
+    toast.show(message, "info", 3500);
   }
 
   async function create(values: MatchFormValues) {
@@ -200,7 +200,7 @@
 <QrExportModal open={qrMatch !== null} packet={qrMatch ? app.matches.find((match) => match.id === qrMatch?.id)?.packet ?? null : null} matchName={qrMatch?.matchName || "this match"} onNotice={notice} onClose={() => qrMatch = null} />
 <input bind:this={fileInput} id="home-import-file-input" type="file" accept=".txt,.json,text/plain,application/json" class="hidden" onchange={importFile} />
 <TeamNumberModal open={teamOpen} onSave={saveTeam} />
-{#if toast}<button class="toast" onclick={() => toast = ""} aria-live="polite">{toast}</button>{/if}
+{#if latestToast}<button class="toast" class:toast-error={latestToast.kind === "error"} onclick={() => toast.dismiss(latestToast.id)} aria-live="polite">{latestToast.text}</button>{/if}
 
 <style>
   /* Transient status messages have no pre-rewrite counterpart; styled to match
@@ -219,5 +219,9 @@
     background: #141414;
     font-family: inherit;
     font-size: 1rem;
+  }
+  .toast-error {
+    color: #e89090;
+    border-color: #4a2020;
   }
 </style>
