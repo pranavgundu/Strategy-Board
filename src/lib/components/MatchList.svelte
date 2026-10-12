@@ -1,21 +1,9 @@
 <script lang="ts">
-  import { loadContributorTeams } from "$lib/features";
   import type { Match } from "./types";
 
   let { matches, onOpen, onEdit, onDuplicate, onExportPng, onExportQr, onShare, onDelete }: { matches: Match[]; onOpen: (match: Match) => void; onEdit: (match: Match) => void; onDuplicate: (match: Match) => void; onExportPng: (match: Match) => void; onExportQr: (match: Match) => void; onShare: (match: Match) => void; onDelete: (match: Match) => void } = $props();
 
-  const GOLD_TEAM = "834";
   let openId = $state<string | null>(null);
-  let contributorTeams = $state<string[]>([]);
-
-  $effect(() => { void loadContributorTeams().then((teams) => (contributorTeams = teams), () => {}); });
-
-  /** Matches the original: team 834 pulses gold, contributor teams cycle rainbow. */
-  function animationOf(team: string): "rainbow" | "gold" | "none" {
-    if (team === GOLD_TEAM) return "gold";
-    if (contributorTeams.includes(team)) return "rainbow";
-    return "none";
-  }
 
   // Red is listed right-to-left so the alliances mirror across the "VS" divider.
   const redTeams = (match: Match) => [match.redThree, match.redTwo, match.redOne];
@@ -31,12 +19,7 @@
 </script>
 
 {#snippet teamList(teams: string[], baseColor: string)}
-  {#each teams as team, teamIndex}{#if teamIndex > 0}{" "}{/if}<span class={baseColor}
-    >{#if animationOf(team) === "none"}{team}{:else}{#each team.split("") as digit, digitIndex}<span
-          class={animationOf(team) === "rainbow" ? "rainbow-team-digit" : "special-team-digit"}
-          style="animation-delay: {digitIndex * 0.3}s;">{digit}</span
-        >{/each}{/if}</span
-  >{/each}
+  {#each teams as team, teamIndex}{#if teamIndex > 0}{" "}{/if}<span class={baseColor}>{team}</span>{/each}
 {/snippet}
 
 <div

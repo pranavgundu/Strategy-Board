@@ -3,10 +3,9 @@
   import "../app.css";
   import { app } from "$lib/stores/app.svelte";
   import { native } from "$lib/native/api";
-  import { buildCommit, dismissRelease, isNativeRuntime, isReleaseDismissed, loadTeamNumber, parseShareCode, removeShareCodeFromUrl, saveTeamNumber, timeAgo } from "$lib/features";
+  import { buildCommit, isNativeRuntime, loadTeamNumber, parseShareCode, removeShareCodeFromUrl, saveTeamNumber, timeAgo } from "$lib/features";
   import AppLoading from "$lib/components/AppLoading.svelte";
   import ConfirmModal from "$lib/components/ConfirmModal.svelte";
-  import ContributorsModal from "$lib/components/ContributorsModal.svelte";
   import HomeToolbar from "$lib/components/HomeToolbar.svelte";
   import LinkImportModal from "$lib/components/LinkImportModal.svelte";
   import MatchEditorModal from "$lib/components/MatchEditorModal.svelte";
@@ -14,28 +13,24 @@
   import OrientationWarning from "$lib/components/OrientationWarning.svelte";
   import QrExportModal from "$lib/components/QrExportModal.svelte";
   import QrImportModal from "$lib/components/QrImportModal.svelte";
-  import ReleaseAnnouncementModal from "$lib/components/ReleaseAnnouncementModal.svelte";
   import ShareModal from "$lib/components/ShareModal.svelte";
   import TbaImportModal from "$lib/components/TbaImportModal.svelte";
   import TeamNumberModal from "$lib/components/TeamNumberModal.svelte";
   import WhiteboardScreen from "$lib/components/WhiteboardScreen.svelte";
   import type { Match, MatchFormValues } from "$lib/components/types";
-  import type { MatchPacket, ReleaseAnnouncement, StrategyMatch } from "$lib/native/types";
+  import type { MatchPacket, StrategyMatch } from "$lib/native/types";
 
   let createOpen = $state(false);
   let clearOpen = $state(false);
   let tbaOpen = $state(false);
   let linkOpen = $state(false);
   let qrImportOpen = $state(false);
-  let contributorsOpen = $state(false);
-  let releaseOpen = $state(false);
   let teamOpen = $state(false);
   let editing = $state<Match | null>(null);
   let qrMatch = $state<Match | null>(null);
   let shareLink = $state("");
   let toast = $state("");
   let pngRequest = $state(0);
-  let releaseAnnouncement = $state<ReleaseAnnouncement | null>(null);
 
   function asMatch(match: StrategyMatch): Match {
     return {
@@ -59,13 +54,9 @@
     window.addEventListener("click", openExternal);
     void (async () => {
       await app.init();
-      const [teamNumber, config] = await Promise.all([loadTeamNumber().catch(() => null), native.config.current().catch(() => null)]);
+      const teamNumber = await loadTeamNumber().catch(() => null);
       if (!active) return;
       teamOpen = teamNumber === null;
-      const announcement = config?.releaseAnnouncement;
-      if (announcement?.enabled && !(await isReleaseDismissed(announcement.id, announcement.showOnce))) {
-        if (active) { releaseAnnouncement = announcement; releaseOpen = true; }
-      }
       const code = parseShareCode();
       if (code && active && await importLink(code)) removeShareCodeFromUrl();
     })().catch(() => notice("Some startup services could not be loaded."));
@@ -103,7 +94,7 @@
 
   async function importLink(code: string): Promise<boolean> {
     const shareCode = parseShareCode(code);
-    if (!shareCode) { notice("Enter a valid 6-character Strategy Board share link or code."); return false; }
+    if (!shareCode) { notice("Enter a valid 6-character share link or code."); return false; }
     try {
       const packet = await native.cloud.download(shareCode);
       if (!packet) {
@@ -167,14 +158,9 @@
     teamOpen = false;
     notice(`Team ${normalized} saved.`);
   }
-
-  async function dismissAnnouncement() {
-    if (releaseAnnouncement) await dismissRelease(releaseAnnouncement.id, releaseAnnouncement.showOnce);
-    releaseOpen = false;
-  }
 </script>
 
-<svelte:head><title>Strategy Board</title><meta name="description" content="The Digital Strategy Whiteboard for FRC" /></svelte:head>
+<svelte:head><title>Orbit Strategy Board</title><meta name="description" content="Orbit 1690's match strategy whiteboard for FRC" /></svelte:head>
 
 {#if app.loading}<AppLoading />{/if}
 <OrientationWarning />
@@ -188,30 +174,6 @@
       class="w-full bg-[#0d0d0d] flex items-center justify-center border-t border-[#1a1a1a] relative"
       style="min-height: 4rem; padding-bottom: env(safe-area-inset-bottom, 0px);"
     >
-      <div class="flex items-center justify-center gap-4">
-        <a
-          href="https://github.com/pranavgundu/Strategy-Board"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex items-center justify-center text-[#999] hover:text-[#ccc] transition-colors"
-          aria-label="GitHub"
-        >
-          <i class="fab fa-github text-2xl leading-none"></i>
-        </a>
-        <a
-          href="mailto:pranav@strategyboard.app"
-          class="flex items-center justify-center text-[#999] hover:text-[#ccc] transition-colors"
-          aria-label="Contact"
-        >
-          <i class="fas fa-envelope text-2xl leading-none"></i>
-        </a>
-        <a
-          href="/privacy"
-          class="text-xs text-[#999] hover:text-[#ccc] transition-colors"
-        >
-          Privacy
-        </a>
-      </div>
       <div id="last-commit-info" class="absolute left-6 text-[#999] text-xs" style="top: 50%; transform: translateY(-50%);">
         <a
           href={buildCommit.url}
@@ -225,14 +187,6 @@
           <span>{timeAgo(new Date(buildCommit.date))}</span>
         </a>
       </div>
-      <button
-        id="contributors-link-btn"
-        class="absolute right-6 flex items-center text-[#999] hover:text-[#ccc] transition-colors text-base"
-        style="top: 50%; transform: translateY(-50%);"
-        onclick={() => contributorsOpen = true}
-      >
-        strategyboard.app
-      </button>
     </div>
   </div>
 {/if}
@@ -246,8 +200,6 @@
 <QrImportModal open={qrImportOpen} onImport={importQr} onNotice={notice} onClose={() => qrImportOpen = false} />
 <QrExportModal open={qrMatch !== null} packet={qrMatch ? app.matches.find((match) => match.id === qrMatch?.id)?.packet ?? null : null} matchName={qrMatch?.matchName || "this match"} onNotice={notice} onClose={() => qrMatch = null} />
 <ShareModal open={Boolean(shareLink)} {shareLink} onNotice={notice} onClose={() => shareLink = ""} />
-<ContributorsModal open={contributorsOpen} onClose={() => contributorsOpen = false} />
-<ReleaseAnnouncementModal open={releaseOpen} announcement={releaseAnnouncement} onDismiss={dismissAnnouncement} onClose={() => releaseOpen = false} />
 <TeamNumberModal open={teamOpen} onSave={saveTeam} />
 {#if toast}<button class="toast" onclick={() => toast = ""} aria-live="polite">{toast}</button>{/if}
 

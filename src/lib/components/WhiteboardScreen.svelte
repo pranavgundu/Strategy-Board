@@ -114,7 +114,7 @@
     const data = controller?.exportPng();
     if (!data) { onNotice("The whiteboard is not ready to export yet."); return; }
     try {
-      const result = await savePng(data, safeFilename(app.activeMatch?.matchName || "strategy-board"));
+      const result = await savePng(data, safeFilename(app.activeMatch?.matchName || "orbit-strategy-board"));
       if (result.saved) onNotice("PNG exported.");
     } catch {
       onNotice("Could not export the PNG.");

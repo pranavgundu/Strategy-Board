@@ -1,7 +1,6 @@
 import { native } from "$lib/native/api";
 
 export const TEAM_NUMBER_KEY = "teamNumber";
-export const RELEASE_DISMISSAL_KEY = "releaseAnnouncementDismissal";
 
 export function normalizeTeamNumber(value: string): string | null {
   const normalized = value.trim();
@@ -19,13 +18,4 @@ export async function saveTeamNumber(value: string): Promise<string> {
   if (!teamNumber) throw new Error("Team number must be between 1 and 99999");
   await native.storage.set(TEAM_NUMBER_KEY, teamNumber);
   return teamNumber;
-}
-
-export async function isReleaseDismissed(releaseId: string, showOnce: boolean): Promise<boolean> {
-  if (!showOnce) return false;
-  return (await native.storage.get(RELEASE_DISMISSAL_KEY)) === releaseId;
-}
-
-export async function dismissRelease(releaseId: string, showOnce: boolean): Promise<void> {
-  if (showOnce) await native.storage.set(RELEASE_DISMISSAL_KEY, releaseId);
 }

@@ -1,7 +1,6 @@
 pub mod board;
 pub mod cloud;
 pub mod config;
-pub mod contributors;
 pub mod manager;
 pub mod match_model;
 pub mod model;

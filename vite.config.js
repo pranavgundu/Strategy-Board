@@ -14,7 +14,7 @@ const env = { ...(existsSync(envFile) ? parseEnv(readFileSync(envFile, "utf-8"))
 
 /** Build-time commit stamp shown in the footer. */
 function getGitCommitInfo() {
-  const REPO_URL = "https://github.com/pranavgundu/Strategy-Board";
+  const REPO_URL = "https://github.com/Team1690/orbit-strategy-board";
   try {
     /** @param {string} cmd */
     const git = (cmd) => execSync(`git ${cmd}`, { encoding: "utf-8" }).trim();

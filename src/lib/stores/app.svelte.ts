@@ -121,7 +121,7 @@ export const app = {
             if (normalized.length > 0) {
               await native.model.addPackets(normalized);
               loaded = await native.model.loadPackets();
-              toast.show(`Migrated ${normalized.length} match${normalized.length === 1 ? "" : "es"} from the previous Strategy Board install.`, "success");
+              toast.show(`Migrated ${normalized.length} match${normalized.length === 1 ? "" : "es"} from the previous install.`, "success");
             }
           }
           await native.storage.set(LEGACY_MIGRATION_KEY, true);
@@ -129,7 +129,7 @@ export const app = {
         setPackets(loaded);
         initialized = true;
       } catch (error) {
-        console.error("Failed to load Strategy Board data", error);
+        console.error("Failed to load Orbit Strategy Board data", error);
         toast.show("Could not load saved matches. Your existing data was not changed.", "error");
       } finally {
         loading = false;
