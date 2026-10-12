@@ -1,4 +1,5 @@
 import { readChecklist, type ChecklistRow } from "./checklist";
+import { readCommonPaths, type CommonPath } from "./common-paths";
 import { isObject } from "./json";
 import type { TeamColorOverrides } from "./team-colors";
 
@@ -6,12 +7,13 @@ import type { TeamColorOverrides } from "./team-colors";
 export interface BoardConfig {
   checklist: ChecklistRow[];
   teamColors: TeamColorOverrides;
+  commonPaths: CommonPath[];
 }
 
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
 export function emptyBoardConfig(): BoardConfig {
-  return { checklist: [], teamColors: {} };
+  return { checklist: [], teamColors: {}, commonPaths: [] };
 }
 
 /** A team number as the board stores it, or null when the text isn't one. */
@@ -30,7 +32,7 @@ export function readBoardConfig(value: unknown): BoardConfig {
       if (key && typeof color === "string" && HEX_COLOR.test(color)) teamColors[key] = color.toLowerCase();
     }
   }
-  return { checklist: readChecklist(source.checklist), teamColors };
+  return { checklist: readChecklist(source.checklist), teamColors, commonPaths: readCommonPaths(source.commonPaths) };
 }
 
 export function setTeamColorOverride(config: BoardConfig, team: string, color: string): BoardConfig {

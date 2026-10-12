@@ -1,3 +1,6 @@
+import type { MatchPacket } from "$lib/native/types";
+
+import { isObject } from "./json";
 import type { StationKey } from "./stations";
 
 export interface FieldPoint { readonly x: number; readonly y: number }
@@ -31,6 +34,14 @@ const LAYOUT_2026: FieldLayout = {
     blueOne: { x: -65, y: 273 }, blueTwo: { x: -65, y: 588 }, blueThree: { x: -65, y: 1124 },
   },
 };
+
+/** The field a Match is drawn on: its chosen field year, else its TBA year, else the newest field. */
+export function matchFieldYear(packet: MatchPacket): number {
+  const metadata = packet[12];
+  const selected = isObject(metadata) && typeof metadata.selectedFieldYear === "number" ? metadata.selectedFieldYear : null;
+  const requested = selected || (typeof packet[11] === "number" ? packet[11] : null);
+  return requested && requested < 2026 ? 2025 : 2026;
+}
 
 /** Falsy years mean the newest field, matching the native runtime's year selection. */
 export function fieldLayout(year?: number | null): FieldLayout {

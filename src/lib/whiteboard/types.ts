@@ -41,7 +41,7 @@ export interface WhiteboardState {
 export interface WhiteboardCommit {
   match: WhiteboardMatch;
   mode: BoardPhaseName;
-  reason: "stroke" | "erase" | "checkbox" | "transform" | "undo" | "redo";
+  reason: "stroke" | "erase" | "checkbox" | "transform" | "paste" | "undo" | "redo";
 }
 export interface WhiteboardControllerOptions {
   /** URLs by field year. The newest available artwork is used as fallback. */

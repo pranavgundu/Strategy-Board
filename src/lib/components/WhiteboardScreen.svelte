@@ -3,9 +3,12 @@
   import { app } from "$lib/stores/app.svelte";
   import { boardConfig } from "$lib/stores/config.svelte";
   import { createWhiteboardController, whiteboardMatchFromPacket, writeWhiteboardPacket, type WhiteboardController, type WhiteboardMatch, type WhiteboardMode, type WhiteboardState } from "$lib/whiteboard";
-  import { safeFilename, savePng } from "$lib/features";
-  import type { Lineup } from "$lib/domain";
+  import { newId, safeFilename, savePng } from "$lib/features";
+  import { addCommonPath, commonPathChoices, matchFieldYear, saveCommonPath, type CommonPath, type Lineup, type MatchPhase, type StationKey } from "$lib/domain";
+  import type { MatchPacket } from "$lib/native/types";
+  import ApplyCommonPathModal from "./ApplyCommonPathModal.svelte";
   import InkPicker from "./InkPicker.svelte";
+  import SaveCommonPathModal from "./SaveCommonPathModal.svelte";
   import StatboticsPanel from "./StatboticsPanel.svelte";
 
   let { pngRequest = 0, onNotice = () => {} }: { pngRequest?: number; onNotice?: (message: string) => void } = $props();
@@ -23,6 +26,9 @@
   let toolbarRight = $state<HTMLDivElement>();
   let toolbarFit = $state<"" | "toolbar-condensed" | "toolbar-ultra">("");
 
+  let savePathFor = $state<StationKey | null>(null);
+  let applyOpen = $state(false);
+
   let loadedMatchId = "";
   let commitQueue: Promise<void> = Promise.resolve();
   let handledPngRequest = 0;
@@ -33,6 +39,17 @@
   });
   const teleopLabel = $derived(fieldYear === 2026 ? "ACTIVE" : "TELEOP");
   const endgameLabel = $derived(fieldYear === 2026 ? "INACTIVE" : "ENDGAME");
+  const phaseLabels = $derived<Record<MatchPhase, string>>({ auto: "AUTO", transition: "TRANSITION", teleop: teleopLabel, endgame: endgameLabel, notes: "NOTES" });
+  const phaseOnScreen = $derived<MatchPhase | null>(ui.mode === "statbotics" ? null : ui.mode);
+  const pathFieldYear = $derived(app.activeMatch ? matchFieldYear(app.activeMatch.packet) : 2026);
+  const pathChoices = $derived(applyOpen && lineup && phaseOnScreen
+    ? commonPathChoices(boardConfig.current.commonPaths, { fieldYear: pathFieldYear, phase: phaseOnScreen, lineup })
+    : []);
+  const savePreview = $derived.by(() => {
+    if (!savePathFor || !phaseOnScreen) return null;
+    const packet = livePacket();
+    return packet ? saveCommonPath(packet, savePathFor, phaseOnScreen, { id: "preview", name: "preview", tag: null }) : null;
+  });
   const showTransition = $derived(fieldYear === 2026);
   const showStats = $derived(
     [app.activeMatch?.redOne, app.activeMatch?.redTwo, app.activeMatch?.redThree, app.activeMatch?.blueOne, app.activeMatch?.blueTwo, app.activeMatch?.blueThree]
@@ -88,6 +105,27 @@
   });
 
   function setMode(mode: WhiteboardMode) { controller?.setMode(mode); }
+
+  /** The open Match as the canvas holds it right now, including edits still being saved. */
+  function livePacket(): MatchPacket | null {
+    const source = app.activeMatch;
+    const scene = controller?.getMatch();
+    return source && scene ? writeWhiteboardPacket(source.packet, scene) : null;
+  }
+
+  function savePath(details: { name: string; tag: string | null }) {
+    const packet = livePacket();
+    if (!packet || !savePathFor || !phaseOnScreen) return;
+    const path = saveCommonPath(packet, savePathFor, phaseOnScreen, { id: newId(), ...details });
+    void boardConfig.update(addCommonPath(boardConfig.current, path));
+    savePathFor = null;
+    onNotice(`Saved "${path.name}" as a Common Path.`);
+  }
+
+  function applyPath(path: CommonPath, station: StationKey) {
+    controller?.pasteCommonPath(path, station);
+    applyOpen = false;
+  }
 
   /** Cycles marker → eraser → checkbox (notes only) → marker. */
   function cycleTool() {
@@ -148,6 +186,15 @@
       </div>
 
       <div bind:this={toolbarRight} class="toolbar-right flex items-center justify-end gap-4 mr-8 md:mr-14">
+        {#if ui.isCanvasVisible}
+          <button
+            id="whiteboard-toolbar-paths"
+            class="text-base md:text-xl font-semibold select-none touch-none btn-secondary px-6 py-3 md:px-8 md:py-3"
+            onclick={() => (applyOpen = true)}
+          >
+            PATHS
+          </button>
+        {/if}
         <button
           id="whiteboard-toolbar-view-toggle"
           class="text-base md:text-xl font-semibold select-none touch-none btn-secondary px-6 py-3 md:px-8 md:py-3"
@@ -191,9 +238,20 @@
       </div>
 
       {#if lineup}
-        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hiddenTeams={ui.hiddenTeams} onPick={(ink) => controller?.setInk(ink)} onToggleHidden={(team) => controller?.toggleHiddenTeam(team)} />
+        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hiddenTeams={ui.hiddenTeams} onPick={(ink) => controller?.setInk(ink)} onToggleHidden={(team) => controller?.toggleHiddenTeam(team)} onSavePath={(station) => (savePathFor = station)} />
       {/if}
     {/if}
   </div>
-{/if}
 
+  {#if lineup}
+    <SaveCommonPathModal
+      open={savePathFor !== null}
+      team={savePathFor ? lineup[savePathFor] : ""}
+      phaseLabel={phaseOnScreen ? phaseLabels[phaseOnScreen] : ""}
+      strokeCount={savePreview?.strokes.length ?? 0}
+      onSave={savePath}
+      onClose={() => (savePathFor = null)}
+    />
+    <ApplyCommonPathModal open={applyOpen} choices={pathChoices} {lineup} fieldYear={pathFieldYear} {phaseLabels} onApply={applyPath} onClose={() => (applyOpen = false)} />
+  {/if}
+{/if}

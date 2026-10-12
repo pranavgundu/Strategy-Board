@@ -5,6 +5,10 @@ import { STATIONS } from "./stations";
 
 const ROBOT_SIZE = 152.4;
 
+export type MatchPhase = "auto" | "teleop" | "transition" | "endgame" | "notes";
+/** Where each Phase's drawing sits in the packet body; the order is fixed by the official app. */
+export const PHASE_INDEX: Readonly<Record<MatchPhase, number>> = { auto: 1, teleop: 2, endgame: 3, notes: 4, transition: 5 };
+
 function blankPhase(year?: number): JsonValue[] {
   const { defaults } = fieldLayout(year);
   return [...STATIONS.map((station) => [defaults[station].x, defaults[station].y, 0]), [], [], []];

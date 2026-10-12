@@ -1,6 +1,7 @@
 import field2025 from "../images/2025.png";
 import field2026 from "../images/2026.png";
 import { fieldLayout } from "$lib/domain/field-layout";
+import { commonPathPaste, type CommonPath } from "$lib/domain/common-paths";
 import { defaultInk, inkColor, inkStation, isStrokeErasable, isStrokeVisible, NEUTRAL_INK, officialInkColor, type Lineup } from "$lib/domain/ink";
 import { resolveTeamColor, type TeamColorOverrides } from "$lib/domain/team-colors";
 import { canvasLayout, distanceToSegment, pointInRotatedRect, segmentTouchesBounds, segmentsIntersect, strokeBounds, type Point } from "./geometry";
@@ -17,7 +18,8 @@ type Action =
   | { kind: "erase"; strokes: Array<{ index: number; stroke: Stroke }>; checkboxes: Array<{ index: number; checkbox: CheckboxAnnotation }> }
   | { kind: "checkbox-add"; checkbox: CheckboxAnnotation }
   | { kind: "checkbox-toggle"; index: number; before: boolean; after: boolean }
-  | { kind: "transform"; slot: Slot; before: Pick<RobotPosition, "x" | "y" | "r">; after: Pick<RobotPosition, "x" | "y" | "r"> };
+  | { kind: "transform"; slot: Slot; before: Pick<RobotPosition, "x" | "y" | "r">; after: Pick<RobotPosition, "x" | "y" | "r"> }
+  | { kind: "paste"; slot: Slot; strokes: Stroke[]; before: Pick<RobotPosition, "x" | "y" | "r">; after: Pick<RobotPosition, "x" | "y" | "r"> };
 
 const slots: readonly Slot[] = ["redOne", "redTwo", "redThree", "blueOne", "blueTwo", "blueThree"];
 const VIEWS: Record<View, Point> = { full: [FIELD_WIDTH / 2, FIELD_HEIGHT / 2], red: [(FIELD_WIDTH * 3) / 4, FIELD_HEIGHT / 2], blue: [FIELD_WIDTH / 4, FIELD_HEIGHT / 2] };
@@ -151,6 +153,19 @@ export class WhiteboardController {
   undo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.undoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "undo"); this.history(this.redoHistory, mode).push(action); this.redrawFor(action); this.commit("undo"); }
   redo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.redoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "redo"); this.history(this.undoHistory, mode).push(action); this.redrawFor(action); this.commit("redo"); }
 
+  /** Pastes a Common Path into one Station in the Phase on screen, as a single undo step. */
+  pasteCommonPath(path: CommonPath, station: Slot): void {
+    const phase = this.phase(); if (!phase || !this.match) return;
+    const paste = commonPathPaste(path, station);
+    const strokes: Stroke[] = paste.strokes;
+    const robot = phase[`${station}Robot`]; const before = this.pose(robot); const after = { ...paste.pose };
+    const team = this.match[station].trim(); if (team) this.hiddenTeams.delete(team);
+    for (const stroke of strokes) { phase.drawing.push(stroke); phase.drawingBBox.push(strokeBounds(stroke)); }
+    Object.assign(robot, after);
+    this.drawItems(); this.redrawDrawing();
+    this.record({ kind: "paste", slot: station, strokes, before, after }, "paste");
+  }
+
   /** Produces a complete field-sized PNG (background, robots, and annotations). */
   exportPng(type = "image/png", quality?: number): string | null {
     if (!this.refs || typeof document === "undefined") return null;
@@ -235,9 +250,14 @@ export class WhiteboardController {
     } else if (action.kind === "checkbox-add") {
       if (direction === "undo") { const i = phase.checkboxes.indexOf(action.checkbox); if (i >= 0) phase.checkboxes.splice(i, 1); } else phase.checkboxes.push(action.checkbox);
     } else if (action.kind === "checkbox-toggle") { if (phase.checkboxes[action.index]) phase.checkboxes[action.index][3] = direction === "undo" ? action.before : action.after; }
+    else if (action.kind === "paste") {
+      if (direction === "undo") for (const stroke of action.strokes) { const i = phase.drawing.indexOf(stroke); if (i >= 0) { phase.drawing.splice(i, 1); phase.drawingBBox.splice(i, 1); } }
+      else for (const stroke of action.strokes) { phase.drawing.push(stroke); phase.drawingBBox.push(strokeBounds(stroke)); }
+      Object.assign(phase[`${action.slot}Robot`], direction === "undo" ? action.before : action.after);
+    }
     else { const robot = phase[`${action.slot}Robot`]; Object.assign(robot, direction === "undo" ? action.before : action.after); }
   }
-  private redrawFor(action: Action): void { if (action.kind === "transform") this.drawItems(); else this.redrawDrawing(); }
+  private redrawFor(action: Action): void { if (action.kind === "transform" || action.kind === "paste") this.drawItems(); if (action.kind !== "transform") this.redrawDrawing(); }
 
   private updateLayout(): void {
     if (!this.refs) return;

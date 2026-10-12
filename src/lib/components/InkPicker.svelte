@@ -1,25 +1,28 @@
 <script lang="ts">
-  import { inkColor, NEUTRAL_INK, STATIONS, teamInk, type Lineup, type TeamColorOverrides } from "$lib/domain";
+  import { inkColor, NEUTRAL_INK, STATIONS, teamInk, type Lineup, type StationKey, type TeamColorOverrides } from "$lib/domain";
 
-  let { lineup, ink, overrides, hiddenTeams, onPick, onToggleHidden }: {
+  let { lineup, ink, overrides, hiddenTeams, onPick, onToggleHidden, onSavePath }: {
     lineup: Lineup;
     ink: number;
     overrides: TeamColorOverrides;
     hiddenTeams: readonly string[];
     onPick: (ink: number) => void;
     onToggleHidden: (team: string) => void;
+    onSavePath: (station: StationKey) => void;
   } = $props();
+
+  let menu = $state<{ station: StationKey; team: string; top: number } | null>(null);
 
   // expanded shows every chip plus the close control; collapsed leaves only the active Ink
   let open = $state(true);
   let closing = $state(false);
 
   const chips = $derived([
-    { ink: NEUTRAL_INK, team: "", label: "Neutral", color: "#ffffff", alliance: "", empty: false, hidden: false },
+    { ink: NEUTRAL_INK, station: null, team: "", label: "Neutral", color: "#ffffff", alliance: "", empty: false, hidden: false },
     ...STATIONS.map((station) => {
       const team = lineup[station].trim();
       return {
-        ink: teamInk(station), team, label: team || "Empty", color: inkColor(teamInk(station), lineup, overrides),
+        ink: teamInk(station), station, team, label: team || "Empty", color: inkColor(teamInk(station), lineup, overrides),
         alliance: station.startsWith("red") ? "red" : "blue", empty: !team, hidden: Boolean(team) && hiddenTeams.includes(team),
       };
     }),
@@ -28,6 +31,10 @@
   function pick(chipInk: number) {
     if (!open) { open = true; return; }
     onPick(chipInk);
+  }
+
+  function openMenu(station: StationKey, team: string, button: HTMLElement) {
+    menu = menu?.station === station ? null : { station, team, top: button.offsetTop };
   }
 
   function collapse() {
@@ -55,7 +62,8 @@
         <span class="ink-swatch" style:background={chip.color}></span>
         <span>{chip.label}</span>
       </button>
-      {#if chip.team}
+      {#if chip.team && chip.station}
+        {@const station = chip.station}
         <button
           class="ink-eye"
           aria-pressed={chip.hidden}
@@ -64,9 +72,21 @@
         >
           <i class="fas {chip.hidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
         </button>
+        <button class="ink-eye" aria-label={`More for team ${chip.team}`} aria-expanded={menu?.station === station} onclick={(event) => openMenu(station, chip.team, event.currentTarget)}>
+          <i class="fas fa-ellipsis-vertical"></i>
+        </button>
       {/if}
     </div>
   {/each}
+  {#if menu}
+    {@const current = menu}
+    <button class="ink-menu-backdrop" aria-label="Close the team menu" onclick={() => (menu = null)}></button>
+    <div class="ink-menu" style:top="{current.top}px" role="menu" aria-label={`Team ${current.team}`}>
+      <button role="menuitem" onclick={() => { const { station } = current; menu = null; onSavePath(station); }}>
+        <i class="fas fa-route w-5"></i> Save as Common Path…
+      </button>
+    </div>
+  {/if}
   <div class="ink-chip justify-center" class:collapsed-away={!open}>
     <button id="whiteboard-ink-close" class="ink-pick justify-center" aria-label="Collapse the Ink picker" onclick={collapse}>
       <i class="fa fa-close text-red-500"></i>
@@ -78,7 +98,7 @@
   .ink-chip {
     display: flex;
     align-items: center;
-    min-width: 8.75rem;
+    min-width: 11rem;
     height: 2.6rem;
     border: 2px solid #2e2e2e;
     border-left-width: 6px;
@@ -121,7 +141,7 @@
   .ink-pick:disabled { cursor: default; }
   .ink-eye {
     justify-content: center;
-    width: 2.4rem;
+    width: 2.2rem;
     padding: 0;
     color: #777;
     border-left: 1px solid #2a2a2a;
@@ -137,6 +157,42 @@
     border: 2px solid rgba(255, 255, 255, 0.35);
     border-radius: 999px;
   }
+  .ink-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    min-height: 0;
+    border: none;
+    background: transparent;
+    cursor: default;
+  }
+  .ink-menu {
+    position: absolute;
+    left: calc(100% + 0.5rem);
+    z-index: 11;
+    min-width: 15rem;
+    padding: 0.35rem;
+    border: 1px solid #3a3a3a;
+    border-radius: 0.75rem;
+    background: #1a1a1a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+  .ink-menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #e8e8e8;
+    font-family: inherit;
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+  }
+  .ink-menu button:hover { background: #252525; }
   #whiteboard-ink-picker.color-picker-hidden .ink-chip {
     animation: colorItemSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
