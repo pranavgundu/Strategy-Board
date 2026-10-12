@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { onNew, onTba, onImportQr, onImportLink, onClear }: { onNew: () => void; onTba: () => void; onImportQr: () => void; onImportLink: () => void; onClear: () => void } = $props();
+  let { onNew, onTba, onImportQr, onImportLink, onClear, onSettings }: { onNew: () => void; onTba: () => void; onImportQr: () => void; onImportLink: () => void; onClear: () => void; onSettings: () => void } = $props();
 </script>
 
 <div
@@ -16,8 +16,8 @@
   >
     Orbit Strategy Board
   </div>
-  <!-- Paddings step down with the viewport: at full size the five buttons plus the
-       logo need ~1150px, so anything narrower than `lg` has to compact or the row
+  <!-- Paddings step down with the viewport: at full size the six buttons plus the
+       logo need ~1230px, so anything narrower than `lg` has to compact or the row
        overflows the bar. -->
   <div class="flex shrink-0 gap-2 sm:gap-2.5 md:gap-3 lg:gap-4 items-center">
     <button
@@ -57,6 +57,15 @@
       onclick={onClear}
     >
       Clear
+    </button>
+    <button
+      id="home-toolbar-settings-btn"
+      class="flex items-center justify-center px-3 sm:px-4 md:px-5 lg:px-6 h-11 md:h-12 lg:h-14 btn-secondary text-sm sm:text-base md:text-lg lg:text-xl"
+      onclick={onSettings}
+      aria-label="Settings"
+      title="Settings"
+    >
+      <i class="fas fa-gear"></i>
     </button>
   </div>
 </div>

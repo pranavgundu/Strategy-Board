@@ -13,6 +13,7 @@
   import OrientationWarning from "$lib/components/OrientationWarning.svelte";
   import QrExportModal from "$lib/components/QrExportModal.svelte";
   import QrImportModal from "$lib/components/QrImportModal.svelte";
+  import SettingsScreen from "$lib/components/SettingsScreen.svelte";
   import ShareModal from "$lib/components/ShareModal.svelte";
   import TbaImportModal from "$lib/components/TbaImportModal.svelte";
   import TeamNumberModal from "$lib/components/TeamNumberModal.svelte";
@@ -25,6 +26,7 @@
   let tbaOpen = $state(false);
   let linkOpen = $state(false);
   let qrImportOpen = $state(false);
+  let settingsOpen = $state(false);
   let teamOpen = $state(false);
   let editing = $state<Match | null>(null);
   let qrMatch = $state<Match | null>(null);
@@ -167,7 +169,7 @@
 
 {#if app.screen === "home"}
   <div id="home-container" class="flex flex-col w-full h-full touch-none">
-    <HomeToolbar onNew={() => createOpen = true} onTba={() => tbaOpen = true} onImportQr={() => qrImportOpen = true} onImportLink={() => linkOpen = true} onClear={() => clearOpen = true} />
+    <HomeToolbar onNew={() => createOpen = true} onTba={() => tbaOpen = true} onImportQr={() => qrImportOpen = true} onImportLink={() => linkOpen = true} onClear={() => clearOpen = true} onSettings={() => settingsOpen = true} />
     <MatchList {matches} onOpen={(match) => app.openMatch(match.id)} onEdit={(match) => editing = match} onDuplicate={(match) => app.duplicateMatch(match.id)} onExportPng={(match) => { app.openMatch(match.id); pngRequest += 1; }} onExportQr={(match) => qrMatch = match} onShare={share} onDelete={(match) => app.deleteMatch(match.id)} />
     <div
       id="home-bottom-bar"
@@ -191,6 +193,7 @@
   </div>
 {/if}
 
+<SettingsScreen open={settingsOpen && app.screen === "home"} onClose={() => settingsOpen = false} />
 <WhiteboardScreen {pngRequest} onNotice={notice} />
 <MatchEditorModal open={createOpen} onSave={create} onClose={() => createOpen = false} />
 <MatchEditorModal open={editing !== null} match={editing} onSave={save} onClose={() => editing = null} />

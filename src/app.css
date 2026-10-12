@@ -836,7 +836,8 @@ body {
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
     #home-toolbar-import-link-btn,
-    #home-toolbar-clear-btn {
+    #home-toolbar-clear-btn,
+    #home-toolbar-settings-btn {
         min-width: 0;
         padding: 0.45rem 0.65rem !important;
         font-size: 0.95rem !important;
@@ -861,7 +862,8 @@ body {
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
     #home-toolbar-import-link-btn,
-    #home-toolbar-clear-btn {
+    #home-toolbar-clear-btn,
+    #home-toolbar-settings-btn {
         min-height: 2.5rem !important;
         padding: 0.5rem 0.75rem !important;
     }
@@ -878,7 +880,8 @@ body {
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
     #home-toolbar-import-link-btn,
-    #home-toolbar-clear-btn {
+    #home-toolbar-clear-btn,
+    #home-toolbar-settings-btn {
         min-height: 2.25rem !important;
         padding: 0.4rem 0.6rem !important;
         font-size: 0.875rem !important;
@@ -905,7 +908,8 @@ body {
     #home-toolbar-tba-btn,
     #home-toolbar-import-btn,
     #home-toolbar-import-link-btn,
-    #home-toolbar-clear-btn {
+    #home-toolbar-clear-btn,
+    #home-toolbar-settings-btn {
         height: 2.5rem !important;
     }
     #tba-import-container > div,
@@ -1501,7 +1505,8 @@ a:active,
     #home-toolbar-import-btn,
     #home-toolbar-import-link-btn,
     #home-toolbar-tba-btn,
-    #home-toolbar-clear-btn {
+    #home-toolbar-clear-btn,
+    #home-toolbar-settings-btn {
         min-height: 48px !important;
     }
 
