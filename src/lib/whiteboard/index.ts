@@ -1,6 +1,7 @@
 import field2025 from "../images/2025.png";
 import field2026 from "../images/2026.png";
 import { fieldLayout } from "$lib/domain/field-layout";
+import { resolveTeamColor, type TeamColorOverrides } from "$lib/domain/team-colors";
 import { canvasLayout, distanceToSegment, pointInRotatedRect, segmentTouchesBounds, segmentsIntersect, strokeBounds, type Point } from "./geometry";
 import { FIELD_HEIGHT, FIELD_WIDTH, MAX_HISTORY, type BoardPhaseName, type CheckboxAnnotation, type RobotPosition, type Stroke, type WhiteboardCommit, type WhiteboardControllerOptions, type WhiteboardMatch, type WhiteboardMode, type WhiteboardPhase, type WhiteboardRefs, type WhiteboardState, type WhiteboardTool } from "./types";
 
@@ -60,6 +61,7 @@ export class WhiteboardController {
   private resizeObserver: ResizeObserver | null = null;
   private abortController: AbortController | null = null;
   private layout = { scale: 1, left: 0, top: 0 };
+  private teamColors: TeamColorOverrides = {};
   private readonly options: Required<Pick<WhiteboardControllerOptions, "fieldImages">> & Omit<WhiteboardControllerOptions, "fieldImages">;
 
   constructor(options: WhiteboardControllerOptions = {}) {
@@ -126,6 +128,7 @@ export class WhiteboardController {
   setColor(color: number): void { const next = validColor(color); if (next !== this.color) { this.color = next; this.emitState(); } }
   toggleView(): void { this.view = this.view === "full" ? "red" : this.view === "red" ? "blue" : "full"; this.camera = VIEWS[this.view]; this.redrawAll(); this.emitState(); }
   forceRedraw(): void { this.redrawAll(); }
+  setTeamColorOverrides(overrides: TeamColorOverrides): void { this.teamColors = overrides; this.drawItems(); }
   resetMode(): void { this.setMode("auto"); }
 
   canUndo(): boolean { const mode = this.dataMode(); return !!mode && (this.undoHistory.get(mode)?.length ?? 0) > 0; }
@@ -266,6 +269,11 @@ export class WhiteboardController {
     const [x, y] = this.screen([robot.x, robot.y]); const selected = this.selected?.slot === slot; const team = isBlue(slot) ? "#2563eb" : "#dc2626";
     context.save(); context.translate(x, y); context.rotate(robot.r); context.fillStyle = team; if (selected) { context.shadowBlur = 28; context.shadowColor = "#fff"; } context.beginPath(); context.roundRect(-robot.w / 2, -robot.h / 2, robot.w, robot.h, 20); context.fill(); context.shadowBlur = 0;
     context.fillStyle = "#242429"; context.beginPath(); context.roundRect(-robot.w / 2 + 17, -robot.h / 2 + 17, robot.w - 34, robot.h - 34, 10); context.fill();
+    const teamNumber = this.match?.[slot].trim();
+    if (teamNumber) {
+      context.fillStyle = resolveTeamColor(teamNumber, this.teamColors); context.strokeStyle = "rgba(255,255,255,0.35)"; context.lineWidth = 3;
+      context.beginPath(); context.roundRect(-robot.w / 2 + 27, robot.h / 2 - 49, robot.w - 54, 22, 6); context.fill(); context.stroke();
+    }
     context.fillStyle = "#fff"; context.font = "bold 48px sans-serif"; context.textAlign = "center"; context.textBaseline = "middle"; if (this.match && (this.view === "full" || (this.view === "blue") === isBlue(slot))) context.fillText(this.match[slot], 0, 0);
     if (selected) { context.beginPath(); context.arc(isBlue(slot) ? -robot.w / 2 : robot.w / 2, 0, 20, 0, Math.PI * 2); context.fill(); }
     context.restore();

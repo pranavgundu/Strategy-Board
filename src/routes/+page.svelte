@@ -5,6 +5,7 @@
   import "@fortawesome/fontawesome-free/css/regular.min.css";
   import "../app.css";
   import { app } from "$lib/stores/app.svelte";
+  import { boardConfig } from "$lib/stores/config.svelte";
   import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, isNativeRuntime, loadTeamNumber, safeFilename, saveTeamNumber, shareBoardFile, timeAgo } from "$lib/features";
@@ -59,6 +60,7 @@
       void native.platform.openUrl(anchor.href).catch(() => notice("Could not open that link."));
     };
     window.addEventListener("click", openExternal);
+    void boardConfig.init();
     void (async () => {
       await app.init();
       const teamNumber = await loadTeamNumber().catch(() => null);

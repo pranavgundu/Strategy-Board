@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Component } from "svelte";
+  import TeamColorsSection from "./settings/TeamColorsSection.svelte";
 
   interface SettingsSection {
     id: string;
@@ -10,7 +11,9 @@
 
   let { open, onClose }: { open: boolean; onClose: () => void } = $props();
 
-  const sections: SettingsSection[] = [];
+  const sections: SettingsSection[] = [
+    { id: "team-colors", title: "Team Colors", description: "Recolor a team on this device when its scouting app color is hard to see or clashes.", component: TeamColorsSection },
+  ];
 
   let body = $state<HTMLDivElement>();
 

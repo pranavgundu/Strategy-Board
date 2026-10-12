@@ -14,6 +14,7 @@
     "check:watch": "svelte-kit sync && svelte-check --tsgo --tsconfig ./tsconfig.json --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "team-colors": "node scripts/team-colors.mjs",
     "mobile:init": "bun tauri android init && bun run ios:init",
     "mobile:build": "bun tauri android build && bun run ios:build",
     "ios:init": "PATH=\"$PWD/scripts/swift-shim:$PATH\" bun tauri ios init && bun run ios:patch",

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import { app } from "$lib/stores/app.svelte";
+  import { boardConfig } from "$lib/stores/config.svelte";
   import { createWhiteboardController, whiteboardMatchFromPacket, writeWhiteboardPacket, type WhiteboardController, type WhiteboardMatch, type WhiteboardMode, type WhiteboardState } from "$lib/whiteboard";
   import { safeFilename, savePng } from "$lib/features";
   import StatboticsPanel from "./StatboticsPanel.svelte";
@@ -67,6 +68,10 @@
     loadedMatchId = active.id;
     controller.setMatch(whiteboardMatchFromPacket(active.packet));
     fieldYear = controller.getCurrentFieldYear();
+  });
+
+  $effect(() => {
+    controller?.setTeamColorOverrides(boardConfig.current.teamColors);
   });
 
   $effect(() => {

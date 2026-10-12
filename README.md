@@ -13,6 +13,7 @@ bun run dev  # http://localhost:1420
 - `bun run test` runs the Vitest suite
 - `bun run check` type-checks the Svelte and TypeScript code
 - `bun run build` builds the static web app into `build/`
+- `bun run team-colors [path]` regenerates the Team Color table from the scouting app's `team_to_color.dart` (defaults to `../Scouting-2026`)
 
 API keys are compiled into the web build from `orbit-strategy-board.env`. Real environment variables override the file. Never commit the filled-in file.
 

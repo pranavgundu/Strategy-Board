@@ -1,5 +1,7 @@
 import type { JsonObject, MatchPacket } from "$lib/native/types";
 
+import { isObject } from "./json";
+
 export type MatchLevel = "practice" | "qual" | "playoff" | "final";
 export const MATCH_LEVELS: readonly MatchLevel[] = ["practice", "qual", "playoff", "final"];
 
@@ -23,9 +25,6 @@ export type ExtrasPatch = { [Key in keyof MatchExtras]?: MatchExtras[Key] | unde
 // the official app and both runtimes keep unknown metadata keys, so all extras live under this one
 const EXTRAS_KEY = "orbit";
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 function strings(value: unknown): string[] | undefined {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string") ? [...value] : undefined;
 }

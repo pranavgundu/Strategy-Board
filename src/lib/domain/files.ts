@@ -1,6 +1,7 @@
 import type { MatchPacket } from "$lib/native/types";
 
 import { toWhatIfMatch } from "./extras";
+import { isObject } from "./json";
 
 const MATCH_FILE = "orbit-strategy-board/match";
 const FILE_VERSION = 1;
@@ -9,10 +10,6 @@ export type BoardFile = { kind: "match"; packet: MatchPacket };
 
 export class BoardFileError extends Error {
   override name = "BoardFileError";
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /** Clears the local id like a QR export does, so an import always becomes a new Match. */
