@@ -7,7 +7,7 @@ import { toast } from "./toast.svelte";
 export type Screen = "home" | "whiteboard";
 
 let screen = $state<Screen>("home");
-let packets = $state<MatchPacket[]>([]);
+let packets = $state.raw<MatchPacket[]>([]);
 let activeMatchId = $state<string | null>(null);
 let loading = $state(true);
 let saving = $state(false);
