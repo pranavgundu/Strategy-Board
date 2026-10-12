@@ -16,6 +16,8 @@
     openId = null;
   }
   function run(action: (match: Match) => void, match: Match) { openId = null; action(match); }
+  // the menu button disappears once the actions open - if it kept focus, chrome's focusout on removal would close them again
+  function focusRow(button: HTMLElement) { button.closest<HTMLElement>('[role="button"]')?.focus(); }
 </script>
 
 {#snippet teamList(teams: string[], baseColor: string)}
@@ -60,7 +62,7 @@
         {#if openId !== match.id}
           <button
             class="match-menu-btn flex flex-col w-14 sm:w-16 md:w-18 gap-2.5 items-center justify-center rounded"
-            onclick={(event) => { event.stopPropagation(); openId = match.id; }}
+            onclick={(event) => { event.stopPropagation(); openId = match.id; focusRow(event.currentTarget); }}
             aria-label={`Actions for ${match.matchName}`}
           >
             <div class="menu-dot w-2.5 h-2.5 rounded-full bg-[#555]"></div>
