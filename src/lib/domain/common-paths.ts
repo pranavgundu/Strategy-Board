@@ -7,7 +7,7 @@ import { matchFieldYear } from "./field-layout";
 import { teamInk, type Lineup } from "./ink";
 import { isObject } from "./json";
 import { PHASE_INDEX, type MatchPhase } from "./packets";
-import { STATIONS, stationAlliance, type AllianceColor, type StationKey } from "./stations";
+import { STATIONS, stationAlliance, teamNumberKey, type AllianceColor, type StationKey } from "./stations";
 
 export interface CommonPathPose { x: number; y: number; r: number }
 /** One robot's Strokes from one Phase plus its Bumper Sprite pose, saved to paste into other Matches. */
@@ -105,6 +105,26 @@ function rank({ path, station }: CommonPathChoice, phase: MatchPhase): number {
 
 export function addCommonPath(config: BoardConfig, path: CommonPath): BoardConfig {
   return { ...config, commonPaths: [...config.commonPaths, structuredClone(path)] };
+}
+
+function updatePath(config: BoardConfig, id: string, change: Partial<CommonPath>): BoardConfig {
+  return { ...config, commonPaths: config.commonPaths.map((path) => (path.id === id ? { ...path, ...change } : path)) };
+}
+
+export function renameCommonPath(config: BoardConfig, id: string, name: string): BoardConfig {
+  return updatePath(config, id, { name });
+}
+
+/** Tags a path with a team number, or with null when any robot can run it. */
+export function retagCommonPath(config: BoardConfig, id: string, tag: string | null): BoardConfig {
+  const key = tag === null ? null : teamNumberKey(tag);
+  if (tag !== null && !key) throw new Error("A Common Path is tagged with a team number or with any robot.");
+  return updatePath(config, id, { tag: key });
+}
+
+/** Pasted copies keep no link to the library, so Matches never change when a path is deleted. */
+export function deleteCommonPath(config: BoardConfig, id: string): BoardConfig {
+  return { ...config, commonPaths: config.commonPaths.filter((path) => path.id !== id) };
 }
 
 function point(value: unknown): [number, number] | null {

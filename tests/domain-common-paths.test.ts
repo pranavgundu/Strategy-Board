@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addCommonPath, applyCommonPath, commonPathChoices, emptyBoardConfig, NEUTRAL_INK, newMatchPacket, packetLineup, readBoardConfig, saveCommonPath, teamInk, type CommonPath } from "$lib/domain";
+import { addCommonPath, applyCommonPath, commonPathChoices, deleteCommonPath, emptyBoardConfig, NEUTRAL_INK, newMatchPacket, packetLineup, readBoardConfig, renameCommonPath, retagCommonPath, saveCommonPath, teamInk, type CommonPath } from "$lib/domain";
 import type { MatchPacket } from "$lib/native/types";
 
 /** 1690 in Red 1 has a two-Stroke auto and one teleop Stroke; 2231 and a Neutral note share the auto. */
@@ -102,5 +102,32 @@ describe("Common Paths", () => {
     stored.commonPaths.push({ id: "broken", name: "No strokes or pose" });
 
     expect(readBoardConfig(stored).commonPaths).toEqual([threePiece()]);
+  });
+});
+
+describe("The Common Path library", () => {
+  const library = () => addCommonPath(addCommonPath(emptyBoardConfig(), threePiece()), { ...threePiece(), id: "path-2", name: "Defense lane", tag: null, phase: "teleop" });
+
+  it("renames a path and changes nothing else about it", () => {
+    const config = renameCommonPath(library(), "path-1", "Three piece amp side");
+
+    expect(config.commonPaths[0]).toEqual({ ...threePiece(), name: "Three piece amp side" });
+    expect(config.commonPaths[1]).toEqual(library().commonPaths[1]);
+  });
+
+  it("retags a path to another team or to any robot", () => {
+    expect(retagCommonPath(library(), "path-2", "0254").commonPaths[1].tag).toBe("254");
+    expect(retagCommonPath(library(), "path-1", null).commonPaths[0].tag).toBeNull();
+    expect(() => retagCommonPath(library(), "path-1", "not a team")).toThrow();
+  });
+
+  it("deletes a path without touching the Matches it was already pasted into", () => {
+    const pasted = applyCommonPath(laterMatch(), threePiece(), "redTwo", "auto");
+    const before = structuredClone(pasted);
+
+    const config = deleteCommonPath(library(), "path-1");
+
+    expect(config.commonPaths.map((path) => path.id)).toEqual(["path-2"]);
+    expect(pasted).toEqual(before);
   });
 });

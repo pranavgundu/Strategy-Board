@@ -1,6 +1,7 @@
 import { readChecklist, type ChecklistRow } from "./checklist";
 import { readCommonPaths, type CommonPath } from "./common-paths";
 import { isObject } from "./json";
+import { teamNumberKey } from "./stations";
 import type { TeamColorOverrides } from "./team-colors";
 
 /** The device-level setup that travels together between tablets. */
@@ -14,12 +15,6 @@ const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
 export function emptyBoardConfig(): BoardConfig {
   return { checklist: [], teamColors: {}, commonPaths: [] };
-}
-
-/** A team number as the board stores it, or null when the text isn't one. */
-export function teamNumberKey(team: string): string | null {
-  const trimmed = team.trim();
-  return /^\d{1,5}$/.test(trimmed) && Number(trimmed) > 0 ? String(Number(trimmed)) : null;
 }
 
 /** Reads a Board Config from storage or a file, keeping only the parts that are valid. */

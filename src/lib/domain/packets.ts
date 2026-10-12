@@ -9,6 +9,13 @@ export type MatchPhase = "auto" | "teleop" | "transition" | "endgame" | "notes";
 /** Where each Phase's drawing sits in the packet body; the order is fixed by the official app. */
 export const PHASE_INDEX: Readonly<Record<MatchPhase, number>> = { auto: 1, teleop: 2, endgame: 3, notes: 4, transition: 5 };
 
+/** The Phase names the board shows; the 2026 game calls teleop and endgame Active and Inactive. */
+export function phaseName(phase: MatchPhase, fieldYear: number): string {
+  if (phase === "teleop") return fieldYear >= 2026 ? "Active" : "Teleop";
+  if (phase === "endgame") return fieldYear >= 2026 ? "Inactive" : "Endgame";
+  return { auto: "Auto", transition: "Transition", notes: "Notes" }[phase];
+}
+
 function blankPhase(year?: number): JsonValue[] {
   const { defaults } = fieldLayout(year);
   return [...STATIONS.map((station) => [defaults[station].x, defaults[station].y, 0]), [], [], []];
