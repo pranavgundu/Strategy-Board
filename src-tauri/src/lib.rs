@@ -39,8 +39,6 @@ pub fn run() {
             commands::tba_teams_at_event,
             commands::tba_simple_events,
             commands::tba_simple_matches,
-            commands::github_teams,
-            commands::github_contributors,
             commands::cloud_upload,
             commands::cloud_download,
             commands::cloud_share_exists,

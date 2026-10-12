@@ -24,7 +24,7 @@ function enqueue<T>(operation: () => Promise<T>): Promise<T> {
 }
 
 function report(error: unknown): void {
-  console.error("Strategy Board state command failed", error);
+  console.error("Orbit Strategy Board state command failed", error);
   toast.show("Could not update the board controls. Please try again.", "error");
 }
 

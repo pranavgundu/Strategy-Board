@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "strategy-board",
+      "name": "orbit-strategy-board",
       "dependencies": {
         "@tauri-apps/api": "^2.11.1",
         "@tauri-apps/plugin-clipboard-manager": "^2.3.3",

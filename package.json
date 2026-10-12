@@ -1,12 +1,9 @@
 {
-  "name": "strategy-board",
+  "name": "orbit-strategy-board",
   "version": "26.6.0",
-  "description": "The Digital Strategy Whiteboard for FRC",
-  "homepage": "https://github.com/pranavgundu/Strategy-Board",
-  "author": {
-    "name": "Pranav Gundu",
-    "email": "pranav@strategyboard.app"
-  },
+  "description": "Orbit 1690's match strategy whiteboard for FRC",
+  "homepage": "https://github.com/Team1690/orbit-strategy-board",
+  "author": "Orbit 1690",
   "packageManager": "bun@1.3.14",
   "type": "module",
   "scripts": {

@@ -9,12 +9,11 @@ import tailwindcss from "@tailwindcss/vite";
 const host = process.env.TAURI_DEV_HOST;
 
 const envFile = fileURLToPath(new URL("./orbit-strategy-board.env", import.meta.url));
-// real environment variables win so ci and vercel secrets override the local file
 const env = { ...(existsSync(envFile) ? parseEnv(readFileSync(envFile, "utf-8")) : {}), ...process.env };
 
 /** Build-time commit stamp shown in the footer. */
 function getGitCommitInfo() {
-  const REPO_URL = "https://github.com/pranavgundu/Strategy-Board";
+  const REPO_URL = "https://github.com/Team1690/orbit-strategy-board";
   try {
     /** @param {string} cmd */
     const git = (cmd) => execSync(`git ${cmd}`, { encoding: "utf-8" }).trim();
@@ -38,8 +37,6 @@ export default defineConfig(async () => ({
 
   define: {
     __BUILD_COMMIT__: JSON.stringify(getGitCommitInfo()),
-    // VITE_* names are conventional for local builds; the unprefixed names
-    // also support CI/Vercel secrets without exposing process.env at runtime.
     __FIREBASE_API_KEY__: JSON.stringify(env.VITE_FIREBASE_API_KEY || env.FIREBASE_API_KEY || ""),
     __TBA_API_KEY__: JSON.stringify(env.VITE_TBA_API_KEY || env.TBA_API_KEY || ""),
   },

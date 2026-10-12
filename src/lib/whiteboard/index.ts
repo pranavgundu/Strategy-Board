@@ -71,7 +71,7 @@ export class WhiteboardController {
     const foundContexts = {
       background: refs.background.getContext("2d"), items: refs.items.getContext("2d"), drawing: refs.drawing.getContext("2d"),
     };
-    if (!foundContexts.background || !foundContexts.items || !foundContexts.drawing) throw new Error("Strategy Board requires 2D canvas support.");
+    if (!foundContexts.background || !foundContexts.items || !foundContexts.drawing) throw new Error("Orbit Strategy Board requires 2D canvas support.");
     const contexts = { background: foundContexts.background, items: foundContexts.items, drawing: foundContexts.drawing };
     this.refs = refs;
     this.contexts = contexts;

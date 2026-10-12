@@ -1,15 +1,4 @@
-//! Static field and release configuration shared by the native helpers.
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct ReleaseAnnouncement {
-    pub enabled: bool,
-    pub id: &'static str,
-    pub title: &'static str,
-    pub message: &'static str,
-    pub cta_label: &'static str,
-    pub cta_url: &'static str,
-    pub show_once: bool,
-}
+//! Static field configuration shared by the native helpers.
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Config {
@@ -30,7 +19,6 @@ pub struct Config {
     pub blue_three_station_x: f64,
     pub blue_three_station_y: f64,
     pub shared_tba_api_key: String,
-    pub release_announcement: ReleaseAnnouncement,
 }
 
 impl Config {
@@ -61,15 +49,6 @@ impl Config {
                 .or_else(|| option_env!("TBA_API_KEY").map(str::to_owned))
                 .or_else(|| option_env!("VITE_TBA_API_KEY").map(str::to_owned))
                 .unwrap_or_default(),
-            release_announcement: ReleaseAnnouncement {
-                enabled: false,
-                id: "release-2026-2-0",
-                title: "New update available",
-                message: "We shipped a new release with fixes and improvements.",
-                cta_label: "View release notes",
-                cta_url: "https://github.com/pranavgundu/Strategy-Board/releases",
-                show_once: true,
-            },
         }
     }
 }
@@ -79,7 +58,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn has_valid_field_dimensions_station_coordinates_and_release_contract() {
+    fn has_valid_field_dimensions_and_station_coordinates() {
         let config = Config::current();
         assert!(config.field_png_pixel_width > 0 && config.field_png_pixel_height > 0);
         assert!(config.field_real_width_inches > 0.0 && config.field_real_height_inches > 0.0);
@@ -93,9 +72,5 @@ mod tests {
         ] {
             assert!(x.is_finite());
         }
-        let release = config.release_announcement;
-        assert!(!release.id.is_empty() && !release.title.is_empty() && !release.message.is_empty());
-        assert!(!release.cta_label.is_empty() && !release.cta_url.is_empty());
-        assert!(release.cta_url.starts_with("https://"));
     }
 }

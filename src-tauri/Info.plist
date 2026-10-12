@@ -5,6 +5,6 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-  <string>Strategy Board uses the camera to import match data from QR codes.</string>
+  <string>Orbit Strategy Board uses the camera to import match data from QR codes.</string>
 </dict>
 </plist>
