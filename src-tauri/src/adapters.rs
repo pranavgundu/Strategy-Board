@@ -100,7 +100,22 @@ impl storage::KeyValueStore for JsonFileStore {
     }
 }
 
-/// Shared native-TLS client. Commands use its async methods; implementations
+// android has no openssl and its system store needs jni - ship mozilla's roots instead
+#[cfg(target_os = "android")]
+fn android_tls_config() -> Result<rustls::ClientConfig, String> {
+    let roots = rustls::RootCertStore {
+        roots: webpki_roots::TLS_SERVER_ROOTS.to_vec(),
+    };
+    Ok(rustls::ClientConfig::builder_with_provider(std::sync::Arc::new(
+        rustls::crypto::ring::default_provider(),
+    ))
+    .with_safe_default_protocol_versions()
+    .map_err(|error| error.to_string())?
+    .with_root_certificates(roots)
+    .with_no_client_auth())
+}
+
+/// Shared TLS client. Commands use its async methods; implementations
 /// of legacy synchronous helper traits are retained for non-runtime callers.
 #[derive(Clone)]
 pub struct HttpAdapter {
@@ -110,15 +125,26 @@ pub struct HttpAdapter {
 
 impl HttpAdapter {
     pub fn new() -> Result<Self, String> {
-        let client = reqwest::Client::builder()
-            .use_native_tls()
+        #[cfg(not(target_os = "android"))]
+        let (client, blocking) = (
+            reqwest::Client::builder().use_native_tls(),
+            reqwest::blocking::Client::builder().use_native_tls(),
+        );
+        #[cfg(target_os = "android")]
+        let (client, blocking) = {
+            let tls = android_tls_config()?;
+            (
+                reqwest::Client::builder().use_preconfigured_tls(tls.clone()),
+                reqwest::blocking::Client::builder().use_preconfigured_tls(tls),
+            )
+        };
+        let client = client
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(15))
             .user_agent("orbit-strategy-board/0.1")
             .build()
             .map_err(|error| error.to_string())?;
-        let blocking = reqwest::blocking::Client::builder()
-            .use_native_tls()
+        let blocking = blocking
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(15))
             .user_agent("orbit-strategy-board/0.1")
