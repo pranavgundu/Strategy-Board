@@ -32,6 +32,10 @@
   });
 
   async function loadEvents() {
+    if (!navigator.onLine) {
+      status = { message: "You're offline. Importing from TBA needs an internet connection.", isError: true };
+      return;
+    }
     status = { message: "Loading events...", isError: false };
     try {
       const years: number[] = [];
@@ -90,6 +94,8 @@
     }
   }
 </script>
+
+<svelte:window ononline={() => { if (open && events.length === 0) void loadEvents(); }} />
 
 <Modal
   {open}

@@ -1,9 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import "@fortawesome/fontawesome-free/css/fontawesome.min.css";
+  import "@fortawesome/fontawesome-free/css/solid.min.css";
+  import "@fortawesome/fontawesome-free/css/regular.min.css";
   import "../app.css";
   import { app } from "$lib/stores/app.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, isNativeRuntime, loadTeamNumber, parseShareCode, removeShareCodeFromUrl, saveTeamNumber, timeAgo } from "$lib/features";
+  import { registerServiceWorker, requestPersistentStorage } from "$lib/features/offline";
   import AppLoading from "$lib/components/AppLoading.svelte";
   import ConfirmModal from "$lib/components/ConfirmModal.svelte";
   import HomeToolbar from "$lib/components/HomeToolbar.svelte";
@@ -46,6 +50,8 @@
 
   onMount(() => {
     let active = true;
+    registerServiceWorker();
+    requestPersistentStorage();
     const openExternal = (event: MouseEvent) => {
       if (!isNativeRuntime() || event.defaultPrevented || event.button !== 0) return;
       const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[target="_blank"]') : null;

@@ -173,13 +173,17 @@
       (next) => { if (token === requestToken) { data = next; loading = false; } },
       (reason: unknown) => {
         if (token === requestToken) {
-          error = reason instanceof Error ? reason.message : "Could not load Statbotics data.";
+          error = !navigator.onLine
+            ? "You're offline. Stats load again when the connection returns."
+            : reason instanceof Error ? reason.message : "Could not load Statbotics data.";
           loading = false;
         }
       },
     );
   });
 </script>
+
+<svelte:window ononline={() => { if (visible && error) retry(); }} />
 
 {#if visible}
   {#if !hasTbaIdentity(match) || error}

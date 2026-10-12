@@ -1,0 +1,16 @@
+{
+  "name": "Orbit Strategy Board",
+  "short_name": "Strategy Board",
+  "description": "Orbit 1690's match strategy whiteboard for FRC",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0d0d0d",
+  "theme_color": "#111111",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

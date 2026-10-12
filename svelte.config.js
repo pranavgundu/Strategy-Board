@@ -12,6 +12,10 @@ const config = {
     adapter: adapter({
       fallback: "index.html",
     }),
+    // registered by hand so the Tauri webview never gets a service worker
+    serviceWorker: {
+      register: false,
+    },
   },
 };
 

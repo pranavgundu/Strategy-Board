@@ -20,6 +20,7 @@ const FIREBASE_PUBLIC_API_KEY = "AIzaSyDT2M0XwxAJxqrARFe3GVJKDds-IAwomMM";
 const TBA_BASE = "https://www.thebluealliance.com/api/v3";
 const STATBOTICS_BASE = "https://api.statbotics.io/v3";
 const STATBOTICS_TTL_MS = 24 * 60 * 60 * 1000;
+const REQUEST_TIMEOUT_MS = 15_000;
 
 let databasePromise: Promise<IDBDatabase> | null = null;
 let qrTotal: number | null = null;
@@ -224,7 +225,8 @@ async function cloudDownload(rawCode: string): Promise<MatchPacket | null> {
 }
 
 async function requestJson<T>(url: string, headers: HeadersInit = {}): Promise<T> {
-  const response = await fetch(url, { headers });
+  if (navigator.onLine === false) throw new Error("You're offline. This needs an internet connection.");
+  const response = await fetch(url, { headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   if (!response.ok) throw new Error(`Request failed (${response.status} ${response.statusText})`);
   return response.json() as Promise<T>;
 }
