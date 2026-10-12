@@ -3,6 +3,7 @@
   import ChecklistSection from "./settings/ChecklistSection.svelte";
   import CommonPathsSection from "./settings/CommonPathsSection.svelte";
   import CurrentEventSection from "./settings/CurrentEventSection.svelte";
+  import FilesSection from "./settings/FilesSection.svelte";
   import TeamColorsSection from "./settings/TeamColorsSection.svelte";
 
   interface SettingsSection {
@@ -19,6 +20,7 @@
     { id: "team-colors", title: "Team Colors", description: "Recolor a team on this device when its scouting app color is hard to see or clashes.", component: TeamColorsSection },
     { id: "common-paths", title: "Common Paths", description: "Saved robot plans you can paste into any Match from the whiteboard's PATHS button.", component: CommonPathsSection },
     { id: "current-event", title: "Current Event", description: "Schedule Sync follows this event and adds every match with 1690, with each team in its schedule Station.", component: CurrentEventSection },
+    { id: "files", title: "Files", description: "Move this tablet's setup and Matches to another tablet, or keep a copy.", component: FilesSection },
   ];
 
   let body = $state<HTMLDivElement>();

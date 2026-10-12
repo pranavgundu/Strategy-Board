@@ -1,4 +1,4 @@
-import { dismissMatches, OUR_TEAM, parseNexusEvent, parseTbaMatches, pickCurrentEvent, planSync, restoreDismissed, runningNexusEvents, type CurrentEvent, type DismissedMatches, type EventSchedule, type ScheduleInfo } from "$lib/domain";
+import { dismissMatches, OUR_TEAM, parseNexusEvent, parseTbaMatches, pickCurrentEvent, planSync, readDismissedMatches, restoreDismissed, runningNexusEvents, type CurrentEvent, type DismissedMatches, type EventSchedule, type ScheduleInfo } from "$lib/domain";
 import { newId } from "$lib/features/runtime";
 import { native } from "$lib/native/api";
 import type { JsonValue, MatchPacket, SourceResponse } from "$lib/native/types";
@@ -81,11 +81,6 @@ async function remember(source: SyncSource, eventKey: string, etagKey: string, e
   else delete etags[etagKey];
   bookkeeping = { etags, source, eventKey, at: Date.now() };
   await native.storage.set(BOOKKEEPING_KEY, bookkeeping as unknown as JsonValue).catch(() => undefined);
-}
-
-function readDismissed(value: unknown): DismissedMatches {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
-  return Object.fromEntries(Object.entries(value).filter(([, keys]) => Array.isArray(keys) && keys.every((key) => typeof key === "string")));
 }
 
 function readBookkeeping(value: unknown): Bookkeeping {
@@ -213,6 +208,16 @@ export const scheduleSync = {
     await native.storage.set(DISMISSED_KEY, dismissed as unknown as JsonValue);
   },
 
+  /** Puts back the hand-entered event key and Dismissed Matches from a Backup. */
+  async restoreState(restored: { manualEventKey: string | null; dismissed: DismissedMatches }): Promise<void> {
+    dismissed = restored.dismissed;
+    queue = null;
+    await native.storage.set(DISMISSED_KEY, dismissed as unknown as JsonValue);
+    await native.storage.delete(QUEUE_KEY);
+    await this.setManualEventKey(restored.manualEventKey);
+    void this.syncNow();
+  },
+
   async restore(eventKey: string): Promise<void> {
     dismissed = restoreDismissed(dismissed, eventKey);
     await native.storage.set(DISMISSED_KEY, dismissed as unknown as JsonValue);
@@ -223,7 +228,7 @@ export const scheduleSync = {
   init(): Promise<void> {
     loading ??= Promise.all([native.storage.get(MANUAL_EVENT_KEY), native.storage.get(BOOKKEEPING_KEY), native.storage.get(QUEUE_KEY), native.storage.get(DISMISSED_KEY)]).then(
       ([stored, kept, queued, deleted]) => {
-        dismissed = readDismissed(deleted);
+        dismissed = readDismissedMatches(deleted);
         manualEventKey = typeof stored === "string" && EVENT_KEY.test(stored) ? stored : null;
         bookkeeping = readBookkeeping(kept);
         queue = queued && typeof queued === "object" && !Array.isArray(queued) && typeof queued.eventKey === "string" ? queued as unknown as EventQueue : null;

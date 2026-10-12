@@ -158,6 +158,12 @@ export function dismissMatches(dismissed: DismissedMatches, deleted: readonly Ma
   return next;
 }
 
+/** Reads Dismissed Matches from storage or a Backup, keeping only events with lists of identity keys. */
+export function readDismissedMatches(value: unknown): DismissedMatches {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).filter(([, keys]) => Array.isArray(keys) && keys.every((key) => typeof key === "string")));
+}
+
 export function restoreDismissed(dismissed: DismissedMatches, eventKey: string): DismissedMatches {
   return Object.fromEntries(Object.entries(dismissed).filter(([key]) => key !== eventKey));
 }

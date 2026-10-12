@@ -6,11 +6,12 @@
   import "../app.css";
   import { app } from "$lib/stores/app.svelte";
   import { boardConfig } from "$lib/stores/config.svelte";
+  import { boardFiles } from "$lib/stores/files.svelte";
   import { scheduleSync } from "$lib/stores/sync.svelte";
   import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, isNativeRuntime, newId, safeFilename, shareBoardFile, timeAgo } from "$lib/features";
-  import { BoardFileError, encodeMatchFile, groupMatchesByEvent, identityKey, planTbaImport, readBoardFile, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
+  import { BoardFileError, encodeMatchFile, groupMatchesByEvent, identityKey, planTbaImport, readExtras, scheduleSort, toWhatIfMatch } from "$lib/domain";
   import { queueBadge } from "$lib/features/queue";
   import { registerServiceWorker, requestPersistentStorage } from "$lib/features/offline";
   import AppLoading from "$lib/components/AppLoading.svelte";
@@ -189,11 +190,18 @@
     input.value = "";
     if (!chosen) return;
     try {
-      const file = readBoardFile(await chosen.text());
-      await app.importPackets([file.packet]);
-      notice(`Imported "${file.packet[0] || "Untitled match"}" as a what-if match.`);
+      const message = await boardFiles.open(chosen);
+      if (message) notice(message);
     } catch (error) {
       notice(error instanceof BoardFileError ? error.message : "Could not import that file.");
+    }
+  }
+
+  async function confirmReplacingFile() {
+    try {
+      notice(await boardFiles.confirm());
+    } catch {
+      notice("Could not apply that file. Nothing was replaced.");
     }
   }
 
@@ -254,6 +262,17 @@
   destructive
   onConfirm={() => { if (deletingGroup) void deleteEvent(deletingGroup); }}
   onClose={() => (deletingGroup = null)}
+/>
+<ConfirmModal
+  open={boardFiles.pending !== null}
+  title={boardFiles.pending?.kind === "backup" ? "Restore this Backup?" : "Replace the Board Config?"}
+  message={boardFiles.pending?.kind === "backup"
+    ? `This replaces every Match on this tablet with the ${boardFiles.pending.backup.packets.length} in the Backup, along with the Board Config, the event key, and the deleted matches list.`
+    : "This replaces the Checklist, Team Color overrides, and Common Paths on this tablet with the ones in the file."}
+  confirmLabel={boardFiles.pending?.kind === "backup" ? "Restore" : "Replace"}
+  destructive
+  onConfirm={() => void confirmReplacingFile()}
+  onClose={() => boardFiles.cancel()}
 />
 <ConfirmModal open={clearOpen} title="Clear All Data?" message="This will permanently delete all matches and data. This action cannot be undone." confirmLabel="Clear All" destructive onConfirm={async () => { await app.clearAll(); clearOpen = false; }} onClose={() => clearOpen = false} />
 <TbaImportModal open={tbaOpen} onImport={importTba} onClose={() => tbaOpen = false} />
