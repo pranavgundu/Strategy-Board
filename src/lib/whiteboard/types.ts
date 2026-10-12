@@ -32,7 +32,7 @@ export interface WhiteboardRefs {
   drawing: HTMLCanvasElement;
 }
 export interface WhiteboardState {
-  mode: WhiteboardMode; tool: WhiteboardTool; color: number;
+  mode: WhiteboardMode; tool: WhiteboardTool; ink: number;
   view: "full" | "red" | "blue"; canUndo: boolean; canRedo: boolean;
   isCanvasVisible: boolean;
 }

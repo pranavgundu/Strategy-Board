@@ -4,6 +4,8 @@
   import { boardConfig } from "$lib/stores/config.svelte";
   import { createWhiteboardController, whiteboardMatchFromPacket, writeWhiteboardPacket, type WhiteboardController, type WhiteboardMatch, type WhiteboardMode, type WhiteboardState } from "$lib/whiteboard";
   import { safeFilename, savePng } from "$lib/features";
+  import type { Lineup } from "$lib/domain";
+  import InkPicker from "./InkPicker.svelte";
   import StatboticsPanel from "./StatboticsPanel.svelte";
 
   let { pngRequest = 0, onNotice = () => {} }: { pngRequest?: number; onNotice?: (message: string) => void } = $props();
@@ -13,7 +15,7 @@
   let items = $state<HTMLCanvasElement>();
   let drawing = $state<HTMLCanvasElement>();
   let controller = $state<WhiteboardController | null>(null);
-  let ui = $state<WhiteboardState>({ mode: "auto", tool: "marker", color: 0, view: "full", canUndo: false, canRedo: false, isCanvasVisible: true });
+  let ui = $state<WhiteboardState>({ mode: "auto", tool: "marker", ink: 0, view: "full", canUndo: false, canRedo: false, isCanvasVisible: true });
   let fieldYear = $state<number | undefined>(undefined);
   let toolbar = $state<HTMLDivElement>();
   let toolbarLeft = $state<HTMLDivElement>();
@@ -21,24 +23,14 @@
   let toolbarRight = $state<HTMLDivElement>();
   let toolbarFit = $state<"" | "toolbar-condensed" | "toolbar-ultra">("");
 
-  // Colour picker: expanded shows every swatch plus the close control; collapsed
-  // leaves only the active swatch, exactly as the original behaved.
-  let paletteOpen = $state(true);
-  let pickedColor = $state<number | null>(null);
-  let paletteClosing = $state(false);
-
   let loadedMatchId = "";
   let commitQueue: Promise<void> = Promise.resolve();
   let handledPngRequest = 0;
 
-  const swatches = [
-    { id: "yellow", index: 4, classes: "bg-yellow-500 border-amber-600" },
-    { id: "green", index: 3, classes: "bg-green-500 border-green-700" },
-    { id: "blue", index: 2, classes: "bg-blue-500 border-blue-700" },
-    { id: "red", index: 1, classes: "bg-red-500 border-red-700" },
-    { id: "white", index: 0, classes: "bg-white border-gray-300" },
-  ] as const;
-
+  const lineup = $derived<Lineup | null>(app.activeMatch && {
+    redOne: app.activeMatch.redOne, redTwo: app.activeMatch.redTwo, redThree: app.activeMatch.redThree,
+    blueOne: app.activeMatch.blueOne, blueTwo: app.activeMatch.blueTwo, blueThree: app.activeMatch.blueThree,
+  });
   const teleopLabel = $derived(fieldYear === 2026 ? "ACTIVE" : "TELEOP");
   const endgameLabel = $derived(fieldYear === 2026 ? "INACTIVE" : "ENDGAME");
   const showTransition = $derived(fieldYear === 2026);
@@ -100,17 +92,6 @@
   /** Cycles marker → eraser → checkbox (notes only) → marker. */
   function cycleTool() {
     controller?.toggleTool();
-  }
-
-  function pickColor(index: number) {
-    if (!paletteOpen) { paletteOpen = true; return; }
-    pickedColor = index;
-    controller?.setColor(index);
-  }
-
-  function collapsePalette() {
-    paletteClosing = true;
-    window.setTimeout(() => { paletteClosing = false; paletteOpen = false; }, 300);
   }
 
   function exit() { app.closeMatch(); }
@@ -209,47 +190,10 @@
         <i id="whiteboard-draw-config-checkbox" class="fa-regular fa-square-check text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white" style:display={ui.tool === "checkbox" ? "inline" : "none"}></i>
       </div>
 
-      <div
-        id="whiteboard-color-config"
-        class="absolute flex flex-col justify-center items-center bottom-3 sm:bottom-4 md:bottom-6 left-3 sm:left-4 md:left-6 bg-[#1a1a1a] border border-[#3a3a3a] rounded-full p-2 sm:p-3"
-        class:hidden={ui.tool === "eraser"}
-        class:color-picker-hidden={paletteClosing}
-      >
-        {#each swatches as swatch (swatch.id)}
-          <div
-            id="whiteboard-color-{swatch.id}"
-            class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 rounded-full border-2 cursor-pointer {swatch.classes}"
-            class:hidden={!paletteOpen && ui.color !== swatch.index}
-            class:border-4={pickedColor === swatch.index}
-            role="button"
-            tabindex="0"
-            aria-label="Use {swatch.id} ink"
-            onclick={() => pickColor(swatch.index)}
-            onkeydown={(event) => { if (event.key === "Enter" || event.key === " ") pickColor(swatch.index); }}
-          ></div>
-        {/each}
-        <div
-          id="whiteboard-color-close"
-          class="size-5 sm:size-6 md:size-8 lg:size-10 xl:size-12 m-1 sm:m-1.5 md:m-2 flex justify-center items-center text-center rounded-full border-2 border-[#3a3a3a] bg-[#2a2a2a] cursor-pointer"
-          class:hidden={!paletteOpen}
-          role="button"
-          tabindex="0"
-          aria-label="Collapse colour picker"
-          onclick={collapsePalette}
-          onkeydown={(event) => { if (event.key === "Enter" || event.key === " ") collapsePalette(); }}
-        >
-          <i class="fa fa-close text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-red-500"></i>
-        </div>
-      </div>
+      {#if lineup}
+        <InkPicker {lineup} ink={ui.ink} overrides={boardConfig.current.teamColors} hidden={ui.tool === "eraser"} onPick={(ink) => controller?.setInk(ink)} />
+      {/if}
     {/if}
   </div>
 {/if}
 
-<style>
-  /* `.hidden` and `.flex` are both display utilities; an id-scoped rule keeps the
-     collapse deterministic regardless of their order in the generated sheet. */
-  #whiteboard-color-close.hidden,
-  #whiteboard-color-config.hidden {
-    display: none;
-  }
-</style>

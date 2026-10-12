@@ -533,12 +533,12 @@ body {
     transform: scale(1) rotate(0deg);
 }
 
-#whiteboard-color-config {
+#whiteboard-ink-picker {
     transform-origin: bottom center;
     animation: colorPickerSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-#whiteboard-color-config.color-picker-hidden {
+#whiteboard-ink-picker.color-picker-hidden {
     animation: colorPickerSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)
         forwards;
     pointer-events: none;
@@ -566,63 +566,6 @@ body {
     }
 }
 
-#whiteboard-color-config > div[id*="color"] {
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        inset 0 2px 4px rgba(255, 255, 255, 0.3),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-    animation: colorItemSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-
-#whiteboard-color-config.color-picker-hidden > div[id*="color"] {
-    animation: colorItemSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)
-        forwards;
-}
-
-#whiteboard-color-yellow {
-    animation-delay: 0s;
-}
-#whiteboard-color-config.color-picker-hidden #whiteboard-color-yellow {
-    animation-delay: 0.2s;
-}
-
-#whiteboard-color-green {
-    animation-delay: 0.05s;
-}
-#whiteboard-color-config.color-picker-hidden #whiteboard-color-green {
-    animation-delay: 0.15s;
-}
-
-#whiteboard-color-blue {
-    animation-delay: 0.1s;
-}
-#whiteboard-color-config.color-picker-hidden #whiteboard-color-blue {
-    animation-delay: 0.1s;
-}
-
-#whiteboard-color-red {
-    animation-delay: 0.15s;
-}
-#whiteboard-color-config.color-picker-hidden #whiteboard-color-red {
-    animation-delay: 0.05s;
-}
-
-#whiteboard-color-white {
-    animation-delay: 0.2s;
-}
-#whiteboard-color-config.color-picker-hidden #whiteboard-color-white {
-    animation-delay: 0s;
-}
-
-#whiteboard-color-close {
-    animation-delay: 0.2s;
-}
-#whiteboard-color-config.color-picker-hidden #whiteboard-color-close {
-    animation-delay: 0s;
-}
-
 @keyframes colorItemSlideUp {
     from {
         opacity: 0;
@@ -643,31 +586,6 @@ body {
         opacity: 0;
         transform: translateY(20px) scale(0.5);
     }
-}
-
-#whiteboard-color-config > div[id*="color"]::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.4) 0%,
-        rgba(255, 255, 255, 0.1) 50%,
-        transparent 100%
-    );
-    border-radius: inherit;
-    pointer-events: none;
-}
-
-#whiteboard-color-config > div[id*="color"]:hover {
-    transform: scale(1.15);
-    box-shadow:
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 2px 4px rgba(255, 255, 255, 0.4),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #whiteboard-toolbar-back,
@@ -722,21 +640,6 @@ body {
     border-color: #555 !important;
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.07);
     cursor: pointer;
-}
-
-#whiteboard-color-config > div {
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-#whiteboard-color-config > div:hover {
-    transform: scale(1.12);
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
-    cursor: pointer;
-}
-
-#whiteboard-color-close:hover {
-    border-color: #8a3030 !important;
-    background: #2a0f0f !important;
-    box-shadow: 0 0 10px rgba(200, 80, 80, 0.2);
 }
 
 #orientation-warning {
@@ -1172,7 +1075,7 @@ body #whiteboard-statbotics-container {
         bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
     }
 
-    #whiteboard-color-config {
+    #whiteboard-ink-picker {
         left: max(0.75rem, env(safe-area-inset-left)) !important;
         bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
     }
@@ -1450,15 +1353,6 @@ a,
     transform: translateZ(0);
 }
 
-/* The palette swatches are `role="button"` divs, so the 44px tap-target floor
-   above would otherwise beat every one of their explicit sizes (min-width wins
-   over width) and stretch the collapsed column past the height of a landscape
-   phone. They carry their own sizing, so opt them out. */
-#whiteboard-color-config > [role="button"] {
-    min-height: 0;
-    min-width: 0;
-}
-
 #home-match-list,
 #tba-event-list,
 #tba-team-list {
@@ -1534,8 +1428,7 @@ a:active,
 }
 
 @media (max-width: 1024px) {
-    #whiteboard-draw-config,
-    #whiteboard-color-config {
+    #whiteboard-draw-config {
         transform: scale(1.15);
     }
 
@@ -1558,26 +1451,10 @@ a:active,
         font-size: 1.25rem !important;
     }
 
-    #whiteboard-color-config {
+    #whiteboard-ink-picker {
         bottom: 0.75rem !important;
         left: 0.75rem !important;
         padding: 0.5rem !important;
-        transform: scale(1.2);
-    }
-
-    #whiteboard-color-yellow,
-    #whiteboard-color-green,
-    #whiteboard-color-blue,
-    #whiteboard-color-red,
-    #whiteboard-color-white,
-    #whiteboard-color-close {
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-        margin: 0.3rem !important;
-    }
-
-    #whiteboard-color-close i {
-        font-size: 1.25rem !important;
     }
 
     #whiteboard-number-pad {
@@ -1603,17 +1480,6 @@ a:active,
     #whiteboard-draw-config {
         width: 3rem !important;
         height: 3rem !important;
-    }
-
-    #whiteboard-color-yellow,
-    #whiteboard-color-green,
-    #whiteboard-color-blue,
-    #whiteboard-color-red,
-    #whiteboard-color-white,
-    #whiteboard-color-close {
-        width: 2.25rem !important;
-        height: 2.25rem !important;
-        margin: 0.25rem !important;
     }
 
     #whiteboard-number-pad button {

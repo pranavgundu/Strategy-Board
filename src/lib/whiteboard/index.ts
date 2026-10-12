@@ -1,6 +1,7 @@
 import field2025 from "../images/2025.png";
 import field2026 from "../images/2026.png";
 import { fieldLayout } from "$lib/domain/field-layout";
+import { defaultInk, inkColor, inkStation, NEUTRAL_INK, officialInkColor, type Lineup } from "$lib/domain/ink";
 import { resolveTeamColor, type TeamColorOverrides } from "$lib/domain/team-colors";
 import { canvasLayout, distanceToSegment, pointInRotatedRect, segmentTouchesBounds, segmentsIntersect, strokeBounds, type Point } from "./geometry";
 import { FIELD_HEIGHT, FIELD_WIDTH, MAX_HISTORY, type BoardPhaseName, type CheckboxAnnotation, type RobotPosition, type Stroke, type WhiteboardCommit, type WhiteboardControllerOptions, type WhiteboardMatch, type WhiteboardMode, type WhiteboardPhase, type WhiteboardRefs, type WhiteboardState, type WhiteboardTool } from "./types";
@@ -19,12 +20,11 @@ type Action =
   | { kind: "transform"; slot: Slot; before: Pick<RobotPosition, "x" | "y" | "r">; after: Pick<RobotPosition, "x" | "y" | "r"> };
 
 const slots: readonly Slot[] = ["redOne", "redTwo", "redThree", "blueOne", "blueTwo", "blueThree"];
-const COLORS = ["#ffffff", "#ef4444", "#3b82f6", "#22c55e", "#eab308"] as const;
 const VIEWS: Record<View, Point> = { full: [FIELD_WIDTH / 2, FIELD_HEIGHT / 2], red: [(FIELD_WIDTH * 3) / 4, FIELD_HEIGHT / 2], blue: [FIELD_WIDTH / 4, FIELD_HEIGHT / 2] };
 const fieldImageCache = new Map<string, HTMLImageElement>();
 
 function phaseFor(match: WhiteboardMatch, mode: BoardPhaseName): WhiteboardPhase { return match[mode]; }
-function validColor(value: number): number { return Number.isInteger(value) && value >= 0 && value < COLORS.length ? value : 0; }
+function lineupOf(match: WhiteboardMatch): Lineup { return { redOne: match.redOne, redTwo: match.redTwo, redThree: match.redThree, blueOne: match.blueOne, blueTwo: match.blueTwo, blueThree: match.blueThree }; }
 function isBlue(slot: Slot): boolean { return slot.startsWith("blue"); }
 function samePose(a: Pick<RobotPosition, "x" | "y" | "r">, b: Pick<RobotPosition, "x" | "y" | "r">): boolean { return a.x === b.x && a.y === b.y && a.r === b.r; }
 
@@ -49,7 +49,7 @@ export class WhiteboardController {
   private match: WhiteboardMatch | null = null;
   private mode: WhiteboardMode = "auto";
   private tool: WhiteboardTool = "marker";
-  private color = 0;
+  private ink = NEUTRAL_INK;
   private view: View = "full";
   private camera: Point = VIEWS.full;
   private image: HTMLImageElement | null = null;
@@ -107,6 +107,7 @@ export class WhiteboardController {
     if (this.match?.id !== match?.id) {
       this.undoHistory.clear();
       this.redoHistory.clear();
+      this.ink = match ? defaultInk(lineupOf(match)) : NEUTRAL_INK;
     }
     this.match = match;
     this.selected = null; this.pointer = null;
@@ -116,7 +117,7 @@ export class WhiteboardController {
   getMatch(): WhiteboardMatch | null { return this.match; }
   /** Field artwork year in use; phase labels differ from 2026 onward. */
   getCurrentFieldYear(): number | undefined { return this.fieldYear(); }
-  getState(): WhiteboardState { return { mode: this.mode, tool: this.tool, color: this.color, view: this.view, canUndo: this.canUndo(), canRedo: this.canRedo(), isCanvasVisible: this.mode !== "statbotics" }; }
+  getState(): WhiteboardState { return { mode: this.mode, tool: this.tool, ink: this.ink, view: this.view, canUndo: this.canUndo(), canRedo: this.canRedo(), isCanvasVisible: this.mode !== "statbotics" }; }
   setMode(mode: WhiteboardMode): void {
     if (this.mode === mode) return;
     this.mode = mode; this.selected = null; this.pointer = null;
@@ -125,10 +126,10 @@ export class WhiteboardController {
   }
   setTool(tool: WhiteboardTool): void { if (tool === "checkbox" && this.mode !== "notes") tool = "marker"; if (this.tool !== tool) { this.tool = tool; this.emitState(); } }
   toggleTool(): void { this.setTool(this.tool === "marker" ? "eraser" : this.tool === "eraser" ? (this.mode === "notes" ? "checkbox" : "marker") : "marker"); }
-  setColor(color: number): void { const next = validColor(color); if (next !== this.color) { this.color = next; this.emitState(); } }
+  setInk(ink: number): void { const next = ink === NEUTRAL_INK || inkStation(ink) ? ink : NEUTRAL_INK; if (next !== this.ink) { this.ink = next; this.emitState(); } }
   toggleView(): void { this.view = this.view === "full" ? "red" : this.view === "red" ? "blue" : "full"; this.camera = VIEWS[this.view]; this.redrawAll(); this.emitState(); }
   forceRedraw(): void { this.redrawAll(); }
-  setTeamColorOverrides(overrides: TeamColorOverrides): void { this.teamColors = overrides; this.drawItems(); }
+  setTeamColorOverrides(overrides: TeamColorOverrides): void { this.teamColors = overrides; this.drawItems(); this.redrawDrawing(); }
   resetMode(): void { this.setMode("auto"); }
 
   canUndo(): boolean { const mode = this.dataMode(); return !!mode && (this.undoHistory.get(mode)?.length ?? 0) > 0; }
@@ -165,7 +166,7 @@ export class WhiteboardController {
     }
     if (selected) { this.selected = { ...selected, rotating: false, before: this.pose(selected.robot) }; this.drawItems(); return; }
     this.selected = null; this.drawItems();
-    if (this.tool === "marker") this.pointer.stroke = [this.color, [point[0], point[1]]];
+    if (this.tool === "marker") this.pointer.stroke = [this.ink, [point[0], point[1]]];
     else if (this.tool === "checkbox") this.toggleCheckbox(point);
     else this.eraseSegment(point, point, erased);
   };
@@ -284,18 +285,19 @@ export class WhiteboardController {
     for (const checkbox of phase.checkboxes ?? []) this.drawCheckbox(context, checkbox);
   }
   private drawStroke(context: CanvasRenderingContext2D, stroke: Stroke): void {
-    if (stroke.length < 2) return; context.lineWidth = 10; context.lineCap = "round"; context.lineJoin = "round"; context.strokeStyle = COLORS[validColor(stroke[0])]; const first = this.screen(stroke[1]);
+    if (stroke.length < 2) return; context.lineWidth = 10; context.lineCap = "round"; context.lineJoin = "round"; context.strokeStyle = this.strokeColor(stroke[0]); const first = this.screen(stroke[1]);
     if (stroke.length === 2) { context.fillStyle = context.strokeStyle; context.beginPath(); context.arc(first[0], first[1], 5, 0, Math.PI * 2); context.fill(); return; }
     context.beginPath(); context.moveTo(first[0], first[1]); for (const point of stroke.slice(2) as Point[]) { const screen = this.screen(point); context.lineTo(screen[0], screen[1]); } context.stroke();
   }
-  private drawStrokeSegment(start: Point, end: Point, color: number): void { const context = this.contexts?.drawing; if (!context) return; const a = this.screen(start); const b = this.screen(end); context.lineWidth = 10; context.lineCap = "round"; context.lineJoin = "round"; context.strokeStyle = COLORS[validColor(color)]; context.beginPath(); context.moveTo(a[0], a[1]); context.lineTo(b[0], b[1]); context.stroke(); }
-  private drawCheckbox(context: CanvasRenderingContext2D, checkbox: CheckboxAnnotation): void { const [x, y] = this.screen([checkbox[0], checkbox[1]]); const size = 150; context.strokeStyle = COLORS[validColor(checkbox[2])]; context.lineWidth = 8; context.strokeRect(x - size / 2, y - size / 2, size, size); if (checkbox[3]) { context.strokeStyle = "#22c55e"; context.lineWidth = 12; context.lineCap = "round"; context.beginPath(); context.moveTo(x - size / 2 + 15, y); context.lineTo(x - size / 6, y + size / 2 - 15); context.lineTo(x + size / 2 - 15, y - size / 2 + 15); context.stroke(); } }
+  private drawStrokeSegment(start: Point, end: Point, color: number): void { const context = this.contexts?.drawing; if (!context) return; const a = this.screen(start); const b = this.screen(end); context.lineWidth = 10; context.lineCap = "round"; context.lineJoin = "round"; context.strokeStyle = this.strokeColor(color); context.beginPath(); context.moveTo(a[0], a[1]); context.lineTo(b[0], b[1]); context.stroke(); }
+  private drawCheckbox(context: CanvasRenderingContext2D, checkbox: CheckboxAnnotation): void { const [x, y] = this.screen([checkbox[0], checkbox[1]]); const size = 150; context.strokeStyle = officialInkColor(checkbox[2]); context.lineWidth = 8; context.strokeRect(x - size / 2, y - size / 2, size, size); if (checkbox[3]) { context.strokeStyle = "#22c55e"; context.lineWidth = 12; context.lineCap = "round"; context.beginPath(); context.moveTo(x - size / 2 + 15, y); context.lineTo(x - size / 6, y + size / 2 - 15); context.lineTo(x + size / 2 - 15, y - size / 2 + 15); context.stroke(); } }
+  private strokeColor(ink: number): string { return this.match ? inkColor(ink, lineupOf(this.match), this.teamColors) : officialInkColor(ink); }
   private eventPoint(event: PointerEvent): Point | null { if (!this.refs) return null; const rect = this.refs.drawing.getBoundingClientRect(); if (!rect.width || !rect.height) return null; return [(event.clientX - rect.left) / this.layout.scale + this.camera[0] - FIELD_WIDTH / 2, (event.clientY - rect.top) / this.layout.scale + this.camera[1] - FIELD_HEIGHT / 2]; }
   private pose(robot: RobotPosition): Pick<RobotPosition, "x" | "y" | "r"> { return { x: robot.x, y: robot.y, r: robot.r }; }
   private robotAt(point: Point): { slot: Slot; robot: RobotPosition; offset: Point } | null { const phase = this.phase(); if (!phase || this.mode === "notes") return null; for (const slot of [...slots].reverse()) { const robot = phase[`${slot}Robot`]; if (pointInRotatedRect(point, [robot.x, robot.y], robot.w, robot.h, robot.r)) return { slot, robot, offset: [robot.x - point[0], robot.y - point[1]] }; } return null; }
   private rotationHandleAt(point: Point, selected: NonNullable<WhiteboardController["selected"]>): boolean { const sign = isBlue(selected.slot) ? -1 : 1; const handle: Point = [selected.robot.x + sign * selected.robot.w / 2 * Math.cos(selected.robot.r), selected.robot.y + sign * selected.robot.w / 2 * Math.sin(selected.robot.r)]; return Math.hypot(point[0] - handle[0], point[1] - handle[1]) < 35; }
   private moveSelected(point: Point): void { if (!this.selected) return; const { robot, offset, rotating, slot } = this.selected; if (rotating) { robot.r = Math.atan2(point[1] - robot.y, point[0] - robot.x) + (isBlue(slot) ? Math.PI : 0); } else { robot.x = point[0] + offset[0]; robot.y = point[1] + offset[1]; } this.drawItems(); }
-  private toggleCheckbox(point: Point): void { const phase = this.phase(); if (!phase) return; const index = phase.checkboxes.findIndex(([x, y]) => Math.abs(x - point[0]) <= 60 && Math.abs(y - point[1]) <= 60); if (index >= 0) { const before = phase.checkboxes[index][3]; phase.checkboxes[index][3] = !before; this.redrawDrawing(); this.record({ kind: "checkbox-toggle", index, before, after: !before }, "checkbox"); } else { const checkbox: CheckboxAnnotation = [point[0], point[1], this.color, false]; phase.checkboxes.push(checkbox); this.redrawDrawing(); this.record({ kind: "checkbox-add", checkbox }, "checkbox"); } }
+  private toggleCheckbox(point: Point): void { const phase = this.phase(); if (!phase) return; const index = phase.checkboxes.findIndex(([x, y]) => Math.abs(x - point[0]) <= 60 && Math.abs(y - point[1]) <= 60); if (index >= 0) { const before = phase.checkboxes[index][3]; phase.checkboxes[index][3] = !before; this.redrawDrawing(); this.record({ kind: "checkbox-toggle", index, before, after: !before }, "checkbox"); } else { const checkbox: CheckboxAnnotation = [point[0], point[1], NEUTRAL_INK, false]; phase.checkboxes.push(checkbox); this.redrawDrawing(); this.record({ kind: "checkbox-add", checkbox }, "checkbox"); } }
   private eraseSegment(start: Point, end: Point, erased: Extract<Action, { kind: "erase" }>): void { const phase = this.phase(); if (!phase) return; const radius = 10; let changed = false; for (let index = phase.drawing.length - 1; index >= 0; index--) { const stroke = phase.drawing[index]; if (!segmentTouchesBounds(start, end, phase.drawingBBox[index] ?? strokeBounds(stroke), radius)) continue; const points = stroke.slice(1) as Point[]; const hit = points.length === 1 ? distanceToSegment(points[0], start, end) <= radius + 5 : points.slice(1).some((point, i) => segmentsIntersect(start, end, points[i], point, radius)); if (hit) { phase.drawing.splice(index, 1); phase.drawingBBox.splice(index, 1); erased.strokes.push({ index, stroke }); changed = true; } }
     for (let index = phase.checkboxes.length - 1; index >= 0; index--) { const checkbox = phase.checkboxes[index]; if (distanceToSegment([checkbox[0], checkbox[1]], start, end) <= 75 + radius) { phase.checkboxes.splice(index, 1); erased.checkboxes.push({ index, checkbox }); changed = true; } }
     if (changed) this.redrawDrawing(); }
