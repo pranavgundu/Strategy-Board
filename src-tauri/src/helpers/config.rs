@@ -31,17 +31,17 @@ impl Config {
             field_real_width_inches: 690.875,
             field_real_height_inches: 317.0,
             red_one_station_x: 3575.0,
-            red_one_station_y: 455.0,
+            red_one_station_y: 1337.0,
             red_two_station_x: 3575.0,
-            red_two_station_y: 805.0,
+            red_two_station_y: 1022.0,
             red_three_station_x: 3575.0,
-            red_three_station_y: 1155.0,
+            red_three_station_y: 486.0,
             blue_one_station_x: -65.0,
-            blue_one_station_y: 455.0,
+            blue_one_station_y: 273.0,
             blue_two_station_x: -65.0,
-            blue_two_station_y: 805.0,
+            blue_two_station_y: 588.0,
             blue_three_station_x: -65.0,
-            blue_three_station_y: 1155.0,
+            blue_three_station_y: 1124.0,
             shared_tba_api_key: std::env::var("TBA_API_KEY")
                 .or_else(|_| std::env::var("VITE_TBA_API_KEY"))
                 .ok()
@@ -72,5 +72,21 @@ mod tests {
         ] {
             assert!(x.is_finite());
         }
+        assert_eq!(
+            [
+                config.red_three_station_y,
+                config.red_two_station_y,
+                config.red_one_station_y,
+            ],
+            [486.0, 1022.0, 1337.0]
+        );
+        assert_eq!(
+            [
+                config.blue_one_station_y,
+                config.blue_two_station_y,
+                config.blue_three_station_y,
+            ],
+            [273.0, 588.0, 1124.0]
+        );
     }
 }

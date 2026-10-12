@@ -4,6 +4,7 @@ import type {
   PdfDocumentPlan, QrProgress, StatboticsMatch, StatboticsTeamYear, StatboticsYear, TbaEvent,
   TbaMatch, TbaSimpleEvent, TbaSimpleMatch,
 } from "./types";
+import { fieldLayout } from "$lib/domain/field-layout";
 import { whiteboardMatchFromPacket, writeWhiteboardPacket } from "$lib/whiteboard/packet";
 
 const DB_NAME = "strategy-board-web";
@@ -92,15 +93,10 @@ function uuid(): string {
 }
 
 function positionsForYear(year?: number | null): FieldRobotPositions {
-  if (year && year < 2026) {
-    return {
-      red: { one: { x: 2055, y: 455 }, two: { x: 2055, y: 805 }, three: { x: 2055, y: 1155 } },
-      blue: { one: { x: 1455, y: 455 }, two: { x: 1455, y: 805 }, three: { x: 1455, y: 1155 } },
-    };
-  }
+  const { defaults } = fieldLayout(year);
   return {
-    red: { one: { x: 2680, y: 205 }, two: { x: 2680, y: 805 }, three: { x: 2680, y: 1405 } },
-    blue: { one: { x: 830, y: 205 }, two: { x: 830, y: 805 }, three: { x: 830, y: 1405 } },
+    red: { one: { ...defaults.redOne }, two: { ...defaults.redTwo }, three: { ...defaults.redThree } },
+    blue: { one: { ...defaults.blueOne }, two: { ...defaults.blueTwo }, three: { ...defaults.blueThree } },
   };
 }
 
@@ -347,10 +343,11 @@ function fuzzyMatch(searchTerm: string, target: string, originalTarget?: string)
   return cursor === query.length ? { score: Math.max(1, 50 - text.length + query.length), matchedIndices } : (originalTarget ? fuzzyMatch(searchTerm, originalTarget) : null);
 }
 
+const labels = fieldLayout().labels;
 const config: NativeConfig = {
   fieldPngPixelWidth: 3510, fieldPngPixelHeight: 1610, fieldRealWidthInches: 690.875, fieldRealHeightInches: 317,
-  redOneStationX: 3575, redOneStationY: 455, redTwoStationX: 3575, redTwoStationY: 805, redThreeStationX: 3575, redThreeStationY: 1155,
-  blueOneStationX: -65, blueOneStationY: 455, blueTwoStationX: -65, blueTwoStationY: 805, blueThreeStationX: -65, blueThreeStationY: 1155,
+  redOneStationX: labels.redOne.x, redOneStationY: labels.redOne.y, redTwoStationX: labels.redTwo.x, redTwoStationY: labels.redTwo.y, redThreeStationX: labels.redThree.x, redThreeStationY: labels.redThree.y,
+  blueOneStationX: labels.blueOne.x, blueOneStationY: labels.blueOne.y, blueTwoStationX: labels.blueTwo.x, blueTwoStationY: labels.blueTwo.y, blueThreeStationX: labels.blueThree.x, blueThreeStationY: labels.blueThree.y,
   sharedTbaApiKey: null,
 };
 

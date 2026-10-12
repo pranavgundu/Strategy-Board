@@ -1,5 +1,6 @@
 import field2025 from "../images/2025.png";
 import field2026 from "../images/2026.png";
+import { fieldLayout } from "$lib/domain/field-layout";
 import { canvasLayout, distanceToSegment, pointInRotatedRect, segmentTouchesBounds, segmentsIntersect, strokeBounds, type Point } from "./geometry";
 import { FIELD_HEIGHT, FIELD_WIDTH, MAX_HISTORY, type BoardPhaseName, type CheckboxAnnotation, type RobotPosition, type Stroke, type WhiteboardCommit, type WhiteboardControllerOptions, type WhiteboardMatch, type WhiteboardMode, type WhiteboardPhase, type WhiteboardRefs, type WhiteboardState, type WhiteboardTool } from "./types";
 
@@ -251,7 +252,8 @@ export class WhiteboardController {
     context.fillStyle = "#0d0d0d"; context.fillRect(0, 0, FIELD_WIDTH, FIELD_HEIGHT);
     if (this.image?.complete && this.image.naturalWidth) { const [x, y] = this.screen([0, 0]); context.drawImage(this.image, x, y, FIELD_WIDTH, FIELD_HEIGHT); }
     if (!this.match) return;
-    const teams: Array<[string, number, number]> = [[this.match.redOne, 3575, 455], [this.match.redTwo, 3575, 805], [this.match.redThree, 3575, 1155], [this.match.blueOne, -65, 455], [this.match.blueTwo, -65, 805], [this.match.blueThree, -65, 1155]];
+    const { labels } = fieldLayout(this.fieldYear());
+    const teams = slots.map((slot): [string, number, number] => [this.match![slot], labels[slot].x, labels[slot].y]);
     context.font = "bold 64px sans-serif"; context.fillStyle = "white"; context.textAlign = "center"; context.textBaseline = "middle";
     for (const [name, x, y] of teams) { if ((x > FIELD_WIDTH / 2 && this.view === "blue") || (x < FIELD_WIDTH / 2 && this.view === "red")) continue; const [sx, sy] = this.screen([x, y]); context.save(); context.translate(Math.max(70, Math.min(FIELD_WIDTH - 70, sx)), Math.max(70, Math.min(FIELD_HEIGHT - 70, sy))); context.rotate(Math.PI / 2); context.fillText(name, 0, 0); context.restore(); }
   }

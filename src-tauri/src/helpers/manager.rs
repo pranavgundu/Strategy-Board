@@ -57,7 +57,7 @@ const POSITIONS_2026: RobotPositions = RobotPositions {
     red: AlliancePositions {
         one: Point {
             x: 2680.0,
-            y: 205.0,
+            y: 1405.0,
         },
         two: Point {
             x: 2680.0,
@@ -65,7 +65,7 @@ const POSITIONS_2026: RobotPositions = RobotPositions {
         },
         three: Point {
             x: 2680.0,
-            y: 1405.0,
+            y: 205.0,
         },
     },
     blue: AlliancePositions {
@@ -186,10 +186,14 @@ mod tests {
         assert_ne!(p25.red.one.x, p26.red.one.x);
         assert_eq!(
             [p26.red.one.y, p26.red.two.y, p26.red.three.y],
+            [1405.0, 805.0, 205.0]
+        );
+        assert_eq!(
+            [p26.blue.one.y, p26.blue.two.y, p26.blue.three.y],
             [205.0, 805.0, 1405.0]
         );
         assert_eq!(p25.red.one.y, p25.blue.one.y);
         assert_eq!(p25.red.two.y, p25.blue.two.y);
-        assert_eq!(p26.red.three.y, p26.blue.three.y);
+        assert_eq!(p26.red.one.y, p26.blue.three.y);
     }
 }
