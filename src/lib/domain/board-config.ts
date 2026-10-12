@@ -1,15 +1,17 @@
+import { readChecklist, type ChecklistRow } from "./checklist";
 import { isObject } from "./json";
 import type { TeamColorOverrides } from "./team-colors";
 
 /** The device-level setup that travels together between tablets. */
 export interface BoardConfig {
+  checklist: ChecklistRow[];
   teamColors: TeamColorOverrides;
 }
 
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
 export function emptyBoardConfig(): BoardConfig {
-  return { teamColors: {} };
+  return { checklist: [], teamColors: {} };
 }
 
 /** A team number as the board stores it, or null when the text isn't one. */
@@ -28,7 +30,7 @@ export function readBoardConfig(value: unknown): BoardConfig {
       if (key && typeof color === "string" && HEX_COLOR.test(color)) teamColors[key] = color.toLowerCase();
     }
   }
-  return { teamColors };
+  return { checklist: readChecklist(source.checklist), teamColors };
 }
 
 export function setTeamColorOverride(config: BoardConfig, team: string, color: string): BoardConfig {

@@ -1,4 +1,5 @@
 import { parseNexusEvent, planSync } from "$lib/domain";
+import { newId } from "$lib/features/runtime";
 import { native } from "$lib/native/api";
 import type { SourceResponse } from "$lib/native/types";
 
@@ -19,10 +20,6 @@ let manualEventKey = $state<string | null>(null);
 let status = $state<SyncStatus>({ state: "idle", message: "", at: null });
 let loading: Promise<void> | null = null;
 let running: Promise<void> | null = null;
-
-function newId(): string {
-  return typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-}
 
 function failureMessage(response: SourceResponse, eventKey: string): string {
   switch (response.kind) {

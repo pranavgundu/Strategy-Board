@@ -1,4 +1,5 @@
 export * from "./board-config";
+export * from "./checklist";
 export * from "./extras";
 export * from "./field-layout";
 export * from "./files";
