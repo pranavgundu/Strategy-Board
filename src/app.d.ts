@@ -20,6 +20,7 @@ declare global {
 
   /** Build-time public client keys used by the browser service adapter. */
   const __TBA_API_KEY__: string;
+  const __NEXUS_API_KEY__: string;
 }
 
 export {};

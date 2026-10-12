@@ -5,7 +5,7 @@ import { browserInvoke } from "./web";
 import type {
   BoardMode, BoardState, BoardTool, CreateMatchInput, FieldRobotPositions,
   FuzzyBatchItem, FuzzyBatchMatch, FuzzyMatchResult, JsonValue, MatchPacket, NativeConfig,
-  PdfDocumentPlan, QrProgress, StatboticsMatch, StatboticsTeamYear, StatboticsYear, TbaEvent,
+  PdfDocumentPlan, QrProgress, SourceResponse, StatboticsMatch, StatboticsTeamYear, StatboticsYear, TbaEvent,
   TbaMatch, TbaSimpleEvent, TbaSimpleMatch,
 } from "./types";
 
@@ -82,6 +82,10 @@ export const native = {
     teamsAtEvent: (eventKey: string) => call<string[]>("tba_teams_at_event", { eventKey }),
     simpleEvents: (events: TbaEvent[]) => call<TbaSimpleEvent[]>("tba_simple_events", { events }),
     simpleMatches: (matches: TbaMatch[]) => call<TbaSimpleMatch[]>("tba_simple_matches", { matches }),
+  },
+  nexus: {
+    /** Live status of one event. Pass the last ETag so an unchanged schedule answers "not-modified". */
+    eventStatus: (eventKey: string, etag?: string | null) => call<SourceResponse>("nexus_event_status", { eventKey, etag: etag ?? null }),
   },
   statbotics: {
     cached: (matchKey: string) => call<JsonValue | null>("statbotics_cached", { matchKey }),

@@ -1,3 +1,4 @@
+import { toWhatIfMatch, type SyncPlan } from "$lib/domain";
 import { native } from "$lib/native/api";
 import type { Alliance, CreateMatchInput, MatchPacket, StrategyMatch } from "$lib/native/types";
 import { readLegacyMatchPackets } from "$lib/features/legacy-migration";
@@ -96,6 +97,7 @@ async function createMatch(inputOrName: CreateMatchInput | string, red?: readonl
 export const app = {
   get screen(): Screen { return screen; },
   get matches(): StrategyMatch[] { return packets.map(project); },
+  get packets(): readonly MatchPacket[] { return packets; },
   get activeMatch(): StrategyMatch | null {
     const packet = activeMatchId === null ? undefined : packets.find((item) => item[7] === activeMatchId);
     return packet ? project(packet) : null;
@@ -172,7 +174,7 @@ export const app = {
         ...(source[10] ? { tbaMatchKey: source[10] } : {}),
         ...(source[11] !== null && source[11] !== undefined ? { tbaYear: source[11] } : {}),
       });
-      const copy = structuredClone(source);
+      const copy = toWhatIfMatch(source);
       copy[0] = fresh[0];
       copy[7] = fresh[7];
       const newId = await native.model.addPacket(copy);
@@ -210,6 +212,16 @@ export const app = {
       const ids = await native.model.addPackets(imported);
       setPackets(await native.model.loadPackets());
       return ids;
+    });
+  },
+
+  /** Adds and updates the Synced Matches of one sync plan in a single queued write. */
+  async applySyncPlan(plan: SyncPlan): Promise<void> {
+    if (!plan.add.length && !plan.update.length) return;
+    await queueWrite(async () => {
+      if (plan.add.length) await native.model.addPackets(plan.add);
+      for (const packet of plan.update) await native.model.replacePacket(packet);
+      setPackets(await native.model.loadPackets());
     });
   },
 

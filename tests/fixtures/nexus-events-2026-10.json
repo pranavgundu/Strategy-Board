@@ -1,0 +1,107 @@
+{
+  "2026azrl": {
+    "name": "Arizona Robotics League Championship",
+    "start": 1792738800000,
+    "end": 1792864800000
+  },
+  "2026cabl": {
+    "name": "Beach Blitz",
+    "start": 1793368800000,
+    "end": 1793584800000
+  },
+  "2026cacc": {
+    "name": "Capital City Classic",
+    "start": 1792764000000,
+    "end": 1792976400000
+  },
+  "2026cacg": {
+    "name": "CalGames",
+    "start": 1792159200000,
+    "end": 1792371600000
+  },
+  "2026cttd": {
+    "name": "Cow Town Throwdown",
+    "start": 1792738800000,
+    "end": 1792864800000
+  },
+  "2026gagai1": {
+    "name": "GRITS",
+    "start": 1792148400000,
+    "end": 1792281600000
+  },
+  "2026mexas": {
+    "name": "Mexico ALL-STAR",
+    "start": 1792069200000,
+    "end": 1792281600000
+  },
+  "2026mimid1": {
+    "name": "Great Lakes Bay Bot Bash",
+    "start": 1793358000000,
+    "end": 1793491200000
+  },
+  "2026mttd": {
+    "name": "MadTown Throwdown",
+    "start": 1793977200000,
+    "end": 1794189600000
+  },
+  "2026ncfay": {
+    "name": "Doyenne Inspiration East",
+    "start": 1792234800000,
+    "end": 1792281600000
+  },
+  "2026ncfay1": {
+    "name": "THOR East",
+    "start": 1792321200000,
+    "end": 1792368000000
+  },
+  "2026ncrut": {
+    "name": "THOR West",
+    "start": 1792839600000,
+    "end": 1792886400000
+  },
+  "2026nhalt": {
+    "name": "Battle of the Bay",
+    "start": 1794052800000,
+    "end": 1794099600000
+  },
+  "2026nhalt1": {
+    "name": "Girls Behind the Glass",
+    "start": 1794139200000,
+    "end": 1794186000000
+  },
+  "2026nhman": {
+    "name": "RiverRage 29",
+    "start": 1792839600000,
+    "end": 1792886400000
+  },
+  "2026nydix": {
+    "name": "Half Hollow Hills Robotics Invitational",
+    "start": 1793534400000,
+    "end": 1793581200000
+  },
+  "2026ohwar": {
+    "name": "Voltage Valley Vibe",
+    "start": 1792234800000,
+    "end": 1792281600000
+  },
+  "2026vagle1": {
+    "name": "Rumble 11",
+    "start": 1792839600000,
+    "end": 1792972800000
+  },
+  "2026wamil": {
+    "name": "PNW Block Party",
+    "start": 1792850400000,
+    "end": 1792983600000
+  },
+  "2026wimil": {
+    "name": "SHOUT Robotics Competition",
+    "start": 1792238400000,
+    "end": 1792285200000
+  },
+  "2027mnbt": {
+    "name": "Blue Twilight Week Zero",
+    "start": 1803128400000,
+    "end": 1803254400000
+  }
+}

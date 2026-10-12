@@ -915,8 +915,7 @@ body {
     #tba-import-container > div,
     #create-match-container > div,
     #edit-match-container > div,
-    #clear-confirm-container > div,
-    #team-number-popup > div {
+    #clear-confirm-container > div {
         max-height: calc(100dvh - 1rem) !important;
     }
     #tba-import-container > div,

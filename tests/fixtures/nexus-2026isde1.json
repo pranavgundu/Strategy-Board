@@ -1,0 +1,779 @@
+{
+  "eventKey": "2026isde1",
+  "dataAsOfTime": 1791817120667,
+  "matches": [
+    {
+      "label": "Practice 1",
+      "status": "On field",
+      "redTeams": [
+        "1574",
+        "9303",
+        "7039"
+      ],
+      "blueTeams": [
+        "4586",
+        "8223",
+        "3065"
+      ],
+      "times": {
+        "scheduledStartTime": 1782633600000,
+        "estimatedQueueTime": 1782632880406,
+        "estimatedOnDeckTime": 1782632880406,
+        "estimatedOnFieldTime": 1782634298310,
+        "estimatedStartTime": 1782634718310,
+        "actualQueueTime": 1782632880406,
+        "actualOnDeckTime": 1782632880406,
+        "actualOnFieldTime": 1782634298310
+      }
+    },
+    {
+      "label": "Practice 3",
+      "status": "On field",
+      "redTeams": [
+        "1577",
+        "3211",
+        "1690"
+      ],
+      "blueTeams": [
+        "2679",
+        "3835",
+        "7067"
+      ],
+      "times": {
+        "scheduledStartTime": 1782634800000,
+        "estimatedQueueTime": 1782634298364,
+        "estimatedOnDeckTime": 1782634791024,
+        "estimatedOnFieldTime": 1782635781216,
+        "estimatedStartTime": 1782636201216,
+        "actualQueueTime": 1782634298364,
+        "actualOnDeckTime": 1782634791024,
+        "actualOnFieldTime": 1782635781216
+      }
+    },
+    {
+      "label": "Practice 9",
+      "status": "On field",
+      "redTeams": [
+        "3083",
+        "7039",
+        "9740"
+      ],
+      "blueTeams": [
+        "1690",
+        "5135",
+        "1574"
+      ],
+      "times": {
+        "scheduledStartTime": 1782638400000,
+        "estimatedQueueTime": 1782639075208,
+        "estimatedOnDeckTime": 1782639919833,
+        "estimatedOnFieldTime": 1782639930723,
+        "estimatedStartTime": 1782640350723,
+        "actualQueueTime": 1782639075208,
+        "actualOnDeckTime": 1782639919833,
+        "actualOnFieldTime": 1782639930723
+      }
+    },
+    {
+      "label": "Qualification 1",
+      "status": "On field",
+      "redTeams": [
+        "9739",
+        "10935",
+        "6738"
+      ],
+      "blueTeams": [
+        "5135",
+        "3065",
+        "3083"
+      ],
+      "times": {
+        "scheduledStartTime": 1782642600000,
+        "estimatedQueueTime": 1782642725633,
+        "estimatedOnDeckTime": 1782642725633,
+        "estimatedOnFieldTime": 1782643675218,
+        "estimatedStartTime": 1782644035218,
+        "actualQueueTime": 1782642725633,
+        "actualOnDeckTime": 1782642725633,
+        "actualOnFieldTime": 1782643675218
+      }
+    },
+    {
+      "label": "Qualification 2",
+      "status": "On field",
+      "redTeams": [
+        "9740",
+        "9738",
+        "1574"
+      ],
+      "blueTeams": [
+        "1690",
+        "7039",
+        "2231"
+      ],
+      "times": {
+        "scheduledStartTime": 1782643140000,
+        "estimatedQueueTime": 1782642726015,
+        "estimatedOnDeckTime": 1782643675231,
+        "estimatedOnFieldTime": 1782643881166,
+        "estimatedStartTime": 1782644241166,
+        "actualQueueTime": 1782642726015,
+        "actualOnDeckTime": 1782643675231,
+        "actualOnFieldTime": 1782643881166
+      }
+    },
+    {
+      "label": "Qualification 9",
+      "status": "On field",
+      "redTeams": [
+        "1690",
+        "5635",
+        "4416"
+      ],
+      "blueTeams": [
+        "9739",
+        "4586",
+        "3339"
+      ],
+      "times": {
+        "scheduledStartTime": 1782646920000,
+        "estimatedQueueTime": 1782646561667,
+        "estimatedOnDeckTime": 1782647228838,
+        "estimatedOnFieldTime": 1782648011565,
+        "estimatedStartTime": 1782648371565,
+        "actualQueueTime": 1782646561667,
+        "actualOnDeckTime": 1782647228838,
+        "actualOnFieldTime": 1782648011565
+      }
+    },
+    {
+      "label": "Qualification 13",
+      "status": "On field",
+      "redTeams": [
+        "4586",
+        "2679",
+        "5635"
+      ],
+      "blueTeams": [
+        "1574",
+        "9739",
+        "1690"
+      ],
+      "times": {
+        "scheduledStartTime": 1782649080000,
+        "estimatedQueueTime": 1782649445213,
+        "estimatedOnDeckTime": 1782649602643,
+        "estimatedOnFieldTime": 1782650251037,
+        "estimatedStartTime": 1782650611037,
+        "actualQueueTime": 1782649445213,
+        "actualOnDeckTime": 1782649602643,
+        "actualOnFieldTime": 1782650251037
+      }
+    },
+    {
+      "label": "Qualification 16",
+      "status": "On field",
+      "redTeams": [
+        "8223",
+        "3065",
+        "9739"
+      ],
+      "blueTeams": [
+        "4586",
+        "11480",
+        "1690"
+      ],
+      "times": {
+        "scheduledStartTime": 1782650700000,
+        "estimatedQueueTime": 1782650663566,
+        "estimatedOnDeckTime": 1782651113585,
+        "estimatedOnFieldTime": 1782652053818,
+        "estimatedStartTime": 1782652413818,
+        "actualQueueTime": 1782650663566,
+        "actualOnDeckTime": 1782651113585,
+        "actualOnFieldTime": 1782652053818
+      }
+    },
+    {
+      "label": "Qualification 19",
+      "status": "On field",
+      "redTeams": [
+        "3065",
+        "2231",
+        "1690"
+      ],
+      "blueTeams": [
+        "4416",
+        "1580",
+        "8223"
+      ],
+      "times": {
+        "scheduledStartTime": 1782653220000,
+        "estimatedQueueTime": 1782653200128,
+        "estimatedOnDeckTime": 1782653553879,
+        "estimatedOnFieldTime": 1782654431369,
+        "estimatedStartTime": 1782654791369,
+        "actualQueueTime": 1782653200128,
+        "actualOnDeckTime": 1782653553879,
+        "actualOnFieldTime": 1782654431369
+      }
+    },
+    {
+      "label": "Qualification 27",
+      "status": "On field",
+      "redTeams": [
+        "1574",
+        "4590",
+        "10986"
+      ],
+      "blueTeams": [
+        "5635",
+        "1690",
+        "10935"
+      ],
+      "times": {
+        "scheduledStartTime": 1782657540000,
+        "estimatedQueueTime": 1782658346723,
+        "estimatedOnDeckTime": 1782659226548,
+        "estimatedOnFieldTime": 1782659756983,
+        "estimatedStartTime": 1782660116983,
+        "actualQueueTime": 1782658346723,
+        "actualOnDeckTime": 1782659226548,
+        "actualOnFieldTime": 1782659756983
+      }
+    },
+    {
+      "label": "Qualification 32",
+      "status": "On field",
+      "redTeams": [
+        "4590",
+        "1690",
+        "6738"
+      ],
+      "blueTeams": [
+        "3211",
+        "4416",
+        "7039"
+      ],
+      "times": {
+        "scheduledStartTime": 1782710820000,
+        "estimatedQueueTime": 1782709877842,
+        "estimatedOnDeckTime": 1782710119407,
+        "estimatedOnFieldTime": 1782710579441,
+        "estimatedStartTime": 1782710939441,
+        "actualQueueTime": 1782709877842,
+        "actualOnDeckTime": 1782710119407,
+        "actualOnFieldTime": 1782710579441
+      }
+    },
+    {
+      "label": "Qualification 36",
+      "status": "On field",
+      "redTeams": [
+        "1577",
+        "5635",
+        "5135"
+      ],
+      "blueTeams": [
+        "3835",
+        "1580",
+        "1690"
+      ],
+      "times": {
+        "scheduledStartTime": 1782712980000,
+        "estimatedQueueTime": 1782711690834,
+        "estimatedOnDeckTime": 1782712120808,
+        "estimatedOnFieldTime": 1782712578507,
+        "estimatedStartTime": 1782712938507,
+        "actualQueueTime": 1782711690834,
+        "actualOnDeckTime": 1782712120808,
+        "actualOnFieldTime": 1782712578507
+      }
+    },
+    {
+      "label": "Qualification 41",
+      "status": "On field",
+      "redTeams": [
+        "1577",
+        "1690",
+        "3211"
+      ],
+      "blueTeams": [
+        "5635",
+        "9303",
+        "2231"
+      ],
+      "times": {
+        "scheduledStartTime": 1782715680000,
+        "estimatedQueueTime": 1782714571940,
+        "estimatedOnDeckTime": 1782715054648,
+        "estimatedOnFieldTime": 1782715556303,
+        "estimatedStartTime": 1782715916303,
+        "actualQueueTime": 1782714571940,
+        "actualOnDeckTime": 1782715054648,
+        "actualOnFieldTime": 1782715556303
+      }
+    },
+    {
+      "label": "Qualification 45",
+      "status": "On field",
+      "redTeams": [
+        "1690",
+        "10986",
+        "5135"
+      ],
+      "blueTeams": [
+        "7067",
+        "1577",
+        "1574"
+      ],
+      "times": {
+        "scheduledStartTime": 1782717840000,
+        "estimatedQueueTime": 1782717761602,
+        "estimatedOnDeckTime": 1782718361249,
+        "estimatedOnFieldTime": 1782718581139,
+        "estimatedStartTime": 1782718941139,
+        "actualQueueTime": 1782717761602,
+        "actualOnDeckTime": 1782718361249,
+        "actualOnFieldTime": 1782718581139
+      }
+    },
+    {
+      "label": "Qualification 50",
+      "status": "On field",
+      "redTeams": [
+        "10935",
+        "11480",
+        "3211"
+      ],
+      "blueTeams": [
+        "1690",
+        "9303",
+        "9738"
+      ],
+      "times": {
+        "scheduledStartTime": 1782720540000,
+        "estimatedQueueTime": 1782720706242,
+        "estimatedOnDeckTime": 1782721382611,
+        "estimatedOnFieldTime": 1782721639317,
+        "estimatedStartTime": 1782721999317,
+        "actualQueueTime": 1782720706242,
+        "actualOnDeckTime": 1782721382611,
+        "actualOnFieldTime": 1782721639317
+      }
+    },
+    {
+      "label": "Qualification 53",
+      "status": "On field",
+      "redTeams": [
+        "10935",
+        "3065",
+        "1577"
+      ],
+      "blueTeams": [
+        "9740",
+        "1690",
+        "7067"
+      ],
+      "times": {
+        "scheduledStartTime": 1782722160000,
+        "estimatedQueueTime": 1782722108917,
+        "estimatedOnDeckTime": 1782722995135,
+        "estimatedOnFieldTime": 1782723642632,
+        "estimatedStartTime": 1782724002632,
+        "actualQueueTime": 1782722108917,
+        "actualOnDeckTime": 1782722995135,
+        "actualOnFieldTime": 1782723642632
+      }
+    },
+    {
+      "label": "Playoff 1",
+      "status": "On field",
+      "redTeams": [
+        "1690",
+        "2231",
+        "11480"
+      ],
+      "blueTeams": [
+        "1580",
+        "7067",
+        "3211"
+      ],
+      "times": {
+        "scheduledStartTime": 1782730800000,
+        "estimatedQueueTime": 1782731427221,
+        "estimatedOnDeckTime": 1782731427221,
+        "estimatedOnFieldTime": 1782731446428,
+        "estimatedStartTime": 1782731806428,
+        "actualQueueTime": 1782731427221,
+        "actualOnDeckTime": 1782731427221,
+        "actualOnFieldTime": 1782731446428
+      }
+    },
+    {
+      "label": "Playoff 2",
+      "status": "On field",
+      "redTeams": [
+        "4586",
+        "8223",
+        "6738"
+      ],
+      "blueTeams": [
+        "1574",
+        "3083",
+        "10935"
+      ],
+      "times": {
+        "scheduledStartTime": 1782731340000,
+        "estimatedQueueTime": 1782731427321,
+        "estimatedOnDeckTime": 1782731446444,
+        "estimatedOnFieldTime": 1782731466619,
+        "estimatedStartTime": 1782731826619,
+        "actualQueueTime": 1782731427321,
+        "actualOnDeckTime": 1782731446444,
+        "actualOnFieldTime": 1782731466619
+      }
+    },
+    {
+      "label": "Playoff 3",
+      "status": "On field",
+      "redTeams": [
+        "4590",
+        "1577",
+        "2679"
+      ],
+      "blueTeams": [
+        "9303",
+        "3065",
+        "9740"
+      ],
+      "times": {
+        "scheduledStartTime": 1782731880000,
+        "estimatedQueueTime": 1782731446509,
+        "estimatedOnDeckTime": 1782731466632,
+        "estimatedOnFieldTime": 1782732032188,
+        "estimatedStartTime": 1782732392188,
+        "actualQueueTime": 1782731446509,
+        "actualOnDeckTime": 1782731466632,
+        "actualOnFieldTime": 1782732032188
+      }
+    },
+    {
+      "label": "Playoff 4",
+      "status": "On field",
+      "redTeams": [
+        "7039",
+        "3339",
+        "5135"
+      ],
+      "blueTeams": [
+        "3835",
+        "4416",
+        "9738"
+      ],
+      "times": {
+        "scheduledStartTime": 1782732420000,
+        "estimatedQueueTime": 1782731467123,
+        "estimatedOnDeckTime": 1782732032209,
+        "estimatedOnFieldTime": 1782732430722,
+        "estimatedStartTime": 1782732790722,
+        "actualQueueTime": 1782731467123,
+        "actualOnDeckTime": 1782732032209,
+        "actualOnFieldTime": 1782732430722
+      }
+    },
+    {
+      "label": "Playoff 5",
+      "status": "On field",
+      "redTeams": [
+        "1580",
+        "7067",
+        "3211"
+      ],
+      "blueTeams": [
+        "4586",
+        "8223",
+        "6738"
+      ],
+      "times": {
+        "scheduledStartTime": 1782732960000,
+        "estimatedQueueTime": 1782732032274,
+        "estimatedOnDeckTime": 1782732430737,
+        "estimatedOnFieldTime": 1782733061740,
+        "estimatedStartTime": 1782733421740,
+        "actualQueueTime": 1782732032274,
+        "actualOnDeckTime": 1782732430737,
+        "actualOnFieldTime": 1782733061740
+      }
+    },
+    {
+      "label": "Playoff 6",
+      "status": "On field",
+      "redTeams": [
+        "9303",
+        "3065",
+        "9740",
+        "9739"
+      ],
+      "blueTeams": [
+        "3835",
+        "4416",
+        "9738"
+      ],
+      "times": {
+        "scheduledStartTime": 1782733500000,
+        "estimatedQueueTime": 1782733061756,
+        "estimatedOnDeckTime": 1782733061756,
+        "estimatedOnFieldTime": 1782734025207,
+        "estimatedStartTime": 1782734385207,
+        "actualQueueTime": 1782733061756,
+        "actualOnDeckTime": 1782733061756,
+        "actualOnFieldTime": 1782734025207
+      }
+    },
+    {
+      "label": "Playoff 7",
+      "status": "On field",
+      "redTeams": [
+        "1690",
+        "2231",
+        "11480"
+      ],
+      "blueTeams": [
+        "1574",
+        "3083",
+        "10935"
+      ],
+      "times": {
+        "scheduledStartTime": 1782734040000,
+        "estimatedQueueTime": 1782733061852,
+        "estimatedOnDeckTime": 1782734025235,
+        "estimatedOnFieldTime": 1782734844182,
+        "estimatedStartTime": 1782735204182,
+        "actualQueueTime": 1782733061852,
+        "actualOnDeckTime": 1782734025235,
+        "actualOnFieldTime": 1782734844182
+      }
+    },
+    {
+      "label": "Playoff 8",
+      "status": "On field",
+      "redTeams": [
+        "4590",
+        "1577",
+        "2679"
+      ],
+      "blueTeams": [
+        "7039",
+        "3339",
+        "5135"
+      ],
+      "times": {
+        "scheduledStartTime": 1782734580000,
+        "estimatedQueueTime": 1782734025370,
+        "estimatedOnDeckTime": 1782734844206,
+        "estimatedOnFieldTime": 1782736111684,
+        "estimatedStartTime": 1782736471684,
+        "actualQueueTime": 1782734025370,
+        "actualOnDeckTime": 1782734844206,
+        "actualOnFieldTime": 1782736111684
+      }
+    },
+    {
+      "label": "Playoff 9",
+      "status": "On field",
+      "redTeams": [
+        "1574",
+        "3083",
+        "10935"
+      ],
+      "blueTeams": [
+        "3835",
+        "4416",
+        "9738"
+      ],
+      "times": {
+        "scheduledStartTime": 1782735120000,
+        "estimatedQueueTime": 1782736111709,
+        "estimatedOnDeckTime": 1782736111709,
+        "estimatedOnFieldTime": 1782736360063,
+        "estimatedStartTime": 1782736720063,
+        "actualQueueTime": 1782736111709,
+        "actualOnDeckTime": 1782736111709,
+        "actualOnFieldTime": 1782736360063
+      }
+    },
+    {
+      "label": "Playoff 10",
+      "status": "On field",
+      "redTeams": [
+        "7039",
+        "3339",
+        "5135"
+      ],
+      "blueTeams": [
+        "4586",
+        "8223",
+        "6738"
+      ],
+      "times": {
+        "scheduledStartTime": 1782735660000,
+        "estimatedQueueTime": 1782736360091,
+        "estimatedOnDeckTime": 1782736360091,
+        "estimatedOnFieldTime": 1782736902805,
+        "estimatedStartTime": 1782737262805,
+        "actualQueueTime": 1782736360091,
+        "actualOnDeckTime": 1782736360091,
+        "actualOnFieldTime": 1782736902805
+      },
+      "breakAfter": "Break"
+    },
+    {
+      "label": "Playoff 11",
+      "status": "On field",
+      "redTeams": [
+        "1690",
+        "2231",
+        "11480"
+      ],
+      "blueTeams": [
+        "4590",
+        "1577",
+        "2679"
+      ],
+      "times": {
+        "scheduledStartTime": 1782736380000,
+        "estimatedQueueTime": 1782736902830,
+        "estimatedOnDeckTime": 1782737523840,
+        "estimatedOnFieldTime": 1782738219147,
+        "estimatedStartTime": 1782738399147,
+        "actualQueueTime": 1782736902830,
+        "actualOnDeckTime": 1782737523840,
+        "actualOnFieldTime": 1782738219147
+      }
+    },
+    {
+      "label": "Playoff 12",
+      "status": "On field",
+      "redTeams": [
+        "7039",
+        "3339",
+        "5135"
+      ],
+      "blueTeams": [
+        "1574",
+        "3083",
+        "10935"
+      ],
+      "times": {
+        "scheduledStartTime": 1782736920000,
+        "estimatedQueueTime": 1782737524372,
+        "estimatedOnDeckTime": 1782738219167,
+        "estimatedOnFieldTime": 1782738829863,
+        "estimatedStartTime": 1782739189863,
+        "actualQueueTime": 1782737524372,
+        "actualOnDeckTime": 1782738219167,
+        "actualOnFieldTime": 1782738829863
+      },
+      "breakAfter": "Awards break"
+    },
+    {
+      "label": "Playoff 13",
+      "status": "On field",
+      "redTeams": [
+        "4590",
+        "1577",
+        "2679"
+      ],
+      "blueTeams": [
+        "1574",
+        "3083",
+        "10935"
+      ],
+      "times": {
+        "scheduledStartTime": 1782738180000,
+        "estimatedQueueTime": 1782739621023,
+        "estimatedOnDeckTime": 1782739621023,
+        "estimatedOnFieldTime": 1782740395643,
+        "estimatedStartTime": 1782740575643,
+        "actualQueueTime": 1782739621023,
+        "actualOnDeckTime": 1782739621023,
+        "actualOnFieldTime": 1782740395643
+      },
+      "breakAfter": "Awards break"
+    },
+    {
+      "label": "Final 1",
+      "status": "On field",
+      "redTeams": [
+        "1690",
+        "2231",
+        "11480"
+      ],
+      "blueTeams": [
+        "4590",
+        "1577",
+        "2679"
+      ],
+      "times": {
+        "scheduledStartTime": 1782739440000,
+        "estimatedQueueTime": 1782741584456,
+        "estimatedOnDeckTime": 1782741584456,
+        "estimatedOnFieldTime": 1782742311289,
+        "estimatedStartTime": 1782742491289,
+        "actualQueueTime": 1782741584456,
+        "actualOnDeckTime": 1782741584456,
+        "actualOnFieldTime": 1782742311289
+      },
+      "breakAfter": "Awards break"
+    },
+    {
+      "label": "Final 2",
+      "status": "On field",
+      "redTeams": [
+        "1690",
+        "2231",
+        "11480"
+      ],
+      "blueTeams": [
+        "4590",
+        "1577",
+        "2679"
+      ],
+      "times": {
+        "scheduledStartTime": 1782740700000,
+        "estimatedQueueTime": 1782743146857,
+        "estimatedOnDeckTime": 1782743146857,
+        "estimatedOnFieldTime": 1782743828196,
+        "estimatedStartTime": 1782744008196,
+        "actualQueueTime": 1782743146857,
+        "actualOnDeckTime": 1782743146857,
+        "actualOnFieldTime": 1782743828196
+      },
+      "breakAfter": "Awards break"
+    },
+    {
+      "label": "Final 3",
+      "status": "Queuing soon",
+      "redTeams": [
+        "1690",
+        "2231",
+        "11480"
+      ],
+      "blueTeams": [
+        "4590",
+        "1577",
+        "2679"
+      ],
+      "times": {
+        "scheduledStartTime": 1782741960000,
+        "estimatedQueueTime": 1791817120667,
+        "estimatedOnDeckTime": 1791817120667,
+        "estimatedOnFieldTime": 1791818020667,
+        "estimatedStartTime": 1791818200667
+      }
+    }
+  ],
+  "announcements": [],
+  "partsRequests": []
+}

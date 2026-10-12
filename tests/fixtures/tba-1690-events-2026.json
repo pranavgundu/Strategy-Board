@@ -1,0 +1,305 @@
+[
+  {
+    "key": "2026cmptx",
+    "name": "Einstein Field",
+    "short_name": "Einstein",
+    "event_code": "cmptx",
+    "event_type": 4,
+    "event_type_string": "Championship Finals",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "district": null,
+    "division_keys": [
+      "2026arc",
+      "2026cur",
+      "2026dal",
+      "2026gal",
+      "2026hop",
+      "2026joh",
+      "2026mil",
+      "2026new"
+    ],
+    "first_event_id": null,
+    "first_event_code": "cmptx",
+    "year": 2026,
+    "timezone": "America/Chicago",
+    "week": null,
+    "website": "https://www.firstchampionship.org",
+    "remap_teams": null,
+    "city": "Houston",
+    "state_prov": "TX",
+    "country": "USA",
+    "postal_code": "77010",
+    "lat": null,
+    "lng": null,
+    "location_name": "George R. Brown Convention Center",
+    "address": "1001 Avenida De Las Americas",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "start_date": "2026-05-02",
+    "end_date": "2026-05-02",
+    "webcasts": [
+      {
+        "type": "youtube",
+        "channel": "11EJNc9VMn8",
+        "date": "2026-04-30"
+      },
+      {
+        "type": "youtube",
+        "channel": "dtP3LZMkgqQ",
+        "date": "2026-05-01"
+      },
+      {
+        "type": "youtube",
+        "channel": "HkI21hq7dIw",
+        "date": "2026-05-02"
+      },
+      {
+        "type": "youtube",
+        "channel": "pDb17D4Jchk",
+        "date": "2026-05-02"
+      },
+      {
+        "type": "youtube",
+        "channel": "cqLLqH7lr1E",
+        "date": "2026-05-02"
+      },
+      {
+        "type": "youtube",
+        "channel": "MFGaMe0zSA8",
+        "date": "2026-05-02"
+      }
+    ]
+  },
+  {
+    "key": "2026gal",
+    "name": "Galileo Division",
+    "short_name": "Galileo",
+    "event_code": "gal",
+    "event_type": 3,
+    "event_type_string": "Championship Division",
+    "parent_event_key": "2026cmptx",
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "district": null,
+    "division_keys": [],
+    "first_event_id": null,
+    "first_event_code": "galileo",
+    "year": 2026,
+    "timezone": "America/Chicago",
+    "week": null,
+    "website": "https://www.firstchampionship.org",
+    "remap_teams": null,
+    "city": "Houston",
+    "state_prov": "TX",
+    "country": "USA",
+    "postal_code": "77010",
+    "lat": null,
+    "lng": null,
+    "location_name": "George R. Brown Convention Center",
+    "address": "1001 Avenida De Las Americas",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "start_date": "2026-04-29",
+    "end_date": "2026-05-02",
+    "webcasts": [
+      {
+        "type": "youtube",
+        "channel": "KQXK4qA41EM",
+        "date": "2026-04-29"
+      },
+      {
+        "type": "youtube",
+        "channel": "g1iPzNURUgY",
+        "date": "2026-04-30"
+      },
+      {
+        "type": "youtube",
+        "channel": "9njBqpH4fhA",
+        "date": "2026-05-01"
+      },
+      {
+        "type": "youtube",
+        "channel": "9xPUOKbzvqw",
+        "date": "2026-05-02"
+      }
+    ]
+  },
+  {
+    "key": "2026iscmp",
+    "name": "FIRST Israel District Championship",
+    "short_name": "Israel",
+    "event_code": "iscmp",
+    "event_type": 2,
+    "event_type_string": "District Championship",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "district": {
+      "key": "2026isr",
+      "year": 2026,
+      "abbreviation": "isr",
+      "display_name": "FIRST Israel",
+      "official_advancement_counts": {
+        "dcmp": 42,
+        "cmp": 12
+      }
+    },
+    "division_keys": [],
+    "first_event_id": null,
+    "first_event_code": "iscmp",
+    "year": 2026,
+    "timezone": "Asia/Jerusalem",
+    "week": 18,
+    "website": "http://firstisrael.org.il",
+    "remap_teams": null,
+    "city": "Hadera",
+    "state_prov": "M",
+    "country": "Israel",
+    "postal_code": null,
+    "lat": null,
+    "lng": null,
+    "location_name": "Enerbox",
+    "address": "Mishmar Hagvul 5",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "start_date": "2026-07-06",
+    "end_date": "2026-07-08",
+    "webcasts": [
+      {
+        "type": "youtube",
+        "channel": "wNrg2AAfQVk",
+        "date": "2026-07-07"
+      },
+      {
+        "type": "youtube",
+        "channel": "Ju01LOKcEdk",
+        "date": "2026-07-08"
+      }
+    ]
+  },
+  {
+    "key": "2026isde1",
+    "name": "ISR District Event #1",
+    "short_name": "ISR #1",
+    "event_code": "isde1",
+    "event_type": 1,
+    "event_type_string": "District",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "district": {
+      "key": "2026isr",
+      "year": 2026,
+      "abbreviation": "isr",
+      "display_name": "FIRST Israel",
+      "official_advancement_counts": {
+        "dcmp": 42,
+        "cmp": 12
+      }
+    },
+    "division_keys": [],
+    "first_event_id": null,
+    "first_event_code": "isde1",
+    "year": 2026,
+    "timezone": "Asia/Jerusalem",
+    "week": 16,
+    "website": "http://firstisrael.org.il",
+    "remap_teams": null,
+    "city": "Natanya",
+    "state_prov": "M",
+    "country": "Israel",
+    "postal_code": null,
+    "lat": null,
+    "lng": null,
+    "location_name": "Arena Natanya",
+    "address": "Haltztadion St 1",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "start_date": "2026-06-28",
+    "end_date": "2026-06-29",
+    "webcasts": [
+      {
+        "type": "youtube",
+        "channel": "jfRHcBNhMkA",
+        "date": "2026-06-28"
+      }
+    ]
+  },
+  {
+    "key": "2026isde3",
+    "name": "ISR District Event #3",
+    "short_name": "ISR #3",
+    "event_code": "isde3",
+    "event_type": 1,
+    "event_type_string": "District",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "district": {
+      "key": "2026isr",
+      "year": 2026,
+      "abbreviation": "isr",
+      "display_name": "FIRST Israel",
+      "official_advancement_counts": {
+        "dcmp": 42,
+        "cmp": 12
+      }
+    },
+    "division_keys": [],
+    "first_event_id": null,
+    "first_event_code": "isde3",
+    "year": 2026,
+    "timezone": "Asia/Jerusalem",
+    "week": 1,
+    "website": "http://firstisrael.org.il",
+    "remap_teams": null,
+    "city": "Hadera",
+    "state_prov": "M",
+    "country": "Israel",
+    "postal_code": null,
+    "lat": null,
+    "lng": null,
+    "location_name": "Enerbox",
+    "address": "Mishmar Hagvul 5",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "start_date": "2026-03-15",
+    "end_date": "2026-03-17",
+    "webcasts": []
+  },
+  {
+    "key": "2026isrtp",
+    "name": "Israel Team Practice",
+    "short_name": "",
+    "event_code": "isrtp",
+    "event_type": 99,
+    "event_type_string": "Offseason",
+    "parent_event_key": null,
+    "playoff_type": 1,
+    "playoff_type_string": "Elimination Bracket (16 Alliances)",
+    "district": null,
+    "division_keys": [],
+    "first_event_id": null,
+    "first_event_code": null,
+    "year": 2026,
+    "timezone": "Asia/Jerusalem",
+    "week": null,
+    "website": "https://www.chiefdelphi.com/t/single-team-auditions-for-cmp-in-israel/516978/65",
+    "remap_teams": null,
+    "city": "Beit Yanai",
+    "state_prov": "HaMerkaz",
+    "country": "Israel",
+    "postal_code": null,
+    "lat": null,
+    "lng": null,
+    "location_name": "Hadassah Neurim",
+    "address": "Hadassah Neurim\r\nHadassah Neurim\r\nBeit Yanai, HaMerkaz, Israel",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "start_date": "2026-04-03",
+    "end_date": "2026-04-03",
+    "webcasts": []
+  }
+]

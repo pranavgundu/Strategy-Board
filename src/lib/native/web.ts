@@ -1,16 +1,18 @@
 import type {
   BoardMode, BoardState, BoardTool, CreateMatchInput, FieldRobotPositions,
   FuzzyBatchItem, FuzzyBatchMatch, FuzzyMatchResult, JsonValue, MatchPacket, NativeConfig,
-  PdfDocumentPlan, QrProgress, StatboticsMatch, StatboticsTeamYear, StatboticsYear, TbaEvent,
+  PdfDocumentPlan, QrProgress, SourceResponse, StatboticsMatch, StatboticsTeamYear, StatboticsYear, TbaEvent,
   TbaMatch, TbaSimpleEvent, TbaSimpleMatch,
 } from "./types";
 import { fieldLayout } from "$lib/domain/field-layout";
+import { newMatchPacket } from "$lib/domain/packets";
 import { whiteboardMatchFromPacket, writeWhiteboardPacket } from "$lib/whiteboard/packet";
 
 const DB_NAME = "strategy-board-web";
 const STORE_NAME = "keyval";
 const APP_DATA_KEY = "appData";
 const TBA_BASE = "https://www.thebluealliance.com/api/v3";
+const NEXUS_BASE = "https://frc.nexus/api/v1";
 const STATBOTICS_BASE = "https://api.statbotics.io/v3";
 const STATBOTICS_TTL_MS = 24 * 60 * 60 * 1000;
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -94,27 +96,8 @@ function positionsForYear(year?: number | null): FieldRobotPositions {
   };
 }
 
-function phasePacket(positions: FieldRobotPositions): JsonValue[] {
-  return [
-    [positions.red.one.x, positions.red.one.y, 0],
-    [positions.red.two.x, positions.red.two.y, 0],
-    [positions.red.three.x, positions.red.three.y, 0],
-    [positions.blue.one.x, positions.blue.one.y, 0],
-    [positions.blue.two.x, positions.blue.two.y, 0],
-    [positions.blue.three.x, positions.blue.three.y, 0],
-    [], [], [],
-  ];
-}
-
 export function createBrowserMatchPacket(input: CreateMatchInput, id = uuid()): MatchPacket {
-  if (input.redTeams.length !== 3 || input.blueTeams.length !== 3) throw new Error("A match requires exactly three teams per alliance");
-  const positions = positionsForYear(input.tbaYear);
-  const dimensions = Array.from({ length: 6 }, () => [152.4, 152.4]);
-  return [
-    String(input.matchName), ...input.redTeams.map(String), ...input.blueTeams.map(String), id,
-    [dimensions, phasePacket(positions), phasePacket(positions), phasePacket(positions), phasePacket(positions), phasePacket(positions)],
-    input.tbaEventKey ?? null, input.tbaMatchKey ?? null, input.tbaYear ?? null, null,
-  ] as unknown as MatchPacket;
+  return newMatchPacket(input, id);
 }
 
 export function normalizeBrowserMatchPacket(value: unknown): MatchPacket {
@@ -162,10 +145,37 @@ async function addPackets(values: MatchPacket[]): Promise<string[]> {
 }
 
 async function requestJson<T>(url: string, headers: HeadersInit = {}): Promise<T> {
-  if (navigator.onLine === false) throw new Error("You're offline. This needs an internet connection.");
+  if (isOffline()) throw new Error("You're offline. This needs an internet connection.");
   const response = await fetch(url, { headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   if (!response.ok) throw new Error(`Request failed (${response.status} ${response.statusText})`);
   return response.json() as Promise<T>;
+}
+
+function isOffline(): boolean {
+  return navigator.onLine === false;
+}
+
+async function sourceRequest(url: string, headers: Record<string, string>, etag?: string | null): Promise<SourceResponse> {
+  if (isOffline()) return { kind: "offline" };
+  try {
+    const response = await fetch(url, { headers: { ...headers, ...(etag ? { "If-None-Match": etag } : {}) }, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+    // nexus does not expose its etag to browsers, so a null etag here is normal and the http cache revalidates instead
+    const nextEtag = response.headers.get("etag");
+    if (response.status === 304) return { kind: "not-modified", etag: nextEtag ?? etag ?? null };
+    if (response.status === 401) return { kind: "missing-key" };
+    if (response.status === 403) return { kind: "rejected-key" };
+    if (response.status === 404) return { kind: "not-found" };
+    if (!response.ok) return { kind: "unreachable", detail: `${response.status} ${response.statusText}`.trim() };
+    return { kind: "ok", data: await response.json() as JsonValue, etag: nextEtag };
+  } catch (error) {
+    if (isOffline()) return { kind: "offline" };
+    return { kind: "unreachable", detail: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+function nexusRequest(path: string, etag?: string | null): Promise<SourceResponse> {
+  if (!__NEXUS_API_KEY__) return Promise.resolve({ kind: "missing-key" });
+  return sourceRequest(`${NEXUS_BASE}${path}`, { "Nexus-Api-Key": __NEXUS_API_KEY__ }, etag);
 }
 
 async function tbaRequest<T>(endpoint: string): Promise<T> {
@@ -314,6 +324,7 @@ export async function browserInvoke<TResult>(command: string, args: Record<strin
     case "model_clear_matches": await storageSet(APP_DATA_KEY, []); break;
     case "match_create_packet": result = createBrowserMatchPacket({ matchName: args.matchName, redTeams: args.redTeams, blueTeams: args.blueTeams, tbaEventKey: args.tbaEventKey, tbaMatchKey: args.tbaMatchKey, tbaYear: args.tbaYear } as CreateMatchInput); break;
     case "match_normalize_packet": result = normalizeBrowserMatchPacket(args.packet); break;
+    case "nexus_event_status": result = await nexusRequest(`/event/${encodeURIComponent(String(args.eventKey))}`, typeof args.etag === "string" ? args.etag : null); break;
     case "tba_set_api_key": await storageSet("tbaApiKey", String(args.apiKey)); break;
     case "tba_has_api_key": result = Boolean((await storageGet("tbaApiKey")) || __TBA_API_KEY__); break;
     case "tba_events": result = await tbaRequest<TbaEvent[]>(`/events/${args.year}`); break;

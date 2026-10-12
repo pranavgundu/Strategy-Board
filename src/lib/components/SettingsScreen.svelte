@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Component } from "svelte";
+  import CurrentEventSection from "./settings/CurrentEventSection.svelte";
   import TeamColorsSection from "./settings/TeamColorsSection.svelte";
 
   interface SettingsSection {
@@ -13,6 +14,7 @@
 
   const sections: SettingsSection[] = [
     { id: "team-colors", title: "Team Colors", description: "Recolor a team on this device when its scouting app color is hard to see or clashes.", component: TeamColorsSection },
+    { id: "current-event", title: "Current Event", description: "Schedule Sync adds every match with 1690 at this event, with each team in its schedule Station.", component: CurrentEventSection },
   ];
 
   let body = $state<HTMLDivElement>();

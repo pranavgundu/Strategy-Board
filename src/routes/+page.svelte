@@ -6,9 +6,10 @@
   import "../app.css";
   import { app } from "$lib/stores/app.svelte";
   import { boardConfig } from "$lib/stores/config.svelte";
+  import { scheduleSync } from "$lib/stores/sync.svelte";
   import { toast } from "$lib/stores/toast.svelte";
   import { native } from "$lib/native/api";
-  import { buildCommit, isNativeRuntime, loadTeamNumber, safeFilename, saveTeamNumber, shareBoardFile, timeAgo } from "$lib/features";
+  import { buildCommit, isNativeRuntime, safeFilename, shareBoardFile, timeAgo } from "$lib/features";
   import { BoardFileError, encodeMatchFile, readBoardFile, toWhatIfMatch } from "$lib/domain";
   import { registerServiceWorker, requestPersistentStorage } from "$lib/features/offline";
   import AppLoading from "$lib/components/AppLoading.svelte";
@@ -21,7 +22,6 @@
   import QrImportModal from "$lib/components/QrImportModal.svelte";
   import SettingsScreen from "$lib/components/SettingsScreen.svelte";
   import TbaImportModal from "$lib/components/TbaImportModal.svelte";
-  import TeamNumberModal from "$lib/components/TeamNumberModal.svelte";
   import WhiteboardScreen from "$lib/components/WhiteboardScreen.svelte";
   import type { Match, MatchFormValues } from "$lib/components/types";
   import type { MatchPacket, StrategyMatch } from "$lib/native/types";
@@ -31,7 +31,6 @@
   let tbaOpen = $state(false);
   let qrImportOpen = $state(false);
   let settingsOpen = $state(false);
-  let teamOpen = $state(false);
   let editing = $state<Match | null>(null);
   let qrMatch = $state<Match | null>(null);
   let fileInput = $state<HTMLInputElement>();
@@ -49,7 +48,6 @@
   const matches = $derived(app.matches.map(asMatch));
 
   onMount(() => {
-    let active = true;
     registerServiceWorker();
     requestPersistentStorage();
     const openExternal = (event: MouseEvent) => {
@@ -61,13 +59,9 @@
     };
     window.addEventListener("click", openExternal);
     void boardConfig.init();
-    void (async () => {
-      await app.init();
-      const teamNumber = await loadTeamNumber().catch(() => null);
-      if (!active) return;
-      teamOpen = teamNumber === null;
-    })().catch(() => notice("Some startup services could not be loaded."));
-    return () => { active = false; window.removeEventListener("click", openExternal); };
+    void scheduleSync.init();
+    void app.init();
+    return () => window.removeEventListener("click", openExternal);
   });
 
   function notice(message: string) {
@@ -154,11 +148,6 @@
     await app.importPackets([toWhatIfMatch(packet)]);
   }
 
-  async function saveTeam(team: string) {
-    const normalized = await saveTeamNumber(team);
-    teamOpen = false;
-    notice(`Team ${normalized} saved.`);
-  }
 </script>
 
 <svelte:head><title>Orbit Strategy Board</title><meta name="description" content="Orbit 1690's match strategy whiteboard for FRC" /></svelte:head>
@@ -201,7 +190,6 @@
 <QrImportModal open={qrImportOpen} onImport={importQr} onNotice={notice} onClose={() => qrImportOpen = false} />
 <QrExportModal open={qrMatch !== null} packet={qrMatch ? app.matches.find((match) => match.id === qrMatch?.id)?.packet ?? null : null} matchName={qrMatch?.matchName || "this match"} onNotice={notice} onClose={() => qrMatch = null} />
 <input bind:this={fileInput} id="home-import-file-input" type="file" accept=".txt,.json,text/plain,application/json" class="hidden" onchange={importFile} />
-<TeamNumberModal open={teamOpen} onSave={saveTeam} />
 {#if latestToast}<button class="toast" class:toast-error={latestToast.kind === "error"} onclick={() => toast.dismiss(latestToast.id)} aria-live="polite">{latestToast.text}</button>{/if}
 
 <style>

@@ -2,5 +2,8 @@ export * from "./board-config";
 export * from "./extras";
 export * from "./field-layout";
 export * from "./files";
+export * from "./packets";
+export * from "./schedule";
 export * from "./stations";
+export * from "./sync";
 export * from "./team-colors";
