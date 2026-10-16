@@ -3,7 +3,7 @@
   <meta name="description" content="Privacy policy for Strategy Board." />
 </svelte:head>
 
-<main class="min-h-screen bg-slate-950 px-5 py-10 text-slate-100 sm:px-8">
+<main class="h-full overflow-y-auto bg-slate-950 px-5 py-10 text-slate-100 sm:px-8" style="padding-top: max(2.5rem, env(safe-area-inset-top)); padding-bottom: max(2.5rem, env(safe-area-inset-bottom));">
   <article class="mx-auto max-w-3xl space-y-7 leading-7">
     <a href="/" class="text-sm text-sky-400 hover:text-sky-300">← Strategy Board</a>
     <header class="space-y-2">

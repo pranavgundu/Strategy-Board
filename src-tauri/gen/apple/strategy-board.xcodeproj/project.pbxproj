@@ -16,6 +16,7 @@
 		61CE2B23C252D51BFCDBB688 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D8C43BCD5AC85DCD26B1296 /* Metal.framework */; };
 		79478E5584B88D64E5175F91 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 311001AAFCD3CC700D2F46FE /* CoreGraphics.framework */; };
 		9093D58A64EA10A771877E2F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 67CCEA604BA4452784CB5717 /* LaunchScreen.storyboard */; };
+		A1B2C3D4E5F60718293A4B5C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60718293A4B5D /* PrivacyInfo.xcprivacy */; };
 		DAD4F272D2BEFBABF900105D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50E769F80F98C248120557CE /* Assets.xcassets */; };
 		DF279A9708BA8C4A2955984A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D92FD17F8EF1FEEFB2AFB8CC /* Security.framework */; };
 		ECC3C8A4E812A13AFF72E2EB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE9EB28837BF8AD2DC7141B6 /* QuartzCore.framework */; };
@@ -43,6 +44,7 @@
 		7FB08958C955D3FBD37D034F /* board.rs */ = {isa = PBXFileReference; path = board.rs; sourceTree = "<group>"; };
 		806D183505A97E5BC3483DDD /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		84EA98966D7FC3B0C785E1EA /* pdf.rs */ = {isa = PBXFileReference; path = pdf.rs; sourceTree = "<group>"; };
+		B1C2D3E4F5A60718293A4B5D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		877D63FF63470CB9B1F15018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		94CE8A25583CE08AA65AAF5E /* lib.rs */ = {isa = PBXFileReference; path = lib.rs; sourceTree = "<group>"; };
 		95CDE6085FA7486E8A343984 /* storage.rs */ = {isa = PBXFileReference; path = storage.rs; sourceTree = "<group>"; };
@@ -149,6 +151,7 @@
 			children = (
 				877D63FF63470CB9B1F15018 /* Info.plist */,
 				E7B158E6974B836F3F50FCD4 /* strategy-board_iOS.entitlements */,
+				B1C2D3E4F5A60718293A4B5D /* PrivacyInfo.xcprivacy */,
 			);
 			path = "strategy-board_iOS";
 			sourceTree = "<group>";
@@ -251,6 +254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAD4F272D2BEFBABF900105D /* Assets.xcassets in Resources */,
+				A1B2C3D4E5F60718293A4B5C /* PrivacyInfo.xcprivacy in Resources */,
 				9093D58A64EA10A771877E2F /* LaunchScreen.storyboard in Resources */,
 				34E2BF556A51839658FD206F /* assets in Resources */,
 			);

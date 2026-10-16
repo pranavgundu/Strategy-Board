@@ -2,7 +2,7 @@
 
 Apple requires this recording to be made on a physical iPhone or iPad running the latest operating system. A Simulator recording is not acceptable.
 
-1. Install build 26.6.1 (public version 26.6.0) from TestFlight on the physical device.
+1. Install build 26.6.2 (public version 26.6.0) from TestFlight on the physical device.
 2. Turn on Do Not Disturb and use landscape orientation.
 3. Start the built-in screen recorder in Control Center.
 4. Launch Strategy Board from the Home Screen so the recording includes app launch.

@@ -2,7 +2,7 @@ name: strategy-board
 options:
   bundleIdPrefix: app.strategyboard
   deploymentTarget:
-    iOS: 14.0
+    iOS: 15.0
 fileGroups: [../../src]
 configs:
   debug: debug
@@ -52,7 +52,7 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         CFBundleShortVersionString: 26.6.0
-        CFBundleVersion: "26.6.1"
+        CFBundleVersion: "26.6.2"
         ITSAppUsesNonExemptEncryption: false
     entitlements:
       path: strategy-board_iOS/strategy-board_iOS.entitlements

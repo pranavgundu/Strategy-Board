@@ -40,7 +40,7 @@
     ],
     "iOS": {
       "minimumSystemVersion": "15.0",
-      "bundleVersion": "26.6.1"
+      "bundleVersion": "26.6.2"
     }
   }
 }

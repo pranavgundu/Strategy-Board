@@ -19,7 +19,7 @@ impl std::fmt::Display for ExternalUrlError {
             ),
             Self::UnsupportedScheme => write!(
                 formatter,
-                "only http and https URLs may be opened externally"
+                "only http, https, and mailto URLs may be opened externally"
             ),
             Self::MissingAuthority => write!(formatter, "external URL has no host"),
             Self::InvalidAuthority => write!(formatter, "external URL host is malformed"),
@@ -41,6 +41,31 @@ pub fn validate_external_url(url: &str) -> Result<&str, ExternalUrlError> {
         .any(|character| character.is_whitespace() || character.is_control())
     {
         return Err(ExternalUrlError::ContainsWhitespaceOrControl);
+    }
+    if let Some(address) = url
+        .get(..7)
+        .filter(|scheme| scheme.eq_ignore_ascii_case("mailto:"))
+        .map(|_| &url[7..])
+    {
+        // Only a bare `local@domain` support address; no headers or bodies.
+        let (local, domain) = address
+            .split_once('@')
+            .ok_or(ExternalUrlError::InvalidAuthority)?;
+        let valid = !local.is_empty()
+            && !domain.is_empty()
+            && !domain.starts_with('.')
+            && !domain.ends_with('.')
+            && local.bytes().all(|byte| {
+                byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'-' | b'_' | b'+')
+            })
+            && domain
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'-'));
+        return if valid {
+            Ok(url)
+        } else {
+            Err(ExternalUrlError::InvalidAuthority)
+        };
     }
     let Some((scheme, after_scheme)) = url.split_once("://") else {
         return Err(ExternalUrlError::UnsupportedScheme);
@@ -112,6 +137,7 @@ mod tests {
             "HTTP://localhost:1420/path?mode=dev#section"
         ));
         assert!(is_safe_external_url("https://[::1]:1420/"));
+        assert!(is_safe_external_url("mailto:pranav@strategyboard.app"));
     }
 
     #[test]
@@ -123,6 +149,10 @@ mod tests {
             "tauri://open",
             "https:javascript:alert(1)",
             "ftp://example.com",
+            "mailto:",
+            "mailto:nobody",
+            "mailto:a@b.com?subject=hi",
+            "mailto:a@b.com,c@d.com",
         ] {
             assert!(!is_safe_external_url(value), "{value} should be rejected");
         }

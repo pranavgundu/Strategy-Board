@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import "../app.css";
   import { app } from "$lib/stores/app.svelte";
   import { native } from "$lib/native/api";
   import { buildCommit, dismissRelease, isNativeRuntime, isReleaseDismissed, loadTeamNumber, parseShareCode, removeShareCodeFromUrl, saveTeamNumber, timeAgo } from "$lib/features";
@@ -51,7 +50,7 @@
     let active = true;
     const openExternal = (event: MouseEvent) => {
       if (!isNativeRuntime() || event.defaultPrevented || event.button !== 0) return;
-      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[target="_blank"]') : null;
+      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[target="_blank"], a[href^="mailto:"]') : null;
       if (!anchor) return;
       event.preventDefault();
       void native.platform.openUrl(anchor.href).catch(() => notice("Could not open that link."));
