@@ -18,6 +18,9 @@
   let teamNumber = $state("");
   let teamOpen = $state(false);
   let status = $state<{ message: string; isError: boolean } | null>(null);
+  let importing = $state(false);
+  let savingKey = $state(false);
+  let teamRequest = 0;
 
   const filteredEvents = $derived(
     events.filter((event) => `${event.name} ${event.location} ${event.key}`.toLowerCase().includes(eventSearch.trim().toLowerCase())),
@@ -44,18 +47,38 @@
     }
   }
 
+  async function saveApiKey() {
+    if (!apiKey.trim() || savingKey || importing) return;
+    savingKey = true;
+    try {
+      await native.tba.setApiKey(apiKey.trim());
+      hasApiKey = true;
+      apiKey = "";
+      await loadEvents();
+    } catch {
+      status = { message: "Could not save the API key.", isError: true };
+    } finally {
+      savingKey = false;
+    }
+  }
+
   async function selectEvent(event: TbaSimpleEvent) {
+    const request = ++teamRequest;
     eventKey = event.key;
     eventSearch = event.name;
     eventOpen = false;
     teams = [];
     teamSearch = "";
     teamNumber = "";
+    teamOpen = false;
     try {
-      teams = (await native.tba.teamsAtEvent(event.key)).sort((a, b) => parseInt(a) - parseInt(b));
+      const fetched = await native.tba.teamsAtEvent(event.key);
+      if (request !== teamRequest) return;
+      teams = fetched.sort((a, b) => parseInt(a) - parseInt(b));
       status = null;
       teamOpen = teams.length > 0;
     } catch {
+      if (request !== teamRequest) return;
       status = { message: "Failed to load teams for this event.", isError: true };
     }
   }
@@ -73,20 +96,26 @@
   }
 
   async function submit() {
+    if (importing || savingKey) return;
     if (!eventKey) {
       status = { message: "Select an event first.", isError: true };
       return;
     }
+    const selectedEvent = eventKey;
+    const selectedTeam = teamNumber;
+    importing = true;
     status = { message: "Importing matches...", isError: false };
     try {
       if (apiKey.trim()) {
         await native.tba.setApiKey(apiKey.trim());
         hasApiKey = true;
       }
-      await onImport(eventKey, teamNumber);
+      await onImport(selectedEvent, selectedTeam);
       status = null;
     } catch {
       status = { message: "Could not import matches from The Blue Alliance.", isError: true };
+    } finally {
+      importing = false;
     }
   }
 </script>
@@ -114,6 +143,11 @@
         spellcheck="false"
         bind:value={apiKey}
       />
+      <button
+        class="w-full mt-2 p-2 text-sm btn-secondary disabled:opacity-40"
+        disabled={!apiKey.trim() || savingKey || importing}
+        onclick={() => void saveApiKey()}
+      >{savingKey ? "Saving key..." : "Save key and reload events"}</button>
       <div class="text-xs text-[#999] text-center mt-2">
         {hasApiKey ? "Using your saved API key." : "Using shared API key."} Add your own at
         <a href="https://www.thebluealliance.com/account" target="_blank" rel="noreferrer" class="text-[#60a5fa] underline">thebluealliance.com/account</a>
@@ -197,9 +231,10 @@
     <button
       id="tba-import-btn"
       class="w-1/2 text-center text-sm btn-secondary p-4 border-t border-[#1e1e1e] rounded-none rounded-bl-[6px]"
+      disabled={importing || savingKey}
       onclick={() => void submit()}
     >
-      Import
+      {importing ? "Importing..." : "Import"}
     </button>
     <button
       id="tba-cancel-btn"

@@ -43,6 +43,22 @@ describe("whiteboard packet codec", () => {
     expect((((written[8] as unknown[])[5] as unknown[])[8] as unknown[])[0]).toEqual([25, 30, 1, false]);
   });
 
+  it("keeps committed packets isolated from later canvas edits in both directions", () => {
+    const source = packet();
+    const match = whiteboardMatchFromPacket(source);
+    const written = writeWhiteboardPacket(source, match);
+    const snapshot = structuredClone(written);
+
+    match.auto.drawing[0][1][0] = 999;
+    match.notes.checkboxes[0][3] = false;
+    match.auto.drawingBBox.length = 0;
+    expect(written).toEqual(snapshot);
+
+    const decoded = whiteboardMatchFromPacket(written);
+    decoded.auto.drawing[0][1][0] = 888;
+    expect(written).toEqual(snapshot);
+  });
+
   it("repairs omitted legacy bounding boxes from the stroke geometry", () => {
     const source = packet();
     ((source[8] as unknown[])[1] as unknown[])[7] = [];

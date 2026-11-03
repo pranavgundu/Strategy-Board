@@ -51,7 +51,7 @@ export function whiteboardMatchFromPacket(packet: WhiteboardPacket): WhiteboardM
 
 function packetPhase(phase: WhiteboardPhase): unknown[] {
   const robots = robotKeys.map((key) => { const robot = phase[key]; return [robot.x, robot.y, Number(robot.r.toFixed(2))]; });
-  return [...robots, phase.drawing, phase.drawingBBox, phase.checkboxes];
+  return structuredClone([...robots, phase.drawing, phase.drawingBBox, phase.checkboxes]);
 }
 
 /**

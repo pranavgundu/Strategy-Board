@@ -198,6 +198,7 @@ export class QrScanSession {
   #callbacks: QrScanCallbacks | null = null;
   #stopped = false;
   #receiving = false;
+  #generation = 0;
 
   static async listCameras(requestLabels = true): Promise<CameraDevice[]> {
     const QrScanner = await loadQrScanner();
@@ -205,12 +206,16 @@ export class QrScanSession {
   }
 
   async start(video: HTMLVideoElement, callbacks: QrScanCallbacks, cameraId?: string): Promise<void> {
+    const generation = this.#generation + 1;
     await this.dispose();
+    if (generation !== this.#generation) return;
     this.#video = video;
     this.#callbacks = callbacks;
     this.#stopped = false;
     await native.qr.reset();
+    if (generation !== this.#generation) return;
     const QrScanner = await loadQrScanner();
+    if (generation !== this.#generation) return;
     const scanner = new QrScanner(video, (result) => { void this.#receive(result.data); }, {
       preferredCamera: cameraId ?? "environment",
       maxScansPerSecond: 8,
@@ -225,7 +230,9 @@ export class QrScanSession {
     this.#scanner = scanner;
     try {
       await scanner.start();
+      if (generation !== this.#generation) scanner.destroy();
     } catch (error) {
+      if (generation !== this.#generation) return;
       await this.dispose();
       throw error;
     }
@@ -237,6 +244,7 @@ export class QrScanSession {
   }
 
   async dispose(): Promise<void> {
+    this.#generation += 1;
     this.#stopped = true;
     this.#scanner?.destroy();
     this.#scanner = null;
@@ -251,8 +259,10 @@ export class QrScanSession {
     if (this.#stopped || this.#receiving || !this.#callbacks) return;
     this.#receiving = true;
     const callbacks = this.#callbacks;
+    const generation = this.#generation;
     try {
       const progress = await native.qr.receive(frame);
+      if (generation !== this.#generation) return;
       if (progress.status === "complete") {
         // Stop accepting frames before the importer awaits persistence. This
         // prevents a fast camera from completing the same repeating stream twice.
@@ -262,13 +272,13 @@ export class QrScanSession {
         try {
           await callbacks.onProgress(progress);
         } finally {
-          await this.dispose();
+          if (generation === this.#generation) await this.dispose();
         }
       } else {
         await callbacks.onProgress(progress);
       }
     } catch (error) {
-      callbacks.onError?.(error instanceof Error ? error : new Error(String(error)));
+      if (generation === this.#generation) callbacks.onError?.(error instanceof Error ? error : new Error(String(error)));
     } finally {
       this.#receiving = false;
     }

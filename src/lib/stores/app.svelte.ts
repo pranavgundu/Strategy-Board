@@ -7,7 +7,9 @@ import { toast } from "./toast.svelte";
 export type Screen = "home" | "whiteboard";
 
 let screen = $state<Screen>("home");
-let packets = $state<MatchPacket[]>([]);
+// Packets are immutable snapshots, not deep reactive proxies: cloning and
+// IndexedDB/IPC serialization must always receive plain structured data.
+let packets = $state.raw<MatchPacket[]>([]);
 let activeMatchId = $state<string | null>(null);
 let loading = $state(true);
 let saving = $state(false);
@@ -183,9 +185,10 @@ export const app = {
 
   /** Persist one fully composed packet atomically after a form or canvas edit. */
   async commitPacket(packet: MatchPacket): Promise<void> {
+    const snapshot = structuredClone(packet);
     await queueWrite(async () => {
-      await native.model.replacePacket(packet);
-      replaceInMemory(packet);
+      await native.model.replacePacket(snapshot);
+      replaceInMemory(snapshot);
     });
   },
 

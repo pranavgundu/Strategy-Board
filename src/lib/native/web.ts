@@ -150,8 +150,7 @@ export function normalizeBrowserMatchPacket(value: unknown): MatchPacket {
   return normalized;
 }
 
-async function loadPackets(): Promise<MatchPacket[]> {
-  const value = await storageGet(APP_DATA_KEY);
+function packetsFromStorage(value: JsonValue | null): MatchPacket[] {
   if (!Array.isArray(value)) return [];
   const results = value.map((packet) => {
     try { return normalizeBrowserMatchPacket(packet); } catch { return null; }
@@ -159,15 +158,42 @@ async function loadPackets(): Promise<MatchPacket[]> {
   return results.filter((packet): packet is MatchPacket => packet !== null);
 }
 
+async function loadPackets(): Promise<MatchPacket[]> {
+  return packetsFromStorage(await storageGet(APP_DATA_KEY));
+}
+
+// Keep the read and write in one IndexedDB transaction. Separate transactions
+// lose updates when commands overlap, including writes from another tab.
+async function mutatePackets(update: (packets: MatchPacket[]) => MatchPacket[]): Promise<void> {
+  const db = await database();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(APP_DATA_KEY);
+    let failure: unknown;
+    request.onsuccess = () => {
+      try {
+        store.put(update(packetsFromStorage(request.result ?? null)), APP_DATA_KEY);
+      } catch (error) {
+        failure = error;
+        transaction.abort();
+      }
+    };
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = transaction.onabort = () => reject(failure ?? transaction.error ?? new Error("Could not update saved matches"));
+  });
+}
+
 async function addPackets(values: MatchPacket[]): Promise<string[]> {
   const additions = values.map(normalizeBrowserMatchPacket);
-  const packets = await loadPackets();
-  const ids = new Set(packets.map((packet) => packet[7]));
-  for (const packet of additions) {
-    if (ids.has(packet[7])) throw new Error(`A match with id ${packet[7]} already exists`);
-    ids.add(packet[7]);
-  }
-  await storageSet(APP_DATA_KEY, [...packets, ...additions] as JsonValue);
+  await mutatePackets((packets) => {
+    const ids = new Set(packets.map((packet) => packet[7]));
+    for (const packet of additions) {
+      if (ids.has(packet[7])) throw new Error(`A match with id ${packet[7]} already exists`);
+      ids.add(packet[7]);
+    }
+    return [...packets, ...additions];
+  });
   return additions.map((packet) => packet[7]);
 }
 
@@ -370,13 +396,16 @@ export async function browserInvoke<TResult>(command: string, args: Record<strin
     case "model_add_packets": result = await addPackets(args.packets as MatchPacket[]); break;
     case "model_replace_packet": {
       const packet = normalizeBrowserMatchPacket(args.packet);
-      const packets = await loadPackets();
-      const index = packets.findIndex((candidate) => candidate[7] === packet[7]);
-      if (index < 0) throw new Error(`Match ${packet[7]} does not exist`);
-      packets[index] = packet; await storageSet(APP_DATA_KEY, packets as JsonValue); result = packet[7]; break;
+      await mutatePackets((packets) => {
+        const index = packets.findIndex((candidate) => candidate[7] === packet[7]);
+        if (index < 0) throw new Error(`Match ${packet[7]} does not exist`);
+        packets[index] = packet;
+        return packets;
+      });
+      result = packet[7]; break;
     }
-    case "model_delete_match": await storageSet(APP_DATA_KEY, (await loadPackets()).filter((packet) => packet[7] !== args.id) as JsonValue); break;
-    case "model_clear_matches": await storageSet(APP_DATA_KEY, []); break;
+    case "model_delete_match": await mutatePackets((packets) => packets.filter((packet) => packet[7] !== args.id)); break;
+    case "model_clear_matches": await mutatePackets(() => []); break;
     case "match_create_packet": result = createBrowserMatchPacket({ matchName: args.matchName, redTeams: args.redTeams, blueTeams: args.blueTeams, tbaEventKey: args.tbaEventKey, tbaMatchKey: args.tbaMatchKey, tbaYear: args.tbaYear } as CreateMatchInput); break;
     case "match_normalize_packet": result = normalizeBrowserMatchPacket(args.packet); break;
     case "cloud_upload": result = await cloudUpload(args.packet as MatchPacket); break;

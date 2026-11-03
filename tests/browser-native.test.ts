@@ -33,6 +33,38 @@ describe("browser native fallback", () => {
     expect(await browserInvoke<unknown[]>("model_load_packets")).toHaveLength(1);
   });
 
+  it("does not lose matches when browser writes overlap", async () => {
+    await browserInvoke("model_clear_matches");
+    const make = (id: string) => createBrowserMatchPacket({ matchName: id, redTeams: ["1", "2", "3"], blueTeams: ["4", "5", "6"] }, id);
+    await Promise.all(["a", "b", "c"].map((id) => browserInvoke("model_add_packet", { packet: make(id) })));
+    const packets = await browserInvoke<ReturnType<typeof make>[]>("model_load_packets");
+    expect(packets.map((packet) => packet[7])).toEqual(["a", "b", "c"]);
+
+    const replacement = make("b");
+    replacement[0] = "updated";
+    await Promise.all([
+      browserInvoke("model_delete_match", { id: "a" }),
+      browserInvoke("model_replace_packet", { packet: replacement }),
+      browserInvoke("model_add_packet", { packet: make("d") }),
+    ]);
+    const remaining = await browserInvoke<ReturnType<typeof make>[]>("model_load_packets");
+    expect(remaining.map((packet) => packet[7])).toEqual(["b", "c", "d"]);
+    expect(remaining[0][0]).toBe("updated");
+  });
+
+  it("rejects duplicate concurrent inserts without changing saved data", async () => {
+    await browserInvoke("model_clear_matches");
+    const packet = createBrowserMatchPacket({ matchName: "duplicate", redTeams: ["1", "2", "3"], blueTeams: ["4", "5", "6"] }, "duplicate");
+    const results = await Promise.allSettled([
+      browserInvoke("model_add_packet", { packet }),
+      browserInvoke("model_add_packet", { packet }),
+    ]);
+    expect(results.map((result) => result.status)).toEqual(["fulfilled", "rejected"]);
+    expect(await browserInvoke<unknown[]>("model_load_packets")).toHaveLength(1);
+    await expect(browserInvoke("model_replace_packet", { packet: { ...packet } })).rejects.toThrow();
+    expect(await browserInvoke<unknown[]>("model_load_packets")).toHaveLength(1);
+  });
+
   it("repairs portable shared packets without losing board data or dimensions", () => {
     const source = createBrowserMatchPacket({
       matchName: "Shared match",

@@ -28,6 +28,9 @@
 
   let loadedMatchId = "";
   let commitQueue: Promise<void> = Promise.resolve();
+  let saveFailed = false;
+  let commitVersion = 0;
+  let exiting = $state(false);
   let handledPngRequest = 0;
 
   const swatches = [
@@ -47,10 +50,25 @@
   );
 
   function queueCommit(match: WhiteboardMatch) {
-    const source = app.activeMatch;
-    if (!source || source.id !== match.id) return;
-    const packet = writeWhiteboardPacket(source.packet, match);
-    commitQueue = commitQueue.then(() => app.commitPacket(packet)).catch(() => onNotice("Could not save the latest whiteboard change."));
+    // Unmount can finish a gesture after closeMatch has cleared activeMatch.
+    const source = app.matches.find((candidate) => candidate.id === match.id);
+    if (!source) return;
+    const version = ++commitVersion;
+    try {
+      const packet = writeWhiteboardPacket(source.packet, match);
+      commitQueue = commitQueue.then(async () => {
+        await app.commitPacket(packet);
+        if (version === commitVersion) saveFailed = false;
+      }).catch(reportSaveError);
+    } catch (error) {
+      reportSaveError(error);
+    }
+  }
+
+  function reportSaveError(error: unknown) {
+    saveFailed = true;
+    console.error("Could not save whiteboard changes", error);
+    onNotice("Could not save the latest whiteboard change. Please try again before exiting.");
   }
 
   $effect(() => {
@@ -108,7 +126,23 @@
     window.setTimeout(() => { paletteClosing = false; paletteOpen = false; }, 300);
   }
 
-  function exit() { app.closeMatch(); }
+  async function exit() {
+    if (exiting) return;
+    exiting = true;
+    try {
+      controller?.flushPendingGesture();
+      // Do not reopen the match from an old snapshot while IndexedDB is still
+      // saving. Include any gestures completed while the previous write waits.
+      let pending: Promise<void>;
+      do {
+        pending = commitQueue;
+        await pending;
+      } while (pending !== commitQueue);
+      if (!saveFailed) app.closeMatch();
+    } finally {
+      exiting = false;
+    }
+  }
 
   async function exportPng() {
     const data = controller?.exportPng();
@@ -135,8 +169,9 @@
           id="whiteboard-toolbar-back"
           class="text-base md:text-xl font-semibold select-none touch-none btn-secondary px-6 py-3 md:px-8 md:py-3"
           onclick={exit}
+          disabled={exiting}
         >
-          EXIT
+          {exiting ? "SAVING..." : "EXIT"}
         </button>
         <button
           id="whiteboard-toolbar-undo"

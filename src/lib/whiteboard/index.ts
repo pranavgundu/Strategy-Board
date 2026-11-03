@@ -62,7 +62,7 @@ export class WhiteboardController {
   private readonly options: Required<Pick<WhiteboardControllerOptions, "fieldImages">> & Omit<WhiteboardControllerOptions, "fieldImages">;
 
   constructor(options: WhiteboardControllerOptions = {}) {
-    this.options = { fieldImages: { 2025: field2025, 2026: field2026, ...options.fieldImages }, ...options };
+    this.options = { ...options, fieldImages: { 2025: field2025, 2026: field2026, ...options.fieldImages } };
     preloadFieldImages(this.options.fieldImages);
   }
 
@@ -95,6 +95,7 @@ export class WhiteboardController {
   }
 
   destroy(): void {
+    this.finishPointer();
     this.abortController?.abort(); this.abortController = null;
     this.resizeObserver?.disconnect(); this.resizeObserver = null;
     this.refs = null; this.contexts = null; this.pointer = null; this.selected = null;
@@ -116,21 +117,24 @@ export class WhiteboardController {
   getState(): WhiteboardState { return { mode: this.mode, tool: this.tool, color: this.color, view: this.view, canUndo: this.canUndo(), canRedo: this.canRedo(), isCanvasVisible: this.mode !== "statbotics" }; }
   setMode(mode: WhiteboardMode): void {
     if (this.mode === mode) return;
-    this.mode = mode; this.selected = null; this.pointer = null;
+    this.finishPointer();
+    this.mode = mode; this.selected = null;
     if (mode !== "notes" && this.tool === "checkbox") this.tool = "marker";
     this.redrawAll(); this.emitState();
   }
-  setTool(tool: WhiteboardTool): void { if (tool === "checkbox" && this.mode !== "notes") tool = "marker"; if (this.tool !== tool) { this.tool = tool; this.emitState(); } }
+  setTool(tool: WhiteboardTool): void { this.finishPointer(); if (tool === "checkbox" && this.mode !== "notes") tool = "marker"; if (this.tool !== tool) { this.tool = tool; this.emitState(); } }
   toggleTool(): void { this.setTool(this.tool === "marker" ? "eraser" : this.tool === "eraser" ? (this.mode === "notes" ? "checkbox" : "marker") : "marker"); }
   setColor(color: number): void { const next = validColor(color); if (next !== this.color) { this.color = next; this.emitState(); } }
-  toggleView(): void { this.view = this.view === "full" ? "red" : this.view === "red" ? "blue" : "full"; this.camera = VIEWS[this.view]; this.redrawAll(); this.emitState(); }
+  toggleView(): void { this.finishPointer(); this.view = this.view === "full" ? "red" : this.view === "red" ? "blue" : "full"; this.camera = VIEWS[this.view]; this.redrawAll(); this.emitState(); }
+  /** Commit an active gesture before the UI waits for pending saves on exit. */
+  flushPendingGesture(): void { this.finishPointer(); }
   forceRedraw(): void { this.redrawAll(); }
   resetMode(): void { this.setMode("auto"); }
 
   canUndo(): boolean { const mode = this.dataMode(); return !!mode && (this.undoHistory.get(mode)?.length ?? 0) > 0; }
   canRedo(): boolean { const mode = this.dataMode(); return !!mode && (this.redoHistory.get(mode)?.length ?? 0) > 0; }
-  undo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.undoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "undo"); this.history(this.redoHistory, mode).push(action); this.redrawFor(action); this.commit("undo"); }
-  redo(): void { const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.redoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "redo"); this.history(this.undoHistory, mode).push(action); this.redrawFor(action); this.commit("redo"); }
+  undo(): void { this.finishPointer(); const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.undoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "undo"); this.history(this.redoHistory, mode).push(action); this.redrawFor(action); this.commit("undo"); }
+  redo(): void { this.finishPointer(); const mode = this.dataMode(); if (!mode || !this.match) return; const action = this.redoHistory.get(mode)?.pop(); if (!action) return; this.apply(action, "redo"); this.history(this.undoHistory, mode).push(action); this.redrawFor(action); this.commit("redo"); }
 
   /** Produces a complete field-sized PNG (background, robots, and annotations). */
   exportPng(type = "image/png", quality?: number): string | null {
@@ -142,12 +146,14 @@ export class WhiteboardController {
   }
 
   private readonly onKeyDown = (event: KeyboardEvent): void => {
+    const target = event.target;
+    if (target instanceof HTMLElement && (target.isContentEditable || target.closest("input, textarea, select"))) return;
     const modifier = event.metaKey || event.ctrlKey;
     if (!modifier || event.code !== "KeyZ") return;
     event.preventDefault(); if (event.shiftKey) this.redo(); else this.undo();
   };
   private readonly onPointerDown = (event: PointerEvent): void => {
-    if (!this.refs || !this.match || this.mode === "statbotics") return;
+    if (!this.refs || !this.match || this.mode === "statbotics" || this.pointer) return;
     if (event.pointerType === "pen" && event.button === 1) { this.toggleTool(); return; }
     if (event.button !== 0 && event.pointerType !== "touch") return;
     event.preventDefault();
@@ -176,9 +182,13 @@ export class WhiteboardController {
     } else if (this.tool === "eraser") { this.eraseSegment(pointer.last, point, pointer.erased); pointer.last = point; }
   };
   private readonly onPointerEnd = (event: PointerEvent): void => {
-    const pointer = this.pointer; if (!pointer || pointer.id !== event.pointerId) return;
-    try { this.refs?.drawing.releasePointerCapture(event.pointerId); } catch { /* browser may already have released it */ }
+    if (this.pointer?.id === event.pointerId) this.finishPointer();
+  };
+
+  private finishPointer(): void {
+    const pointer = this.pointer; if (!pointer) return;
     this.pointer = null;
+    try { this.refs?.drawing.releasePointerCapture(pointer.id); } catch { /* browser may already have released it */ }
     if (this.selected) {
       const { slot, robot, before } = this.selected; const after = this.pose(robot);
       // Keep the robot selected after a drag so its rotation handle remains
@@ -190,7 +200,7 @@ export class WhiteboardController {
     if (pointer.stroke) {
       const phase = this.phase(); if (phase) { phase.drawing.push(pointer.stroke); phase.drawingBBox.push(strokeBounds(pointer.stroke)); this.redrawDrawing(); this.record({ kind: "stroke", stroke: pointer.stroke }, "stroke"); }
     } else if (pointer.erased.strokes.length || pointer.erased.checkboxes.length) this.record(pointer.erased, "erase");
-  };
+  }
 
   private dataMode(): BoardPhaseName | null { return this.mode === "statbotics" ? null : this.mode; }
   private phase(): WhiteboardPhase | null { return this.match && this.dataMode() ? phaseFor(this.match, this.dataMode()!) : null; }
@@ -206,8 +216,8 @@ export class WhiteboardController {
       else { phase.drawing.push(action.stroke); phase.drawingBBox.push(strokeBounds(action.stroke)); }
     } else if (action.kind === "erase") {
       if (direction === "undo") {
-        for (const { index, stroke } of [...action.strokes].sort((a, b) => a.index - b.index)) { phase.drawing.splice(index, 0, stroke); phase.drawingBBox.splice(index, 0, strokeBounds(stroke)); }
-        for (const { index, checkbox } of [...action.checkboxes].sort((a, b) => a.index - b.index)) phase.checkboxes.splice(index, 0, checkbox);
+        for (const { index, stroke } of [...action.strokes].reverse()) { phase.drawing.splice(index, 0, stroke); phase.drawingBBox.splice(index, 0, strokeBounds(stroke)); }
+        for (const { index, checkbox } of [...action.checkboxes].reverse()) phase.checkboxes.splice(index, 0, checkbox);
       } else {
         for (const { stroke } of action.strokes) { const i = phase.drawing.indexOf(stroke); if (i >= 0) { phase.drawing.splice(i, 1); phase.drawingBBox.splice(i, 1); } }
         for (const { checkbox } of action.checkboxes) { const i = phase.checkboxes.indexOf(checkbox); if (i >= 0) phase.checkboxes.splice(i, 1); }

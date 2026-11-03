@@ -26,10 +26,11 @@ service cloud.firestore {
     // (Firestore > TTL) for automatic deletion.
     match /matches/{code} {
 
-      // Reads are public but only for non-expired documents - defense in
-      // depth against a stale client missing the expiry check.
-      allow read: if resource.data.expiresAt is number
-                  && resource.data.expiresAt > request.time.toMillis();
+      // Only direct lookups by share code are public. Do not allow collection
+      // queries to enumerate other users' unexpired shared matches.
+      allow get: if resource.data.expiresAt is number
+                 && resource.data.expiresAt > request.time.toMillis();
+      allow list: if false;
 
       // Anyone can create a new share doc, but the payload must match the
       // expected schema. `create` only matches when no doc exists at this
